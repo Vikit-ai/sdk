@@ -1,0 +1,193 @@
+import argparse
+import os
+import random
+import string
+
+from urllib3 import disable_warnings
+disable_warnings(InsecureRequestWarning)
+
+from loguru import logger
+
+import vikit.gateways.mail_gateway as mail_gateway
+import vikit.gateways.discord_gateway as discord_gateway
+from vikit.gateways.cloud_storage import upload_to_GCS_cloud_bucket
+from vikit.video.video import Video
+from vikit.video_building import VideoMixer
+from vikit.video_keywords_raw_enhanced_prompt import VideosAggregate_KeywordAndRawPrompt
+from transition import Transition
+from prompt_factory import PromptFactory
+from vikit.musicimport generate_background_music
+from context_managers import WorkingFolderContext
+
+REINIT_PREVIOUS_WORDS_EVERY_X_STEPS = 10
+
+
+def parse_args():
+    """
+    Parse the command line arguments
+
+     - a text prompt
+     - The path of the mp3 file to convert
+     - The email to which send the video
+     - Do we send the video to dream channel on Discord
+     - The desired width of the video (default 540)
+     - The desired heigth of the video (default 960)
+     - time Between Two Images in seconds
+     - Do we want a background ?
+
+    """
+
+    parser = argparse.ArgumentParser(
+        description="Generate text prompt or sound recording based video."
+    )
+
+    parser.add_argument(
+        "-text",
+        type=str,
+        help="Text prompt",
+    )
+    parser.add_argument(
+        "-mp3_path",
+        type=str,
+        help="prompt sound recording file path",
+    )
+    parser.add_argument(
+        "-discord",
+        type=str,
+        help="Publish video to discord",
+    )
+    parser.add_argument(
+        "-requestor_email",
+        type=str,
+        help="sound recording file path",
+    )
+
+    parser.add_argument(
+        "-width_video",
+        type=str,
+        help="Video Width",
+    )
+
+    parser.add_argument(
+        "-height_video",
+        type=str,
+        help="Video Height",
+    )
+
+    args = parser.parse_args()
+
+    if args.mp3_path:
+        mp3_file_path = args.mp3_path
+        logger.debug(f"mp3_file_path: {mp3_file_path}")
+    else:
+        mp3_file_path = None
+
+    if args.text:
+        text_prompt = args.text
+        logger.debug(f"text_prompt: {text_prompt}")
+    else:
+        text_prompt = None
+
+    if args.requestor_email:
+        emailToSend = args.requestor_email
+        logger.debug(f"requestor_email: {emailToSend}")
+    else:
+        emailToSend = None
+
+    if args.discord:
+        discordUserId = args.discord
+        logger.debug(f"discordUserId: {discordUserId}")
+    else:
+        discordUserId = None
+
+    if args.width_video and args.height_video:
+        width_video = args.width_video
+        height_video = args.height_video
+    else:
+        width_video = 540
+        height_video = 960
+    logger.debug(f"width_video: {width_video}")
+    logger.debug(f"height_video: {height_video}")
+
+    return (
+        mp3_file_path,
+        text_prompt,
+        discordUserId,
+        emailToSend,
+        width_video,
+        height_video,
+    )
+
+
+if __name__ == "__main__":
+    """
+    Generate an original video from a text prompt or a sound file based prompt (e.g: a podcast)
+    """
+    # Parse commande line argument and gather variables from it
+    (
+        mp3_file_path,
+        text_prompt,
+        discordUserId,
+        emailToSend,
+        width_video,
+        height_video,
+    ) = parse_args()
+
+    # Today we cannot handle both text prompt and audio file
+    if (text_prompt is not None) and (mp3_file_path is not None):
+        raise ValueError(
+            "You cannot have both a text prompt and an audiofile to process"
+        )
+    if text_prompt is None:
+        user_prompt = PromptFactory().create_prompt_from_audio_file(recorded_audio_prompt_path=mp3_file_path)
+    else:
+        user_prompt = PromptFactory().create_prompt_from_text(prompt_text=text_prompt)
+
+    with WorkingFolderContext():  # we work in the temp folder once for all the script
+        subtitles = user_prompt.get_subtitles()
+        previous_words = ""
+        video_mixer = VideoMixer()
+        video_from_last_iteration: Video = None
+        index = 0
+
+        for subtitle in subtitles:
+            """
+            for each subtitle:
+                - we generate a video which is the aggregation of smaller video, see how its done on KeywordAndRawPromptVideosAggregate
+                - we generate a transition (which is video too) between the current video aggregate and the previous one
+                - Generate a music background from the prompt
+                - Genrate the final video, adding the music background
+                - Upload the final video to the cloud
+            ...end we send it to the world via email or discord channel :)
+            """
+            subtitle_video = VideosAggregate_KeywordAndRawPrompt(subtitle=subtitle,
+                                                                 previous_words=previous_words,
+                                                                 width=width_video,
+                                                                 height=height_video)
+            
+            # TODO: The line below should be in the VideosAggregate_KeywordAndRawPrompt class somehow
+            previous_words = "" if (index % REINIT_PREVIOUS_WORDS_EVERY_X_STEPS == 0) else " ".join(previous_words, subtitle_video.previous_words)
+
+            if subtitle != subtitles[0]:  # If it is not the first subtitle, we need to add a transition from the previous video
+                transition_from_previous_video = Transition(source_video=video_from_last_iteration, target_video=subtitle_video)
+                video_mixer.append_video(transition_from_previous_video)
+            else:
+                video_mixer.append_video(subtitle_video)  # Append the subtitle video to the video mixer
+                video_from_last_iteration = subtitle_video
+
+            index += 1
+
+        # Now let's genrate the final video, starting by adding background music
+        background_audio_file = generate_background_music(duration=video_mixer.get_duration(),
+                                                          prompt=user_prompt.text_prompt)
+        video_mixer.set_background_music(background_audio_file)
+        final_video_with_background_music = video_mixer.mix()
+
+    # Store the final video in the cloud
+    final_GCS_file_path = upload_to_GCS_cloud_bucket(final_video_with_background_music.source_file_path)
+
+    # Now proudly send our work to the world :)
+    if emailToSend:
+        mail_gateway.send_email(emailToSend, final_GCS_file_path)
+    if discordUserId:
+        discord_gateway.post_message(final_GCS_file_path)

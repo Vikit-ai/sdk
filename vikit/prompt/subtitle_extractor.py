@@ -1,0 +1,73 @@
+from loguru import logger
+
+from vikit.common.decorators import log_function_params
+import vikit.common.config as config
+
+
+class SubtitleExtractor:
+    """
+    A class to extract subtitles from a sound recording,
+    merge short subtitles into longer ones, or extract them as text tokens
+    """
+
+    @log_function_params
+    def merge_short_subtitles(self, subtitles, min_duration=7):
+        """
+        Merge subtitles which total duration is less than 7 seconds
+        """
+        subs = subtitles
+        assert len(subs) > 0, "No Subtitles to process from the provided recording file"
+        logger.debug(f"Subs to merge {len(subs)}")
+
+        # We  make sure that all subtitles are minimum of 7 seconds in order to be able to insert two videos inside
+        index = 0
+        while index < len(subs) - 1:
+            secondsForSubtitle = (
+                subs[index].start.hours * 60 + subs[index].start.minutes
+            ) * 60 + subs[index].start.seconds
+            secondsForNextSubtitle = (
+                subs[index + 1].start.hours * 60 + subs[index + 1].start.minutes
+            ) * 60 + subs[index + 1].start.seconds
+            interspace = secondsForNextSubtitle - secondsForSubtitle
+
+            if interspace < min_duration:
+                # We need to merge the subtitles
+                subs[index + 1].text = subs[index].text + " " + subs[index + 1].text
+                subs[index + 1].start = subs[index].start
+                del subs[index]
+            else:
+                index = index + 1
+
+        logger.debug(f"Subs after merge {len(subs)}")
+        return subs
+
+    @log_function_params
+    def build_subtitles_as_text_tokens(self, subtitles) -> list[str]:
+        """
+        Create blocks of subtitles
+
+        Args:
+            subtitles: The subtitles to process
+
+        returns:
+            list of text tokens corresponding to the subtitles in some sort
+            of human readeable format
+        """
+        texts = []
+        step = 0
+        text = ""
+
+        for sub in subtitles:
+            numberOfWords = len(sub.text.split(" "))
+            if numberOfWords > 2:
+                text = text + " " + sub.text
+                step += 1
+                if step % config.get_nb_subs_per_video() == 0:
+                    texts.append(text)
+                    text = ""
+
+        # add the remaining text
+        if text:
+            texts.append(text)
+
+        return texts

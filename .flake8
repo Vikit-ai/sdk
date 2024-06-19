@@ -1,0 +1,9 @@
+[flake8]
+ignore = E501, W291, W292, W293, W391
+count = True
+statistics = True
+max-line-length = 100
+max-complexity = 10
+exclude =
+    .oldpy,
+    __pycache__
