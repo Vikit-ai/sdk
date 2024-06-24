@@ -14,7 +14,7 @@ class GeneralBuildSettings:
     def __init__(
         self,
         delete_interim_files: bool = False,  # not implemented yet :)
-        run_async: bool = True,
+        run_async: bool = False,
         test_mode: bool = False,
     ):
         self.delete_interim_files = delete_interim_files  # Not deleting the intermediate video files, first and last frames TODO: to be implemented

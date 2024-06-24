@@ -54,6 +54,9 @@ coverage.xml
 # Django stuff:
 *.log
 
+# Log files for unit tests:
+log*.txt
+
 # Sphinx documentation
 docs/_build/
 

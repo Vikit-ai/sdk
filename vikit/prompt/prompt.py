@@ -6,7 +6,7 @@ import pysrt
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.common.decorators import log_function_params
-import vikit.common.secret as secrets
+import vikit.common.secrets as secrets
 
 
 os.environ["REPLICATE_API_TOKEN"] = secrets.get_replicate_api_token()

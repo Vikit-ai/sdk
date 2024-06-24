@@ -6,7 +6,7 @@ from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
 import vikit.common.os_objects_naming_tools as osnamingtools
 from vikit.wrappers.ffmpeg_wrapper import merge_audio
-from vikit.music import MusicBuildingContext
+from vikit.music_building_context import MusicBuildingContext
 from vikit.video.composite_video_builder_strategy_factory import (
     CompositeVideoBuilderStrategyFactory,
 )

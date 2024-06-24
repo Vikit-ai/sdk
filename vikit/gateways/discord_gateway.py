@@ -1,7 +1,7 @@
 import requests
 from loguru import logger
 
-from vikit.common.secret import get_discord_api_key
+from vikit.common.secrets import get_discord_api_key
 
 
 def post_message(message, video_name):

@@ -2,7 +2,7 @@ import requests
 from loguru import logger
 
 from vikit.common.config import get_elevenLabs_url
-from vikit.common.secret import get_eleven_labs_api_key
+from vikit.common.secrets import get_eleven_labs_api_key
 
 
 def generate_mp3_from_text(text, target_file):

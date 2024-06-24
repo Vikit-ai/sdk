@@ -8,7 +8,7 @@ from vikit.video.composite_video import CompositeVideo
 from vikit.common.decorators import log_function_params
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.seine_transition import SeineTransition
-from vikit.music import MusicBuildingContext
+from vikit.music_building_context import MusicBuildingContext
 
 
 class PromptBasedVideo(Video):

@@ -13,7 +13,7 @@ from vikit.prompt.text_prompt import TextPrompt
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.video import VideoBuildSettings
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.music import MusicBuildingContext
+from vikit.music_building_context import MusicBuildingContext
 import tests.tests_tools as tools  # used to get a library of test prompts
 import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
 
@@ -25,11 +25,14 @@ class TestPromptBasedVideo(unittest.TestCase):
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
+        logger.add("log_test_prompt_based_video.txt", rotation="10 MB")
 
+    @pytest.mark.unit
     def test_no_prompt_text(self):
         with pytest.raises(ValueError):
             _ = PromptBasedVideo(TextPrompt(""))
 
+    @pytest.mark.unit
     def test_get_title(self):
         with WorkingFolderContext():
             video_title = PromptBasedVideo(
@@ -83,7 +86,7 @@ class TestPromptBasedVideo(unittest.TestCase):
             assert pbvid.media_url, "media URL was not updated"
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
-    @pytest.mark.local_integration
+    @pytest.mark.integration
     def test_build_single_video_with_generated_bg_music_with_subtitles(self):
         with WorkingFolderContext():
 
@@ -93,6 +96,7 @@ class TestPromptBasedVideo(unittest.TestCase):
                     apply_background_music=True,
                     generate_background_music=True,
                 ),
+                test_mode=False,
             )
 
             pbvid = PromptBasedVideo(
@@ -117,7 +121,7 @@ class TestPromptBasedVideo(unittest.TestCase):
             assert os.path.exists(result.media_url)
 
     @pytest.mark.local_integration
-    # @unittest.skip("To be activated on case by case basis")
+    @unittest.skip("To be activated on case by case basis")
     def test_use_sound_of_silence_original_audio_infer_subs_from_audio(self):
         """
         Test generating video from music prompt with original audio
@@ -165,7 +169,6 @@ class TestPromptBasedVideo(unittest.TestCase):
             ).create_prompt_from_text(
                 test_media.SOUND_OF_SILENCE, generate_recording=True
             )
-            original_audio = test_prompt.get_audio()
             bld_settings.prompt = test_prompt
 
             video = PromptBasedVideo(test_prompt)
@@ -192,7 +195,7 @@ class TestPromptBasedVideo(unittest.TestCase):
             assert os.path.exists(video.media_url)
 
     @pytest.mark.integration
-    @unittest.skip("To be activated on case by case basis")
+    # @unittest.skip("To be activated on case by case basis")
     def test_reunion_island_prompt_with_bk_music_subs(self):
         with WorkingFolderContext():
             bld_sett = VideoBuildSettings(

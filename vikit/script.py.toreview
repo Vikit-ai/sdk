@@ -16,7 +16,7 @@ from vikit.video_building import VideoMixer
 from vikit.video_keywords_raw_enhanced_prompt import VideosAggregate_KeywordAndRawPrompt
 from transition import Transition
 from prompt_factory import PromptFactory
-from vikit.musicimport generate_background_music
+from vikit.music_building_contextimport generate_background_music
 from context_managers import WorkingFolderContext
 
 REINIT_PREVIOUS_WORDS_EVERY_X_STEPS = 10

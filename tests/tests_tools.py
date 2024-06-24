@@ -5,7 +5,6 @@ from tests.tests_medias import (
     get_test_prompt_recording_trainboy,
     get_test_recorded_prompt_path,
     get_test_prompt_recording_stones_trainboy_path,
-    get_SoF_audio_path,
 )
 from vikit.prompt.subtitle_extractor import SubtitleExtractor
 
@@ -96,28 +95,7 @@ def create_fake_prompt_tired():
     return prompt
 
 
-def create_fake_prompt_sondofsilence():
-    prompt = RecordedPrompt()
-    _sample_media_dir = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        SAMPLE_MEDIA_FOLDER,
-    )
-    prompt = RecordedPrompt()
-    prompt._subtitles = pysrt.open(
-        os.path.join(_sample_media_dir, "SoundOfSilence.srt")
-    )
-    subs_as_text_tokens = SubtitleExtractor().build_subtitles_as_text_tokens(
-        prompt._subtitles
-    )
-    prompt._recorded_audio_prompt_path = get_SoF_audio_path()
-    prompt._text = " ".join(subs_as_text_tokens)
-    prompt._subtitle_as_text_tokens = subs_as_text_tokens
-
-    return prompt
-
-
 test_prompt_library = {
-    "sound of silence": create_fake_prompt_sondofsilence(),
     "moss_stones-train_boy": create_fake_prompt_for_local_tests_moss_stones_train_boy(),
     "train_boy": create_fake_prompt_for_local_tests(),
     "tired": create_fake_prompt_tired(),

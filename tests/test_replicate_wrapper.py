@@ -1,4 +1,5 @@
-from unittest.mock import patch
+import unittest
+import warnings
 import pytest
 from loguru import logger
 
@@ -10,55 +11,67 @@ from vikit.common.context_managers import WorkingFolderContext
 
 SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in an abandoned forest, revealing intricate carvings
 and symbols. This is additional text to make sure we generate serveral subtitles. """
-ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
-    test_mode=False
-)
 
 
-@pytest.mark.integration
-def test_inte_get_keywords_from_prompt():
-    with WorkingFolderContext():
-        test_prompt = PromptFactory(ml_gateway=ml_gw).create_prompt_from_text(
-            SAMPLE_PROMPT_TEXT
-        )
-        keywords, title = ml_gw.get_keywords_from_prompt(
-            test_prompt.text, "previous_words"
-        )
-        assert len(keywords) > 0
-        assert len(title) > 0
+class TestReplicateWrapper(unittest.TestCase):
 
+    def setUp(self) -> None:
+        warnings.simplefilter("ignore", category=ResourceWarning)
+        warnings.simplefilter("ignore", category=UserWarning)
 
-def test_extract_keywords_clean_nodigits():
-    prompt = "A group of ancient, moss-covered stones come to life in an \n 8 abandoned forest, \n  revealing intricate,, carvings and symbols"
+        logger.add("log_test_replicate_wrapper.txt", rotation="10 MB")
 
-    result = cleanse_llm_keywords(prompt)
-    assert not any(
-        char.isdigit() for char in result
-    ), "The result should not contain any digits"
+    @pytest.mark.integration
+    def test_inte_get_keywords_from_prompt(self):
 
+        with WorkingFolderContext():
+            ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
+                test_mode=False
+            )
 
-def test_extract_keywords_clean_nodoublecomma():
-    prompt = "A group of ancient, moss-covered stones come to life in an \n abandoned forest,, revealing intricate,, carvings and symbols"
-    result = cleanse_llm_keywords(prompt)
-    assert not result.__contains__(
-        ",,"
-    ), "The result should not contain ',,' i.e. double commas"
+            test_prompt = PromptFactory(ml_gateway=ml_gw).create_prompt_from_text(
+                SAMPLE_PROMPT_TEXT
+            )
+            keywords, title = ml_gw.get_keywords_from_prompt(
+                test_prompt.text, "previous_words"
+            )
+            assert len(keywords) > 0
+            assert len(title) > 0
 
+    @pytest.mark.unit
+    def test_extract_keywords_clean_nodigits(self):
+        prompt = "A group of ancient, moss-covered stones come to life in an \n 8 abandoned forest, \n  revealing intricate,, carvings and symbols"
 
-def test_extract_keywords_clean_nodots():
-    prompt = "A group of ancient, moss-covered stones come to life in .  \n an abandoned forest, revealing intricate, carvings and symbols."
-    result = cleanse_llm_keywords(prompt)
-    assert not result.__contains__("."), "The result should not contain '.' i.e. dots"
+        result = cleanse_llm_keywords(prompt)
+        assert not any(
+            char.isdigit() for char in result
+        ), "The result should not contain any digits"
 
+    @pytest.mark.unit
+    def test_extract_keywords_clean_nodoublecomma(self):
+        prompt = "A group of ancient, moss-covered stones come to life in an \n abandoned forest,, revealing intricate,, carvings and symbols"
+        result = cleanse_llm_keywords(prompt)
+        assert not result.__contains__(
+            ",,"
+        ), "The result should not contain ',,' i.e. double commas"
 
-def test_extract_keywords_clean_empty():
-    prompt = ""
-    result = cleanse_llm_keywords(prompt)
-    logger.debug(f"res : {result}")
-    assert result == "", "The result should be an empty string"
+    @pytest.mark.unit
+    def test_extract_keywords_clean_nodots(self):
+        prompt = "A group of ancient, moss-covered stones come to life in .  \n an abandoned forest, revealing intricate, carvings and symbols."
+        result = cleanse_llm_keywords(prompt)
+        assert not result.__contains__(
+            "."
+        ), "The result should not contain '.' i.e. dots"
 
+    @pytest.mark.unit
+    def test_extract_keywords_clean_empty(self):
+        prompt = ""
+        result = cleanse_llm_keywords(prompt)
+        logger.debug(f"res : {result}")
+        assert result == "", "The result should be an empty string"
 
-def test_extract_keywords_clean_None():
-    with pytest.raises(AttributeError):
-        prompt = None
-        _ = cleanse_llm_keywords(prompt)
+    @pytest.mark.unit
+    def test_extract_keywords_clean_None(self):
+        with pytest.raises(AttributeError):
+            prompt = None
+            _ = cleanse_llm_keywords(prompt)

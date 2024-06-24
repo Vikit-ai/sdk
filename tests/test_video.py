@@ -29,20 +29,24 @@ class TestVideo(unittest.TestCase):
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
         warnings.simplefilter("ignore", category=DeprecationWarning)
+        logger.add("log_test_video.txt", rotation="10 MB")
         DeprecationWarning
 
+    @pytest.mark.unit
     def test_get_first_frame_as_image_path_with_non_generated_video(self):
         with pytest.raises(AssertionError):
             PromptBasedVideo(
                 tools.test_prompt_library["moss_stones-train_boy"]
             ).get_first_frame_as_image()
 
+    @pytest.mark.unit
     def test_get_last_frame_as_image_path_with_non_generated_video(self):
         with pytest.raises(AssertionError):
             PromptBasedVideo(
                 tools.test_prompt_library["moss_stones-train_boy"]
             ).get_last_frame_as_image()
 
+    @pytest.mark.unit
     def test_display_video_as_console_text(self):
         prompt = tools.test_prompt_library["moss_stones-train_boy"]
 
@@ -66,6 +70,7 @@ class TestVideo(unittest.TestCase):
                         tools.test_prompt_library["moss_stones-train_boy"]
                     ).get_duration()
 
+    @pytest.mark.unit
     def test_get_bk_music_filemame(self):
         video_test = Video()
         video_test._media_url = "/usr/path/to/my/file.mp4"
@@ -92,7 +97,3 @@ class TestVideo(unittest.TestCase):
             assert image_path is not None
             assert image_path.__len__() > 0
             assert os.path.exists(image_path)
-
-
-if __name__ == "__main__":
-    unittest.main()
