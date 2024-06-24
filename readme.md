@@ -13,10 +13,11 @@ AIVideo is easy to deploy trough docker containers: one container per service
 
 ## Installation
 
-The solution is composed of:
+The SDK is composed of:
 
-- several versions of a web client and server components
-- a set of services that actually do the real stuff. They are microservices meant to be run as containers
+- several type of videos: Composites, prompt baased video, Rawtext based videos, ...
+- one type of transition, which looks a bit loke morphing
+- gateways, to call models and generate videos, music, transitions, etc hosted on other platforms
 
 ### Requirements
 

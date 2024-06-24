@@ -1,11 +1,13 @@
 replicate==0.24.0
 pysrt==1.1.2
-pnumpy==1.26.4
+# ffmpeg-python==0.2.0
+# sib_api_v3_sdk==7.6.0
+numpy==1.26.4
 loguru==0.7.2
 requests==2.31.0
 python-dotenv==1.0.1
-pydantic==2.7.4
 tenacity==8.2.3
 pytest==8.1.1
 pytest-xdist==3.6.1
-typing_extensions==4.12.2
+Sphinx==7.3.7
+sphinx-autoapi==3.1.2
