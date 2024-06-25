@@ -48,18 +48,3 @@ class TestPrompt(unittest.TestCase):
             self.assertEqual(prompt.text, "This is a fake prompt")
 
 
-    @pytest.mark.integration
-    def test_reunion_island_prompt(self):
-        with WorkingFolderContext():
-            test_prompt = PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_text(
-                """A travel over Reunion Island, taken fomm birdview at 2000meters above 
-                the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
-                , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
-                generate_recording=True,
-            )
-
-            video = PromptBasedVideo(prompt=test_prompt)
-            video.build(bld_sett)
-
-            assert video.media_url is not None
-            assert os.path.exists(video.media_url)

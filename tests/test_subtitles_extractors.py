@@ -11,6 +11,8 @@ from vikit.prompt.recorded_prompt_subtitles_extractor import (
 )
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.gateways import replicate_gateway as replicate_gateway
+from vikit.common.context_managers import WorkingFolderContext
+
 
 SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in an abandoned forest, revealing intricate carvings
 and symbols. This is additional text to make sure we generate serveral subtitles. """
@@ -50,22 +52,23 @@ class TestSubtitlesExtrators(unittest.TestCase):
 
     @pytest.mark.integration
     def test_reunion_island_prompt(self):
-        gw = replicate_gateway.ReplicateGateway()
-        test_prompt = PromptFactory(ml_gateway=gw).create_prompt_from_text(
-            """A travel over Reunion Island, taken fomm birdview at 2000meters above 
-            the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
-            , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
-            generate_recording=True,
-        )
+        with WorkingFolderContext():  # we work in the temp folder once for all the script
+            gw = replicate_gateway.ReplicateGateway()
+            test_prompt = PromptFactory(ml_gateway=gw).create_prompt_from_text(
+                """A travel over Reunion Island, taken fomm birdview at 2000meters above 
+                the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
+                , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
+                generate_recording=True,
+            )
 
-        sub_extractor = RecordedPromptSubtitlesExtractor()
-        subs: pysrt.SubRipFile = sub_extractor.extract_subtitles(
-            recorded_prompt_file_path=test_prompt._recorded_audio_prompt_path,
-            ml_models_gateway=gw,
-        )
+            sub_extractor = RecordedPromptSubtitlesExtractor()
+            subs: pysrt.SubRipFile = sub_extractor.extract_subtitles(
+                recorded_prompt_file_path=test_prompt._recorded_audio_prompt_path,
+                ml_models_gateway=gw,
+            )
 
-        for sub in subs:
-            sub = pysrt.SubRipItem(sub)
-            assert sub.text is not None
-            assert sub.text != ""
-            logger.debug(f"Sub: {sub.text}")
+            for sub in subs:
+                sub = pysrt.SubRipItem(sub)
+                assert sub.text is not None
+                assert sub.text != ""
+                logger.debug(f"Sub: {sub.text}")
