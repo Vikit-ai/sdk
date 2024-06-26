@@ -1,0 +1,34 @@
+GeneralBuildSettings
+====================
+
+.. py:module:: GeneralBuildSettings
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   GeneralBuildSettings.GeneralBuildSettings
+
+
+Module Contents
+---------------
+
+.. py:class:: GeneralBuildSettings(delete_interim_files: bool = False, run_async: bool = False, test_mode: bool = False)
+
+   General build settings for the video generation
+
+   The settings are:
+   - delete_interim_files: whether to delete the intermediate video files, first and last frames
+   - run_async: whether to run the video generation in async mode, to boost reactivity and performance of the application
+   - test_mode: whether to run the video generation in local mode, to run local and fast tests
+
+
+   .. py:method:: get_ml_models_gateway()
+
+      Handy function to get the ML models gateway from the buildsettings, as it is used in many places
+      like a context
+
+
+

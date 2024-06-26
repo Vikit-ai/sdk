@@ -1,0 +1,48 @@
+prompt_based_video
+==================
+
+.. py:module:: prompt_based_video
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   prompt_based_video.PromptBasedVideo
+
+
+Module Contents
+---------------
+
+.. py:class:: PromptBasedVideo(prompt=None)
+
+   Bases: :py:obj:`vikit.video.video.Video`
+
+
+   PromptBasedVideo is a simple way to generate a video based out of a text prompt
+
+   It creates a master composite video which embeds as many composite video as there are subtitles
+   in the given prompt.
+
+   We do some form of inheritance by composition to prevent circular dependencies and benefit from more modularity
+
+
+   .. py:method:: get_title()
+
+      Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
+
+
+
+   .. py:method:: build(build_settings=VideoBuildSettings())
+
+      Generate the actual inner video
+
+      Params:
+          - build_settings: allow some customization
+
+      Returns:
+          The current instance
+
+
+

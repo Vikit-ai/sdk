@@ -1,0 +1,35 @@
+recorded_prompt
+===============
+
+.. py:module:: recorded_prompt
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   recorded_prompt.RecordedPrompt
+
+
+Module Contents
+---------------
+
+.. py:class:: RecordedPrompt
+
+   Bases: :py:obj:`vikit.prompt.prompt.Prompt`
+
+
+   A class to represent a prompt generated from a recorded audio file. You may want to use this class
+   to generate a prompt from a recorded audio file, like a podcast or a video soundtrack (e.g. a musical video clip)
+
+
+   .. py:property:: audio_recording
+
+
+   .. py:method:: get_duration() -> float
+
+      Returns the duration of the recording
+
+
+

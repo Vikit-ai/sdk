@@ -1,0 +1,31 @@
+text_prompt
+===========
+
+.. py:module:: text_prompt
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   text_prompt.TextPrompt
+
+
+Module Contents
+---------------
+
+.. py:class:: TextPrompt(prompt_text: str = None)
+
+   Bases: :py:obj:`vikit.prompt.prompt.Prompt`
+
+
+   A class to represent a text prompt
+
+
+   .. py:method:: get_duration() -> float
+
+      Returns the duration of the recording
+
+
+

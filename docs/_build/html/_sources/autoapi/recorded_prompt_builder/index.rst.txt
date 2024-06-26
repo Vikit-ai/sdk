@@ -1,0 +1,53 @@
+recorded_prompt_builder
+=======================
+
+.. py:module:: recorded_prompt_builder
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   recorded_prompt_builder.RecordedPromptBuilder
+
+
+Module Contents
+---------------
+
+.. py:class:: RecordedPromptBuilder
+
+   Builds a prompt based on a recorded audio file
+
+   Most functions are used by a prompt builder, as the way to generate a prompt may vary and get a bit complex
+
+
+
+   .. py:method:: convert_recorded_audio_prompt_path(recorded_audio_prompt_path: str, prompt_mp3_file_name=None)
+
+      Convert the recorded audio prompt to mp3
+
+      Args:
+          recorded_audio_prompt_path: The path to the recorded audio file
+          prompt_mp3_file_name: The name of the mp3 file to save the recording as
+
+
+
+   .. py:method:: set_subtitles(subs: list[pysrt.SubRipItem])
+
+      set the prompt text using an LLM which extracts it from the recorded file
+
+
+
+   .. py:method:: set_text(text: str)
+
+      Set the text prompt
+
+      Args:
+          text: The text prompt
+
+
+
+   .. py:method:: build()
+
+
