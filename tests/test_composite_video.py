@@ -47,7 +47,7 @@ class TestCompositeVideo(unittest.TestCase):
         No Music
         """
         with pytest.raises(TypeError):
-            video = Video()
+            _ = Video()
 
     @pytest.mark.local_integration
     def test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life(

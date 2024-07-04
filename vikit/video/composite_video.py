@@ -236,6 +236,7 @@ class CompositeVideo(Video):
         """
         bld_set_interim = build_settings
         bld_set_interim.include_audio_subtitles = True
+        self.metadata.is_prompt_read_aloud = True
 
         if build_settings.prompt:
             self._media_url = merge_audio(
@@ -243,6 +244,7 @@ class CompositeVideo(Video):
                 audio_file_path=build_settings.prompt._recorded_audio_prompt_path,
                 target_file_name=self.get_file_name_by_state(bld_set_interim),
             )
+
         else:
             logger.warning("No prompt audio file provided, skipping audio insertion")
 
