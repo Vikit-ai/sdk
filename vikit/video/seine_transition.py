@@ -31,16 +31,16 @@ class SeineTransition(Transition):
         """
         super().build(build_settings)
 
-        if self._is_video_generated:
+        if self.is_video_generated:
             return self
 
-        if not self._source_video._is_video_generated:
+        if not self._source_video.is_video_generated:
             self._source_video.build(build_settings=build_settings)
-        if not self._target_video._is_video_generated:
+        if not self._target_video.is_video_generated:
             self._target_video.build(build_settings=build_settings)
 
-        assert self._source_video._is_video_generated, "source video must be generated"
-        assert self._target_video._is_video_generated, "target video must be generated"
+        assert self._source_video.is_video_generated, "source video must be generated"
+        assert self._target_video.is_video_generated, "target video must be generated"
         assert url_exists(self._source_video.media_url), "source_video must exist"
         assert url_exists(self._target_video.media_url), "target_video must exist"
 
@@ -53,13 +53,20 @@ class SeineTransition(Transition):
             source_image_path=self._source_video.get_last_frame_as_image(),
             target_image_path=self._target_video.get_first_frame_as_image(),
         )
-        logger.debug(
-            f"URL Retrieved to be quality augmented {link_to_transition_video}"
-        )
-        interpolated_transition_link = ml_gw.interpolate(link_to_transition_video)
-        # Then we download it
-        target_file_name = self.get_target_file_name(build_settings=build_settings)
-        urlretrieve(interpolated_transition_link, target_file_name)
+        if link_to_transition_video is None:
+            raise ValueError("No link to transition video generated")
+        logger.debug(f"URL Retrieved to be interpolated {link_to_transition_video}")
+
+        self.metadata.is_interpolated = build_settings.interpolate
+
+        target_file_name = self.get_file_name_by_state(build_settings=build_settings)
+        if build_settings.interpolate:
+            interpolated_transition_link = ml_gw.interpolate(link_to_transition_video)
+            urlretrieve(interpolated_transition_link, target_file_name)
+        else:
+            urlretrieve(link_to_transition_video, target_file_name)
+
+        self.metadata.is_video_generated = True
         self._media_url = target_file_name
 
         return self

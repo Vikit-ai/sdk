@@ -22,5 +22,4 @@ class CompositeVideoBuilderStrategyCloud(CompositeVideoBuilderStrategy):
             root_composite_video: a built composite video
         """
 
-        super().execute(composite_video=composite_video, build_settings=build_settings)
         raise NotImplementedError("Not implemented yet")

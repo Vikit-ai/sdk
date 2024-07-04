@@ -74,6 +74,12 @@ class Video(ABC):
     def metadata(self):
         return self._videoMetadata
 
+    @metadata.setter
+    def metadata(self, metadata):
+        if not isinstance(metadata, VideoMetadata):
+            raise ValueError("metadata should be of type VideoMetadata")
+        self._videoMetadata = metadata
+
     @property
     @abstractmethod
     def short_type_name(self):
@@ -84,39 +90,29 @@ class Video(ABC):
 
     @property
     def width(self):
-        return self._width
+        return self.metadata.width
 
     @property
     def height(self):
-        return self._height
+        return self.metadata.height
 
     @property
     def id(self) -> str:
-        return str(self._id)
+        return str(self.metadata.id)
 
     @property
     def background_music(self):
         return self._background_music_file_name
 
-    def __str__(self):
-        video_as_string = os.linesep.join(
-            [
-                """////// Video Description \\\\\\""",
-                f"Video Title: {self.get_title()}",
-                f"Video id: {self.id}",
-                f"Duration: {self._duration}",
-                f"Media URL: {self.media_url}",
-                f"Width: {self._width}",
-                f"Height: {self._height}",
-                f"is_video_generated: {self._is_video_generated}",
-                f"background_music_file_name: {self._background_music_file_name}",
-                f"top parent id: {self._background_music_file_name}",
-            ]
-        )
+    @property
+    def duration(self):
+        return self.metadata.duration
 
-        return os.linesep + video_as_string + os.linesep
+    @property
+    def is_video_generated(self):
+        return self.metadata.is_video_generated
 
-    def get_target_file_name(
+    def get_file_name_by_state(
         self,
         build_settings: VideoBuildSettings,
         metadata: VideoMetadata = None,
@@ -251,7 +247,9 @@ class Video(ABC):
             ), f"File {self._background_music_file_name} does not exist"
 
         self._media_url = merge_audio(
-            media_url=self.media_url, audio_file_path=self._background_music_file_name
+            media_url=self.media_url,
+            audio_file_path=self._background_music_file_name,
+            target_file_name="background_music_" + self.media_url.split("/")[-1],
         )
         self.metadata.bg_music_applied = True
         return self

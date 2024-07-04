@@ -73,19 +73,6 @@ class CompositeVideo(Video):
 
         return f"Composite Video: {videos_output}"
 
-    def __repr__(self):
-        videos_output = (
-            "oooooo----- Composite video Head-----oooooo"
-            + os.linesep
-            + super().__str__()
-            + os.linesep
-            + "----- Composite video video list-----"
-        )
-        for video in self._video_list:
-            videos_output = videos_output + video.__str__() + os.linesep
-
-        return os.linesep + f"VideosAggregate: {os.linesep}{videos_output}"
-
     @log_function_params
     def append_video(self, video: Video = None):
         """
@@ -138,9 +125,11 @@ class CompositeVideo(Video):
         return self._title
 
     @log_function_params
-    def get_target_file_name(self, build_settings: VideoBuildSettings = None):
+    def get_file_name_by_state(self, build_settings: VideoBuildSettings = None):
         """
-        Get the target / expected final file name for the composite video
+        Get the target / expected file name for the composite video depending on its state
+        State is build progressively from Instantiation to the final build, where steps like
+        adding music or audio prompt are carried out
 
         params:
             build_settings: The settings to be used for the build
@@ -156,8 +145,8 @@ class CompositeVideo(Video):
             if self._is_root_video_composite
             else str(VideoType.COMPCHILD)
         )
-        video_fname = super().get_target_file_name(
-            build_settings, video_type=video_type
+        video_fname = super().get_file_name_by_state(
+            build_settings=build_settings, video_type=video_type
         )
         return str(video_fname)
 
@@ -185,11 +174,13 @@ class CompositeVideo(Video):
             return self
 
         # Cleanse the video list by removing any empty composites videos
-        filter(
-            lambda video: not (
-                isinstance(video, CompositeVideo) and len(video._video_list) == 0
-            ),
-            self._video_list,
+        self._video_list = list(
+            filter(
+                lambda video: not (
+                    isinstance(video, CompositeVideo) and len(video._video_list) == 0
+                ),
+                self._video_list,
+            )
         )
 
         if building_strategy is None:  # Fail open, take the local strategy
@@ -198,11 +189,6 @@ class CompositeVideo(Video):
             )
         else:
             building_strategy = building_strategy
-
-        worflow_build_settings = build_settings
-        worflow_build_settings.music_building_context.apply_background_music = False
-        worflow_build_settings.music_building_context.apply_background_music = False
-        worflow_build_settings.music_building_context.apply_background_music = False
 
         generated_vid_composite = building_strategy.execute(
             composite_video=self, build_settings=build_settings
@@ -239,6 +225,8 @@ class CompositeVideo(Video):
                     build_settings
                 )
 
+        self.metadata.is_video_generated = True
+
         return generated_vid_composite
 
     @log_function_params
@@ -253,7 +241,7 @@ class CompositeVideo(Video):
             self._media_url = merge_audio(
                 media_url=self.media_url,
                 audio_file_path=build_settings.prompt._recorded_audio_prompt_path,
-                target_file_name=self.get_target_file_name(bld_set_interim),
+                target_file_name=self.get_file_name_by_state(bld_set_interim),
             )
         else:
             logger.warning("No prompt audio file provided, skipping audio insertion")

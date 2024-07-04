@@ -74,7 +74,7 @@ class ImportedVideo(Video):
         return str(VideoType.TRANSITION)
 
     @log_function_params
-    def get_target_file_name(
+    def get_file_name_by_state(
         self,
         build_settings: VideoBuildSettings,
     ):
@@ -84,4 +84,4 @@ class ImportedVideo(Video):
         Returns:
             str: The file name of the video
         """
-        return super().get_target_file_name(build_settings)
+        return super().get_file_name_by_state(build_settings)

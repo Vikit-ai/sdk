@@ -122,9 +122,9 @@ class RawTextBasedVideo(Video):
         self.metadata.is_video_generated = True
 
         if build_settings.interpolate:
-            file_name = self.get_target_file_name(build_settings)
-
             interpolated_video = ml_gateway.interpolate(video_link_from_prompt)
+            self.metadata.is_interpolated = True
+            file_name = self.get_file_name_by_state(build_settings)
             interpolated_video_path = urlretrieve(
                 interpolated_video,
                 file_name,
@@ -134,7 +134,7 @@ class RawTextBasedVideo(Video):
             self._media_url = interpolated_video_path
             self.metadata.is_interpolated = True
         else:
-            file_name = self.get_target_file_name(build_settings)
+            file_name = self.get_file_name_by_state(build_settings)
             self._media_url = video_link_from_prompt
         self._source = type(
             ml_gateway

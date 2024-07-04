@@ -63,7 +63,7 @@ class TestVideoFileNames(unittest.TestCase):
         raw_text_video = RawTextBasedVideo(raw_text_prompt="test prompt")
 
         fname = str(
-            raw_text_video.get_target_file_name(build_settings=VideoBuildSettings()),
+            raw_text_video.get_file_name_by_state(build_settings=VideoBuildSettings()),
         )
         assert VideoFileName.is_video_file_name(
             fname
@@ -142,134 +142,99 @@ class TestVideoFileNames(unittest.TestCase):
 
         return bld_set
 
-    @pytest.mark.local_integration
-    def test_root_composite_video_file_name(self):
-        """
-        Test if the file name of a root composite video is generated correctly
-
-        Here we expect the name to conform to the general video file name format:
-        - video type as rootcomp
-        - video features as goooo
-
-        """
-        with WorkingFolderContext():
-            composite_video = CompositeVideo()
-            bld_set = self.get_test_build_settings()
-            fname = str(composite_video.get_target_file_name(build_settings=bld_set))
-            vid_fname = VideoFileName.from_file_name(fname)
-
-            assert VideoFileName.is_video_file_name(
-                fname
-            ), "The file name of the RawTextBasedVideo instance is not valid. Generated file name: {}".format(
-                fname
-            )
-
-            assert vid_fname.video_type == str(
-                VideoType.COMPROOT
-            ), "The video type is not correct, {}. Returned: ".format(
-                vid_fname.video_type
-            )
-            assert (
-                vid_fname.video_features == "goooo"
-            ), "The video features are not correct: features returned: {}".format(
-                vid_fname.video_features
-            )
-            assert (
-                vid_fname.build_id == "1234567890"
-            ), "The build ID is not correct, {}".format(bld_set.id)
-            assert vid_fname._build_date == bld_set.build_date
-            assert vid_fname._build_time == bld_set.build_time
-            assert vid_fname.unique_id is not None
-
-    @pytest.mark.local_integration
-    def test_child_composite_video_file_name(self):
+    @pytest.mark.unit
+    def test_video_file_names_across_building_steps(self):
 
         with WorkingFolderContext():
             root_composite_video = CompositeVideo()
-            child_composite_video = CompositeVideo()
-            root_composite_video.append_video(child_composite_video)
             bld_set = self.get_test_build_settings()
 
             fname = str(
-                child_composite_video.get_target_file_name(build_settings=bld_set)
+                root_composite_video.get_file_name_by_state(build_settings=bld_set)
             )
             vid_fname = VideoFileName.from_file_name(fname)
 
             assert VideoFileName.is_video_file_name(
                 fname
-            ), "The file name of the RawTextBasedVideo instance is not valid. Generated file name: {}".format(
+            ), "The file name of the video instance is not valid. Generated file name: {}".format(
                 fname
             )
-
-            assert vid_fname.video_type == str(
-                VideoType.COMPCHILD
-            ), "The video type is not correct, {}. Returned: ".format(
-                vid_fname.video_type
-            )
             assert (
-                vid_fname.video_features == "goooo"
+                vid_fname.video_features == "ooooo"
             ), "The video features are not correct: features returned: {}".format(
                 vid_fname.video_features
             )
             assert (
-                vid_fname.build_id == "1234567890"
+                vid_fname.build_id == bld_set.id
             ), "The build ID is not correct, {}".format(bld_set.id)
+
             assert vid_fname._build_date == bld_set.build_date
             assert vid_fname._build_time == bld_set.build_time
             assert vid_fname.unique_id is not None
 
-    @pytest.mark.local_integration
-    def test_prompt_based_video_file_name(self):
-        with WorkingFolderContext():
-            bld_set = self.get_test_build_settings()
-            prpt_vid = PromptBasedVideo(
-                prompt=PromptFactory(
-                    ml_gateway=bld_set.get_ml_models_gateway()
-                ).create_prompt_from_text("test of prompt that last a few seconds")
-            )
-            fname = str(prpt_vid.get_target_file_name(build_settings=bld_set))
-            vid_fname = VideoFileName.from_file_name(fname)
+            # now we stop to the next video building step (build the video, here we decide to
+            # interpolate and reencode), we expect the video features to be updated accordingly
+            root_composite_video.metadata.is_video_generated = True
+            root_composite_video.metadata.is_interpolated = True
+            root_composite_video.metadata.is_reencoded = True
 
+            fname_built = str(
+                root_composite_video.get_file_name_by_state(build_settings=bld_set)
+            )
+            vid_fname = VideoFileName.from_file_name(fname_built)
             assert VideoFileName.is_video_file_name(
                 fname
-            ), "The file name of the PromptBasedVideo instance is not valid. Generated file name: {}".format(
+            ), "The file name of the video instance is not valid. Generated file name: {}".format(
                 fname
             )
-
-            assert vid_fname.video_type == str(
-                VideoType.PRMPTBASD
-            ), "The video type is not correct, {}. Returned: ".format(
-                vid_fname.video_type
-            )
             assert (
-                vid_fname.video_features == "goooo"
+                vid_fname.video_features == "oorio"
             ), "The video features are not correct: features returned: {}".format(
                 vid_fname.video_features
             )
-            assert (
-                vid_fname.build_id == "1234567890"
+            assert (  # Check the build id has not changed
+                vid_fname.build_id == bld_set.id
             ), "The build ID is not correct, {}".format(bld_set.id)
-            assert vid_fname._build_date == bld_set.build_date
-            assert vid_fname._build_time == bld_set.build_time
-            assert vid_fname.unique_id is not None
 
-    @pytest.mark.local_integration
-    def test_transition_video_file_name(self):
-        with WorkingFolderContext():
-            trans_vid = Transition(RawTextBasedVideo("test"), RawTextBasedVideo("test"))
-            bld_set = self.get_test_build_settings()
-            fname = trans_vid.get_target_file_name(build_settings=bld_set)
-            vid_fname = VideoFileName.from_file_name(fname)
-
-            assert vid_fname.video_type == str(VideoType.TRANSITION)
+            # now we stop to the next video building step, here we add background music, and it needs
+            # to be generated. We expect the video features to be updated accordingly
+            root_composite_video.metadata.is_bg_music_applied = True
+            root_composite_video.metadata.is_bg_music_generated = True
+            fname_built = str(
+                root_composite_video.get_file_name_by_state(build_settings=bld_set)
+            )
+            vid_fname = VideoFileName.from_file_name(fname_built)
+            assert VideoFileName.is_video_file_name(
+                fname
+            ), "The file name of the video instance is not valid. Generated file name: {}".format(
+                fname
+            )
             assert (
-                vid_fname.video_features == "goooo"
+                vid_fname.video_features == "gorio"
             ), "The video features are not correct: features returned: {}".format(
                 vid_fname.video_features
             )
-            assert (
-                vid_fname.build_id == "1234567890"
+            assert (  # Check the build id has not changed
+                vid_fname.build_id == bld_set.id
             ), "The build ID is not correct, {}".format(bld_set.id)
-            assert vid_fname._build_date == bld_set.build_date
-            assert vid_fname._build_time == bld_set.build_time
-            assert vid_fname.unique_id is not None
+
+            # now we stop to the next video building step, here we add read aloud subtitles.
+            #  We expect the video features to be updated accordingly
+            root_composite_video.metadata.is_prompt_read_aloud = True
+            fname_built = str(
+                root_composite_video.get_file_name_by_state(build_settings=bld_set)
+            )
+            vid_fname = VideoFileName.from_file_name(fname_built)
+            assert VideoFileName.is_video_file_name(
+                fname
+            ), "The file name of the video instance is not valid. Generated file name: {}".format(
+                fname
+            )
+            assert (
+                vid_fname.video_features == "gvrio"
+            ), "The video features are not correct: features returned: {}".format(
+                vid_fname.video_features
+            )
+            assert (  # Check the build id has not changed
+                vid_fname.build_id == bld_set.id
+            ), "The build ID is not correct, {}".format(bld_set.id)

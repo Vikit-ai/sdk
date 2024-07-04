@@ -69,14 +69,14 @@ class PromptBasedVideo(Video):
 
         return self._title
 
-    def get_target_file_name(self, build_settings: VideoBuildSettings):
+    def get_file_name_by_state(self, build_settings: VideoBuildSettings):
         """
         Get the file name of the video
 
         Returns:
             str: The file name of the video
         """
-        return super().get_target_file_name(build_settings)
+        return super().get_file_name_by_state(build_settings)
 
     def build(self, build_settings=VideoBuildSettings()):
         """

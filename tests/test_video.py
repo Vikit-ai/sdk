@@ -45,16 +45,6 @@ class TestVideo(unittest.TestCase):
                 tools.test_prompt_library["moss_stones-train_boy"]
             ).get_last_frame_as_image()
 
-    @pytest.mark.unit
-    def test_display_video_as_console_text(self):
-        prompt = tools.test_prompt_library["moss_stones-train_boy"]
-
-        video = PromptBasedVideo(prompt)
-        logger.debug(f"Test display_video_as_text, video: {video}")
-        assert (
-            video.__str__().splitlines().__len__() > 4
-        )  # here we check the console representation
-
     @pytest.mark.integration
     def test_get_duration(self):
         with WorkingFolderContext():
