@@ -112,6 +112,14 @@ class Video(ABC):
     def is_video_generated(self):
         return self.metadata.is_video_generated
 
+    @property
+    def media_url(self):
+        return self._media_url
+
+    @property
+    def title(self):
+        return self.get_title()
+
     def get_file_name_by_state(
         self,
         build_settings: VideoBuildSettings,

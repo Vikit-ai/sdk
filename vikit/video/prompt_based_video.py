@@ -5,7 +5,6 @@ from loguru import logger
 from vikit.video.video import VideoBuildSettings
 from vikit.video.video import Video
 from vikit.video.composite_video import CompositeVideo
-from vikit.common.decorators import log_function_params
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.seine_transition import SeineTransition
 from vikit.video.video_types import VideoType
@@ -21,7 +20,6 @@ class PromptBasedVideo(Video):
     We do some form of inheritance by composition to prevent circular dependencies and benefit from more modularity
     """
 
-    @log_function_params
     def __init__(self, prompt=None):
         if prompt is None:
             raise ValueError("prompt cannot be None")
@@ -31,7 +29,7 @@ class PromptBasedVideo(Video):
         super().__init__()
         self._prompt = prompt
         self._title = None
-        self._is_video_generated = False
+        self.metadata.title = self._title
         self._source = type(
             self
         ).__name__  # PromptBasedVideo is made of several composites
@@ -54,8 +52,8 @@ class PromptBasedVideo(Video):
         """
         Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
         """
-        if self._title:
-            self._title
+        if self.title:
+            self.title
         else:
             # backup plan: If no title existing yet (should be generated straight from an LLM)
             # then get the first and last words of the prompt

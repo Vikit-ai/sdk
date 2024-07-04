@@ -45,6 +45,7 @@ class RawTextBasedVideo(Video):
             self._title = title
         else:
             self._title = self.get_title()
+            self.metadata.title = self._title
         self._keywords = None
         self._needs_reencoding = False
 

@@ -31,6 +31,7 @@ class ImportedVideo(Video):
             raise ValueError("The video file path should be provided")
 
         self._needs_reencoding = True
+        self.metadata.title = self.get_title()
 
     def get_title(self):
         """

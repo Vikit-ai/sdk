@@ -10,7 +10,6 @@ from vikit.video.composite_video_builder_strategy_factory import (
     CompositeVideoBuilderStrategyFactory,
 )
 from vikit.video.composite_video_builder_strategy import CompositeVideoBuilderStrategy
-from vikit.video.video_file_name import VideoFileName
 from vikit.video.video_types import VideoType
 
 
@@ -120,7 +119,6 @@ class CompositeVideo(Video):
         """
         title = "_".join([subvideo.get_title() for subvideo in self.video_list])
         self._title = "empty-composite" if title == "" else title
-
         self.metadata.title = self._title
         return self._title
 
