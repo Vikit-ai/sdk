@@ -315,6 +315,9 @@ class VideoFileName:
                 raise ValueError("The file name is too long, it cannot be truncated")
             else:
                 fitted_name = self.truncate(gap)
+                logger.warning(
+                    f"The file name has been truncated to fit the file system's limits. New file name: {fitted_name}",
+                )
         else:
             fitted_name = self.file_name
 

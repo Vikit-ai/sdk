@@ -58,12 +58,12 @@ class CompositeVideoBuilderStrategy(ABC):
         or to compose from its inner videos in case of a child composite video
 
         Args:
-            args: The arguments: video, build_settings, video.media_url
+            args: The arguments: video, build_settings, video.media_url, target_file_name
 
         Returns:
             CompositeVideo: The composite video
         """
-        video, build_settings, _ = args
+        video, build_settings, _, _ = args
 
         video_build = video.build(build_settings=build_settings)
         VideoMetadata(video_build.metadata).is_video_generated = True

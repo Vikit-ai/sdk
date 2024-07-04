@@ -52,9 +52,7 @@ class PromptBasedVideo(Video):
         """
         Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
         """
-        if self.title:
-            self.title
-        else:
+        if not self._title:
             # backup plan: If no title existing yet (should be generated straight from an LLM)
             # then get the first and last words of the prompt
             splitted_prompt = self._prompt.subtitles[0].text.split(" ")

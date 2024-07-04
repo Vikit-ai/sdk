@@ -224,7 +224,6 @@ class CompositeVideo(Video):
                 )
 
         self.metadata.is_video_generated = True
-
         return generated_vid_composite
 
     @log_function_params
@@ -242,11 +241,9 @@ class CompositeVideo(Video):
                 audio_file_path=build_settings.prompt._recorded_audio_prompt_path,
                 target_file_name=self.get_file_name_by_state(bld_set_interim),
             )
-
+            self.metadata.is_subtitle_audio_applied = True
         else:
             logger.warning("No prompt audio file provided, skipping audio insertion")
-
-        self.metadata.is_subtitle_audio_applied = True
 
     @log_function_params
     def _generate_background_music_prompt(self):

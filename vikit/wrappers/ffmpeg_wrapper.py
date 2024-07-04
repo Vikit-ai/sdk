@@ -408,8 +408,9 @@ def reencode_video(params):
     Returns:
         Video: The reencoded video
     """
-    video, _, video_url = params
-    target_video_name = "reencoded_" + get_canonical_name(video_url) + ".mp4"
+    video, _, video_url, target_video_name = params
+    if not target_video_name:
+        target_video_name = "reencoded_" + get_canonical_name(video_url) + ".mp4"
 
     result = subprocess.run(
         [

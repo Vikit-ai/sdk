@@ -68,6 +68,7 @@ class ImportedVideo(Video):
 
         return self
 
+    @property
     def short_type_name(self):
         """
         Get the short type name of the video

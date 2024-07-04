@@ -162,7 +162,18 @@ class CompositeVideoBuilderStrategyLocal(CompositeVideoBuilderStrategy):
             results = []
             for video in video_list:
                 results.extend(
-                    [function_to_invoke((video, build_settings, video.media_url))]
+                    [
+                        function_to_invoke(
+                            (
+                                video,
+                                build_settings,
+                                video.media_url,
+                                video.get_file_name_by_state(
+                                    build_settings=build_settings
+                                ),
+                            )
+                        )
+                    ]
                 )
 
         return results
