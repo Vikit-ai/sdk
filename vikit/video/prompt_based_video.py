@@ -8,7 +8,7 @@ from vikit.video.composite_video import CompositeVideo
 from vikit.common.decorators import log_function_params
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.seine_transition import SeineTransition
-from vikit.music import MusicBuildingContext
+from vikit.video.video_types import VideoType
 
 
 class PromptBasedVideo(Video):
@@ -43,6 +43,13 @@ class PromptBasedVideo(Video):
         super_str = super().__str__()
         return super_str + os.linesep + f"Prompt: {self._prompt}"
 
+    @property
+    def short_type_name(self):
+        """
+        Get the short type name of the video
+        """
+        return str(VideoType.PRMPTBASD)
+
     def get_title(self):
         """
         Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
@@ -60,7 +67,16 @@ class PromptBasedVideo(Video):
                 summarised_title = clean_title_words[0] + "-" + clean_title_words[-1]
             self._title = summarised_title
 
-            return self._title
+        return self._title
+
+    def get_target_file_name(self, build_settings: VideoBuildSettings):
+        """
+        Get the file name of the video
+
+        Returns:
+            str: The file name of the video
+        """
+        return super().get_target_file_name(build_settings)
 
     def build(self, build_settings=VideoBuildSettings()):
         """
@@ -102,9 +118,11 @@ class PromptBasedVideo(Video):
             )  # Adding the comnposite to the overall video
 
         vid_cp_final.build(build_settings=build_settings)
-        self._is_video_generated = True
+
         self.inner_composite = vid_cp_final
-        self._media_url = vid_cp_final._media_url
+        self._is_video_generated = True
+        self.metadata = vid_cp_final.metadata
+        self._media_url = vid_cp_final.media_url
         self._background_music_file_name = vid_cp_final.background_music
 
         return self

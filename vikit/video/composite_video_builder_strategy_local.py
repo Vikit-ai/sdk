@@ -1,7 +1,8 @@
 import random
 from concurrent.futures import ProcessPoolExecutor
 import os
-import atexit
+
+# import atexit
 
 from loguru import logger
 
@@ -12,15 +13,15 @@ from vikit.video.composite_video_builder_strategy import (
     CompositeVideoBuilderStrategy,
 )
 
-# The following code is used to mutualize the processexecutor across all the CompositeVideoBuilderStrategyLocal instances
+# # The following code is used to mutualize the processexecutor across all the CompositeVideoBuilderStrategyLocal instances
 executor = ProcessPoolExecutor()
 
 
-def shutdown_executor():
-    executor.shutdown(wait=True)
+# def shutdown_executor():
+#     executor.shutdown(wait=True)
 
 
-atexit.register(shutdown_executor)
+# atexit.register(shutdown_executor)
 
 
 class CompositeVideoBuilderStrategyLocal(CompositeVideoBuilderStrategy):
@@ -49,9 +50,13 @@ class CompositeVideoBuilderStrategyLocal(CompositeVideoBuilderStrategy):
         """
         super().execute(composite_video=composite_video, build_settings=build_settings)
 
+        short_title = composite_video.get_title()
+        if len(short_title) > 20:
+            short_title = short_title[:20]
+
         video_list_file = "_".join(
             [
-                self._composite_video.get_title(),
+                short_title,
                 str(random.randint(0, 1000)),
                 config.get_video_list_file_name(),
             ]
@@ -79,7 +84,7 @@ class CompositeVideoBuilderStrategyLocal(CompositeVideoBuilderStrategy):
                 function_to_invoke=reencode_video,
             )
 
-        # We have the final file names (they nay have changed between initial video instanciation and
+        # We have the final file names (they may have changed between initial video instanciation and
         # inference of a name after querying an LLM
         with open(video_list_file, "w") as myfile:
             for video in self._composite_video.video_list:
@@ -88,7 +93,9 @@ class CompositeVideoBuilderStrategyLocal(CompositeVideoBuilderStrategy):
 
         self._composite_video._media_url = concatenate_videos(
             input_file=os.path.abspath(video_list_file),
-            target_file_name=self._composite_video._get_target_file_name(),
+            target_file_name=self._composite_video.get_target_file_name(
+                build_settings=build_settings
+            ),
             ratioToMultiplyAnimations=ratio,
         )  # keeping one consistent file name
 

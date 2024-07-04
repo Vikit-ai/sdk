@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
 
 from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.video.video_metadata import VideoMetadata
 
 
 class CompositeVideoBuilderStrategy(ABC):
@@ -55,10 +56,11 @@ class CompositeVideoBuilderStrategy(ABC):
 
     def _process_gen_vid_bins(self, args):
         """
-        Process the video generation bins
+        Process the video generation bins: we actually do ask the video to build itself
+        as a video binary (typically an MP4 generated from Gen AI, hosted behind an API)
 
         Args:
-            args: The arguments
+            args: The arguments: video, build_settings, video.media_url
 
         Returns:
             CompositeVideo: The composite video
@@ -66,6 +68,8 @@ class CompositeVideoBuilderStrategy(ABC):
         video, build_settings, _ = args
 
         video_build = video.build(build_settings=build_settings)
+        VideoMetadata(video_build.metadata).is_video_generated = True
+
         assert video is not None, "Video cannot be None"
         assert video.media_url is not None, "Video media URL cannot be None"
 

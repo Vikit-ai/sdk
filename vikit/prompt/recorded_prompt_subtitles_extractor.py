@@ -40,6 +40,7 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
         if recorded_prompt_file_path is None:
             raise ValueError("The path to the recorded audio file is not provided")
 
+        subs = None
         mp3_duration = get_media_duration(recorded_prompt_file_path)
         cat_command_args = ""
         video_length_per_subtitle = config.get_video_length_per_subtitle()

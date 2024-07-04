@@ -4,13 +4,14 @@ from loguru import logger
 
 from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
-import vikit.common.os_objects_naming_tools as osnamingtools
 from vikit.wrappers.ffmpeg_wrapper import merge_audio
 from vikit.music import MusicBuildingContext
 from vikit.video.composite_video_builder_strategy_factory import (
     CompositeVideoBuilderStrategyFactory,
 )
 from vikit.video.composite_video_builder_strategy import CompositeVideoBuilderStrategy
+from vikit.video.video_file_name import VideoFileName
+from vikit.video.video_types import VideoType
 
 
 class CompositeVideo(Video):
@@ -47,12 +48,32 @@ class CompositeVideo(Video):
         self._is_video_generated = False
         self._parent = None  # The parent video composite, helpfull for some optimisations like cascading up
         # the fact to know we have an imported video somewhere and trigger reecoding of the whole tree
+        self._video_file_name = None
+
+    @property
+    def short_type_name(self):
+        """
+        Get the short type name of the video
+        """
+        if self._is_root_video_composite:
+            return str(VideoType.COMPROOT)
+        else:
+            return str(VideoType.COMPCHILD)
 
     @property
     def video_list(self) -> list[Video]:
         return self._video_list
 
     def __str__(self):
+        videos_output = (
+            super().__str__() + os.linesep + "----- Composite video video list-----"
+        )
+        for video in self._video_list:
+            videos_output = videos_output + "ID: " + video.id + os.linesep
+
+        return f"Composite Video: {videos_output}"
+
+    def __repr__(self):
         videos_output = (
             "oooooo----- Composite video Head-----oooooo"
             + os.linesep
@@ -69,9 +90,16 @@ class CompositeVideo(Video):
     def append_video(self, video: Video = None):
         """
         Append a video to the list of videos to be mixed
+
+        params:
+            video: The video to be appended
+
+        returns:
+            self: The current object
         """
         if video is None:
             raise ValueError("video cannot be None")
+        video.top_parent_id = self.top_parent_id  # We cascade the top parent id
         self._video_list.append(video)
 
         if (
@@ -81,41 +109,57 @@ class CompositeVideo(Video):
 
         if type(video) is CompositeVideo:
             video._is_root_video_composite = False
+            video.metadata.top_parent_id = self.top_parent_id
 
         return self
 
     def get_duration(self):
-        # Get the sum of all the videos, we recompute it everytime
+        """
+        Get the duration of the video, we recompute it everytime
+        as the duration of the video can change if we add or remove videos
+        """
         all_video_duration = 0
-        if not self._duration:
-            for video in self.video_list:
-                all_video_duration += video.get_duration()
-            self._duration = all_video_duration
-            return all_video_duration
-        else:
-            return self._duration
+        for video in self.video_list:
+            all_video_duration += video.get_duration()
+        self._duration = all_video_duration
+
+        self.metadata.duration = all_video_duration
+        return all_video_duration
 
     def get_title(self):
-        if self._title is None:
-            final_title = "_".join(
-                [subvideo.get_title() for subvideo in self.video_list]
-            )
-            if len(final_title) > 100:
-                self._title = osnamingtools.create_non_colliding_file_name(final_title)
-            else:
-                self._title = final_title
+        """
+        Get the title of the video, we recompute it everytime
+        as the title of the video can change if we add or remove videos
+        """
+        title = "_".join([subvideo.get_title() for subvideo in self.video_list])
+        self._title = "empty-composite" if title == "" else title
+
+        self.metadata.title = self._title
         return self._title
 
-    def _get_target_file_name(self):
-        if self._is_root_video_composite:
-            return "FINAL_" + self.get_title() + ".mp4"
-        else:
-            return (
-                osnamingtools.create_non_colliding_file_name(
-                    self.get_title() + "_[vid_to_be_merged]_"
-                )
-                + ".mp4"
-            )
+    @log_function_params
+    def get_target_file_name(self, build_settings: VideoBuildSettings = None):
+        """
+        Get the target / expected final file name for the composite video
+
+        params:
+            build_settings: The settings to be used for the build
+
+        returns:
+            str: The target file name
+        """
+        if build_settings is None:
+            raise ValueError("build_settings cannot be None")
+
+        video_type = (
+            str(VideoType.COMPROOT)
+            if self._is_root_video_composite
+            else str(VideoType.COMPCHILD)
+        )
+        video_fname = super().get_target_file_name(
+            build_settings, video_type=video_type
+        )
+        return str(video_fname)
 
     @log_function_params
     def build(
@@ -141,13 +185,11 @@ class CompositeVideo(Video):
             return self
 
         # Cleanse the video list by removing any empty composites videos
-        self._video_list = list(
-            filter(
-                lambda video: not (
-                    isinstance(video, CompositeVideo) and len(video._video_list) == 0
-                ),
-                self._video_list,
-            )
+        filter(
+            lambda video: not (
+                isinstance(video, CompositeVideo) and len(video._video_list) == 0
+            ),
+            self._video_list,
         )
 
         if building_strategy is None:  # Fail open, take the local strategy
@@ -156,6 +198,11 @@ class CompositeVideo(Video):
             )
         else:
             building_strategy = building_strategy
+
+        worflow_build_settings = build_settings
+        worflow_build_settings.music_building_context.apply_background_music = False
+        worflow_build_settings.music_building_context.apply_background_music = False
+        worflow_build_settings.music_building_context.apply_background_music = False
 
         generated_vid_composite = building_strategy.execute(
             composite_video=self, build_settings=build_settings
@@ -199,13 +246,19 @@ class CompositeVideo(Video):
         """
         Insert the subtitles audio recording
         """
+        bld_set_interim = build_settings
+        bld_set_interim.include_audio_subtitles = True
+
         if build_settings.prompt:
             self._media_url = merge_audio(
                 media_url=self.media_url,
                 audio_file_path=build_settings.prompt._recorded_audio_prompt_path,
+                target_file_name=self.get_target_file_name(bld_set_interim),
             )
         else:
             logger.warning("No prompt audio file provided, skipping audio insertion")
+
+        self.metadata.is_subtitle_audio_applied = True
 
     @log_function_params
     def _generate_background_music_prompt(self):

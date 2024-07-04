@@ -1,13 +1,13 @@
 import os
-import random
 
 from urllib.request import urlretrieve
 from loguru import logger
 
 from vikit.video.video import Video
 from vikit.common.decorators import log_function_params
-import vikit.common.os_objects_naming_tools as osnamingtools
+import vikit.common.file_tools as ft
 from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.video.video_types import VideoType
 
 
 class RawTextBasedVideo(Video):
@@ -46,17 +46,24 @@ class RawTextBasedVideo(Video):
         else:
             self._title = self.get_title()
         self._keywords = None
-        self._needs_reencoding = False  # No need for reencoding as we are using the same encodings for all generated videos for now
+        self._needs_reencoding = False
 
     def __str__(self) -> str:
         return super().__str__() + os.linesep + f"text: {self._text}"
+
+    @property
+    def short_type_name(self):
+        """
+        Get the short type name of the video
+        """
+        return str(VideoType.RAWTEXT)
 
     @log_function_params
     def get_title(self):
         if self._title:
             return self._title
         else:
-            # backup plan: If no title existing yet (should be generated straight from an LLM)
+            # If no title existing yet (should be generated straight from an LLM)
             # then get the first and last words of the prompt
             splitted_prompt = self._text.split(" ")
             clean_title_words = [word for word in splitted_prompt if word.isalnum()]
@@ -66,7 +73,7 @@ class RawTextBasedVideo(Video):
                 summarised_title = clean_title_words[0] + "-" + clean_title_words[-1]
 
             # Add a unique identifier suffix to prevent several videos having the same title in a composite down the road
-            self._title = summarised_title + "_" + str(random.randint(0, 10000))
+            self._title = summarised_title
             return self._title
 
     @log_function_params
@@ -89,7 +96,7 @@ class RawTextBasedVideo(Video):
         """
         super().build(build_settings)
 
-        if self._is_video_generated:
+        if self.metadata.is_video_generated:
             return self
 
         logger.info("Generating video, could take somne time ")
@@ -103,31 +110,36 @@ class RawTextBasedVideo(Video):
             )
             self._keywords = enhanced_prompt
         else:
-            # Get more colorfull prompt from current subtitle
+            # Get more colorfull prompt from current prompt text
             enhanced_prompt, enhanced_title = ml_gateway.get_enhanced_prompt(self._text)
             if self._title is None:
-                self._title = osnamingtools.create_non_colliding_file_name(
-                    enhanced_title
-                )
+                self._title = ft.get_safe_filename(enhanced_title)
             self._keywords = None
 
-        video_link_from_prompt = ml_gateway.generate_video(enhanced_prompt)
-        logger.info(
-            f"Video link from prompt before interpolation: {video_link_from_prompt}"
-        )
+        video_link_from_prompt = ml_gateway.generate_video(
+            enhanced_prompt
+        )  # Should give a link on the Internet
+        self.metadata.is_video_generated = True
 
         if build_settings.interpolate:
-            interpolated_video = ml_gateway.interpolate(
-                video_link_from_prompt
-            )  # Then we interpolate it
+            file_name = self.get_target_file_name(build_settings)
+
+            interpolated_video = ml_gateway.interpolate(video_link_from_prompt)
             interpolated_video_path = urlretrieve(
-                interpolated_video, self.get_title() + str(".mp4")
+                interpolated_video,
+                file_name,
             )[
                 0
             ]  # Then we download it
             self._media_url = interpolated_video_path
+            self.metadata.is_interpolated = True
+        else:
+            file_name = self.get_target_file_name(build_settings)
+            self._media_url = video_link_from_prompt
+        self._source = type(
+            ml_gateway
+        ).__name__  # The source of the video is used later to decide if we need to reencode the video
 
-        self._source = type(ml_gateway).__name__
-        self._is_video_generated = True
+        self.metadata.is_interpolated = True
 
         return self

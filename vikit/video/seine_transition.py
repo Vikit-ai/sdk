@@ -2,8 +2,6 @@ from loguru import logger
 from urllib.request import urlretrieve
 
 from vikit.video.video import Video, VideoBuildSettings
-
-import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
 from vikit.common.decorators import log_function_params
 from vikit.video.transition import Transition, url_exists
 
@@ -19,18 +17,6 @@ class SeineTransition(Transition):
         A Seine transition is a video that is generated between two videos
         """
         super().__init__(source_video=source_video, target_video=target_video)
-
-    def _infer_video_path(self):
-        """
-        Infer the path to the transition video
-        """
-        return (
-            "transition_[seine]_from_"
-            + self._source_video.get_title()
-            + "_to_"
-            + self._target_video.get_title()
-            + ".mp4"
-        )
 
     @log_function_params
     def build(self, build_settings: VideoBuildSettings = None) -> Transition:
@@ -67,13 +53,12 @@ class SeineTransition(Transition):
             source_image_path=self._source_video.get_last_frame_as_image(),
             target_image_path=self._target_video.get_first_frame_as_image(),
         )
-        print("Link to transition video " + link_to_transition_video)
         logger.debug(
             f"URL Retrieved to be quality augmented {link_to_transition_video}"
         )
         interpolated_transition_link = ml_gw.interpolate(link_to_transition_video)
         # Then we download it
-        target_file_name = self._infer_video_path()
+        target_file_name = self.get_target_file_name(build_settings=build_settings)
         urlretrieve(interpolated_transition_link, target_file_name)
         self._media_url = target_file_name
 

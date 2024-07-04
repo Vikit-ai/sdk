@@ -8,7 +8,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self,
         delete_interim_files: bool = False,
         run_async: bool = False,
-        nb_cpus_to_use: int = 1,  # You can decide how much to parralelize the video building
         test_mode: bool = True,
         expected_length: float = None,  # The expected length in seconds of the video, will be used when actually building the video
         include_audio_read_subtitles: bool = False,  # Include subtitles in the final video
@@ -17,12 +16,14 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         generate_from_llm_prompt: bool = True,
         interpolate: bool = True,  # Ask to interpolate the video
         music_building_context: MusicBuildingContext = MusicBuildingContext(),
+        target_path: str = None,  # The path where the video will be saved, could be local or remote (i.e. a cloud bucket or a streaming service)
     ):
 
         super().__init__(
             delete_interim_files=delete_interim_files,
             run_async=run_async,
             test_mode=test_mode,
+            output_path=target_path,
         )
 
         self.expected_length = expected_length
@@ -31,5 +32,4 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.generate_from_llm_keyword = generate_from_llm_keyword
         self.generate_from_llm_prompt = generate_from_llm_prompt
         self.music_building_context = music_building_context
-        self.nb_cpus_to_use = nb_cpus_to_use
         self.interpolate = interpolate

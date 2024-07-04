@@ -1,7 +1,7 @@
 import subprocess
 import os
-from abc import abstractmethod
-
+from abc import abstractmethod, ABC
+import uuid as uid
 from loguru import logger
 
 from vikit.common.decorators import log_function_params
@@ -13,11 +13,13 @@ from vikit.wrappers.ffmpeg_wrapper import (
 )
 from vikit.prompt.recorded_prompt import RecordedPrompt
 from vikit.video.video_build_settings import VideoBuildSettings
-import vikit.common.os_objects_naming_tools as osnamingtools
+import vikit.common.file_tools as ft
 import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
+from vikit.video.video_file_name import VideoFileName
+from vikit.video.video_metadata import VideoMetadata
 
 
-class Video:
+class Video(ABC):
     """
     Video is a class that helps to manage video files, be it a small video to be mixed or the final one.
 
@@ -41,11 +43,56 @@ class Video:
         """
         self._width = width
         self._height = height
-        self._duration = None
-        self._media_url = None
         self._background_music_file_name = None
+        self._duration = None
         self._is_video_generated = False
         self._needs_reencoding: bool = None
+        self._id = uid.uuid4()
+        self.top_parent_id = (
+            self._id
+        )  # The top parent id is the id of the video that is the top parent of the current video chain, if any
+        self._short_type_name = (
+            "Video"  # a 5 letters identifier to easily identify the type of video
+        )
+        self._videoMetadata = VideoMetadata(
+            id=self._id,
+            title="notitle-yet",
+            duration=0,
+            width=self._width,
+            height=self._height,
+            is_video_generated=False,
+            is_reencoded=False,
+            is_interpolated=False,
+            is_bg_music_applied=False,
+            is_bg_music_generated=None,  # if not using gnerated we infer the default bg music is used
+            top_parent_id=self.top_parent_id,
+        )
+
+        self._media_url = None
+
+    @property
+    def metadata(self):
+        return self._videoMetadata
+
+    @property
+    @abstractmethod
+    def short_type_name(self):
+        """
+        Get the short type name of the video
+        """
+        return self._short_type_name
+
+    @property
+    def width(self):
+        return self._width
+
+    @property
+    def height(self):
+        return self._height
+
+    @property
+    def id(self) -> str:
+        return str(self._id)
 
     @property
     def background_music(self):
@@ -56,22 +103,54 @@ class Video:
             [
                 """////// Video Description \\\\\\""",
                 f"Video Title: {self.get_title()}",
+                f"Video id: {self.id}",
                 f"Duration: {self._duration}",
                 f"Media URL: {self.media_url}",
                 f"Width: {self._width}",
                 f"Height: {self._height}",
                 f"is_video_generated: {self._is_video_generated}",
                 f"background_music_file_name: {self._background_music_file_name}",
+                f"top parent id: {self._background_music_file_name}",
             ]
         )
 
         return os.linesep + video_as_string + os.linesep
 
+    def get_target_file_name(
+        self,
+        build_settings: VideoBuildSettings,
+        metadata: VideoMetadata = None,
+        video_type: str = None,
+    ):
+        """
+        Get the file name of the video depending on the current metadata / vide state
+
+        params:
+            build_settings (VideoBuildSettings): used to gather build contextual information
+            metadata (VideoMetadata): The metadata to use for generating the file name
+            video_type (str): The type of the video
+
+        Returns:
+            str: The file name of the video
+        """
+        if not metadata:
+            metadata = self.metadata
+
+        vid_type = video_type if video_type else self.short_type_name
+
+        video_fname = VideoFileName(
+            video_type=vid_type,
+            video_metadata=metadata,
+            build_settings=build_settings,
+        )
+        return str(video_fname)
+
+    @abstractmethod
     def get_title(self):
         """
         Returns the title of the video.
         """
-        return self.media_url if self.media_url else "no title"
+        return "no title"
 
     @property
     def media_url(self):
@@ -86,11 +165,10 @@ class Video:
         Get the first frame of the video
         """
         assert self._media_url, "no media URL provided"
-        assert os.path.exists(self.media_url), "The video file does not exist"
-        result_path = (
-            "first_frame_video_"
-            + osnamingtools.create_non_colliding_file_name(self._media_url)
-            + ".jpg"
+        assert os.path.exists(self.media_url), "The video file does not exist yet"
+
+        result_path = ft.create_non_colliding_file_name(
+            canonical_name="fst_frm_" + self.get_title()[0], extension=".jpg"
         )
         result = subprocess.run(
             [
@@ -117,10 +195,9 @@ class Video:
         """
         assert self._media_url, "no media URL provided"
         assert os.path.exists(self._media_url), "The video file does not exist"
-        result_path = (
-            "last_frame_video_"
-            + osnamingtools.create_non_colliding_file_name(self._media_url)
-            + ".jpg"
+
+        result_path = ft.create_non_colliding_file_name(
+            canonical_name="last_frm_" + self.get_title()[0], extension=".jpg"
         )
         result = subprocess.run(
             [
@@ -176,15 +253,23 @@ class Video:
         self._media_url = merge_audio(
             media_url=self.media_url, audio_file_path=self._background_music_file_name
         )
+        self.metadata.bg_music_applied = True
         return self
 
-    def _apply_subtitle(self, build_settings: VideoBuildSettings):
+    def _apply_subtitle_as_read_aloud(self, build_settings: VideoBuildSettings):
+        """
+        Merge the subtitle audio to the video to read aloud the prompt
+
+        Args:
+            build_settings (VideoBuildSettings): The settings to use for building the video
+        """
         if build_settings.prompt is RecordedPrompt:
             if build_settings.prompt.audio_recording:
                 merge_audio(
                     media_url=self._media_url,
                     prompt=build_settings.prompt.audio_recording,
                 )
+                self.metadata.is_prompt_read_aloud = True
 
     @abstractmethod
     def build(self, build_settings: VideoBuildSettings = None):
@@ -250,6 +335,7 @@ class Video:
                 test_mode=build_settings.test_mode,
                 prompt_text=prompt_text,
             )
+            self.metadata.is_bg_music_generated = True
         else:
             if self.background_music:
                 if not os.path.exists(self.background_music):

@@ -12,6 +12,7 @@ data/processed/
 data/interim/
 env/
 venv/
+.venv/
 build/
 develop-eggs/
 dist/

@@ -5,6 +5,8 @@ from urllib.error import URLError
 
 from vikit.video.video import Video
 from vikit.common.decorators import log_function_params
+from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.video.video_types import VideoType
 
 TIMEOUT = 5  # TODO: set to global config , seconds before stopping the request to check an URL exists
 
@@ -68,9 +70,27 @@ class Transition(Video):
         self._source_video = source_video
 
     def get_title(self):
-        return (
-            "transition_"
-            + self._source_video.get_title()
-            + "_to_"
-            + self._target_video.get_title()
-        )
+        return str(self._source_video.id)[:5] + "-to-" + str(self._target_video.id)[:5]
+
+    @property
+    def short_type_name(self):
+        """
+        Get the short type name of the video
+        """
+        return str(VideoType.TRANSITION)
+
+    @log_function_params
+    def get_target_file_name(
+        self,
+        build_settings: VideoBuildSettings,
+    ):
+        """
+        Get the file name of the video
+
+        Returns:
+            str: The file name of the video
+        """
+        return super().get_target_file_name(build_settings)
+
+    def build(self, build_settings: VideoBuildSettings = None):
+        super().build(build_settings)

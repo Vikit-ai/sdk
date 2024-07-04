@@ -46,13 +46,8 @@ class TestCompositeVideo(unittest.TestCase):
         Create a single video mix
         No Music
         """
-        video = Video()
-        test_video_mixer = CompositeVideo()
-        test_video_mixer.append_video(video)
-
-        # As we created a video mix with a single video which does not have a real video binary,  we expect an exception here
-        with pytest.raises(AssertionError):
-            _ = test_video_mixer.build()
+        with pytest.raises(TypeError):
+            video = Video()
 
     @pytest.mark.local_integration
     def test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life(
@@ -133,7 +128,8 @@ class TestCompositeVideo(unittest.TestCase):
             final_video = final_video.build(
                 VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
-                        apply_background_music=False
+                        apply_background_music=True,
+                        generate_background_music=False,
                     ),
                     include_audio_read_subtitles=False,
                     prompt=test_prompt_library["moss_stones-train_boy"],
