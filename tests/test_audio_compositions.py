@@ -6,6 +6,7 @@ import unittest
 import warnings
 
 import pytest
+from loguru import logger
 
 from tests.tests_medias import (
     get_cat_video_path,
@@ -17,7 +18,7 @@ from vikit.video.imported_video import ImportedVideo
 from vikit.video.composite_video import CompositeVideo
 from vikit.common.context_managers import WorkingFolderContext
 from tests.tests_tools import test_prompt_library
-from vikit.music import MusicBuildingContext
+from vikit.music_building_context import MusicBuildingContext
 
 
 class TestAudioCompositions(unittest.TestCase):
@@ -26,11 +27,13 @@ class TestAudioCompositions(unittest.TestCase):
         super().__init__(methodName)
         self.sample_video_path = get_cat_video_path()
         self.prompt_loosing_faith = None
+        logger.add("log_test_audio_compositions.txt", rotation="10 MB")
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
 
+    @pytest.mark.unit
     def test_insert_subtitle_audio_no_prompt(self):
         # This test should work as we fail open: if the prompt is not provided, we should not raise an error
         vid = CompositeVideo()

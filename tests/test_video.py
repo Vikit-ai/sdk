@@ -29,6 +29,7 @@ class TestVideo(unittest.TestCase):
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
         warnings.simplefilter("ignore", category=DeprecationWarning)
+        logger.add("log_test_video.txt", rotation="10 MB")
         DeprecationWarning
 
     @pytest.mark.unit
@@ -54,6 +55,7 @@ class TestVideo(unittest.TestCase):
                 PromptBasedVideo(
                     tools.test_prompt_library["moss_stones-train_boy"]
                 ).get_duration()
+
 
     @pytest.mark.local_integration
     def test_get_first_frame_as_image_path_with_sample_video(self):

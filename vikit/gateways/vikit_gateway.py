@@ -7,7 +7,7 @@ from urllib.request import urlretrieve
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.common.decorators import log_function_params
-from vikit.common.secret import get_replicate_api_token, get_vikit_api_token
+from vikit.common.secrets import get_replicate_api_token, get_vikit_api_token
 from vikit.common.config import get_nb_retries_http_calls
 import requests
 import base64

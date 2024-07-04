@@ -1,6 +1,6 @@
 import os
 
-from vikit.music import MusicBuildingContext
+from vikit.music_building_context import MusicBuildingContext
 from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
 from vikit.video.video_types import VideoType

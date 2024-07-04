@@ -30,7 +30,14 @@ class FakeMLModelsGateway(MLModelsGateway):
     def __init__(self):
         pass
 
-    def generate_background_music(self, duration: int = 3, prompt: str = None) -> str:
+    def generate_background_music(self, duration: float = 3, prompt: str = None) -> str:
+
+        if type(duration) is not float:
+            raise TypeError("Duration must be a float")
+
+        if duration < 0:
+            raise ValueError("Duration must be a positive float")
+
         return tests_medias.get_sample_gen_background_music()
 
     # @delay(0)

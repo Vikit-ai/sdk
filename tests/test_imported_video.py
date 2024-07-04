@@ -9,9 +9,9 @@ from loguru import logger
 
 from tests.tests_medias import get_cat_video_path
 from vikit.video.video import VideoBuildSettings
-from vikit.music import MusicBuildingContext
+from vikit.music_building_context import MusicBuildingContext
 from vikit.video.imported_video import ImportedVideo
-from vikit.common.context_managers import WorkingFolderContext, Step
+from vikit.common.context_managers import WorkingFolderContext
 
 
 class TestImportedVideo(unittest.TestCase):
@@ -19,6 +19,7 @@ class TestImportedVideo(unittest.TestCase):
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
+        logger.add("log_test_imported_video.txt", rotation="10 MB")
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)

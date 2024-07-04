@@ -1,6 +1,6 @@
 from vikit.common import GeneralBuildSettings
 from vikit.prompt.recorded_prompt import RecordedPrompt
-from vikit.music import MusicBuildingContext
+from vikit.music_building_context import MusicBuildingContext
 
 
 class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):

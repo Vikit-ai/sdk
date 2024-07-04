@@ -1,0 +1,48 @@
+text_prompt_subtitles_extractor
+===============================
+
+.. py:module:: text_prompt_subtitles_extractor
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   text_prompt_subtitles_extractor.TextPromptSubtitlesExtractor
+
+
+Module Contents
+---------------
+
+.. py:class:: TextPromptSubtitlesExtractor
+
+   Bases: :py:obj:`vikit.prompt.subtitle_extractor.SubtitleExtractor`
+
+
+   A class to extract subtitles from a sound recording,
+   merge short subtitles into longer ones, or extract them as text tokens
+
+   We do use an heuristic, so it is not as good
+   as creating a recording and getting the prompts from LLMs in the right language
+   but it is a good start and it goes faster than the other way around.
+
+   So  here we just split the text prompt into words and consider each word takes roughly
+   x seconds to pronounce. All these are set in config files
+
+   Here we don't need to rebuild a full srt file as with recorded prompts
+
+
+
+   .. py:method:: extract_subtitles(text) -> list[pysrt.SubRipItem]
+
+      Generate subtitles from a text prompt
+
+      Args:
+          text: The text prompt
+
+      Returns:
+          A list of subtitles generated from the text prompt as a list of pysrt.SubRipItem
+
+
+

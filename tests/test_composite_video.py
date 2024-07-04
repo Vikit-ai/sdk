@@ -11,7 +11,7 @@ from vikit.common.context_managers import WorkingFolderContext
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 import tests.tests_tools as tools  # used to get a library of test prompts
 import vikit.wrappers.ffmpeg_wrapper as ffmpegwrapper
-from vikit.music import MusicBuildingContext
+from vikit.music_building_context import MusicBuildingContext
 from tests.tests_tools import test_prompt_library
 from vikit.video.imported_video import ImportedVideo
 
@@ -29,11 +29,13 @@ class TestCompositeVideo(unittest.TestCase):
         super().__init__(methodName)
         self.sample_cat_video_path = test_media.get_cat_video_path()
         self.prompt_loosing_faith = None
+        logger.add("log_test_composite_video.txt", rotation="10 MB")
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
 
+    @pytest.mark.unit
     def test_create_video_mix_with_empty_video(self):
         video = None
         test_video_mixer = CompositeVideo()

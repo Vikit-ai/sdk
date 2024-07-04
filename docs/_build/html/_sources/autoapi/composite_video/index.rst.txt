@@ -1,0 +1,60 @@
+composite_video
+===============
+
+.. py:module:: composite_video
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   composite_video.CompositeVideo
+
+
+Module Contents
+---------------
+
+.. py:class:: CompositeVideo(target_file_name=None)
+
+   Bases: :py:obj:`vikit.video.video.Video`
+
+
+   Composite made from the collection of videos that need to be generated altogether, as a consistent block
+   It could be a final video or intermediate  composing specific scenes of the final video.
+
+   Composite video can include other composite videos, and so on, to build a tree of videos to be generated
+
+
+   .. py:property:: video_list
+      :type: list[vikit.video.video.Video]
+
+
+
+   .. py:method:: append_video(video: vikit.video.video.Video = None)
+
+      Append a video to the list of videos to be mixed
+
+
+
+   .. py:method:: get_duration()
+
+
+   .. py:method:: get_title()
+
+
+   .. py:method:: build(build_settings=VideoBuildSettings(), building_strategy: vikit.video.composite_video_builder_strategy.CompositeVideoBuilderStrategy = None)
+
+      Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,
+      as we call external services and run video mixing locally.
+
+      The actual algorithm depends on the provided strategy (local, cloud, etc.)
+
+      :param build_settings: The settings to be used for the build
+      :param building_strategy: The strategy to be used for the build
+
+      Returns:
+          self: The current object
+
+
+

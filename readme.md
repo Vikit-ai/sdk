@@ -10,7 +10,6 @@ Vikit.ai SDK is easy to test using collab, and easy to develop trough Dev Contai
 
 ## Installation
 
-
 ### Requirements for local installation
 
 Server includes a Requirements file for python and package.json for npm

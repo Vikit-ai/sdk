@@ -1,0 +1,42 @@
+text_prompt_builder
+===================
+
+.. py:module:: text_prompt_builder
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   text_prompt_builder.TextPromptBuilder
+
+
+Module Contents
+---------------
+
+.. py:class:: TextPromptBuilder
+
+   Builds a text prompt
+
+   Most functions are used by a prompt builder, as the way to generate a prompt may vary and get a bit complex
+
+
+   .. py:method:: set_prompt_text(text: str)
+
+
+   .. py:method:: set_subtitles(subs: list[pysrt.SubRipItem])
+
+      set the prompt text using an LLM which extracts it from the recorded file
+
+
+
+   .. py:method:: set_recording(recording_path: str)
+
+      set the recording path
+
+
+
+   .. py:method:: build()
+
+

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ffmpeg_wrapper &#8212; vikit.ai SDK 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=297bf455" />
+    <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="imported_video" href="../imported_video/index.html" />
+    <link rel="prev" title="vikit_gateway" href="../vikit_gateway/index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-ffmpeg_wrapper">
+<span id="ffmpeg-wrapper"></span><h1>ffmpeg_wrapper<a class="headerlink" href="#module-ffmpeg_wrapper" title="Link to this heading">¶</a></h1>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.has_audio_track" title="ffmpeg_wrapper.has_audio_track"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_audio_track</span></code></a>(video_path)</p></td>
+<td><p>Check if the video has an audio track</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ffmpeg_wrapper.get_media_duration" title="ffmpeg_wrapper.get_media_duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_media_duration</span></code></a>(input_video_path)</p></td>
+<td><p>Get the duration of a media file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.extract_audio_slice" title="ffmpeg_wrapper.extract_audio_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_audio_slice</span></code></a>(audiofile_path[, start, end, ...])</p></td>
+<td><p>Extract a slice of the audio file using ffmpeg</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ffmpeg_wrapper.convert_as_mp3_file" title="ffmpeg_wrapper.convert_as_mp3_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_as_mp3_file</span></code></a>(fileName, target_file_name)</p></td>
+<td><p>Save the incoming audio file to a regular mp3 file with a standardised filename</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.concatenate_videos" title="ffmpeg_wrapper.concatenate_videos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concatenate_videos</span></code></a>(input_file[, target_file_name, ...])</p></td>
+<td><p>Concatenate all the videos in the list using a concatenation file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ffmpeg_wrapper.merge_audio" title="ffmpeg_wrapper.merge_audio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_audio</span></code></a>(media_url, audio_file_path[, ...])</p></td>
+<td><p>Merge audio with the video</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.reencode_video" title="ffmpeg_wrapper.reencode_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reencode_video</span></code></a>(params)</p></td>
+<td><p>Reencode the video, doing this for imported video that might not concatenate well</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ffmpeg_wrapper.has_audio_track">
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">has_audio_track</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.has_audio_track" title="Link to this definition">¶</a></dt>
+<dd><p>Check if the video has an audio track</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>video_path (str): The path to the video file</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if the video has an audio track, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ffmpeg_wrapper.get_media_duration">
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">get_media_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.get_media_duration" title="Link to this definition">¶</a></dt>
+<dd><p>Get the duration of a media file.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>input_video_path (str): The path to the input video file.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The duration of the media file in seconds.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ffmpeg_wrapper.extract_audio_slice">
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">extract_audio_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">audiofile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.extract_audio_slice" title="Link to this definition">¶</a></dt>
+<dd><p>Extract a slice of the audio file using ffmpeg</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>start (int): The start of the slice
+end (int): The end of the slice
+audiofile_path (str): The path to the audio file
+target_file_name : the target file name</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: The path to the extracted audio slice</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ffmpeg_wrapper.convert_as_mp3_file">
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">convert_as_mp3_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.convert_as_mp3_file" title="Link to this definition">¶</a></dt>
+<dd><p>Save the incoming audio file to a regular mp3 file with a standardised filename</p>
+<p>Args:</p>
+<blockquote>
+<div><p>fileName (str): The path to the audio file to convert</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: The path to the converted audio file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ffmpeg_wrapper.concatenate_videos">
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">concatenate_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratioToMultiplyAnimations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.33</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.concatenate_videos" title="Link to this definition">¶</a></dt>
+<dd><p>Concatenate all the videos in the list using a concatenation file</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>input_file (str): The path to the input file
+target_file_name (str): The target file name
+ratioToMultiplyAnimations (int): The ratio to multiply animations
+bias (int): The bias to add to the ratio for the sound to be in sync with video frames</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: The path to the concatenated video file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ffmpeg_wrapper.merge_audio">
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">merge_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">media_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_file_relative_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.merge_audio" title="Link to this definition">¶</a></dt>
+<dd><p>Merge audio with the video</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>media_url (str): The media url to merge
+audio_file_path (str): The audio file path to merge
+audio_file_relative_volume (float): The relative volume of the audio file</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: The merged audio file path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ffmpeg_wrapper.reencode_video">
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">reencode_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.reencode_video" title="Link to this definition">¶</a></dt>
+<dd><p>Reencode the video, doing this for imported video that might not concatenate well
+with generated ones or among themselves</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>params (tuple): The parameters to reencode the video</p>
+</dd>
+<dt>Returns:</dt><dd><p>Video: The reencoded video</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">vikit.ai SDK</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../video/index.html">video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config/index.html">config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prompt/index.html">prompt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../secrets/index.html">secrets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transition/index.html">transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../decorators/index.html">decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../text_prompt/index.html">text_prompt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mail_gateway/index.html">mail_gateway</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vikit_gateway/index.html">vikit_gateway</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ffmpeg_wrapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imported_video/index.html">imported_video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prompt_factory/index.html">prompt_factory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../composite_video/index.html">composite_video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prompt_cleaning/index.html">prompt_cleaning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recorded_prompt/index.html">recorded_prompt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../discord_gateway/index.html">discord_gateway</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../seine_transition/index.html">seine_transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../context_managers/index.html">context_managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ML_models_gateway/index.html">ML_models_gateway</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../replicate_gateway/index.html">replicate_gateway</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prompt_based_video/index.html">prompt_based_video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../subtitle_extractor/index.html">subtitle_extractor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../elevenlabs_gateway/index.html">elevenlabs_gateway</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../text_prompt_builder/index.html">text_prompt_builder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../raw_text_based_video/index.html">raw_text_based_video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../video_build_settings/index.html">video_build_settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../GeneralBuildSettings/index.html">GeneralBuildSettings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cloud_storage_gateway/index.html">cloud_storage_gateway</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../music_building_context/index.html">music_building_context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fake_ML_models_gateway/index.html">fake_ML_models_gateway</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../os_objects_naming_tools/index.html">os_objects_naming_tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recorded_prompt_builder/index.html">recorded_prompt_builder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ML_models_gateway_factory/index.html">ML_models_gateway_factory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../text_prompt_subtitles_extractor/index.html">text_prompt_subtitles_extractor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy/index.html">composite_video_builder_strategy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recorded_prompt_subtitles_extractor/index.html">recorded_prompt_subtitles_extractor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_cloud/index.html">composite_video_builder_strategy_cloud</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_local/index.html">composite_video_builder_strategy_local</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_factory/index.html">composite_video_builder_strategy_factory</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">API Reference</a><ul>
+      <li>Previous: <a href="../vikit_gateway/index.html" title="previous chapter">vikit_gateway</a></li>
+      <li>Next: <a href="../imported_video/index.html" title="next chapter">imported_video</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, vikit.ai team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../../_sources/autoapi/ffmpeg_wrapper/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

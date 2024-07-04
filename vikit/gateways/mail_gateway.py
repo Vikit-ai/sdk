@@ -4,7 +4,7 @@ from pprint import pprint
 from loguru import logger
 
 from vikit.common.config import get_videho_email_contact
-from vikit.common.secret import get_sendinblue_api_key
+from vikit.common.secrets import get_sendinblue_api_key
 
 
 def send_email(emailToSend, nameOfFile):
