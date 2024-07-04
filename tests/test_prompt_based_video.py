@@ -120,34 +120,35 @@ class TestPromptBasedVideo(unittest.TestCase):
             assert result is not None
             assert os.path.exists(result.media_url)
 
-    @pytest.mark.local_integration
-    @unittest.skip("To be activated on case by case basis")
-    def test_use_sound_of_silence_original_audio_infer_subs_from_audio(self):
-        """
-        Test generating video from music prompt with original audio
-        """
-        with WorkingFolderContext():
+    # @pytest.mark.local_integration
+    # @unittest.skip("To be activated on case by case basis")
+    # def test_use_sound_of_silence_original_audio_infer_subs_from_audio(self):
+    #     """
+    #     Test generating video from music prompt with original audio
+    #     """
+    #     with WorkingFolderContext():
 
-            build_settings = VideoBuildSettings(
-                music_building_context=MusicBuildingContext(
-                    apply_background_music=True, use_recorded_prompt_as_audio=True
-                ),
-                include_audio_read_subtitles=False,
-                test_mode=True,
-            )
+    #         build_settings = VideoBuildSettings(
+    #             music_building_context=MusicBuildingContext(
+    #                 apply_background_music=True, use_recorded_prompt_as_audio=True
+    #             ),
+    #             include_audio_read_subtitles=False,
+    #             test_mode=True,
+    #         )
 
-            original_recording_prompt = tools.test_prompt_library["sound of silence"]
-            infered_prompt = PromptFactory(
-                ml_gateway=build_settings.get_ml_models_gateway()
-            ).create_prompt_from_audio_file(  # Here we create a prompt from audio
-                original_recording_prompt._recorded_audio_prompt_path
-            )
-            build_settings.prompt = infered_prompt
-            vid_sof = PromptBasedVideo(infered_prompt)
-            vid_final = vid_sof.build(build_settings=build_settings)
+    #         original_recording_prompt = tools.test_prompt_library["sound of silence"]
+    #         infered_prompt = PromptFactory(
+    #             ml_gateway=build_settings.get_ml_models_gateway()
+    #         ).create_prompt_from_audio_file(  # Here we create a prompt from audio
+    #             original_recording_prompt._recorded_audio_prompt_path
+    #         )
+    #         build_settings.prompt = infered_prompt
+    #         vid_sof = PromptBasedVideo(infered_prompt)
+    #         vid_final = vid_sof.build(build_settings=build_settings)
 
-            assert vid_final.media_url is not None
-            assert vid_final.background_music is not None
+    #         assert vid_final.media_url is not None
+    #         assert vid_final.background_music is not None
+
 
     @pytest.mark.integration
     @unittest.skip("To be activated on case by case basis")

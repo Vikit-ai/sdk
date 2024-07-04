@@ -1,7 +1,8 @@
 import random
 from concurrent.futures import ProcessPoolExecutor
 import os
-import atexit
+
+# import atexit
 
 from loguru import logger
 
@@ -12,15 +13,15 @@ from vikit.video.composite_video_builder_strategy import (
     CompositeVideoBuilderStrategy,
 )
 
-# The following code is used to mutualize the processexecutor across all the CompositeVideoBuilderStrategyLocal instances
+# # The following code is used to mutualize the processexecutor across all the CompositeVideoBuilderStrategyLocal instances
 executor = ProcessPoolExecutor()
 
 
-def shutdown_executor():
-    executor.shutdown(wait=True)
+# def shutdown_executor():
+#     executor.shutdown(wait=True)
 
 
-atexit.register(shutdown_executor)
+# atexit.register(shutdown_executor)
 
 
 class CompositeVideoBuilderStrategyLocal(CompositeVideoBuilderStrategy):
@@ -47,12 +48,17 @@ class CompositeVideoBuilderStrategyLocal(CompositeVideoBuilderStrategy):
         Returns:
             CompositeVideo: The composite video
         """
-        super().execute(composite_video=composite_video, build_settings=build_settings)
+        if composite_video is None:
+            raise ValueError("Composite video cannot be None")
+        self._composite_video = composite_video
+
+        short_title = composite_video.get_title()
+        if len(short_title) > 20:
+            short_title = short_title[:20]
 
         video_list_file = "_".join(
             [
-                self._composite_video.get_title(),
-                str(random.randint(0, 1000)),
+                short_title,
                 config.get_video_list_file_name(),
             ]
         )
@@ -69,6 +75,22 @@ class CompositeVideoBuilderStrategyLocal(CompositeVideoBuilderStrategy):
             video_list=self._composite_video.video_list,
             function_to_invoke=self._process_gen_vid_bins,
         )
+        nb_interpolated = len(
+            list(
+                filter(
+                    lambda builtvideo: builtvideo.metadata.is_interpolated,
+                    self._composite_video._video_list,
+                )
+            )
+        )
+
+        if nb_interpolated < len(self._composite_video._video_list):
+            self._composite_video.metadata.is_interpolated
+        elif nb_interpolated == 0:
+            self._composite_video.metadata.is_interpolated = False
+        # else: #TODO: handle partially interpolated videos, not really importnat for now
+        #     self.metadata.is_interpolated = True
+
         ratio = self._get_ratio_to_multiply_animations(
             build_settings=build_settings, video_composite=self._composite_video
         )
@@ -78,8 +100,9 @@ class CompositeVideoBuilderStrategyLocal(CompositeVideoBuilderStrategy):
                 video_list=self._composite_video.video_list,
                 function_to_invoke=reencode_video,
             )
+            self._composite_video.metadata.is_reencoded = True
 
-        # We have the final file names (they nay have changed between initial video instanciation and
+        # We have the final file names (they may have changed between initial video instanciation and
         # inference of a name after querying an LLM
         with open(video_list_file, "w") as myfile:
             for video in self._composite_video.video_list:
@@ -88,7 +111,9 @@ class CompositeVideoBuilderStrategyLocal(CompositeVideoBuilderStrategy):
 
         self._composite_video._media_url = concatenate_videos(
             input_file=os.path.abspath(video_list_file),
-            target_file_name=self._composite_video._get_target_file_name(),
+            target_file_name=self._composite_video.get_file_name_by_state(
+                build_settings=build_settings
+            ),
             ratioToMultiplyAnimations=ratio,
         )  # keeping one consistent file name
 
@@ -137,7 +162,18 @@ class CompositeVideoBuilderStrategyLocal(CompositeVideoBuilderStrategy):
             results = []
             for video in video_list:
                 results.extend(
-                    [function_to_invoke((video, build_settings, video.media_url))]
+                    [
+                        function_to_invoke(
+                            (
+                                video,
+                                build_settings,
+                                video.media_url,
+                                video.get_file_name_by_state(
+                                    build_settings=build_settings
+                                ),
+                            )
+                        )
+                    ]
                 )
 
         return results

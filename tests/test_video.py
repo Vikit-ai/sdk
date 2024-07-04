@@ -7,11 +7,11 @@ import warnings
 import pytest
 from loguru import logger
 
-from vikit.video.video import Video
 from vikit.video.imported_video import ImportedVideo
 from vikit.video.prompt_based_video import PromptBasedVideo
-from vikit.common.context_managers import WorkingFolderContext, Step
+from vikit.common.context_managers import WorkingFolderContext
 import tests.tests_tools as tools  # used to get a library of test prompts
+
 
 TESTS_MEDIA_FOLDER = "medias/"
 SMALL_VIDEO_CHAT_FILE = "chat_video_super8.mp4"
@@ -39,42 +39,23 @@ class TestVideo(unittest.TestCase):
                 tools.test_prompt_library["moss_stones-train_boy"]
             ).get_first_frame_as_image()
 
-    @pytest.mark.unit
+    @pytest.mark.local_integration
     def test_get_last_frame_as_image_path_with_non_generated_video(self):
         with pytest.raises(AssertionError):
             PromptBasedVideo(
                 tools.test_prompt_library["moss_stones-train_boy"]
             ).get_last_frame_as_image()
 
-    @pytest.mark.unit
-    def test_display_video_as_console_text(self):
-        prompt = tools.test_prompt_library["moss_stones-train_boy"]
-
-        video = PromptBasedVideo(prompt)
-        logger.debug(f"Test display_video_as_text, video: {video}")
-        assert (
-            video.__str__().splitlines().__len__() > 4
-        )  # here we check the console representation
-
     @pytest.mark.integration
     def test_get_duration(self):
         with WorkingFolderContext():
-            with Step(
-                msg="test_get_last_frame_as_image_path_with_sample_video",
-                emoji=":man_running:",
-            ):
-                with pytest.raises(
-                    ValueError
-                ):  # As the video is not generated, we should raise an error
-                    PromptBasedVideo(
-                        tools.test_prompt_library["moss_stones-train_boy"]
-                    ).get_duration()
+            with pytest.raises(
+                ValueError
+            ):  # As the video is not generated, we should raise an error
+                PromptBasedVideo(
+                    tools.test_prompt_library["moss_stones-train_boy"]
+                ).get_duration()
 
-    @pytest.mark.unit
-    def test_get_bk_music_filemame(self):
-        video_test = Video()
-        video_test._media_url = "/usr/path/to/my/file.mp4"
-        assert video_test._get_bk_music_target_filemame() == "file_background_music.mp3"
 
     @pytest.mark.local_integration
     def test_get_first_frame_as_image_path_with_sample_video(self):

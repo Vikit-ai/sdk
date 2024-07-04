@@ -6,7 +6,7 @@ from loguru import logger
 
 import vikit.common.config as config
 from vikit.common.decorators import log_function_params
-from vikit.common.os_objects_naming_tools import get_canonical_name
+from vikit.common.file_tools import get_canonical_name
 
 
 @log_function_params
@@ -203,7 +203,7 @@ def concatenate_videos(
         "-i",
         input_file,
         "-vf",
-        f"setpts={1/ratioToMultiplyAnimations} * PTS",
+        f"setpts={1 / ratioToMultiplyAnimations} * PTS",
         "-c:v",
         "libx264",
         "-crf",
@@ -224,7 +224,10 @@ def concatenate_videos(
 
 
 def merge_audio(
-    media_url: str, audio_file_path: str, audio_file_relative_volume: float = None
+    media_url: str,
+    audio_file_path: str,
+    audio_file_relative_volume: float = None,
+    target_file_name=None,
 ):
     """
     Merge audio with the video
@@ -233,39 +236,37 @@ def merge_audio(
         media_url (str): The media url to merge
         audio_file_path (str): The audio file path to merge
         audio_file_relative_volume (float): The relative volume of the audio file
+        target_file_name (str): The target file name
 
     Returns:
         str: The merged audio file path
 
     """
-    merged_file_name_prefix = (
-        get_canonical_name(media_url)
-        + "_mgd_with_"
-        + get_canonical_name(audio_file_path)
-    )
+    if not target_file_name:
+        target_file_name = "merged_audio_video.mp4"
+
     if has_audio_track(media_url):
         merged_file = _merge_audio_and_video_with_existing_audio(
             media_url=media_url,
             audio_file_path=audio_file_path,
-            merged_file_name_prefix=merged_file_name_prefix,
+            target_file_name=target_file_name,
             audio_file_relative_volume=(
                 audio_file_relative_volume if audio_file_relative_volume else 1.0
             ),
         )
     else:
         merged_file = _merge_audio_and_video_without_audio_track(
-            media_url, audio_file_path, merged_file_name_prefix
+            media_url, audio_file_path, target_file_name=target_file_name
         )
 
     return merged_file
-    # return merged_file_name_prefix + "_encoded.mp4"
 
 
 def _merge_audio_and_video_with_existing_audio(
     media_url: str,
     audio_file_path: str,
     audio_file_relative_volume=1,
-    merged_file_name_prefix="merged_audio_video",
+    target_file_name=None,
 ):
     """
     Merge audio with the video in the case where video already has at least oneaudio track, typically
@@ -275,12 +276,13 @@ def _merge_audio_and_video_with_existing_audio(
         media_url (str): The media url to merge
         audio_file_path (str): The audio file path to merge
         audio_file_relative_volume (float): The relative volume of the audio file
-        merged_file_name_prefix (str): The prefix for the merged file
+        target_file_name (str): The target file name
 
     Returns:
         str: The merged audio file
 
     """
+
     result = subprocess.run(
         [
             "ffmpeg",
@@ -309,7 +311,7 @@ def _merge_audio_and_video_with_existing_audio(
             "44100",  # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
             "-ac",
             "2",  # This tells FFmpeg to use 2 audio channels.
-            merged_file_name_prefix + ".mp4",
+            target_file_name,
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -323,13 +325,13 @@ def _merge_audio_and_video_with_existing_audio(
     )
     result.check_returncode()
 
-    return merged_file_name_prefix + ".mp4"
+    return target_file_name
 
 
 def _merge_audio_and_video_without_audio_track(
     media_url: str,
     audio_file_path: str,
-    merged_file_name_prefix="merged_audio_video",
+    target_file_name="merged_audio_video.mp4",
     audio_file_relative_volume=1,
 ):
     """
@@ -340,7 +342,7 @@ def _merge_audio_and_video_without_audio_track(
         media_url (str): The media url to merge
         audio_file_path (str): The audio file path to merge
         audio_file_relative_volume (float): The relative volume of the audio file
-        merged_file_name_prefix (str): The prefix for the merged file
+        target_file_name (str): The target file name
 
     Returns:
         str: The merged audio file
@@ -374,7 +376,7 @@ def _merge_audio_and_video_without_audio_track(
         "44100",
         "-ac",
         "2",
-        merged_file_name_prefix + ".mp4",
+        target_file_name,
     ]
 
     result = subprocess.run(
@@ -391,7 +393,7 @@ def _merge_audio_and_video_without_audio_track(
     )
     result.check_returncode()
 
-    return merged_file_name_prefix + ".mp4"
+    return target_file_name
 
 
 def reencode_video(params):
@@ -401,12 +403,14 @@ def reencode_video(params):
 
     Args:
         params (tuple): The parameters to reencode the video
+        video, build_settings, video.media_url
 
     Returns:
         Video: The reencoded video
     """
-    video, _, video_url = params
-    target_video_name = "reencoded_" + get_canonical_name(video_url) + ".mp4"
+    video, _, video_url, target_video_name = params
+    if not target_video_name:
+        target_video_name = "reencoded_" + get_canonical_name(video_url) + ".mp4"
 
     result = subprocess.run(
         [

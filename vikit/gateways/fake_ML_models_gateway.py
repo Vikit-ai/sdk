@@ -1,12 +1,13 @@
 import os
-
-from vikit.gateways.ML_models_gateway import MLModelsGateway
-import tests.tests_medias as tests_medias
-from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from pathlib import Path
+
+import tests.tests_medias as tests_medias
+import vikit.common.file_tools as ft
+from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from urllib.parse import urljoin
 from urllib.request import pathname2url
-import vikit.common.os_objects_naming_tools as osnamingtools
+from vikit.common.decorators import delay
+from vikit.gateways.ML_models_gateway import MLModelsGateway
 
 TESTS_MEDIA_FOLDER = "tests/medias/"
 STUDENT_ARM_WRITING = "student_arm_writting.mp4"
@@ -39,6 +40,7 @@ class FakeMLModelsGateway(MLModelsGateway):
 
         return tests_medias.get_sample_gen_background_music()
 
+    # @delay(0)
     def generate_seine_transition(self, source_image_path, target_image_path):
         return tests_medias.get_test_transition_stones_trainboy_path()  # Important:
 
@@ -48,24 +50,18 @@ class FakeMLModelsGateway(MLModelsGateway):
     def cleanse_llm_keywords(self, input):
         return cleanse_llm_keywords(input)
 
+    # @delay(0)
     def compose_music_from_text(self, prompt_text: str, duration: int):
         return tests_medias.get_sample_generated_music_path()
 
     def get_music_generation_keywords(self, text) -> str:
         return "KEYWORDS FROM MUSIC GENERATION"
 
+    # @delay(0)
     def interpolate(self, link_to_video: str):
-        if link_to_video.__contains__("transition"):
-            return urljoin(
-                "file:",
-                pathname2url(
-                    str(tests_medias.get_test_transition_stones_trainboy_path())
-                ),
-            )
-        else:
-            local_file_path = Path(os.path.join(_sample_media_dir, STUDENT_ARM_WRITING))
-            local_file_url = urljoin("file:", pathname2url(str(local_file_path)))
-            return local_file_url
+        local_file_path = Path(os.path.join(_sample_media_dir, STUDENT_ARM_WRITING))
+        local_file_url = urljoin("file:", pathname2url(str(local_file_path)))
+        return local_file_url
 
     def get_keywords_from_prompt(self, subtitleText, excluded_words: str = None):
         return "KEYWORDS FROM PROMPT", "keywords_from_prompt_file"
@@ -73,19 +69,18 @@ class FakeMLModelsGateway(MLModelsGateway):
     def get_enhanced_prompt(self, subtitleText):
         return "ENHANCED FROM PROMPT", "enhanced_from_prompt_file"
 
+    # @delay(0)
     def get_subtitles(self, audiofile_path):
         subs = None
-        with open(os.path.join(_sample_media_dir, "subtitle_0_13.srt"), "r") as f:
+        with open(os.path.join(_sample_media_dir, "subtitles.srt"), "r") as f:
             subs = f.read()
         return {"transcription": subs}
 
-    def generate_video(self, prompt: str):
-        return (
-            osnamingtools.create_non_colliding_file_name(
-                tests_medias.get_cat_video_path()
-            )
-            + ".mp4"
+    # @delay(0)
+    def generate_video(self, prompt: str = None):
+        return ft.create_non_colliding_file_name(
+            tests_medias.get_cat_video_path()[:-4], extension="mp4"
         )
 
     def extract_audio_slice(self, i, end, audiofile_path, target_file_name: str = None):
-        return tests_medias.get_audio_slice()
+        return tests_medias.get_test_prompt_recording_trainboy()

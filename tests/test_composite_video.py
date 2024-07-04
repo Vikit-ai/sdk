@@ -48,13 +48,8 @@ class TestCompositeVideo(unittest.TestCase):
         Create a single video mix
         No Music
         """
-        video = Video()
-        test_video_mixer = CompositeVideo()
-        test_video_mixer.append_video(video)
-
-        # As we created a video mix with a single video which does not have a real video binary,  we expect an exception here
-        with pytest.raises(AssertionError):
-            _ = test_video_mixer.build()
+        with pytest.raises(TypeError):
+            _ = Video()
 
     @pytest.mark.local_integration
     def test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life(
@@ -107,19 +102,23 @@ class TestCompositeVideo(unittest.TestCase):
     def test_build_video_composite_2_prompt_vids_music_no_subs_no_transition(self):
         with WorkingFolderContext():
             test_prompt = prompt_mystic
-            video = RawTextBasedVideo(test_prompt.text)
+            raw_text_video = RawTextBasedVideo(test_prompt.text)
             test_video_mixer = CompositeVideo()
-            test_video_mixer.append_video(video).append_video(video)
+            test_video_mixer.append_video(raw_text_video).append_video(raw_text_video)
             test_video_mixer.build(
                 VideoBuildSettings(
                     test_mode=True,
                     music_building_context=MusicBuildingContext(
-                        generate_background_music=True, apply_background_music=True
+                        apply_background_music=True, generate_background_music=True
                     ),
                 )
             )
-            assert test_video_mixer.media_url is not None
-            assert test_video_mixer.background_music
+            assert (
+                test_video_mixer.media_url is not None
+            ), "Media URL should not be null"
+            assert (
+                test_video_mixer.background_music
+            ), "Background music should not be null"
 
     @pytest.mark.local_integration
     def test_build_video_composite_with_default_bkg_music_and_audio_subtitle(self):
@@ -130,19 +129,20 @@ class TestCompositeVideo(unittest.TestCase):
             final_video = (
                 test_video_mixer.append_video(video_start)
                 .append_video(video_end)
-                .append_video(CompositeVideo())
+                .append_video(CompositeVideo())  # should be filtered
             )
             final_video = final_video.build(
                 VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
-                        apply_background_music=False
+                        apply_background_music=True,
+                        generate_background_music=False,
                     ),
                     include_audio_read_subtitles=False,
                     prompt=test_prompt_library["moss_stones-train_boy"],
                 )
             )
             assert final_video.media_url is not None
-            assert final_video.background_music is None
+            assert final_video.background_music is not None
 
     @pytest.mark.local_integration
     def test_prompt_recording_synchro_tired(self):

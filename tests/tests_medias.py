@@ -32,10 +32,6 @@ def get_sample_generated_music_path():
     return os.path.join(_media_dir, SAMPLE_GENERATED_MUSIC)
 
 
-def get_audio_slice():
-    return os.path.join(_media_dir, "sub_audio_for_subtitle_from_0_to_13.mp3")
-
-
 def get_generated_3s_forest_video_1_path():
     """
     Return the path to the generated 3s forest video sample usually used as start

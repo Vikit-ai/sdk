@@ -15,6 +15,9 @@ class SubtitleExtractor:
         """
         Merge subtitles which total duration is less than 7 seconds
         """
+        if subtitles is None:
+            raise ValueError("The subtitles are not provided")
+
         subs = subtitles
         assert len(subs) > 0, "No Subtitles to process from the provided recording file"
         logger.debug(f"Subs to merge {len(subs)}")

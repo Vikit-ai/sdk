@@ -3,6 +3,7 @@ import os
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
+from vikit.video.video_types import VideoType
 
 
 class ImportedVideo(Video):
@@ -30,6 +31,7 @@ class ImportedVideo(Video):
             raise ValueError("The video file path should be provided")
 
         self._needs_reencoding = True
+        self.metadata.title = self.get_title()
 
     def get_title(self):
         """
@@ -65,3 +67,23 @@ class ImportedVideo(Video):
             self._apply_background_music(background_music_file=music_file)
 
         return self
+
+    @property
+    def short_type_name(self):
+        """
+        Get the short type name of the video
+        """
+        return str(VideoType.TRANSITION)
+
+    @log_function_params
+    def get_file_name_by_state(
+        self,
+        build_settings: VideoBuildSettings,
+    ):
+        """
+        Get the file name of the video
+
+        Returns:
+            str: The file name of the video
+        """
+        return super().get_file_name_by_state(build_settings)
