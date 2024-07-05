@@ -1,4 +1,5 @@
 import os
+import asyncio
 
 from urllib.request import urlretrieve
 from loguru import logger
@@ -106,24 +107,30 @@ class RawTextBasedVideo(Video):
 
         if build_settings.generate_from_llm_keyword:
             # Get more colorfull keywords from prompt, and a title and handle excluded words
-            enhanced_prompt, self._title = ml_gateway.get_keywords_from_prompt(
-                self._text, excluded_words=excluded_words
+            enhanced_prompt, self._title = asyncio.run(
+                ml_gateway.get_keywords_from_prompt_async(
+                    self._text, excluded_words=excluded_words
+                )
             )
             self._keywords = enhanced_prompt
         else:
             # Get more colorfull prompt from current prompt text
-            enhanced_prompt, enhanced_title = ml_gateway.get_enhanced_prompt(self._text)
+            enhanced_prompt, enhanced_title = asyncio.run(
+                ml_gateway.get_enhanced_prompt_async(self._text)
+            )
             if self._title is None:
                 self._title = ft.get_safe_filename(enhanced_title)
             self._keywords = None
 
-        video_link_from_prompt = ml_gateway.generate_video(
+        video_link_from_prompt = ml_gateway.generate_video_async(
             enhanced_prompt
         )  # Should give a link on the Internet
         self.metadata.is_video_generated = True
 
         if build_settings.interpolate:
-            interpolated_video = ml_gateway.interpolate(video_link_from_prompt)
+            interpolated_video = asyncio.run(
+                ml_gateway.interpolate_async(video_link_from_prompt)
+            )
             self.metadata.is_interpolated = True
             file_name = self.get_file_name_by_state(build_settings)
             interpolated_video_path = urlretrieve(

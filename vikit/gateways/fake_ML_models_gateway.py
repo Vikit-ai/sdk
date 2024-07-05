@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+
 import tests.tests_medias as tests_medias
 import vikit.common.file_tools as ft
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
@@ -30,7 +31,10 @@ class FakeMLModelsGateway(MLModelsGateway):
     def __init__(self):
         pass
 
-    def generate_background_music(self, duration: float = 3, prompt: str = None) -> str:
+    @delay(1)
+    async def generate_background_music_async(
+        self, duration: float = 3, prompt: str = None
+    ) -> str:
 
         if type(duration) is not float:
             raise TypeError("Duration must be a float")
@@ -40,8 +44,10 @@ class FakeMLModelsGateway(MLModelsGateway):
 
         return tests_medias.get_sample_gen_background_music()
 
-    # @delay(0)
-    def generate_seine_transition(self, source_image_path, target_image_path):
+    @delay(1)
+    async def generate_seine_transition_async(
+        self, source_image_path, target_image_path
+    ):
         return tests_medias.get_test_transition_stones_trainboy_path()  # Important:
 
     # the returned name should contains "transition" in the file name so we send the same video at the interpolate call
@@ -50,37 +56,42 @@ class FakeMLModelsGateway(MLModelsGateway):
     def cleanse_llm_keywords(self, input):
         return cleanse_llm_keywords(input)
 
-    # @delay(0)
-    def compose_music_from_text(self, prompt_text: str, duration: int):
+    @delay(1)
+    async def compose_music_from_text_async(self, prompt_text: str, duration: int):
         return tests_medias.get_sample_generated_music_path()
 
-    def get_music_generation_keywords(self, text) -> str:
+    async def get_music_generation_keywords_async(self, text) -> str:
         return "KEYWORDS FROM MUSIC GENERATION"
 
-    # @delay(0)
-    def interpolate(self, link_to_video: str):
+    @delay(1)
+    async def interpolate_async(self, link_to_video: str):
         local_file_path = Path(os.path.join(_sample_media_dir, STUDENT_ARM_WRITING))
         local_file_url = urljoin("file:", pathname2url(str(local_file_path)))
         return local_file_url
 
-    def get_keywords_from_prompt(self, subtitleText, excluded_words: str = None):
+    async def get_keywords_from_prompt_async(
+        self, subtitleText, excluded_words: str = None
+    ):
         return "KEYWORDS FROM PROMPT", "keywords_from_prompt_file"
 
-    def get_enhanced_prompt(self, subtitleText):
+    async def get_enhanced_prompt_async(self, subtitleText):
         return "ENHANCED FROM PROMPT", "enhanced_from_prompt_file"
 
-    # @delay(0)
-    def get_subtitles(self, audiofile_path):
+    @delay(1)
+    async def get_subtitles_async(self, audiofile_path):
         subs = None
         with open(os.path.join(_sample_media_dir, "subtitles.srt"), "r") as f:
             subs = f.read()
         return {"transcription": subs}
 
-    # @delay(0)
-    def generate_video(self, prompt: str = None):
-        return ft.create_non_colliding_file_name(
+    @delay(1)
+    async def generate_video_async(self, prompt: str = None):
+        return ft.create_non_colliding_file_name_async(
             tests_medias.get_cat_video_path()[:-4], extension="mp4"
         )
 
-    def extract_audio_slice(self, i, end, audiofile_path, target_file_name: str = None):
+    @delay(1)
+    async def extract_audio_slice_async(
+        self, i, end, audiofile_path, target_file_name: str = None
+    ):
         return tests_medias.get_test_prompt_recording_trainboy()

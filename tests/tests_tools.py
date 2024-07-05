@@ -100,3 +100,36 @@ test_prompt_library = {
     "train_boy": create_fake_prompt_for_local_tests(),
     "tired": create_fake_prompt_tired(),
 }
+
+
+def check_output_bom(folder: str):
+    """
+    Check if the output files in the folder contain the BOM character
+    """
+    raise NotImplementedError("Not implemented yet")
+
+    for file in os.listdir(folder):
+        # so we expect to see the following:
+        # - the generated (or fake) video files
+        # - the subtitle files
+        # - the background music file
+        # - the prompt audio file
+        # - the transition files
+        # - the first and last frame images for transitions
+        # - the composite video files: one global with expected name and one for each subtitle
+
+        self.assert_exists_generated_video(
+            files, len(test_prompt.subtitles) * 2
+        )  # 2 generated videos per subtitle
+        self.assert_exists_transitions(
+            files, len(test_prompt.subtitles)
+        )  # one transition per subtitle
+        self.assert_exists_composite_videos(
+            files, len(test_prompt.subtitles) + 1
+        )  # one composite per subtitle +1 for the global video
+        self.assert_exists_subtitle(files, 0)
+        self.assert_exists_generated_audio_prompt(files, 0)
+        self.assert_exists_generated_bg_music(files, 0)
+        self.assert_exists_default_bg_music(files, 0)
+
+        print(file)

@@ -1,5 +1,6 @@
 from loguru import logger
 from urllib.request import urlretrieve
+import asyncio
 
 from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
@@ -49,9 +50,11 @@ class SeineTransition(Transition):
         )
         ml_gw = build_settings.get_ml_models_gateway()
         # We generate a transition
-        link_to_transition_video = ml_gw.generate_seine_transition(
-            source_image_path=self._source_video.get_last_frame_as_image(),
-            target_image_path=self._target_video.get_first_frame_as_image(),
+        link_to_transition_video = asyncio.run(
+            ml_gw.generate_seine_transition_async(
+                source_image_path=self._source_video.get_last_frame_as_image(),
+                target_image_path=self._target_video.get_first_frame_as_image(),
+            )
         )
         if link_to_transition_video is None:
             raise ValueError("No link to transition video generated")
@@ -61,7 +64,9 @@ class SeineTransition(Transition):
 
         target_file_name = self.get_file_name_by_state(build_settings=build_settings)
         if build_settings.interpolate:
-            interpolated_transition_link = ml_gw.interpolate(link_to_transition_video)
+            interpolated_transition_link = asyncio.run(
+                ml_gw.interpolate_async(link_to_transition_video)
+            )
             urlretrieve(interpolated_transition_link, target_file_name)
         else:
             urlretrieve(link_to_transition_video, target_file_name)

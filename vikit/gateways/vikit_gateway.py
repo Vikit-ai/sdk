@@ -1,4 +1,7 @@
 import os
+import asyncio
+import aiohttp
+
 import subprocess
 
 from tenacity import retry, before_log, after_log, stop_after_attempt
@@ -28,9 +31,10 @@ class VikitGateway(MLModelsGateway):
     def __init__(self):
         super().__init__()
 
-    ##################  Replicate API calls for music generation  ##################
     @log_function_params
-    def generate_background_music(self, duration: int = 3, prompt: str = None) -> str:
+    def generate_background_music_async(
+        self, duration: int = 3, prompt: str = None
+    ) -> str:
         """
         Here we generate the music to add as background music
 
@@ -45,7 +49,7 @@ class VikitGateway(MLModelsGateway):
             duration < 300
         ), "The duration of the music should be less than 300 seconds"
 
-        outputLLM = self.get_music_generation_keywords(prompt)
+        outputLLM = asyncio.run(self.get_music_generation_keywords_async(prompt))
         logger.debug(f"outputLLM: {outputLLM}")
 
         # je veux le dernier mot de la liste de mots générés pour le nom du fichier
@@ -91,7 +95,7 @@ class VikitGateway(MLModelsGateway):
         after=after_log(logger, logger.level("TRACE").no),
     )
     @log_function_params
-    def generate_seine_transition(self, source_image_path, target_image_path):
+    async def generate_seine_transition(self, source_image_path, target_image_path):
         """
         Generate a transition between two videos
 
@@ -147,7 +151,7 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
-    def compose_music_from_text(self, prompt_text: str, duration: int):
+    async def compose_music_from_text(self, prompt_text: str, duration: int):
         """
         Compose a music for a prompt text
 
@@ -203,7 +207,7 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
-    def get_music_generation_keywords(self, text) -> str:
+    async def get_music_generation_keywords_async(self, text) -> str:
         """
         Generate keywords from a text using the Replicate API
 
@@ -219,9 +223,9 @@ class VikitGateway(MLModelsGateway):
 
         if text is None:
             text = "finaly there is no prompt so just unleash your own imagination"
-        llm_keywords = requests.post(
-            vikit_backend_url,
-            json={
+
+        async with aiohttp.ClientSession() as session:
+            payload = {
                 "key": vikit_api_key,
                 "model": "mistralai/mistral-7b-instruct-v0.2",
                 "input": {
@@ -242,12 +246,12 @@ class VikitGateway(MLModelsGateway):
                     "presence_penalty": 0,
                     "frequency_penalty": 0,
                 },
-            },
-        )
+            }
+
+            async with session.post(vikit_backend_url, json=payload) as response:
+                llm_keywords = await response.json()
 
         return cleanse_llm_keywords(llm_keywords.text)
-
-    ##################  Replicate API calls for interpolation  ##################
 
     @retry(
         stop=stop_after_attempt(get_nb_retries_http_calls()),
@@ -255,7 +259,7 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("DEBUG").no),
         after=after_log(logger, logger.level("DEBUG").no),
     )
-    def interpolate(self, video):
+    async def interpolate(self, video):
         """
         Run some interpolation magic. This model may fail after timeout, so you
         should call it with retry logic
@@ -285,11 +289,9 @@ class VikitGateway(MLModelsGateway):
             },
         ).text
 
-    ##################  Replicate API calls for video prompt keywords or sentence  ##################
-
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     @log_function_params
-    def get_keywords_from_prompt(self, subtitleText, excluded_words: str = None):
+    async def get_keywords_from_prompt(self, subtitleText, excluded_words: str = None):
         """
         Generates keywords from a subtitle text using the Replicate API.
 
@@ -342,7 +344,7 @@ class VikitGateway(MLModelsGateway):
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     @log_function_params
-    def get_enhanced_prompt(self, subtitleText):
+    async def get_enhanced_prompt(self, subtitleText):
         """
         Generates an enhanced prompt from an original one, probably written by a user or
         translated from an audio
@@ -383,7 +385,7 @@ class VikitGateway(MLModelsGateway):
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     @log_function_params
-    def get_subtitles(self, audiofile_path):
+    async def get_subtitles(self, audiofile_path):
         # Obtain subtitles using Replicate API
         """
         Extract subtitles from an audio file using the Replicate API
@@ -427,7 +429,7 @@ class VikitGateway(MLModelsGateway):
         return json.loads(subs.text)
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    def generate_video(self, prompt: str):
+    async def generate_video(self, prompt: str):
         """
         Generate a video from the given prompt
 

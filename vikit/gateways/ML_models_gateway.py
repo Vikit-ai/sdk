@@ -14,33 +14,35 @@ class MLModelsGateway(BaseModel, ABC):
     def __init__(self):
         pass
 
-    def generate_background_music(self, duration: int = 3, prompt: str = None) -> str:
+    def generate_background_music_async(
+        self, duration: int = 3, prompt: str = None
+    ) -> str:
         pass
 
-    def generate_seine_transition(self, source_image_path, target_image_path):
+    def generate_seine_transition_async(self, source_image_path, target_image_path):
         pass
 
-    def cleanse_llm_keywords(input):
+    def cleanse_llm_keywords_async(input):
         pass
 
-    def compose_music_from_text(self, prompt_text: str, duration: int):
+    def compose_music_from_text_async(self, prompt_text: str, duration: int):
         pass
 
-    def get_music_generation_keywords(self, text) -> str:
+    def get_music_generation_keywords_async(self, text) -> str:
         pass
 
-    def interpolate(self, video):
+    def interpolate_async(self, video):
         pass
 
-    def get_keywords_from_prompt(self, subtitleText, excluded_words: str = None):
+    def get_keywords_from_prompt_async(self, subtitleText, excluded_words: str = None):
         pass
 
-    def get_enhanced_prompt(self, subtitleText):
+    def get_enhanced_prompt_async(self, subtitleText):
         pass
 
-    def get_subtitles(self, audiofile_path: str):
+    def get_subtitles_async(self, audiofile_path: str):
         pass
 
     @abstractmethod
-    def generate_video(self, prompt: str):
+    def generate_video_async(self, prompt: str):
         pass

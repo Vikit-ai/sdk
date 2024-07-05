@@ -27,7 +27,7 @@ class TestBackgroundMusic(unittest.TestCase):
                 test_mode=False
             )
 
-            _ = ml_gw.generate_background_music(duration=3, prompt="")
+            _ = ml_gw.generate_background_music_async(duration=3, prompt="")
 
     @pytest.mark.local_integration
     def test_generate_background_music_from_short_prompt(self):
@@ -35,7 +35,7 @@ class TestBackgroundMusic(unittest.TestCase):
             ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
                 test_mode=True
             )
-            _ = ml_gw.generate_background_music(duration="a")
+            _ = ml_gw.generate_background_music_async(duration="a")
 
     @pytest.mark.integration
     def test_generate_background_music_from_prompt(self):
@@ -43,6 +43,8 @@ class TestBackgroundMusic(unittest.TestCase):
             ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
                 test_mode=False
             )
-            music_path = ml_gw.generate_background_music(duration=3, prompt=TEST_PROMPT)
+            music_path = ml_gw.generate_background_music_async(
+                duration=3, prompt=TEST_PROMPT
+            )
             assert music_path, "There is no background music for the video"
             assert os.path.exists(music_path), "the generated music does not exists"

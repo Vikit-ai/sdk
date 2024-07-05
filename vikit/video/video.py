@@ -2,6 +2,7 @@ import subprocess
 import os
 from abc import abstractmethod, ABC
 import uuid as uid
+
 from loguru import logger
 
 from vikit.common.decorators import log_function_params
@@ -363,7 +364,7 @@ class Video(ABC):
 
         return self._background_music_file_name
 
-    def _generate_music(
+    async def _generate_music(
         self,
         expected_music_length,
         prompt_text: str = None,
@@ -387,6 +388,6 @@ class Video(ABC):
             )
         )
 
-        return ml_models_gateway.generate_background_music(
+        return await ml_models_gateway.generate_background_music_async(
             duration=expected_music_length, prompt=prompt_text
         )

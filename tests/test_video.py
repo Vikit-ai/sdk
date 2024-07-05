@@ -1,7 +1,5 @@
 import unittest
 import os
-
-# from unittest.mock import patch, MagicMock, Mock
 import warnings
 
 import pytest
@@ -55,7 +53,6 @@ class TestVideo(unittest.TestCase):
                 PromptBasedVideo(
                     tools.test_prompt_library["moss_stones-train_boy"]
                 ).get_duration()
-
 
     @pytest.mark.local_integration
     def test_get_first_frame_as_image_path_with_sample_video(self):
