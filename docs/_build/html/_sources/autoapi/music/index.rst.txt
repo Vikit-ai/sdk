@@ -1,0 +1,19 @@
+music
+=====
+
+.. py:module:: music
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   music.MusicBuildingContext
+
+
+Module Contents
+---------------
+
+.. py:class:: MusicBuildingContext(apply_background_music: bool = False, generate_background_music: bool = False, use_recorded_prompt_as_audio: bool = False, expected_music_length: float = None)
+

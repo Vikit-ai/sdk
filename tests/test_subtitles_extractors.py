@@ -70,5 +70,4 @@ class TestSubtitlesExtrators(unittest.TestCase):
             for sub in subs:
                 sub = pysrt.SubRipItem(sub)
                 assert sub.text is not None
-                assert sub.text != ""
-                logger.debug(f"Sub: {sub.text}")
+                assert sub.text != "", f"Sub.text: {sub.text}"

@@ -7,6 +7,7 @@ from vikit.common.context_managers import WorkingFolderContext
 from vikit.prompt.prompt_factory import PromptFactory
 from tests.tests_medias import get_test_prompt_recording
 from vikit.gateways import replicate_gateway as replicate_gateway
+from vikit.wrappers.ffmpeg_wrapper import get_media_duration
 
 mp3_transcription = "ceci est un test rapide avec nma voix enregistrée pour faire un test"
 
@@ -29,7 +30,7 @@ class TestPrompt(unittest.TestCase):
             _ = PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_audio_file(recorded_audio_prompt_path=None)
 
     @pytest.mark.integration
-    def test_build_basic_audio_prompt_integration(self):
+    def test_build_basic_audio_prompt(self):
         with WorkingFolderContext():
             """
             here we check a prompt has been created sucessfully from an mp3 recording 
@@ -39,7 +40,7 @@ class TestPrompt(unittest.TestCase):
             assert prompt is not None, "Prompt is None"
             assert prompt.text is not None, "Prompt text is None"
             assert prompt.audio_recording is not None, "Prompt sound recording path is None"
-            assert prompt.audio_recording == get_test_prompt_recording()
+            assert get_media_duration(prompt.audio_recording).__ceil__() == get_media_duration(get_test_prompt_recording()).__ceil__(), f"length of the sound recordings  is not the same: {get_media_duration(prompt.audio_recording)} != {get_media_duration(get_test_prompt_recording())}"
 
     @pytest.mark.integration
     def test_build_basic_text_prompt(self):

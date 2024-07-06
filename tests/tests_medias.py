@@ -9,7 +9,7 @@ GENERATED_3S_FOREST_VIDEO_SAMPLE__2 = "treasures.mp4"
 GENERATED_TRANSITION_FOREST_TREASURE_VIDEO_SAMPLE = (
     "transition_[seine]_from_treasures_to_forest.mp4"
 )
-TEST_PROMPT_RECORDING = "medias/test.mp3"
+TEST_PROMPT_RECORDING = "test.mp3"
 TEST_PROMPT_RECORDING_TRAIN_BOY = "sub_audio_for_subtitle_from_0_to_13.mp3"
 TEST_PROMPT_RECORDING_STONES_TRAIN_BOY = "sub_audio_for_subtitle_from_0_to_14.mp3"
 SAMPLE_GENERATED_MUSIC = "knowledgeStones_Forest_Symbols.mp3"
