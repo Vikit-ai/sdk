@@ -11,6 +11,8 @@ from vikit.prompt.recorded_prompt_subtitles_extractor import (
 )
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.gateways import replicate_gateway as replicate_gateway
+from vikit.gateways import fake_ML_models_gateway as fake_gateway
+
 from vikit.common.context_managers import WorkingFolderContext
 
 
@@ -50,8 +52,31 @@ class TestSubtitlesExtrators(unittest.TestCase):
             assert sub.text is not None
             assert len(sub.text.split(" ")) >= 2
 
-    @pytest.mark.integration
+    @pytest.mark.local_integration
     def test_reunion_island_prompt(self):
+        with WorkingFolderContext():  # we work in the temp folder once for all the script
+            # gw = replicate_gateway.ReplicateGateway()
+            gw = fake_gateway.FakeMLModelsGateway()
+            test_prompt = PromptFactory(ml_gateway=gw).create_prompt_from_text(
+                """A travel over Reunion Island, taken fomm birdview at 2000meters above 
+                the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
+                , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
+                generate_recording=True,
+            )
+
+            sub_extractor = RecordedPromptSubtitlesExtractor()
+            subs: pysrt.SubRipFile = sub_extractor.extract_subtitles(
+                recorded_prompt_file_path=test_prompt._recorded_audio_prompt_path,
+                ml_models_gateway=gw,
+            )
+
+            for sub in subs:
+                # sub = pysrt.SubRipItem(sub)
+                assert sub.text is not None, f"Sub.text: {sub.text}"
+                assert sub.text != "", f"Sub.text: {sub.text}"
+
+    @pytest.mark.integration
+    def test_reunion_island_prompt_int(self):
         with WorkingFolderContext():  # we work in the temp folder once for all the script
             gw = replicate_gateway.ReplicateGateway()
             test_prompt = PromptFactory(ml_gateway=gw).create_prompt_from_text(
@@ -68,6 +93,6 @@ class TestSubtitlesExtrators(unittest.TestCase):
             )
 
             for sub in subs:
-                sub = pysrt.SubRipItem(sub)
-                assert sub.text is not None
+                # sub = pysrt.SubRipItem(sub)
+                assert sub.text is not None, f"Sub.text: {sub.text}"
                 assert sub.text != "", f"Sub.text: {sub.text}"
