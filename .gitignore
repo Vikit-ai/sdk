@@ -76,7 +76,8 @@ target/
 .idea
 
 # VS Code
-.vscode/
+# .vscode/
+settings.json
 
 # Spyder
 .spyproject/
