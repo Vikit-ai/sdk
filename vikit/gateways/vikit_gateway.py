@@ -163,8 +163,8 @@ class VikitGateway(MLModelsGateway):
 
         if duration < 1:
             raise AttributeError("The input duration is less than 1")
-        if duration > 60:
-            raise AttributeError("The input duration is greater than 60")
+        if duration > 300:
+            raise AttributeError("The input duration is greater than 300")
         if len(prompt_text) < 1:
             raise AttributeError("The input prompt text is empty")
         result_music_link = requests.post(
