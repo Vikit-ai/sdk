@@ -32,7 +32,7 @@ class TestPromptBasedVideo(unittest.TestCase):
         with pytest.raises(ValueError):
             _ = PromptBasedVideo(TextPrompt(""))
 
-    @pytest.mark.unit
+    @pytest.mark.local_integration
     def test_get_title(self):
         with WorkingFolderContext():
             video_title = PromptBasedVideo(
@@ -148,7 +148,6 @@ class TestPromptBasedVideo(unittest.TestCase):
 
     #         assert vid_final.media_url is not None
     #         assert vid_final.background_music is not None
-
 
     @pytest.mark.integration
     @unittest.skip("To be activated on case by case basis")
