@@ -1,32 +1,60 @@
-from concurrent.futures import ProcessPoolExecutor
-from queue import PriorityQueue
-
 import unittest
 import warnings
 import pytest
 
-from vikit.video import prompt_based_video, video_build_settings
+from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.common.context_managers import WorkingFolderContext
 import tests.tests_tools as tools
 from vikit.video.composite_video_builder_strategy_local import (
     CompositeVideoBuilderStrategyLocal,
 )
-from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 
 
-class TestConcurrency(unittest.TestCase):
+class TestBuildingStrategies(unittest.TestCase):
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
 
     @pytest.mark.unit
-    def test_generate_video_tree_default_strategy_basic_structure(self):
+    def test_generate_video_tree_default_strategy_single_composite(self):
         """
         Test that the video tree is correctly generated, with right order,
         using a simple video tree
+        """
+        with WorkingFolderContext():
+            build_settings = VideoBuildSettings(test_mode=True)
+            composite = CompositeVideo()
+            rtbv = RawTextBasedVideo("test")
+            composite.append_video(rtbv)
+
+            # Here we are testing the ordered list of video to be build
+            # conforms to the expected order
+            strategy = CompositeVideoBuilderStrategyLocal(
+                composite_video=composite, build_order="first_videos_first"
+            )
+            video_build_order = strategy.prepare(
+                build_settings=build_settings,
+                strategy=strategy.get_first_videos_first_build_order,
+            )
+
+            assert video_build_order is not None
+            # here we check the leaf has been generated first, then the root composite
+            assert len(video_build_order) == 2
+
+            assert video_build_order[0].id == rtbv.id
+            assert video_build_order[1].id == composite.id
+            assert isinstance(video_build_order[0], RawTextBasedVideo)
+            assert isinstance(video_build_order[1], CompositeVideo)
+
+    @pytest.mark.unit
+    def test_generate_video_tree_default_strategy_mixed_composites(self):
+        """
+        Test that the video tree is correctly generated, with right order,
+        using a  video tree including root and child composite videos
         """
         with WorkingFolderContext():
             build_settings = video_build_settings.VideoBuildSettings(test_mode=True)
@@ -41,6 +69,7 @@ class TestConcurrency(unittest.TestCase):
             ).prepare(build_settings=build_settings)
 
             assert video_build_order is not None
+            # here we check the leaf has been generated first, then the root composite
             assert len(video_build_order) == 1
             assert video_build_order[0].id == rtbv.id
 

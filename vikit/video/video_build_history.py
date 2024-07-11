@@ -1,6 +1,6 @@
-from vikit.video import Video
+from vikit.video.video import Video
 from vikit.video.video_metadata import VideoMetadata
-from vikit.video.video_build_settings import video_build_settings
+from vikit.video.video_build_settings import VideoBuildSettings
 
 
 class VideoBuildHistory:

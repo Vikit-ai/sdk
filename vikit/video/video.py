@@ -71,9 +71,16 @@ class Video(ABC):
 
         self._media_url = None
         self._build_settings = None
+        self._video_dependencies = (
+            []
+        )  # Define video dependencies, i.e. the videos that are needed to build the current video
 
     @property
-    def _build_settings(self):
+    def video_dependencies(self):
+        return self._video_dependencies
+
+    @property
+    def build_settings(self):
         """
         Get the build settings of the video, once it has been generated or built
         This means the video is immutable once built, and build settings is None until

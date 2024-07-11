@@ -2,8 +2,8 @@ from abc import abstractmethod
 
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_metadata import VideoMetadata
-from vikit.video.video_build_history import VideoBuildHistory
 from vikit.video.video_builder_strategy import VideoBuilderStrategy
+from vikit.video.composite_video import CompositeVideo
 
 
 class CompositeVideoBuilderStrategy(VideoBuilderStrategy):
@@ -23,7 +23,7 @@ class CompositeVideoBuilderStrategy(VideoBuilderStrategy):
             composite_video (CompositeVideo): The composite video
         """
         self._composite_video = composite_video
-        self.build_order = build_order
+        self._build_order = build_order
 
     @property
     def composite_video(self):
@@ -91,5 +91,91 @@ class CompositeVideoBuilderStrategy(VideoBuilderStrategy):
 
         return video_build
 
-    def prepare(build_settings: VideoBuildSettings):
-        pass
+    def prepare(self, build_settings: VideoBuildSettings, strategy) -> list:
+        """
+        Prepare the video build order
+
+        Args:
+            build_settings (VideoBuildSettings): The build settings
+            strategy (str): the function to use to generate the video build order list
+
+        Returns:
+            list: The video build order
+        """
+        already_added = set()
+
+        return strategy(
+            video_tree=self._composite_video.video_list,
+            build_settings=build_settings,
+            already_added=already_added,
+        )
+
+    def get_first_videos_first_build_order(
+        self, video_tree, build_settings: VideoBuildSettings, already_added: set
+    ):
+        """
+        Get the first videos first build order
+
+        Here we generate the video so that the  first composites or leaves
+        (probably corresponding to the first prompts chunks) are generated first,
+        aiming at showing something to the user as soon as possible. This is a graph deep traversal algorithm
+
+        params:
+            video_tree (list): The video tree to recurse on to parse the tree and get the build order
+            build_settings: The build settings
+            already_added (set): The set of already added videos
+
+        Returns:
+            list: The build order
+        """
+        video_build_order = []
+        for video in video_tree:
+            if isinstance(CompositeVideo):
+                video_build_order.extend(
+                    self.get_first_videos_first_build_order(
+                        video.video_list, build_settings, already_added
+                    )
+                )
+            if video.id not in already_added:
+                video_build_order.append(video)
+                already_added.add(video.id)
+
+        return video_build_order
+
+    def get_lazy_dependency_chain_build_order(
+        self, video_tree, build_settings: VideoBuildSettings, already_added: set
+    ):
+        """
+        Get the first videos first build order
+
+        Here we generate the video in a lazy way, starting from the leaf composite and
+        going up to the root composite as depency resolution is done
+
+        params:
+            video_tree (list): The video tree to recurse on to parse the tree and get the build order
+            build_settings: The build settings
+            already_added (set): The set of already added videos
+
+        Returns:
+            list: The build order
+        """
+        video_build_order = []
+        for video in video_tree:
+            if video.is_composite:
+                video_build_order.extend(
+                    self.get_first_videos_first_build_order(
+                        video.video_list, build_settings
+                    )
+                )
+            else:  # process the dependency tree
+                video_build_order.extend(
+                    self.get_lazy_dependency_chain_build_order(
+                        video_tree=video.video_dependencies,
+                        build_settings=build_settings,
+                    )
+                )
+            if video.id not in already_added:
+                video_build_order.append(video)
+                already_added.add(video.id)
+
+        return video_build_order

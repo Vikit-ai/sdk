@@ -1,3 +1,4 @@
+aiohttp==3.9.5
 replicate==0.24.0
 pysrt==1.1.2
 pnumpy==1.26.4

@@ -68,6 +68,7 @@ class Transition(Video):
 
         self._target_video = target_video
         self._source_video = source_video
+        self.video_dependencies.extend([source_video, target_video])
 
     def get_title(self):
         return str(self._source_video.id)[:5] + "-to-" + str(self._target_video.id)[:5]
