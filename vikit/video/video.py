@@ -70,6 +70,16 @@ class Video(ABC):
         )
 
         self._media_url = None
+        self._build_settings = None
+
+    @property
+    def _build_settings(self):
+        """
+        Get the build settings of the video, once it has been generated or built
+        This means the video is immutable once built, and build settings is None until
+        the video is built
+        """
+        return self._build_settings
 
     @property
     def metadata(self):
@@ -314,7 +324,7 @@ class Video(ABC):
         """
         return f"{self.media_url[:-4].split('/')[-1]}_background_music.mp3"
 
-    def _build_background_music(
+    async def _build_background_music(
         self, build_settings: VideoBuildSettings, prompt_text: str = ""
     ):
         """

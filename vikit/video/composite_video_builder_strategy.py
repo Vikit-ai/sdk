@@ -1,15 +1,33 @@
-from abc import abstractmethod, ABC
+from abc import abstractmethod
 
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_metadata import VideoMetadata
+from vikit.video.video_build_history import VideoBuildHistory
+from vikit.video.video_builder_strategy import VideoBuilderStrategy
 
 
-class CompositeVideoBuilderStrategy(ABC):
+class CompositeVideoBuilderStrategy(VideoBuilderStrategy):
     """
     Composite video builder strategy is the base class for strategies to build composite videos:
 
     Some strategies will target maximul quality while others will get video faster for a quick preview
     """
+
+    def __init__(
+        self, composite_video: "CompositeVideo" = None, build_order="first_videos_first"
+    ):
+        """
+        Constructor
+
+        Args:
+            composite_video (CompositeVideo): The composite video
+        """
+        self._composite_video = composite_video
+        self.build_order = build_order
+
+    @property
+    def composite_video(self):
+        return self._composite_video
 
     @abstractmethod
     def execute(
@@ -72,3 +90,6 @@ class CompositeVideoBuilderStrategy(ABC):
         assert video.media_url is not None, "Video media URL cannot be None"
 
         return video_build
+
+    def prepare(build_settings: VideoBuildSettings):
+        pass

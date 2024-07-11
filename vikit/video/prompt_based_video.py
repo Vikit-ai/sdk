@@ -33,13 +33,17 @@ class PromptBasedVideo(Video):
         self._source = type(
             self
         ).__name__  # PromptBasedVideo is made of several composites
-        self.inner_composite = None
+        self._inner_composite = None
         self._needs_reencoding = False  # PromptBasedVideo is made of several
         # composites which themselves are made of raw text based video, so no need for reencoding
 
     def __str__(self) -> str:
         super_str = super().__str__()
         return super_str + os.linesep + f"Prompt: {self._prompt}"
+
+    @property
+    def inner_composite(self):
+        return self._inner_composite
 
     @property
     def short_type_name(self):
@@ -115,7 +119,7 @@ class PromptBasedVideo(Video):
 
         vid_cp_final.build(build_settings=build_settings)
 
-        self.inner_composite = vid_cp_final
+        self._inner_composite = vid_cp_final
         self._is_video_generated = True
         self.metadata = vid_cp_final.metadata
         self._media_url = vid_cp_final.media_url
