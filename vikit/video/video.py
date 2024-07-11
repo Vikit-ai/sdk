@@ -226,10 +226,9 @@ class Video(ABC):
         Returns:
             float: The duration of the final video
         """
-        if self._duration is None:
-            if self._media_url is None:
-                raise ValueError("The source media URL is not set")
-            self._duration = float(get_media_duration(self._media_url))
+        if self._media_url is None:
+            raise ValueError("The source media URL is not set")
+        self._duration = float(get_media_duration(self._media_url))
         return self._duration
 
     @log_function_params
