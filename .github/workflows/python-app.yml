@@ -45,3 +45,4 @@ jobs:
         ELEVEN_LABS_API_URI: https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM
       run: |
         pytest -s -m "unit"
+        pytest -s -m "local_integration"
