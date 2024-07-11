@@ -18,10 +18,11 @@ from vikit.video.video_metadata import VideoMetadata
 from vikit.video.video_building import (
     build_using_local_resources,
     get_lazy_dependency_chain_build_order,
+    is_composite_video,
 )
 
 
-class CompositeVideo(Video):
+class CompositeVideo(Video, is_composite_video):
     """
     Composite made from the collection of videos that need to be generated altogether, as a consistent block
     It could be a final video or intermediate  composing specific scenes of the final video.
@@ -56,6 +57,9 @@ class CompositeVideo(Video):
         self._parent = None  # The parent video composite, helpfull for some optimisations like cascading up
         # the fact to know we have an imported video somewhere and trigger reecoding of the whole tree
         self._video_file_name = None
+
+    def is_composite_video(self):
+        return True
 
     @property
     def short_type_name(self):
@@ -144,7 +148,6 @@ class CompositeVideo(Video):
             already_added=already_added,
         )
 
-    @log_function_params
     def append_video(self, video: Video = None):
         """
         Append a video to the list of videos to be mixed

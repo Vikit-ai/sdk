@@ -62,20 +62,27 @@ class TestVideoBuildingStrategies(unittest.TestCase):
         """
         with WorkingFolderContext():
             build_settings = VideoBuildSettings(test_mode=True)
-            composite = CompositeVideo()
-            rtbv = RawTextBasedVideo("test")
-            composite.append_video(rtbv)
+            pbv = PromptBasedVideo(tools.test_prompt_library)
 
             # Here we are testing the ordered list of video to be build
             # conforms to the expected order
-            video_build_order = build_using_local_resources(
-                composite_video=composite, build_order="first_videos_first"
-            ).prepare(build_settings=build_settings)
+            video_build_order = get_lazy_dependency_chain_build_order(
+                video_build_order=[],
+                video_tree=[pbv.inner_composite],
+                build_settings=build_settings,
+                already_added=set(),
+            )
 
             assert video_build_order is not None
             # here we check the leaf has been generated first, then the root composite
-            assert len(video_build_order) == 1
+            assert (
+                len(video_build_order) == 2
+            ), f"Should have 2 videos, instead we had {len(video_build_order)}"
+
             assert video_build_order[0].id == rtbv.id
+            assert video_build_order[1].id == composite.id
+            assert isinstance(video_build_order[0], RawTextBasedVideo)
+            assert isinstance(video_build_order[1], CompositeVideo)
 
     @pytest.mark.local_integration
     def test_generate_video_tree_default_strategy_from_prompt_based_video(self):
