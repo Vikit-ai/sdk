@@ -1,6 +1,5 @@
 replicate==0.24.0
 pysrt==1.1.2
-pnumpy==1.26.4
 loguru==0.7.2
 requests==2.31.0
 python-dotenv==1.0.1
