@@ -163,8 +163,8 @@ class VikitGateway(MLModelsGateway):
 
         if duration < 1:
             raise AttributeError("The input duration is less than 1")
-        if duration > 60:
-            raise AttributeError("The input duration is greater than 60")
+        if duration > 300:
+            raise AttributeError("The input duration is greater than 300")
         if len(prompt_text) < 1:
             raise AttributeError("The input prompt text is empty")
         result_music_link = requests.post(
@@ -425,9 +425,33 @@ class VikitGateway(MLModelsGateway):
         )
 
         return json.loads(subs.text)
-
+        
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     def generate_video(self, prompt: str):
+        """
+        Generate a video from the given prompt
+
+        Args:
+            prompt: The prompt to generate the video from
+
+        returns:
+                The link to the generated video
+        """
+        logger.debug(f"Generating video from prompt: {prompt}")
+        output = requests.post(
+            vikit_backend_url,
+            json={
+                "key": vikit_api_key,
+                "model": "haiper_text2video",
+                "input": {
+                    "prompt": prompt,  # + ", 4k",
+                },
+            },
+        )
+        return output.json()["value"]["url"]
+
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    def generate_video_VideoCrafter2(self, prompt: str):
         """
         Generate a video from the given prompt
 
