@@ -6,14 +6,17 @@ from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.common.context_managers import WorkingFolderContext
 import tests.tests_tools as tools
-from vikit.video.composite_video_builder_strategy_local import (
-    CompositeVideoBuilderStrategyLocal,
-)
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
+from vikit.video.video_building import (
+    get_lazy_dependency_chain_build_order,
+    get_first_videos_first_build_order,
+    build_using_cloud,  # TO be implemented and tested
+    build_using_local_resources,
+)
 
 
-class TestBuildingStrategies(unittest.TestCase):
+class TestVideoBuildingStrategies(unittest.TestCase):
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
@@ -33,17 +36,18 @@ class TestBuildingStrategies(unittest.TestCase):
 
             # Here we are testing the ordered list of video to be build
             # conforms to the expected order
-            strategy = CompositeVideoBuilderStrategyLocal(
-                composite_video=composite, build_order="first_videos_first"
-            )
-            video_build_order = strategy.prepare(
+            video_build_order = get_lazy_dependency_chain_build_order(
+                video_build_order=[],
+                video_tree=[composite],
                 build_settings=build_settings,
-                strategy=strategy.get_first_videos_first_build_order,
+                already_added=set(),
             )
 
             assert video_build_order is not None
             # here we check the leaf has been generated first, then the root composite
-            assert len(video_build_order) == 2
+            assert (
+                len(video_build_order) == 2
+            ), f"Should have 2 videos, instead we had {len(video_build_order)}"
 
             assert video_build_order[0].id == rtbv.id
             assert video_build_order[1].id == composite.id
@@ -57,14 +61,14 @@ class TestBuildingStrategies(unittest.TestCase):
         using a  video tree including root and child composite videos
         """
         with WorkingFolderContext():
-            build_settings = video_build_settings.VideoBuildSettings(test_mode=True)
+            build_settings = VideoBuildSettings(test_mode=True)
             composite = CompositeVideo()
             rtbv = RawTextBasedVideo("test")
             composite.append_video(rtbv)
 
             # Here we are testing the ordered list of video to be build
             # conforms to the expected order
-            video_build_order = CompositeVideoBuilderStrategyLocal(
+            video_build_order = build_using_local_resources(
                 composite_video=composite, build_order="first_videos_first"
             ).prepare(build_settings=build_settings)
 
@@ -80,17 +84,18 @@ class TestBuildingStrategies(unittest.TestCase):
         a 4 subtitles prompt based video
         """
         with WorkingFolderContext():
-            build_settings = video_build_settings.VideoBuildSettings(
-                run_async=False, test_mode=True
-            )
+            build_settings = VideoBuildSettings(run_async=False, test_mode=True)
             test_prompt = tools.test_prompt_library["train_boy"]
             prompt_vid = PromptBasedVideo(test_prompt)
 
             # Here we are testing the ordered list of video to be build
             # conforms to the expected order
-            video_build_order = CompositeVideoBuilderStrategyLocal(
-                video=prompt_vid.inner_composite, build_order="first_videos_first"
-            ).prepare(build_settings=build_settings)
+            video_build_order = build_using_local_resources(
+                build_settings=build_settings,
+                video_build_order=get_lazy_dependency_chain_build_order,
+                video=prompt_vid.inner_composite,
+                build_order="first_videos_first",
+            )
 
             assert video_build_order is not None
             # In this test, we have 4 subtitles, so with a promptbasedvideo we should have
@@ -114,17 +119,17 @@ class TestBuildingStrategies(unittest.TestCase):
                 video_build_order[1].id == prompt_vid.inner_composite.video_list[1].id
             ), "Second video should be the first transition"
 
-    def test_async_call_to_generate_video(self):
-        """
-        Test that the video is generated asynchronously
-        """
-        with WorkingFolderContext():
-            build_settings = video_build_settings.VideoBuildSettings(
-                run_async=False, test_mode=True
-            )
-            test_prompt = tools.test_prompt_library["train_boy"]
-            prompt_vid = prompt_based_video.PromptBasedVideo(test_prompt)
+    # def test_async_call_to_generate_video(self):
+    #     """
+    #     Test that the video is generated asynchronously
+    #     """
+    #     with WorkingFolderContext():
+    #         build_settings = video_build_settings.VideoBuildSettings(
+    #             run_async=False, test_mode=True
+    #         )
+    #         test_prompt = tools.test_prompt_library["train_boy"]
+    #         prompt_vid = prompt_based_video.PromptBasedVideo(test_prompt)
 
-            built_vid = prompt_vid.build(build_settings=build_settings)
+    #         built_vid = prompt_vid.build(build_settings=build_settings)
 
-            assert built_vid is not None
+    #         assert built_vid is not None

@@ -1,16 +1,24 @@
 import os
+from concurrent.futures import ProcessPoolExecutor
+from typing import Callable
 
 from loguru import logger
 
+import vikit.common.config as config
+from vikit.wrappers.ffmpeg_wrapper import (
+    concatenate_videos,
+    reencode_video,
+    merge_audio,
+)
 from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
-from vikit.wrappers.ffmpeg_wrapper import merge_audio
 from vikit.music_building_context import MusicBuildingContext
-from vikit.video.composite_video_builder_strategy_factory import (
-    CompositeVideoBuilderStrategyFactory,
-)
-from vikit.video.composite_video_builder_strategy import CompositeVideoBuilderStrategy
 from vikit.video.video_types import VideoType
+from vikit.video.video_metadata import VideoMetadata
+from vikit.video.video_building import (
+    build_using_local_resources,
+    get_lazy_dependency_chain_build_order,
+)
 
 
 class CompositeVideo(Video):
@@ -71,6 +79,70 @@ class CompositeVideo(Video):
             videos_output = videos_output + "ID: " + video.id + os.linesep
 
         return f"Composite Video: {videos_output}"
+
+    def _get_ratio_to_multiply_animations(
+        self, build_settings, video_composite: "CompositeVideo"
+    ):
+        # Now we box the video composing this composite into the expected length, typically the one of a prompt
+        if build_settings.expected_length is None:
+            if build_settings.prompt is not None:
+                ratioToMultiplyAnimations = (
+                    video_composite.get_duration()
+                    / build_settings.prompt.get_duration()
+                )
+            else:
+                ratioToMultiplyAnimations = 1
+        else:
+            if build_settings.expected_length <= 0:
+                raise ValueError(
+                    f"Expected length should be greater than 0. Got {build_settings.expected_length}"
+                )
+            ratioToMultiplyAnimations = (
+                video_composite.get_duration() / build_settings.expected_length
+            )
+
+        return ratioToMultiplyAnimations
+
+    def _process_gen_vid_bins(self, args):
+        """
+        Process the video generation binaries: we actually do ask the video to build itself
+        as a video binary (typically an MP4 generated from Gen AI, hosted behind an API),
+        or to compose from its inner videos in case of a child composite video
+
+        Args:
+            args: The arguments: video, build_settings, video.media_url, target_file_name
+
+        Returns:
+            CompositeVideo: The composite video
+        """
+        video, build_settings, _, _ = args
+
+        video_build = video.build(build_settings=build_settings)
+        VideoMetadata(video_build.metadata).is_video_generated = True
+
+        assert video is not None, "Video cannot be None"
+        assert video.media_url is not None, "Video media URL cannot be None"
+
+        return video_build
+
+    def prepare(self, build_settings: VideoBuildSettings, strategy) -> list:
+        """
+        Prepare the video build order
+
+        Args:
+            build_settings (VideoBuildSettings): The build settings
+            strategy (str): the function to use to generate the video build order list
+
+        Returns:
+            list: The video build order
+        """
+        already_added = set()
+
+        return strategy(
+            video_tree=self._composite_video.video_list,
+            build_settings=build_settings,
+            already_added=already_added,
+        )
 
     @log_function_params
     def append_video(self, video: Video = None):
@@ -152,16 +224,23 @@ class CompositeVideo(Video):
     def build(
         self,
         build_settings=VideoBuildSettings(),
-        building_strategy: CompositeVideoBuilderStrategy = None,
+        build_strategy: Callable[
+            ["CompositeVideo", list, VideoBuildSettings], "CompositeVideo"
+        ] = build_using_local_resources,
+        build_order: Callable[
+            [list, "CompositeVideo", VideoBuildSettings, set], list[Video]
+        ] = get_lazy_dependency_chain_build_order,
     ):
         """
         Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,
         as we call external services and run video mixing locally.
 
         The actual algorithm depends on the provided strategy (local, cloud, etc.)
+        We store the history of the build in a local build history object, which can be used to track the build stats
 
-        :param build_settings: The settings to be used for the build
-        :param building_strategy: The strategy to be used for the build
+        params:
+            build_settings: The settings to be used for the build
+            build_strategy: The strategy to use for the build, i.e. today we just user a function pointer, may be extended to a class later
 
         Returns:
             self: The current object
@@ -181,15 +260,8 @@ class CompositeVideo(Video):
             )
         )
 
-        if building_strategy is None:  # Fail open, take the local strategy
-            building_strategy = (
-                CompositeVideoBuilderStrategyFactory().get_local_building_strategy()
-            )
-        else:
-            building_strategy = building_strategy
-
-        generated_vid_composite = building_strategy.execute(
-            composite_video=self, build_settings=build_settings
+        generated_vid_composite = build_strategy(
+            self, build_order, build_settings=build_settings
         )
 
         if self._is_root_video_composite:
@@ -225,6 +297,142 @@ class CompositeVideo(Video):
 
         self.metadata.is_video_generated = True
         return generated_vid_composite
+
+    def local_build_strategy(self, build_settings: VideoBuildSettings):
+        """
+        Build the composite video locally
+
+        params:
+            build_settings: The settings to be used for the build
+
+        returns:
+            self: The current object
+        """
+        short_title = self.get_title()
+        # TODO: change this hard truncate!!
+        if len(short_title) > 20:
+            short_title = short_title[:20]
+
+        video_list_file = "_".join(
+            [
+                short_title,
+                config.get_video_list_file_name(),
+            ]
+        )
+
+        cascaded_build_settings = VideoBuildSettings(  # we will handle the background only at the video composite root level
+            include_audio_read_subtitles=False,  # we will handle the subtitles only at the video composite root level
+            test_mode=build_settings.test_mode,
+            run_async=build_settings.run_async,
+        )
+
+        # Generate the videos
+        self._composite_video._video_list = self.process_videos_async(
+            build_settings=cascaded_build_settings,
+            video_list=self._composite_video.video_list,
+            function_to_invoke=self._process_gen_vid_bins,
+        )
+        nb_interpolated = len(
+            list(
+                filter(
+                    lambda builtvideo: builtvideo.metadata.is_interpolated,
+                    self._composite_video._video_list,
+                )
+            )
+        )
+
+        if nb_interpolated < len(self._composite_video._video_list):
+            self._composite_video.metadata.is_interpolated
+        elif nb_interpolated == 0:
+            self._composite_video.metadata.is_interpolated = False
+            # TODO: handle partially interpolated videos, not really importnat for now
+
+        ratio = self._get_ratio_to_multiply_animations(
+            build_settings=build_settings, video_composite=self._composite_video
+        )
+        if self._composite_video._needs_reencoding:
+            self._composite_video._video_list = self.process_videos_async(
+                build_settings=cascaded_build_settings,  # We take the freshly generated videos as input param
+                video_list=self._composite_video.video_list,
+                function_to_invoke=reencode_video,
+            )
+            self._composite_video.metadata.is_reencoded = True
+
+        # We have the final file names (they may have changed between initial video instanciation and
+        # inference of a name after querying an LLM
+        with open(video_list_file, "w") as myfile:
+            for video in self._composite_video.video_list:
+                file_name = video._media_url
+                myfile.write("file " + file_name + os.linesep)
+
+        self._composite_video._media_url = concatenate_videos(
+            input_file=os.path.abspath(video_list_file),
+            target_file_name=self._composite_video.get_file_name_by_state(
+                build_settings=build_settings
+            ),
+            ratioToMultiplyAnimations=ratio,
+        )  # keeping one consistent file name
+
+        self._composite_video._is_video_generated = True
+        return self._composite_video
+
+    def process_videos_async(
+        self,
+        build_settings: VideoBuildSettings,
+        video_list,
+        function_to_invoke,
+        proc_pool_executor=None,
+    ):
+        """
+        Process the videos asynchronously
+
+        Args:
+            build_settings (VideoBuildSettings): The build settings
+            video_list (list): The list of videos
+            function_to_invoke (function): The function to invoke
+
+        Returns:
+            list: The list of processed videos
+        """
+        if build_settings.run_async:
+            logger.debug(
+                f"Processing videos asynchronously, run_async: {build_settings.run_async}"
+            )
+            results = []
+            if not proc_pool_executor:
+                proc_pool_executor = ProcessPoolExecutor()
+
+            for video in video_list:
+                # TODO: you may have spotted that here we are not really processing the videos asynchronously, this caused some issues
+                # for the 0.1 so we will imporve this in the next version, doing a map on the video_list
+                results.extend(
+                    proc_pool_executor.map(
+                        function_to_invoke,
+                        [(video, build_settings, video.media_url)],
+                    )
+                )
+        else:
+            logger.debug(
+                f"Processing videos synchronously, run_async: {build_settings.run_async}"
+            )
+            results = []
+            for video in video_list:
+                results.extend(
+                    [
+                        function_to_invoke(
+                            (
+                                video,
+                                build_settings,
+                                video.media_url,
+                                video.get_file_name_by_state(
+                                    build_settings=build_settings
+                                ),
+                            )
+                        )
+                    ]
+                )
+
+        return results
 
     @log_function_params
     def _insert_subtitles_audio_recording(self, build_settings: VideoBuildSettings):
