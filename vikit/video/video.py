@@ -252,7 +252,7 @@ class Video(ABC):
         return self._duration
 
     @log_function_params
-    def _apply_background_music(self, background_music_file: str = None):
+    async def _apply_background_music(self, background_music_file: str = None):
         """
         Set the background music for the current video
 
@@ -321,7 +321,7 @@ class Video(ABC):
             Video: The prepared video
         """
         self._build_settings = build_settings
-        self._are_build_settings_prepared = True
+        self.are_build_settings_prepared = True
 
         return self
 

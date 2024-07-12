@@ -79,7 +79,7 @@ class RawTextBasedVideo(Video):
             return self._title
 
     @log_function_params
-    def build(
+    async def build(
         self,
         build_settings=VideoBuildSettings(),
         excluded_words="",
@@ -96,7 +96,7 @@ class RawTextBasedVideo(Video):
         Returns:
             The current instance
         """
-        if self._are_build_settings_prepared:
+        if self.are_build_settings_prepared:
             build_settings = self._build_settings
 
         super().build(build_settings)
@@ -119,15 +119,15 @@ class RawTextBasedVideo(Video):
             self._keywords = enhanced_prompt
         else:
             # Get more colorfull prompt from current prompt text
-            enhanced_prompt, enhanced_title = asyncio.run(
-                ml_gateway.get_enhanced_prompt_async(self._text)
+            enhanced_prompt, enhanced_title = (
+                await ml_gateway.get_enhanced_prompt_async(self._text)
             )
             if self._title is None:
                 self._title = ft.get_safe_filename(enhanced_title)
             self._keywords = None
 
-        video_link_from_prompt = ml_gateway.generate_video_async(
-            enhanced_prompt
+        video_link_from_prompt = asyncio.run(
+            ml_gateway.generate_video_async(enhanced_prompt)
         )  # Should give a link on the Internet
         self.metadata.is_video_generated = True
 

@@ -1,4 +1,5 @@
 import os
+import asyncio
 
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.video import Video, VideoBuildSettings
@@ -53,16 +54,18 @@ class ImportedVideo(Video):
         Returns:
             ImportedVideo: The built video
         """
-        if self._are_build_settings_prepared:
+        if self.are_build_settings_prepared:
             build_settings = self._build_settings
 
         super().build(build_settings)
 
         if build_settings.music_building_context.apply_background_music:
-            music_file = self._build_background_music(
-                VideoBuildSettings(
-                    music_building_context=MusicBuildingContext(
-                        generate_background_music=build_settings.music_building_context.generate_background_music
+            music_file = asyncio.run(
+                self._build_background_music(
+                    VideoBuildSettings(
+                        music_building_context=MusicBuildingContext(
+                            generate_background_music=build_settings.music_building_context.generate_background_music
+                        )
                     )
                 )
             )

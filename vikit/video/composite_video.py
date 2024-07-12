@@ -1,13 +1,10 @@
 import os
-from concurrent.futures import ProcessPoolExecutor
-from typing import Callable
+from typing import Callable, Awaitable
+import asyncio
 
 from loguru import logger
 
-import vikit.common.config as config
 from vikit.wrappers.ffmpeg_wrapper import (
-    concatenate_videos,
-    reencode_video,
     merge_audio,
 )
 from vikit.video.video import Video, VideoBuildSettings
@@ -228,11 +225,9 @@ class CompositeVideo(Video, is_composite_video):
         self,
         build_settings=VideoBuildSettings(),
         build_strategy: Callable[
-            ["CompositeVideo", list, VideoBuildSettings], "CompositeVideo"
+            [], Awaitable["CompositeVideo"]
         ] = build_using_local_resources,
-        build_order: Callable[
-            [list, "CompositeVideo", VideoBuildSettings, set], list[Video]
-        ] = get_lazy_dependency_chain_build_order,
+        build_order=get_lazy_dependency_chain_build_order,
     ):
         """
         Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,
@@ -262,35 +257,51 @@ class CompositeVideo(Video, is_composite_video):
                 self._video_list,
             )
         )
-
-        generated_vid_composite = build_strategy(
-            self, build_order, build_settings=build_settings
-        )
+        if asyncio.get_event_loop().is_running():
+            generated_vid_composite = build_strategy(
+                self, build_order, build_settings=build_settings
+            )
+        else:
+            generated_vid_composite = asyncio.run(
+                build_strategy(self, build_order, build_settings=build_settings)
+            )
 
         if self._is_root_video_composite:
             # Handle the background music
             if build_settings.music_building_context.apply_background_music:
                 if build_settings.music_building_context.use_recorded_prompt_as_audio:
-                    generated_vid_composite._apply_background_music(
-                        build_settings.prompt.audio_recording
-                    )
+                    # As there is recursivity, we may already be in an eventloop
+                    if asyncio.get_event_loop().is_running():
+                        generated_vid_composite._apply_background_music(
+                            build_settings.prompt.audio_recording
+                        )
+                    else:
+                        asyncio.run(
+                            generated_vid_composite._apply_background_music(
+                                build_settings.prompt.audio_recording
+                            )
+                        )
+
                 else:  # we generate the background music (either trough a model or use a default music to fail open)
-                    music_file = super()._build_background_music(
-                        prompt_text=generated_vid_composite._generate_background_music_prompt(),
-                        build_settings=VideoBuildSettings(
-                            test_mode=build_settings.test_mode,
-                            music_building_context=MusicBuildingContext(
-                                generate_background_music=build_settings.music_building_context.generate_background_music,
-                                expected_music_length=(
-                                    build_settings.prompt.get_duration()
-                                    if build_settings.prompt is not None
-                                    else None
+                    music_file = asyncio.run(
+                        super()._build_background_music(
+                            prompt_text=generated_vid_composite.generate_background_music_prompt(),
+                            build_settings=VideoBuildSettings(
+                                test_mode=build_settings.test_mode,
+                                music_building_context=MusicBuildingContext(
+                                    generate_background_music=build_settings.music_building_context.generate_background_music,
+                                    expected_music_length=(
+                                        build_settings.prompt.get_duration()
+                                        if build_settings.prompt is not None
+                                        else None
+                                    ),
                                 ),
                             ),
-                        ),
+                        )
                     )
-
-                    generated_vid_composite._apply_background_music(music_file)
+                    asyncio.run(
+                        generated_vid_composite._apply_background_music(music_file)
+                    )
 
             # Insert the subtitles audio recording
             if build_settings.include_audio_subtitles:
@@ -300,142 +311,6 @@ class CompositeVideo(Video, is_composite_video):
 
         self.metadata.is_video_generated = True
         return generated_vid_composite
-
-    def local_build_strategy(self, build_settings: VideoBuildSettings):
-        """
-        Build the composite video locally
-
-        params:
-            build_settings: The settings to be used for the build
-
-        returns:
-            self: The current object
-        """
-        short_title = self.get_title()
-        # TODO: change this hard truncate!!
-        if len(short_title) > 20:
-            short_title = short_title[:20]
-
-        video_list_file = "_".join(
-            [
-                short_title,
-                config.get_video_list_file_name(),
-            ]
-        )
-
-        cascaded_build_settings = VideoBuildSettings(  # we will handle the background only at the video composite root level
-            include_audio_read_subtitles=False,  # we will handle the subtitles only at the video composite root level
-            test_mode=build_settings.test_mode,
-            run_async=build_settings.run_async,
-        )
-
-        # Generate the videos
-        self._composite_video._video_list = self.process_videos_async(
-            build_settings=cascaded_build_settings,
-            video_list=self._composite_video.video_list,
-            function_to_invoke=self._process_gen_vid_bins,
-        )
-        nb_interpolated = len(
-            list(
-                filter(
-                    lambda builtvideo: builtvideo.metadata.is_interpolated,
-                    self._composite_video._video_list,
-                )
-            )
-        )
-
-        if nb_interpolated < len(self._composite_video._video_list):
-            self._composite_video.metadata.is_interpolated
-        elif nb_interpolated == 0:
-            self._composite_video.metadata.is_interpolated = False
-            # TODO: handle partially interpolated videos, not really importnat for now
-
-        ratio = self._get_ratio_to_multiply_animations(
-            build_settings=build_settings, video_composite=self._composite_video
-        )
-        if self._composite_video._needs_reencoding:
-            self._composite_video._video_list = self.process_videos_async(
-                build_settings=cascaded_build_settings,  # We take the freshly generated videos as input param
-                video_list=self._composite_video.video_list,
-                function_to_invoke=reencode_video,
-            )
-            self._composite_video.metadata.is_reencoded = True
-
-        # We have the final file names (they may have changed between initial video instanciation and
-        # inference of a name after querying an LLM
-        with open(video_list_file, "w") as myfile:
-            for video in self._composite_video.video_list:
-                file_name = video._media_url
-                myfile.write("file " + file_name + os.linesep)
-
-        self._composite_video._media_url = concatenate_videos(
-            input_file=os.path.abspath(video_list_file),
-            target_file_name=self._composite_video.get_file_name_by_state(
-                build_settings=build_settings
-            ),
-            ratioToMultiplyAnimations=ratio,
-        )  # keeping one consistent file name
-
-        self._composite_video._is_video_generated = True
-        return self._composite_video
-
-    def process_videos_async(
-        self,
-        build_settings: VideoBuildSettings,
-        video_list,
-        function_to_invoke,
-        proc_pool_executor=None,
-    ):
-        """
-        Process the videos asynchronously
-
-        Args:
-            build_settings (VideoBuildSettings): The build settings
-            video_list (list): The list of videos
-            function_to_invoke (function): The function to invoke
-
-        Returns:
-            list: The list of processed videos
-        """
-        if build_settings.run_async:
-            logger.debug(
-                f"Processing videos asynchronously, run_async: {build_settings.run_async}"
-            )
-            results = []
-            if not proc_pool_executor:
-                proc_pool_executor = ProcessPoolExecutor()
-
-            for video in video_list:
-                # TODO: you may have spotted that here we are not really processing the videos asynchronously, this caused some issues
-                # for the 0.1 so we will imporve this in the next version, doing a map on the video_list
-                results.extend(
-                    proc_pool_executor.map(
-                        function_to_invoke,
-                        [(video, build_settings, video.media_url)],
-                    )
-                )
-        else:
-            logger.debug(
-                f"Processing videos synchronously, run_async: {build_settings.run_async}"
-            )
-            results = []
-            for video in video_list:
-                results.extend(
-                    [
-                        function_to_invoke(
-                            (
-                                video,
-                                build_settings,
-                                video.media_url,
-                                video.get_file_name_by_state(
-                                    build_settings=build_settings
-                                ),
-                            )
-                        )
-                    ]
-                )
-
-        return results
 
     @log_function_params
     def _insert_subtitles_audio_recording(self, build_settings: VideoBuildSettings):
@@ -457,7 +332,7 @@ class CompositeVideo(Video, is_composite_video):
             logger.warning("No prompt audio file provided, skipping audio insertion")
 
     @log_function_params
-    def _generate_background_music_prompt(self):
+    def generate_background_music_prompt(self):
         """
         Get the background music prompt from the video list.
 

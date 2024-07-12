@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from time import sleep
+import asyncio
 
 import tests.tests_medias as tests_medias
 import vikit.common.file_tools as ft
@@ -32,6 +33,15 @@ class FakeMLModelsGateway(MLModelsGateway):
 
     def sleep(self, sleep_time=1):
         sleep(sleep_time)  # Simulate a long process with time.sleep
+
+    def generate_background_music(
+        self, duration: float = 3, prompt: str = None, sleep_time: int = 0
+    ):
+        asyncio.run(
+            self.generate_background_music_async(
+                duration=duration, sleep_time=sleep_time
+            )
+        )
 
     async def generate_background_music_async(
         self, duration: float = 3, prompt: str = None, sleep_time: int = 0
@@ -86,6 +96,14 @@ class FakeMLModelsGateway(MLModelsGateway):
         return "ENHANCED FROM PROMPT", "enhanced_from_prompt_file"
 
     async def get_subtitles_async(self, audiofile_path, sleep_time: int = 0):
+
+        asyncio.run(
+            self.get_subtitles_async(
+                audiofile_path=audiofile_path, sleep_time=sleep_time
+            )
+        )
+
+    def get_subtitles(self, audiofile_path, sleep_time: int = 0):
         self.sleep(sleep_time)
         subs = None
         with open(os.path.join(_sample_media_dir, "subtitles.srt"), "r") as f:

@@ -11,7 +11,7 @@
             "request": "launch",
             "module": "pytest",
             "args": [
-                "tests/test_video_building_async.py::TestVideoBuildingAsync::test_generate_bg_music_async",
+                "tests/test_composite_video.py::TestCompositeVideo::test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life",
             ],
             "console": "integratedTerminal"
         }
