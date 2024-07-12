@@ -78,26 +78,16 @@ class PromptBasedVideo(Video):
         """
         return super().get_file_name_by_state(build_settings)
 
-    def build(self, build_settings=VideoBuildSettings()):
+    def compose_inner_composite(self, build_settings: VideoBuildSettings):
         """
-        Generate the actual inner video
+        Compose the inner composite video
 
         Params:
             - build_settings: allow some customization
 
         Returns:
-            The current instance
+            The inner composite video
         """
-        super().build(build_settings)
-
-        if self._is_video_generated:
-            return self
-
-        build_settings.prompt = self._prompt
-
-        logger.info(
-            "Generating several videos from the prompt, this could take some time "
-        )
         vid_cp_final = CompositeVideo()
         vid_cp_final._is_root_video_composite = True
 
@@ -117,9 +107,31 @@ class PromptBasedVideo(Video):
                 vid_cp_sub
             )  # Adding the comnposite to the overall video
 
+            self._inner_composite = vid_cp_final
+            return vid_cp_final
+
+    def build(self, build_settings=VideoBuildSettings()):
+        """
+        Generate the actual inner video
+
+        Params:
+            - build_settings: allow some customization
+
+        Returns:
+            The current instance
+        """
+        super().build(build_settings)
+
+        if self._is_video_generated:
+            return self
+
+        vid_cp_final = self.compose_inner_composite(build_settings=build_settings)
+        logger.info(
+            "Generating several videos from the prompt, this could take some time "
+        )
+        build_settings.prompt = self._prompt
         vid_cp_final.build(build_settings=build_settings)
 
-        self._inner_composite = vid_cp_final
         self._is_video_generated = True
         self.metadata = vid_cp_final.metadata
         self._media_url = vid_cp_final.media_url
