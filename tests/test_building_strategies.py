@@ -142,8 +142,8 @@ class TestVideoBuildingStrategies(unittest.TestCase):
                 video_build_order[6], Transition
             ), f"Instead we had {type(video_build_order[7])}"
 
-            assert isinstance(video_build_order[8], CompositeVideo)
-            assert isinstance(video_build_order[9], CompositeVideo)
+            assert isinstance(video_build_order[7], CompositeVideo)
+            assert isinstance(video_build_order[16], CompositeVideo)
 
     @pytest.mark.unit
     def test_generate_video_tree_default_strategy_from_prompt_based_video(self):

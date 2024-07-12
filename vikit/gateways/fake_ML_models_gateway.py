@@ -30,7 +30,7 @@ class FakeMLModelsGateway(MLModelsGateway):
     def __init__(self):
         super().__init__()
 
-    def sleep(self, sleep_time):
+    def sleep(self, sleep_time=1):
         sleep(sleep_time)  # Simulate a long process with time.sleep
 
     async def generate_background_music_async(
