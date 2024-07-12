@@ -69,8 +69,7 @@ def get_first_videos_first_build_order(
     """
     video_build_order = []
     for video in video_tree:
-        # if isinstance(CompositeVideo, video):
-        if video.video_list and len(video.video_list) > 0:
+        if isinstance(video, is_composite_video) and len(video.video_list) > 0:
             video_build_order.append(
                 get_first_videos_first_build_order(
                     video_build_order, video.video_list, build_settings, already_added
@@ -106,7 +105,7 @@ def get_lazy_dependency_chain_build_order(
     for video in video_tree:
         logger.debug(f"type(video) is {type(video)}")
         if isinstance(video, is_composite_video) and len(video.video_list) > 0:
-            logger.debug(f"Going down the dependency chain for {video.id}")
+            logger.trace(f"Going down the dependency chain for {video.id}")
             get_lazy_dependency_chain_build_order(
                 video_build_order=video_build_order,
                 video_tree=video.video_list,
@@ -115,7 +114,7 @@ def get_lazy_dependency_chain_build_order(
             )
         else:  # on a leaf, we need to check if the video has dependencies
             if len(video.video_dependencies) > 0:
-                logger.debug(f"On a leaf, going up the dependency chain for {video.id}")
+                logger.trace(f"On a leaf, going up the dependency chain for {video.id}")
                 # go up the dependency chain
                 get_lazy_dependency_chain_build_order(
                     video_build_order=video_build_order,

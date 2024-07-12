@@ -1,5 +1,7 @@
 import os
 
+import asyncio
+
 from vikit.prompt.text_prompt_builder import TextPromptBuilder
 from vikit.prompt.recorded_prompt_builder import RecordedPromptBuilder
 from vikit.prompt.text_prompt_subtitles_extractor import TextPromptSubtitlesExtractor
@@ -35,7 +37,7 @@ class PromptFactory:
 
         """
         if ml_gateway is None:
-            self._ml_gateway = MLModelsGatewayFactory.get_ml_models_gateway_static(
+            self._ml_gateway = MLModelsGatewayFactory().get_ml_models_gateway(
                 test_mode=True
             )
         else:
@@ -43,6 +45,29 @@ class PromptFactory:
 
     @log_function_params
     def create_prompt_from_text(
+        self,
+        prompt_text: str = None,
+        generate_recording: bool = True,
+    ):
+        """
+        Create a prompt object from a prompt text by possibly creating
+        a recorded  audio file using a ML Model if asked to do so
+
+        There are async calls wrapped in this function
+
+        args:
+            - prompt_text: the text of the prompt
+            - generate_recording: a boolean to indicate if we should generate a recording from the text
+            before extracting subtitles
+
+        returns:
+            self
+        """
+        return asyncio.run(
+            self.create_prompt_from_text_async(prompt_text, generate_recording)
+        )
+
+    async def create_prompt_from_text_async(
         self,
         prompt_text: str = None,
         generate_recording: bool = True,
@@ -66,14 +91,14 @@ class PromptFactory:
         extractor = None
 
         if generate_recording:
-            elevenlabs_gateway.generate_mp3_from_text(
+            await elevenlabs_gateway.generate_mp3_from_text_async(
                 prompt_text, target_file=config.get_prompt_mp3_file_name()
             )
             assert os.path.exists(
                 config.get_prompt_mp3_file_name()
             ), "The generated audio file does not exists"
             extractor = RecordedPromptSubtitlesExtractor()
-            subs = extractor.extract_subtitles(
+            subs = await extractor.extract_subtitles(
                 recorded_prompt_file_path=config.get_prompt_mp3_file_name(),
                 ml_models_gateway=self._ml_gateway,
             )

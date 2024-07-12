@@ -27,7 +27,8 @@ def web_url_exists(url):
 @log_function_params
 def url_exists(url: str):
     """
-    Check if a URL exists somewhere on the internet or locally
+    Check if a URL exists somewhere on the internet or locally. To be superseded by a more
+    versatile and unified library in the future.
 
     Args:
         url (str): The URL to check
@@ -35,9 +36,7 @@ def url_exists(url: str):
     Returns:
         bool: True if the URL exists, False otherwise
     """
-    # TODO: identify the type of URL and just run the appropriate check
     url_exists = False
-
     assert url, "url cannot be None"
 
     if os.path.exists(url):

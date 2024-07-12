@@ -71,6 +71,7 @@ class Video(ABC):
 
         self._media_url = None
         self._build_settings = None
+        self.are_build_settings_prepared = False
         self._video_dependencies = (
             []
         )  # Define video dependencies, i.e. the videos that are needed to build the current video
@@ -306,6 +307,23 @@ class Video(ABC):
         """
         if self._is_video_generated:
             return self
+
+    def prepare_build(self, build_settings: VideoBuildSettings):
+        """
+        Prepare the video for building, may be used to prepare build settings for individual videos
+        that we don't want to share with global buildsettings. For instance to generate a video
+        a given way, and another video another way, all in the same composite video
+
+        Args:
+            build_settings (VideoBuildSettings): The settings to use for building the video later on
+
+        Returns:
+            Video: The prepared video
+        """
+        self._build_settings = build_settings
+        self._are_build_settings_prepared = True
+
+        return self
 
     @log_function_params
     def _fit_standard_background_music(self, expected_music_duration: float = None):

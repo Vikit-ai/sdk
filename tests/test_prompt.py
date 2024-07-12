@@ -18,12 +18,12 @@ class TestPrompt(unittest.TestCase):
         warnings.simplefilter("ignore", category=UserWarning)
         logger.add("log_test_prompt.txt", rotation="10 MB")
 
-    @pytest.mark.unit
+    @pytest.mark.integration
     def test_generate_prompt_from_empty_prompt(self):
         with pytest.raises(ValueError):
             _ = PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_text(prompt_text=None)
 
-    @pytest.mark.unit
+    @pytest.mark.integration
     def test_generate_prompt_from_empty_audio(self):
         with pytest.raises(ValueError):
             _ = PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_audio_file(recorded_audio_prompt_path=None)

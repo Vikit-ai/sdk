@@ -96,6 +96,9 @@ class RawTextBasedVideo(Video):
         Returns:
             The current instance
         """
+        if self._are_build_settings_prepared:
+            build_settings = self._build_settings
+
         super().build(build_settings)
 
         if self.metadata.is_video_generated:
@@ -103,6 +106,7 @@ class RawTextBasedVideo(Video):
 
         logger.info("Generating video, could take somne time ")
         enhanced_prompt = None
+
         ml_gateway = build_settings.get_ml_models_gateway()
 
         if build_settings.generate_from_llm_keyword:

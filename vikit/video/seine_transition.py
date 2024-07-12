@@ -30,6 +30,9 @@ class SeineTransition(Transition):
         Returns:
             str: The path to the generated transition video
         """
+        if self._are_build_settings_prepared:
+            build_settings = self._build_settings
+
         super().build(build_settings)
 
         if self.is_video_generated:

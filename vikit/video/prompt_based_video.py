@@ -108,7 +108,7 @@ class PromptBasedVideo(Video):
             )  # Adding the comnposite to the overall video
 
             self._inner_composite = vid_cp_final
-            return vid_cp_final
+        return vid_cp_final
 
     def build(self, build_settings=VideoBuildSettings()):
         """
@@ -120,6 +120,8 @@ class PromptBasedVideo(Video):
         Returns:
             The current instance
         """
+        if self._are_build_settings_prepared:
+            build_settings = self._build_settings
         super().build(build_settings)
 
         if self._is_video_generated:
@@ -157,7 +159,7 @@ class PromptBasedVideo(Video):
             - prompt_based_vid: the video generated from the prompt
             - transit: the transition between the two
         """
-        keyword_based_vid = RawTextBasedVideo(sub_text).build(
+        keyword_based_vid = RawTextBasedVideo(sub_text).prepare_build(
             build_settings=VideoBuildSettings(
                 generate_from_llm_keyword=True,
                 generate_from_llm_prompt=False,
@@ -165,7 +167,7 @@ class PromptBasedVideo(Video):
             )
         )
 
-        prompt_based_vid = RawTextBasedVideo(sub_text).build(
+        prompt_based_vid = RawTextBasedVideo(sub_text).prepare_build(
             build_settings=VideoBuildSettings(
                 generate_from_llm_prompt=True,
                 generate_from_llm_keyword=False,

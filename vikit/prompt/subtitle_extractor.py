@@ -41,7 +41,7 @@ class SubtitleExtractor:
             else:
                 index = index + 1
 
-        logger.debug(f"Subs after merge {len(subs)}")
+        logger.trace(f"Subs after merge {len(subs)}")
         return subs
 
     @log_function_params

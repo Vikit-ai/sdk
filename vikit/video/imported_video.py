@@ -53,6 +53,9 @@ class ImportedVideo(Video):
         Returns:
             ImportedVideo: The built video
         """
+        if self._are_build_settings_prepared:
+            build_settings = self._build_settings
+
         super().build(build_settings)
 
         if build_settings.music_building_context.apply_background_music:

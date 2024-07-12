@@ -379,7 +379,7 @@ class ReplicateGateway(MLModelsGateway):
         return subs
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def generate_video(self, prompt: str):
+    async def generate_video_async(self, prompt: str):
         """
         Generate a video from the given prompt
 

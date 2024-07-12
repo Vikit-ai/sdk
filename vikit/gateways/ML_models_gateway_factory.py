@@ -11,15 +11,7 @@ class MLModelsGatewayFactory:
     def __init__(self):
         pass
 
-    # TODO: refactor this and only keep one version
     def get_ml_models_gateway(self, test_mode: bool = True):
-        if test_mode:
-            return FakeMLModelsGateway()
-        else:
-            return VikitGateway()
-
-    @staticmethod
-    def get_ml_models_gateway_static(test_mode: bool = True):
         if test_mode:
             return FakeMLModelsGateway()
         else:
