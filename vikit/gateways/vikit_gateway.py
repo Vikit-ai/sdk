@@ -41,9 +41,6 @@ class VikitGateway(MLModelsGateway):
         Returns:
             - str: the path to the generated music
         """
-        assert (
-            duration < 300
-        ), "The duration of the music should be less than 300 seconds"
 
         outputLLM = self.get_music_generation_keywords(prompt)
         logger.debug(f"outputLLM: {outputLLM}")
@@ -163,8 +160,6 @@ class VikitGateway(MLModelsGateway):
 
         if duration < 1:
             raise AttributeError("The input duration is less than 1")
-        if duration > 300:
-            raise AttributeError("The input duration is greater than 300")
         if len(prompt_text) < 1:
             raise AttributeError("The input prompt text is empty")
         result_music_link = requests.post(
