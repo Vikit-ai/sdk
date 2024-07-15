@@ -1,6 +1,7 @@
 import os
 from os import path
 from dotenv import load_dotenv
+from concurrent.futures import ProcessPoolExecutor
 
 from loguru import logger
 
@@ -162,3 +163,24 @@ def get_cloud_bucket_url():
     if cloud_bucket_url is None:
         raise Exception("CLOUD_BUCKET_URL is not set")
     return cloud_bucket_url
+
+
+class singletons:
+    """
+    A class to hold singletons
+    """
+
+    def __init__(self):
+        pass
+
+    _process_pool_executor = None
+
+    @staticmethod
+    def get_process_executor():
+        """
+        The process executor to use for parallel processing
+        """
+        if not singletons._process_pool_executor:
+            singletons._process_pool_executor = ProcessPoolExecutor()
+
+        return singletons._process_pool_executor

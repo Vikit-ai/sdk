@@ -11,11 +11,24 @@ from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.video_types import VideoType
-from vikit.video.video_metadata import VideoMetadata
-from vikit.video.video_building import (
+from video_building.build_order import (
     build_using_local_resources,
     get_lazy_dependency_chain_build_order,
     is_composite_video,
+)
+import vikit.common.config as config
+from vikit.video_building.video_building_handler import VideoBuildingHandler
+from vikit.video_building.handlers.video_reencoding_handler import (
+    VideoBuildingHandlerReencoder,
+)
+from vikit.video_building.handlers.concatenation_handler import (
+    VideoBuildingHandlerConcatenate,
+)
+from video_building.handlers.background_music_existing_handler import (
+    VideoBuildingHandlerGenerateMusic,
+)
+from video_building.handlers.background_music_existing_handler import (
+    VideoBuildingHandlerMixMusic,
 )
 
 
@@ -80,51 +93,6 @@ class CompositeVideo(Video, is_composite_video):
             videos_output = videos_output + "ID: " + video.id + os.linesep
 
         return f"Composite Video: {videos_output}"
-
-    def _get_ratio_to_multiply_animations(
-        self, build_settings, video_composite: "CompositeVideo"
-    ):
-        # Now we box the video composing this composite into the expected length, typically the one of a prompt
-        if build_settings.expected_length is None:
-            if build_settings.prompt is not None:
-                ratioToMultiplyAnimations = (
-                    video_composite.get_duration()
-                    / build_settings.prompt.get_duration()
-                )
-            else:
-                ratioToMultiplyAnimations = 1
-        else:
-            if build_settings.expected_length <= 0:
-                raise ValueError(
-                    f"Expected length should be greater than 0. Got {build_settings.expected_length}"
-                )
-            ratioToMultiplyAnimations = (
-                video_composite.get_duration() / build_settings.expected_length
-            )
-
-        return ratioToMultiplyAnimations
-
-    def _process_gen_vid_bins(self, args):
-        """
-        Process the video generation binaries: we actually do ask the video to build itself
-        as a video binary (typically an MP4 generated from Gen AI, hosted behind an API),
-        or to compose from its inner videos in case of a child composite video
-
-        Args:
-            args: The arguments: video, build_settings, video.media_url, target_file_name
-
-        Returns:
-            CompositeVideo: The composite video
-        """
-        video, build_settings, _, _ = args
-
-        video_build = video.build(build_settings=build_settings)
-        VideoMetadata(video_build.metadata).is_video_generated = True
-
-        assert video is not None, "Video cannot be None"
-        assert video.media_url is not None, "Video media URL cannot be None"
-
-        return video_build
 
     def prepare(self, build_settings: VideoBuildSettings, strategy) -> list:
         """
@@ -220,6 +188,39 @@ class CompositeVideo(Video, is_composite_video):
         )
         return str(video_fname)
 
+    def update_metadata_post_building(self):
+        """
+        Update the metadata post building
+        """
+        self._is_video_generated = True
+
+        nb_interpolated = len(
+            list(
+                filter(
+                    lambda builtvideo: builtvideo.metadata.is_interpolated,
+                    self._video_list,
+                )
+            )
+        )
+        if nb_interpolated < len(self._video_list):
+            self.metadata.is_interpolated
+        elif nb_interpolated == 0:
+            self.metadata.is_interpolated = False
+            # TODO: handle partially interpolated videos, not really importnat for now
+
+    def cleanse_video_list(self):
+        """
+        Cleanse the video list by removing any empty composites videos
+        """
+        list(
+            filter(
+                lambda video: not (
+                    isinstance(video, CompositeVideo) and len(video._video_list) == 0
+                ),
+                self._video_list,
+            )
+        )
+
     @log_function_params
     def build(
         self,
@@ -249,22 +250,24 @@ class CompositeVideo(Video, is_composite_video):
             return self
 
         # Cleanse the video list by removing any empty composites videos
-        self._video_list = list(
-            filter(
-                lambda video: not (
-                    isinstance(video, CompositeVideo) and len(video._video_list) == 0
-                ),
-                self._video_list,
-            )
+        self._video_list = self.cleanse_video_list()
+
+        short_title = self.get_title()
+        # TODO: change this hard truncate!!
+        if len(short_title) > 20:
+            short_title = short_title[:20]
+
+        video_list_file = "_".join(
+            [
+                short_title,
+                config.get_video_list_file_name(),
+            ]
         )
-        if asyncio.get_event_loop().is_running():
-            generated_vid_composite = build_strategy(
-                self, build_order, build_settings=build_settings
-            )
-        else:
-            generated_vid_composite = asyncio.run(
-                build_strategy(self, build_order, build_settings=build_settings)
-            )
+        generated_vid_composite = build_strategy(
+            self, build_order, build_settings=build_settings
+        )
+
+        self.update_metadata()
 
         if self._is_root_video_composite:
             # Handle the background music
@@ -342,3 +345,28 @@ class CompositeVideo(Video, is_composite_video):
         return " ".join(
             [video.get_title() for video in self.video_list if video.get_title()]
         )
+
+    def get_handler_chain(
+        self,
+    ) -> list[VideoBuildingHandler]:
+        """
+        Get the handler chain of the video.
+        Defining the handler chain is the main way to define how the video is built
+        so it is up to the child classes to implement this method
+
+        Args:
+            build_settings (VideoBuildSettings): The settings to use for building the video
+
+        Returns:
+            list: The list of handlers to use for building the video
+        """
+        handlers = []
+        handlers.append(VideoBuildingHandlerConcatenate())
+        if self._needs_reencoding:
+            handlers.append(VideoBuildingHandlerReencoder())
+        if self.build_settings.music_building_context.apply_background_music:
+            if self.build_settings.music_building_context.generate_background_music:
+                handlers.append(VideoBuildingHandlerGenerateMusic())
+            handlers.append(VideoBuildingHandlerMixMusic())
+
+        return handlers

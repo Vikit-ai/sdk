@@ -19,6 +19,7 @@ class GeneralBuildSettings:
         delete_interim_files: bool = False,  # not implemented yet :)
         run_async: bool = False,
         test_mode: bool = False,
+        use_multiprocessing: bool = False,
         output_path: str = None,  # The path where the video will be saved, could be local or remote (i.e. a cloud bucket or a streaming service)
     ):
         self.delete_interim_files = delete_interim_files  # Not deleting the intermediate video files, first and last frames TODO: to be implemented
@@ -27,6 +28,7 @@ class GeneralBuildSettings:
         self.run_async = (
             run_async  # Run the video generation in async mode, to boost reactivity and
         )
+        self.use_multiprocessing = use_multiprocessing
         # performance of the application. Can be set to off for debugging purposes
         self.test_mode = test_mode  # Run the video generation in local mode, to run local and fast tests
         self._ml_models_gateway = None

@@ -1,14 +1,25 @@
 import os
-import asyncio
-
-from urllib.request import urlretrieve
-from loguru import logger
 
 from vikit.video.video import Video
 from vikit.common.decorators import log_function_params
-import vikit.common.file_tools as ft
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
+
+from vikit.video.building.handlers.video_reencoding_handler import (
+    VideoBuildingHandlerReencoder,
+)
+from vikit.video.building.handlers.videogen_handler import (
+    VideoBuildingHandlerGenerateFomApi,
+)
+from vikit.video.building.handlers.interpolation_handler import (
+    VideoBuildingHandlerInterpolate,
+)
+from prompt.building.handlers.prompt_by_raw_user_text_handlers import (
+    PromptByRawUserTextHandler,
+)
+from prompt.building.handlers.prompt_by_keywords_handler import PromptByKeywordsHandler
+
+from vikit.video.building.video_building_handler import VideoBuildingHandler
 
 
 class RawTextBasedVideo(Video):
@@ -96,62 +107,42 @@ class RawTextBasedVideo(Video):
         Returns:
             The current instance
         """
+        if self.metadata.is_video_generated:
+            return self
+
         if self.are_build_settings_prepared:
             build_settings = self._build_settings
 
         super().build(build_settings)
 
-        if self.metadata.is_video_generated:
-            return self
+        handlers = self.get_handler_chain()
+        video_built = handlers[0].execute(self, build_settings)
 
-        logger.info("Generating video, could take somne time ")
-        enhanced_prompt = None
-
-        ml_gateway = build_settings.get_ml_models_gateway()
-
-        if build_settings.generate_from_llm_keyword:
-            # Get more colorfull keywords from prompt, and a title and handle excluded words
-            enhanced_prompt, self._title = asyncio.run(
-                ml_gateway.get_keywords_from_prompt_async(
-                    self._text, excluded_words=excluded_words
-                )
-            )
-            self._keywords = enhanced_prompt
-        else:
-            # Get more colorfull prompt from current prompt text
-            enhanced_prompt, enhanced_title = (
-                await ml_gateway.get_enhanced_prompt_async(self._text)
-            )
-            if self._title is None:
-                self._title = ft.get_safe_filename(enhanced_title)
-            self._keywords = None
-
-        video_link_from_prompt = asyncio.run(
-            ml_gateway.generate_video_async(enhanced_prompt)
-        )  # Should give a link on the Internet
-        self.metadata.is_video_generated = True
-
-        if build_settings.interpolate:
-            interpolated_video = asyncio.run(
-                ml_gateway.interpolate_async(video_link_from_prompt)
-            )
-            self.metadata.is_interpolated = True
-            file_name = self.get_file_name_by_state(build_settings)
-            interpolated_video_path = urlretrieve(
-                interpolated_video,
-                file_name,
-            )[
-                0
-            ]  # Then we download it
-            self._media_url = interpolated_video_path
-            self.metadata.is_interpolated = True
-        else:
-            file_name = self.get_file_name_by_state(build_settings)
-            self._media_url = video_link_from_prompt
         self._source = type(
-            ml_gateway
+            build_settings.get_ml_models_gateway()
         ).__name__  # The source of the video is used later to decide if we need to reencode the video
 
-        self.metadata.is_interpolated = True
+        return video_built
 
-        return self
+    def get_handler_chain(self) -> list[VideoBuildingHandler]:
+        """
+        Get the handler chain of the video.
+        Defining the handler chain is the main way to define how the video is built
+        so it is up to the child classes to implement this method
+
+        Args:
+            build_settings (VideoBuildSettings): The settings to use for building the video
+
+        Returns:
+            list: The list of handlers to use for building the video
+        """
+        handlers = []
+        handlers.append(VideoBuildingHandlerGenerateFomApi())
+        handlers.append(PromptByKeywordsHandler())
+        handlers.append(PromptByRawUserTextHandler())
+        if self.build_settings.interpolate:
+            handlers.append(VideoBuildingHandlerInterpolate())
+        if self._needs_reencoding:
+            handlers.append(VideoBuildingHandlerReencoder())
+
+        return handlers

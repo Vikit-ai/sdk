@@ -18,6 +18,7 @@ import vikit.common.file_tools as ft
 import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
 from vikit.video.video_file_name import VideoFileName
 from vikit.video.video_metadata import VideoMetadata
+from vikit.video_building.video_building_handler import VideoBuildingHandler
 
 
 class Video(ABC):
@@ -72,13 +73,9 @@ class Video(ABC):
         self._media_url = None
         self._build_settings = None
         self.are_build_settings_prepared = False
-        self._video_dependencies = (
+        self.video_dependencies = (
             []
         )  # Define video dependencies, i.e. the videos that are needed to build the current video
-
-    @property
-    def video_dependencies(self):
-        return self._video_dependencies
 
     @property
     def build_settings(self):
@@ -88,6 +85,13 @@ class Video(ABC):
         the video is built
         """
         return self._build_settings
+
+    @build_settings.setter
+    def build_settings(self, build_settings):
+        """
+        Check if the build settings are prepared
+        """
+        self._build_settings = build_settings
 
     @property
     def metadata(self):
@@ -169,7 +173,7 @@ class Video(ABC):
         """
         Returns the title of the video.
         """
-        return "no title"
+        return "notitle"
 
     @property
     def media_url(self):
@@ -178,7 +182,6 @@ class Video(ABC):
         """
         return self._media_url
 
-    @log_function_params
     def get_first_frame_as_image(self):
         """
         Get the first frame of the video
@@ -207,7 +210,6 @@ class Video(ABC):
         result.check_returncode()
         return result_path
 
-    @log_function_params
     def get_last_frame_as_image(self):
         """
         Get the last frame of the video
@@ -292,11 +294,12 @@ class Video(ABC):
                 )
                 self.metadata.is_prompt_read_aloud = True
 
-    @abstractmethod
     def build(self, build_settings: VideoBuildSettings = None):
         """
         Build the video in the child classes, unless the video is already built, in  which case
         we just return ourseleves (Video gets immutable once generated)
+
+        This is a template method, the child classes should implement the get_handler_chain method
 
         Args:
             build_settings (VideoBuildSettings): The settings to use for building the video
@@ -307,6 +310,12 @@ class Video(ABC):
         """
         if self._is_video_generated:
             return self
+
+        handler_chain = self.get_handler_chain()
+        assert handler_chain is not None, "Handler chain cannot be None"
+        assert len(handler_chain) > 0, "Handler chain cannot be empty"
+
+        target_name = self.get_file_name_by_state(build_settings=build_settings)
 
     def prepare_build(self, build_settings: VideoBuildSettings):
         """
@@ -426,3 +435,18 @@ class Video(ABC):
         return await ml_models_gateway.generate_background_music_async(
             duration=expected_music_length, prompt=prompt_text
         )
+
+    @abstractmethod
+    def get_handler_chain(sel) -> list[VideoBuildingHandler]:
+        """
+        Get the handler chain of the video.
+        Defining the handler chain is the main way to define how the video is built
+        so it is up to the child classes to implement this method
+
+        Args:
+            build_settings (VideoBuildSettings): The settings to use for building the video
+
+        Returns:
+            list: The list of handlers to use for building the video
+        """
+        pass
