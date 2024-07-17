@@ -1,4 +1,3 @@
-import unittest
 import warnings
 
 import pytest
@@ -20,7 +19,7 @@ and symbols. This is additional text to make sure we generate serveral subtitles
 # Below are real integration tests, not to be run all the time
 
 
-class TestSubtitlesExtrators(unittest.TestCase):
+class TestSubtitlesExtrators:
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
@@ -28,7 +27,8 @@ class TestSubtitlesExtrators(unittest.TestCase):
         logger.add("log_test_subtitles_extractors.txt", rotation="10 MB")
 
     @pytest.mark.unit
-    def test_extract_raw_subs_from_text_prompt_extractor(self):
+    @pytest.mark.asyncio
+    async def test_extract_raw_subs_from_text_prompt_extractor(self):
         sub_extractor = TextPromptSubtitlesExtractor()
         subs = sub_extractor.extract_subtitles(SAMPLE_PROMPT_TEXT)
         assert subs is not None
@@ -38,7 +38,10 @@ class TestSubtitlesExtrators(unittest.TestCase):
             assert sub.text is not None
 
     @pytest.mark.unit
-    def test_extract_heuristic_human_spoken_style_subs_from_text_prompt_extractor(self):
+    @pytest.mark.asyncio
+    async def test_extract_heuristic_human_spoken_style_subs_from_text_prompt_extractor(
+        self,
+    ):
         # We  make sure that all subtitles are minimum of 7 seconds in order to be able to insert two videos inside
         sub_extractor = TextPromptSubtitlesExtractor()
         subs = sub_extractor.extract_subtitles(SAMPLE_PROMPT_TEXT)
@@ -51,7 +54,8 @@ class TestSubtitlesExtrators(unittest.TestCase):
             assert len(sub.text.split(" ")) >= 2
 
     @pytest.mark.integration
-    def test_reunion_island_prompt(self):
+    @pytest.mark.asyncio
+    async def test_reunion_island_prompt(self):
         with WorkingFolderContext():  # we work in the temp folder once for all the script
             gw = replicate_gateway.ReplicateGateway()
             test_prompt = PromptFactory(ml_gateway=gw).create_prompt_from_text(
@@ -62,8 +66,8 @@ class TestSubtitlesExtrators(unittest.TestCase):
             )
 
             sub_extractor = RecordedPromptSubtitlesExtractor()
-            subs: pysrt.SubRipFile = sub_extractor.extract_subtitles(
-                recorded_prompt_file_path=test_prompt._recorded_audio_prompt_path,
+            subs: pysrt.SubRipFile = await sub_extractor.extract_subtitles_async(
+                recorded_prompt_file_path=test_prompt.recorded_audio_prompt_path,
                 ml_models_gateway=gw,
             )
 

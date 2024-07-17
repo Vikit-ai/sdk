@@ -1,4 +1,3 @@
-import unittest
 import os
 
 # from unittest.mock import patch, MagicMock, Mock
@@ -14,7 +13,7 @@ from vikit.video.imported_video import ImportedVideo
 from vikit.common.context_managers import WorkingFolderContext
 
 
-class TestImportedVideo(unittest.TestCase):
+class TestImportedVideo:
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
@@ -26,7 +25,7 @@ class TestImportedVideo(unittest.TestCase):
         self.sample_video_path = get_cat_video_path()
 
     @pytest.mark.local_integration
-    def test_apply_default_bg_sound_on_existing_video(self):
+    async def test_apply_default_bg_sound_on_existing_video(self):
         with WorkingFolderContext():
             logger.debug(f"self.sample_video_path {self.sample_video_path}")
             vid = ImportedVideo(self.sample_video_path)

@@ -1,5 +1,4 @@
 import os
-from typing import Callable, Awaitable
 import asyncio
 
 from loguru import logger
@@ -9,26 +8,21 @@ from vikit.wrappers.ffmpeg_wrapper import (
 )
 from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
-from vikit.music_building_context import MusicBuildingContext
 from vikit.video.video_types import VideoType
-from video_building.build_order import (
-    build_using_local_resources,
+from vikit.video.building.build_order import (
     get_lazy_dependency_chain_build_order,
     is_composite_video,
 )
 import vikit.common.config as config
-from vikit.video_building.video_building_handler import VideoBuildingHandler
-from vikit.video_building.handlers.video_reencoding_handler import (
+from vikit.video.building.video_building_handler import VideoBuildingHandler
+from vikit.video.building.handlers.video_reencoding_handler import (
     VideoBuildingHandlerReencoder,
 )
-from vikit.video_building.handlers.concatenation_handler import (
+from vikit.video.building.handlers.video_concatenation_handler import (
     VideoBuildingHandlerConcatenate,
 )
-from video_building.handlers.background_music_existing_handler import (
-    VideoBuildingHandlerGenerateMusic,
-)
-from video_building.handlers.background_music_existing_handler import (
-    VideoBuildingHandlerMixMusic,
+from vikit.video.building.handlers.music_audio_merging_handler import (
+    MusicAudioMergingHandler,
 )
 
 
@@ -94,7 +88,7 @@ class CompositeVideo(Video, is_composite_video):
 
         return f"Composite Video: {videos_output}"
 
-    def prepare(self, build_settings: VideoBuildSettings, strategy) -> list:
+    def prepare_build(self, build_settings: VideoBuildSettings, strategy) -> list:
         """
         Prepare the video build order
 
@@ -225,27 +219,19 @@ class CompositeVideo(Video, is_composite_video):
     def build(
         self,
         build_settings=VideoBuildSettings(),
-        build_strategy: Callable[
-            [], Awaitable["CompositeVideo"]
-        ] = build_using_local_resources,
         build_order=get_lazy_dependency_chain_build_order,
     ):
         """
         Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,
         as we call external services and run video mixing locally.
 
-        The actual algorithm depends on the provided strategy (local, cloud, etc.)
-        We store the history of the build in a local build history object, which can be used to track the build stats
-
         params:
             build_settings: The settings to be used for the build
-            build_strategy: The strategy to use for the build, i.e. today we just user a function pointer, may be extended to a class later
+            build_order: The order in which to build the videos
 
         Returns:
             self: The current object
         """
-        super().build(build_settings)
-
         if self._is_video_generated:
             return self
 
@@ -263,8 +249,8 @@ class CompositeVideo(Video, is_composite_video):
                 config.get_video_list_file_name(),
             ]
         )
-        generated_vid_composite = build_strategy(
-            self, build_order, build_settings=build_settings
+        generated_vid_composite = self.get_handler_chain(build_settings)[0].execute(
+            self, build_settings
         )
 
         self.update_metadata()
@@ -286,31 +272,8 @@ class CompositeVideo(Video, is_composite_video):
                         )
 
                 else:  # we generate the background music (either trough a model or use a default music to fail open)
-                    music_file = asyncio.run(
-                        super()._build_background_music(
-                            prompt_text=generated_vid_composite.generate_background_music_prompt(),
-                            build_settings=VideoBuildSettings(
-                                test_mode=build_settings.test_mode,
-                                music_building_context=MusicBuildingContext(
-                                    generate_background_music=build_settings.music_building_context.generate_background_music,
-                                    expected_music_length=(
-                                        build_settings.prompt.get_duration()
-                                        if build_settings.prompt is not None
-                                        else None
-                                    ),
-                                ),
-                            ),
-                        )
-                    )
-                    asyncio.run(
-                        generated_vid_composite._apply_background_music(music_file)
-                    )
 
-            # Insert the subtitles audio recording
-            if build_settings.include_audio_subtitles:
-                generated_vid_composite._insert_subtitles_audio_recording(
-                    build_settings
-                )
+                    generated_vid_composite._apply_background_music(music_file)
 
         self.metadata.is_video_generated = True
         return generated_vid_composite
@@ -346,7 +309,7 @@ class CompositeVideo(Video, is_composite_video):
             [video.get_title() for video in self.video_list if video.get_title()]
         )
 
-    def get_handler_chain(
+    def get_video_handler_chain(
         self,
     ) -> list[VideoBuildingHandler]:
         """
@@ -361,12 +324,14 @@ class CompositeVideo(Video, is_composite_video):
             list: The list of handlers to use for building the video
         """
         handlers = []
+
         handlers.append(VideoBuildingHandlerConcatenate())
+
         if self._needs_reencoding:
             handlers.append(VideoBuildingHandlerReencoder())
+
         if self.build_settings.music_building_context.apply_background_music:
             if self.build_settings.music_building_context.generate_background_music:
-                handlers.append(VideoBuildingHandlerGenerateMusic())
-            handlers.append(VideoBuildingHandlerMixMusic())
+                handlers.append(MusicAudioMergingHandler())
 
         return handlers

@@ -26,7 +26,7 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
     """
 
     @log_function_params
-    async def extract_subtitles(
+    async def extract_subtitles_async(
         self, recorded_prompt_file_path, ml_models_gateway: MLModelsGateway = None
     ):
         """
@@ -57,7 +57,11 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
             )
             logger.debug(f"Generated slice {generated_slice}")
             # Obtain  sub part of subtitles using elevenlabs API
-            subs = ml_models_gateway.get_subtitles(audiofile_path=generated_slice)
+            subs = await ml_models_gateway.get_subtitles_async(
+                audiofile_path=generated_slice
+            )
+            logger.debug(f"Subtitles: {subs}")
+
             subtitle_file_path = "_".join(["subSubtitle", str(i), str(end)]) + ".srt"
             # Write subtitles to a temporary SRT file
             with open(subtitle_file_path, "a") as f:

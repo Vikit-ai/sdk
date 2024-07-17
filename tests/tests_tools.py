@@ -46,7 +46,7 @@ def create_fake_prompt_for_local_tests():
     prompt = RecordedPrompt()
     prompt._recorded_audio_prompt_path = get_test_prompt_recording_trainboy()
     prompt._subtitles = test_subs
-    prompt._text = """A group of ancient moss-covered stones come to life in an abandoned forest, revealing intricate carvings and symbols
+    prompt.text = """A group of ancient moss-covered stones come to life in an abandoned forest, revealing intricate carvings and symbols
     A young boy traveling in the train alongside Mediterranean coast, contemplating the sea and loving it."""
     prompt._subtitle_as_text_tokens = [
         "A group of ancient moss-covered stones come to life in an abandoned forest,",
@@ -72,7 +72,7 @@ def create_fake_prompt_for_local_tests_moss_stones_train_boy():
     prompt._recorded_audio_prompt_path = (
         get_test_prompt_recording_stones_trainboy_path()
     )
-    prompt._text = " ".join(subs_as_text_tokens)
+    prompt.text = " ".join(subs_as_text_tokens)
     prompt._subtitle_as_text_tokens = subs_as_text_tokens
 
     return prompt
@@ -89,7 +89,7 @@ def create_fake_prompt_tired():
         prompt._subtitles
     )
     prompt._recorded_audio_prompt_path = get_test_recorded_prompt_path()
-    prompt._text = " ".join(subs_as_text_tokens)
+    prompt.text = " ".join(subs_as_text_tokens)
     prompt._subtitle_as_text_tokens = subs_as_text_tokens
 
     return prompt

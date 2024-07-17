@@ -1,4 +1,3 @@
-import unittest
 import os
 import warnings
 
@@ -15,7 +14,7 @@ TESTS_MEDIA_FOLDER = "medias/"
 SMALL_VIDEO_CHAT_FILE = "chat_video_super8.mp4"
 
 
-class TestVideo(unittest.TestCase):
+class TestVideo:
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
@@ -31,21 +30,23 @@ class TestVideo(unittest.TestCase):
         DeprecationWarning
 
     @pytest.mark.unit
-    def test_get_first_frame_as_image_path_with_non_generated_video(self):
+    @pytest.mark.asyncio
+    async def test_get_first_frame_as_image_path_with_non_generated_video(self):
         with pytest.raises(AssertionError):
             PromptBasedVideo(
                 tools.test_prompt_library["moss_stones-train_boy"]
             ).get_first_frame_as_image()
 
     @pytest.mark.local_integration
-    def test_get_last_frame_as_image_path_with_non_generated_video(self):
+    async def test_get_last_frame_as_image_path_with_non_generated_video(self):
         with pytest.raises(AssertionError):
             PromptBasedVideo(
                 tools.test_prompt_library["moss_stones-train_boy"]
             ).get_last_frame_as_image()
 
     @pytest.mark.integration
-    def test_get_duration(self):
+    @pytest.mark.asyncio
+    async def test_get_duration(self):
         with WorkingFolderContext():
             with pytest.raises(
                 ValueError
@@ -55,7 +56,7 @@ class TestVideo(unittest.TestCase):
                 ).get_duration()
 
     @pytest.mark.local_integration
-    def test_get_first_frame_as_image_path_with_sample_video(self):
+    async def test_get_first_frame_as_image_path_with_sample_video(self):
         sample_video_path = os.path.join(self.sample_video_path)
         with WorkingFolderContext():
             logger.debug(f"sample_video_path : {sample_video_path}")
@@ -67,7 +68,7 @@ class TestVideo(unittest.TestCase):
             assert os.path.exists(image_path)
 
     @pytest.mark.local_integration
-    def test_get_last_frame_as_image_path_with_sample_video(self):
+    async def test_get_last_frame_as_image_path_with_sample_video(self):
         with WorkingFolderContext():
             video = ImportedVideo(video_file_path=self.sample_video_path)
             image_path = video.get_last_frame_as_image()

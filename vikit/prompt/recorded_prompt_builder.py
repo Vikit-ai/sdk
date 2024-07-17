@@ -71,7 +71,7 @@ class RecordedPromptBuilder:
         """
         if text is None:
             raise ValueError("The text prompt is not provided")
-        self.prompt._text = text
+        self.prompt.text = text
         return self
 
     def build(self):

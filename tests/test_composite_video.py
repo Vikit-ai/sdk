@@ -1,4 +1,3 @@
-import unittest
 import warnings
 
 import pytest
@@ -23,7 +22,7 @@ from tests.tests_medias import (
 prompt_mystic = tools.test_prompt_library["moss_stones-train_boy"]
 
 
-class TestCompositeVideo(unittest.TestCase):
+class TestCompositeVideo:
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
@@ -36,14 +35,15 @@ class TestCompositeVideo(unittest.TestCase):
         warnings.simplefilter("ignore", category=UserWarning)
 
     @pytest.mark.unit
-    def test_create_video_mix_with_empty_video(self):
+    @pytest.mark.asyncio
+    async def test_create_video_mix_with_empty_video(self):
         video = None
         test_video_mixer = CompositeVideo()
         # we expect an exception here
         with pytest.raises(ValueError):
             test_video_mixer.append_video(video)
 
-    def test_create_single_video_mix_single_video(self):
+    async def test_create_single_video_mix_single_video(self):
         """
         Create a single video mix
         No Music
@@ -52,7 +52,7 @@ class TestCompositeVideo(unittest.TestCase):
             _ = Video()
 
     @pytest.mark.local_integration
-    def test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life(
+    async def test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life(
         self,
     ):
         with WorkingFolderContext():
@@ -60,7 +60,7 @@ class TestCompositeVideo(unittest.TestCase):
             assert video.media_url, "Media URL should not be null"
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video)
-            built = test_video_mixer.build(
+            built = await test_video_mixer.build(
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         generate_background_music=True
@@ -74,19 +74,19 @@ class TestCompositeVideo(unittest.TestCase):
             assert built.media_url is not None
 
     @pytest.mark.local_integration
-    def test_int_create_video_mix_with_preexiting_video_bin_no_bkg_music(self):
+    async def test_int_create_video_mix_with_preexiting_video_bin_no_bkg_music(self):
         with WorkingFolderContext():
             video = ImportedVideo(self.sample_cat_video_path)
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video)
-            test_video_mixer.build()
+            await test_video_mixer.build()
             logger.debug(
                 f"Test video mix with preexisting video bin: {test_video_mixer}"
             )
             assert test_video_mixer.media_url is not None
 
     @pytest.mark.local_integration
-    def test_combine_generated_and_preexiting_video_based_video(self):
+    async def test_combine_generated_and_preexiting_video_based_video(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo(
                 tools.test_prompt_library["moss_stones-train_boy"].text
@@ -94,18 +94,20 @@ class TestCompositeVideo(unittest.TestCase):
             video_imp = ImportedVideo(self.sample_cat_video_path)
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video).append_video(video_imp)
-            test_video_mixer.build(VideoBuildSettings(test_mode=True))
+            await test_video_mixer.build(VideoBuildSettings(test_mode=True))
 
             assert test_video_mixer.media_url is not None
 
     @pytest.mark.local_integration
-    def test_build_video_composite_2_prompt_vids_music_no_subs_no_transition(self):
+    async def test_build_video_composite_2_prompt_vids_music_no_subs_no_transition(
+        self,
+    ):
         with WorkingFolderContext():
             test_prompt = prompt_mystic
             raw_text_video = RawTextBasedVideo(test_prompt.text)
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(raw_text_video).append_video(raw_text_video)
-            test_video_mixer.build(
+            await test_video_mixer.build(
                 VideoBuildSettings(
                     test_mode=True,
                     music_building_context=MusicBuildingContext(
@@ -121,7 +123,9 @@ class TestCompositeVideo(unittest.TestCase):
             ), "Background music should not be null"
 
     @pytest.mark.local_integration
-    def test_build_video_composite_with_default_bkg_music_and_audio_subtitle(self):
+    async def test_build_video_composite_with_default_bkg_music_and_audio_subtitle(
+        self,
+    ):
         with WorkingFolderContext():
             video_start = ImportedVideo(get_cat_video_path())
             video_end = ImportedVideo(get_test_transition_stones_trainboy_path())
@@ -131,7 +135,7 @@ class TestCompositeVideo(unittest.TestCase):
                 .append_video(video_end)
                 .append_video(CompositeVideo())  # should be filtered
             )
-            final_video = final_video.build(
+            final_video = await final_video.build(
                 VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True,
@@ -145,7 +149,7 @@ class TestCompositeVideo(unittest.TestCase):
             assert final_video.background_music is not None
 
     @pytest.mark.local_integration
-    def test_prompt_recording_synchro_tired(self):
+    async def test_prompt_recording_synchro_tired(self):
         with WorkingFolderContext():
             prompt_with_recording = tools.test_prompt_library["tired"]
             final_composite_video = CompositeVideo()
@@ -154,7 +158,7 @@ class TestCompositeVideo(unittest.TestCase):
                 # video.build(build_settings=VideoBuildSettings(test_mode=True))
                 final_composite_video.append_video(video)
 
-            final_composite_video.build(
+            await final_composite_video.build(
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         generate_background_music=False, apply_background_music=True
@@ -166,7 +170,7 @@ class TestCompositeVideo(unittest.TestCase):
             )
 
     @pytest.mark.local_integration
-    def test_use_recording_ratio_on_existing_gen_default_bg_music_include_subs_loseFaitprompt(
+    async def test_use_recording_ratio_on_existing_gen_default_bg_music_include_subs_loseFaitprompt(
         self,
     ):
         """
@@ -179,7 +183,7 @@ class TestCompositeVideo(unittest.TestCase):
 
             video_comp = CompositeVideo()
             video_comp.append_video(vid1).append_video(vid2)
-            video_comp.build(
+            await video_comp.build(
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         generate_background_music=False, apply_background_music=True
@@ -190,8 +194,8 @@ class TestCompositeVideo(unittest.TestCase):
             )
 
     @pytest.mark.local_integration
-    @unittest.skip("This test is not working yet, lower priority for now")
-    def test_video_build_expected_video_length(self):
+    @pytest.mark.skip
+    async def test_video_build_expected_video_length(self):
         """
         Create a single video mix with 2 imported video initially nade from gen video
         and check the viddeo expected length is applied
@@ -202,7 +206,7 @@ class TestCompositeVideo(unittest.TestCase):
 
             video_comp = CompositeVideo()
             video_comp.append_video(vid1).append_video(vid2)
-            video_comp.build(
+            await video_comp.build(
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True
@@ -215,7 +219,8 @@ class TestCompositeVideo(unittest.TestCase):
             assert ffmpegwrapper.get_media_duration(video_comp.media_url) == 5
 
     @pytest.mark.integration
-    def test_int_combine_generated_and_preexiting_video_based_video_no_build_settings(
+    @pytest.mark.asyncio
+    async def test_int_combine_generated_and_preexiting_video_based_video_no_build_settings(
         self,
     ):
         with WorkingFolderContext():
@@ -225,22 +230,22 @@ class TestCompositeVideo(unittest.TestCase):
             video2 = ImportedVideo(self.sample_cat_video_path)
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video).append_video(video2)
-            test_video_mixer.build(build_settings=build_stgs)
+            await test_video_mixer.build(build_settings=build_stgs)
 
             assert test_video_mixer.media_url is not None
 
     @pytest.mark.local_integration
-    def test_tired_local_no_transitions_with_music_and_prompts(self):
+    async def test_tired_local_no_transitions_with_music_and_prompts(self):
 
         with WorkingFolderContext():
             tired_prompt_with_recording = tools.create_fake_prompt_tired()
             final_composite_video = CompositeVideo()
             for subtitle in tired_prompt_with_recording.subtitles:
                 video = RawTextBasedVideo(subtitle.text)
-                video.build(build_settings=VideoBuildSettings(test_mode=True))
+                await video.build(build_settings=VideoBuildSettings(test_mode=True))
                 final_composite_video.append_video(video)
 
-            final_composite_video.build(
+            await final_composite_video.build(
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True
@@ -253,7 +258,7 @@ class TestCompositeVideo(unittest.TestCase):
 
     @pytest.mark.local_integration
     # @pytest.mark.non_regression
-    def test_issue_6(self):
+    async def test_issue_6(self):
         """
         Transition between two compositve videos won't work #6
         https://github.com/leclem/aivideo/issues/6
@@ -286,11 +291,11 @@ class TestCompositeVideo(unittest.TestCase):
                 comp_end
             )
             # with pytest.raises(AssertionError):
-            vid_cp_final.build(build_settings=bld_settings)
+            await vid_cp_final.build(build_settings=bld_settings)
 
     @pytest.mark.local_integration
     @pytest.mark.non_regression
-    def test_issue_6_generated_subvids(self):
+    async def test_issue_6_generated_subvids(self):
         """
         Transition between two compositve videos won't work #6
         https://github.com/leclem/aivideo/issues/6
@@ -326,4 +331,4 @@ class TestCompositeVideo(unittest.TestCase):
                 comp_end
             )
             # with pytest.raises(AssertionError):
-            vid_cp_final.build(build_settings=bld_settings)
+            await vid_cp_final.build(build_settings=bld_settings)

@@ -1,5 +1,5 @@
 from vikit.common import GeneralBuildSettings
-from vikit.prompt.recorded_prompt import RecordedPrompt
+from vikit.prompt.prompt import Prompt
 from vikit.music_building_context import MusicBuildingContext
 
 
@@ -7,11 +7,11 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
     def __init__(
         self,
         delete_interim_files: bool = False,
-        run_async: bool = False,
+        run_async: bool = True,
         test_mode: bool = True,
         expected_length: float = None,  # The expected length in seconds of the video, will be used when actually building the video
         include_audio_read_subtitles: bool = False,  # Include subtitles in the final video
-        prompt: RecordedPrompt = None,  # Include subtitles in the final video and fit videos to match the prompt subtitles timelines
+        prompt: Prompt = None,  # Include subtitles in the final video and fit videos to match the prompt subtitles timelines
         generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt
         generate_from_llm_prompt: bool = True,
         interpolate: bool = True,  # Ask to interpolate the video

@@ -1,4 +1,4 @@
-import unittest
+
 import pytest
 import warnings
 from loguru import logger
@@ -11,7 +11,7 @@ from vikit.gateways import replicate_gateway as replicate_gateway
 mp3_transcription = "ceci est un test rapide avec nma voix enregistrée pour faire un test"
 
 
-class TestPrompt(unittest.TestCase):
+class TestPrompt():
             
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
@@ -19,22 +19,25 @@ class TestPrompt(unittest.TestCase):
         logger.add("log_test_prompt.txt", rotation="10 MB")
 
     @pytest.mark.integration
-    def test_generate_prompt_from_empty_prompt(self):
+    @pytest.mark.asyncio
+    async def test_generate_prompt_from_empty_prompt(self):
         with pytest.raises(ValueError):
-            _ = PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_text(prompt_text=None)
+            _ = await PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_text(prompt_text=None)
 
     @pytest.mark.integration
-    def test_generate_prompt_from_empty_audio(self):
+    @pytest.mark.asyncio
+    async def test_generate_prompt_from_empty_audio(self):
         with pytest.raises(ValueError):
-            _ = PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_audio_file(recorded_audio_prompt_path=None)
+            _ = await PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_audio_file(recorded_audio_prompt_path=None)
 
     @pytest.mark.integration
-    def test_build_basic_audio_prompt_integration(self):
+    @pytest.mark.asyncio
+    async def test_build_basic_audio_prompt_integration(self):
         with WorkingFolderContext():
             """
             here we check a prompt has been created sucessfully from an mp3 recording 
             """
-            prompt = PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_audio_file(
+            prompt = await PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_audio_file(
                 recorded_audio_prompt_path=get_test_prompt_recording())
             assert prompt is not None, "Prompt is None"
             assert prompt.text is not None, "Prompt text is None"
@@ -42,9 +45,10 @@ class TestPrompt(unittest.TestCase):
             assert prompt.audio_recording == get_test_prompt_recording()
 
     @pytest.mark.integration
-    def test_build_basic_text_prompt(self):
+    @pytest.mark.asyncio
+    async def test_build_basic_text_prompt(self):
         with WorkingFolderContext():  # we work in the temp folder once for all the script
             prompt = PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_text(prompt_text="This is a fake prompt")
-            self.assertEqual(prompt.text, "This is a fake prompt")
+            assert prompt.text == "This is a fake prompt", "Prompt text is not the one expected"
 
 

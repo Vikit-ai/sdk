@@ -1,10 +1,12 @@
 import os
 
-from vikit.video.video import Video
+from loguru import logger
+
+from vikit.common import file_tools as ft
 from vikit.common.decorators import log_function_params
+from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
-
 from vikit.video.building.handlers.video_reencoding_handler import (
     VideoBuildingHandlerReencoder,
 )
@@ -14,12 +16,9 @@ from vikit.video.building.handlers.videogen_handler import (
 from vikit.video.building.handlers.interpolation_handler import (
     VideoBuildingHandlerInterpolate,
 )
-from prompt.building.handlers.prompt_by_raw_user_text_handlers import (
-    PromptByRawUserTextHandler,
-)
-from prompt.building.handlers.prompt_by_keywords_handler import PromptByKeywordsHandler
-
 from vikit.video.building.video_building_handler import VideoBuildingHandler
+from vikit.prompt.prompt_factory import PromptFactory
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 
 class RawTextBasedVideo(Video):
@@ -90,57 +89,53 @@ class RawTextBasedVideo(Video):
             return self._title
 
     @log_function_params
-    async def build(
+    async def prepare_build(
         self,
         build_settings=VideoBuildSettings(),
-        excluded_words="",
     ):
         """
-        Generate the actual inner video
+        prepare the actual inner video
 
         Params:
             - build_settings: allow some customization
-            - generate_from_keywords: generate the video out of keywords infered from the given prompt, and using an LLM.
-            If False, we will generate an enhanced prompt and generate the video out of it
-            - excluded_words: words to exclude from the prompt. This is used so as to prevent too much repetition across distant video scenes
 
         Returns:
             The current instance
         """
-        if self.metadata.is_video_generated:
-            return self
+        await super().prepare_build(build_settings)
 
-        if self.are_build_settings_prepared:
-            build_settings = self._build_settings
-
-        super().build(build_settings)
-
-        handlers = self.get_handler_chain()
-        video_built = handlers[0].execute(self, build_settings)
-
+        prompt_factory = PromptFactory(PromptBuildSettings)
+        self.build_settings.prompt = (
+            await prompt_factory.get_reengineered_prompt_from_text(
+                self._text, prompt_build_settings=build_settings
+            )
+        )
+        if self._title is None:
+            logger.trace(f"Video Title: {self._title}")
+            self._title = ft.get_safe_filename(
+                self.build_settings.prompter_prompt.extended_fields["title"]
+            )
         self._source = type(
-            build_settings.get_ml_models_gateway()
-        ).__name__  # The source of the video is used later to decide if we need to reencode the video
+            build_settings.get_ml_models_gateway()  # TODO: this is hacky anbd should be refactored
+            # so that we infer source from the different handlers (initial video generator, interpolation, etc)
+        ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
 
-        return video_built
-
-    def get_handler_chain(self) -> list[VideoBuildingHandler]:
+    def get_video_handler_chain(
+        self, build_settings: VideoBuildSettings
+    ) -> list[VideoBuildingHandler]:
         """
         Get the handler chain of the video.
         Defining the handler chain is the main way to define how the video is built
         so it is up to the child classes to implement this method
 
-        Args:
-            build_settings (VideoBuildSettings): The settings to use for building the video
+        At this stage, we should already have the enhanced prompt and title for this video
 
         Returns:
             list: The list of handlers to use for building the video
         """
         handlers = []
         handlers.append(VideoBuildingHandlerGenerateFomApi())
-        handlers.append(PromptByKeywordsHandler())
-        handlers.append(PromptByRawUserTextHandler())
-        if self.build_settings.interpolate:
+        if build_settings.interpolate:
             handlers.append(VideoBuildingHandlerInterpolate())
         if self._needs_reencoding:
             handlers.append(VideoBuildingHandlerReencoder())

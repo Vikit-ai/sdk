@@ -91,6 +91,7 @@ def extract_audio_slice(
     logger.debug(
         f"Extracting audio slice from file  {audiofile_path} from {start} to {end}"
     )
+
     if not target_file_name:
         target_file_name = (
             "_".join(

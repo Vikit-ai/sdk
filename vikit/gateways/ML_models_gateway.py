@@ -14,6 +14,9 @@ class MLModelsGateway(BaseModel, ABC):
     def __init__(self):
         pass
 
+    def generate_mp3_from_text_async(self, prompt_text, target_file):
+        pass
+
     @abstractmethod
     def generate_background_music_async(
         self, duration: int = 3, prompt: str = None

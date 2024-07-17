@@ -92,5 +92,5 @@ class Transition(Video):
         """
         return super().get_file_name_by_state(build_settings)
 
-    def build(self, build_settings: VideoBuildSettings = None):
-        super().build(build_settings)
+    async def build(self, build_settings: VideoBuildSettings = None):
+        await super().build(build_settings)

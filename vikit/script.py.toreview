@@ -12,7 +12,7 @@ import vikit.gateways.mail_gateway as mail_gateway
 import vikit.gateways.discord_gateway as discord_gateway
 from vikit.gateways.cloud_storage import upload_to_GCS_cloud_bucket
 from vikit.video.video import Video
-from vikit.video_building import VideoMixer
+from vikit.video.building import VideoMixer
 from vikit.video_keywords_raw_enhanced_prompt import VideosAggregate_KeywordAndRawPrompt
 from transition import Transition
 from prompt_factory import PromptFactory

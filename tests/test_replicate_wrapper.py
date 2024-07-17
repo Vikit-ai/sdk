@@ -1,4 +1,3 @@
-import unittest
 import warnings
 import pytest
 from loguru import logger
@@ -13,7 +12,7 @@ SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in 
 and symbols. This is additional text to make sure we generate serveral subtitles. """
 
 
-class TestReplicateWrapper(unittest.TestCase):
+class TestReplicateWrapper:
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
@@ -22,7 +21,8 @@ class TestReplicateWrapper(unittest.TestCase):
         logger.add("log_test_replicate_wrapper.txt", rotation="10 MB")
 
     @pytest.mark.integration
-    def test_inte_get_keywords_from_prompt(self):
+    @pytest.mark.asyncio
+    async def test_inte_get_keywords_from_prompt(self):
 
         with WorkingFolderContext():
             ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
@@ -32,7 +32,7 @@ class TestReplicateWrapper(unittest.TestCase):
             test_prompt = PromptFactory(ml_gateway=ml_gw).create_prompt_from_text(
                 SAMPLE_PROMPT_TEXT
             )
-            keywords, title = ml_gw.get_keywords_from_prompt(
+            keywords, title = ml_gw.get_keywords_from_prompt_async(
                 test_prompt.text, "previous_words"
             )
             assert len(keywords) > 0

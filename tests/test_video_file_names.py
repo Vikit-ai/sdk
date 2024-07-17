@@ -1,5 +1,5 @@
 import pytest
-import unittest
+
 import warnings
 import datetime
 import uuid
@@ -17,19 +17,20 @@ from vikit.video.transition import Transition
 from vikit.video.video_metadata import VideoMetadata
 
 
-class TestVideoFileNames(unittest.TestCase):
+class TestVideoFileNames:
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
 
     @pytest.mark.unit
-    def test_nominal_file_name(self):
+    @pytest.mark.asyncio
+    async def test_nominal_file_name(self):
         # Create a VideoFileName instance with sample values
 
         bld_set = VideoBuildSettings()
-        bld_set._id = "1234567890"
-        bld_set._build_date = datetime.date(2024, 7, 1)
-        bld_set._build_time = datetime.time(23, 4, 42)
+        bld_set.id = "1234567890"
+        bld_set.build_date = datetime.date(2024, 7, 1)
+        bld_set.build_time = datetime.time(23, 4, 42)
 
         video_file_name = VideoFileName(
             build_settings=bld_set,
@@ -46,15 +47,17 @@ class TestVideoFileNames(unittest.TestCase):
             + str(video_file_name.unique_id)
             + ".mp4"
         )
-        self.assertEqual(video_file_name.file_name, expected_file_name)
+        assert video_file_name.file_name == expected_file_name
 
     @pytest.mark.unit
-    def test_none_input(self):
-        with self.assertRaises(ValueError):
+    @pytest.mark.asyncio
+    async def test_none_input(self):
+        with pytest.raises(ValueError):
             _ = VideoFileName(build_settings=None, video_metadata=None)
 
     @pytest.mark.unit
-    def test_raw_text_video_file_name(self):
+    @pytest.mark.asyncio
+    async def test_raw_text_video_file_name(self):
         """
         Test if the file name of a RawTextBasedVideo instance is generated correctly
 
@@ -72,7 +75,8 @@ class TestVideoFileNames(unittest.TestCase):
         )
 
     @pytest.mark.unit
-    def test_from_file_name(self):
+    @pytest.mark.asyncio
+    async def test_from_file_name(self):
         id = str(uuid.uuid4())
         file_name = (
             f"exampletitle_comproot_ooooo_1234567890_2022-01-01_12:00_UID_{id}.mp4"
@@ -87,12 +91,13 @@ class TestVideoFileNames(unittest.TestCase):
         assert video_file_name.unique_id == uuid.UUID(id)
 
     @pytest.mark.unit
-    def test_extract_features(self):
+    @pytest.mark.asyncio
+    async def test_extract_features(self):
 
         bld_set = VideoBuildSettings()
-        bld_set._id = "1234567890"
-        bld_set._build_date = datetime.date(2024, 7, 1)
-        bld_set._build_time = datetime.time(23, 4, 42)
+        bld_set.id = "1234567890"
+        bld_set.build_date = datetime.date(2024, 7, 1)
+        bld_set.build_time = datetime.time(23, 4, 42)
 
         video_file_name = VideoFileName(
             video_metadata=VideoMetadata(title="Sample Video"),
@@ -104,15 +109,16 @@ class TestVideoFileNames(unittest.TestCase):
         # Extract the features
         extracted_features = video_file_name.extract_features_as_string()
         # Check if the extracted features are correct
-        self.assertEqual(extracted_features, "dogrs")
+        assert extracted_features == "dogrs"
 
     @pytest.mark.unit
-    def test_extract_features_no_features(self):
+    @pytest.mark.asyncio
+    async def test_extract_features_no_features(self):
 
         bld_set = VideoBuildSettings()
-        bld_set._id = "1234567890"
-        bld_set._build_date = datetime.date(2024, 7, 1)
-        bld_set._build_time = datetime.time(23, 4, 42)
+        bld_set.id = "1234567890"
+        bld_set.build_date = datetime.date(2024, 7, 1)
+        bld_set.build_time = datetime.time(23, 4, 42)
         bld_set.music_building_context.apply_background_music = False
         bld_set.interpolate = False
 
@@ -126,14 +132,14 @@ class TestVideoFileNames(unittest.TestCase):
         extracted_features = video_file_name.extract_features_as_string()
         # Check if the extracted features are correct
         expected_features = "ooooo"
-        self.assertEqual(extracted_features, expected_features)
+        assert extracted_features == expected_features
 
     def get_test_build_settings(self):
         bld_set = VideoBuildSettings()
         bld_set.test_mode = True
-        bld_set._id = "1234567890"
-        bld_set._build_date = datetime.date(2024, 7, 1)
-        bld_set._build_time = datetime.time(23, 4, 42)
+        bld_set.id = "1234567890"
+        bld_set.build_date = datetime.date(2024, 7, 1)
+        bld_set.build_time = datetime.time(23, 4, 42)
         bld_set.output_path = "output_path"
         bld_set.include_audio_subtitles = False
         bld_set.interpolate = False
@@ -143,7 +149,8 @@ class TestVideoFileNames(unittest.TestCase):
         return bld_set
 
     @pytest.mark.unit
-    def test_video_file_names_across_building_steps(self):
+    @pytest.mark.asyncio
+    async def test_video_file_names_across_building_steps(self):
 
         with WorkingFolderContext():
             root_composite_video = CompositeVideo()

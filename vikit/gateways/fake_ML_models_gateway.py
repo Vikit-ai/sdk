@@ -2,6 +2,9 @@ import os
 from pathlib import Path
 from time import sleep
 import asyncio
+import shutil
+
+from loguru import logger
 
 import tests.tests_medias as tests_medias
 import vikit.common.file_tools as ft
@@ -34,6 +37,11 @@ class FakeMLModelsGateway(MLModelsGateway):
     def sleep(self, sleep_time=1):
         sleep(sleep_time)  # Simulate a long process with time.sleep
 
+    def generate_mp3_from_text_async(prompt_text, target_file):
+        shutil.copy(
+            src=tests_medias.get_test_prompt_recording_trainboy(), dst=target_file
+        )
+
     def generate_background_music(
         self, duration: float = 3, prompt: str = None, sleep_time: int = 0
     ):
@@ -46,7 +54,7 @@ class FakeMLModelsGateway(MLModelsGateway):
     async def generate_background_music_async(
         self, duration: float = 3, prompt: str = None, sleep_time: int = 0
     ) -> str:
-        self.sleep(sleep_time)
+        self.asyncio.sleep(sleep_time)
 
         if type(duration) is not float:
             raise TypeError("Duration must be a float")
@@ -59,7 +67,7 @@ class FakeMLModelsGateway(MLModelsGateway):
     async def generate_seine_transition_async(
         self, source_image_path, target_image_path, sleep_time: int = 0
     ):
-        sleep(sleep_time)  # Simulate a long process with time.sleep
+        asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
         return tests_medias.get_test_transition_stones_trainboy_path()  # Important:
 
     # the returned name should contains "transition" in the file name so we send the same video at the interpolate call
@@ -71,47 +79,71 @@ class FakeMLModelsGateway(MLModelsGateway):
     async def compose_music_from_text_async(
         self, prompt_text: str, duration: int, sleep_time: int = 0
     ):
-        self.sleep(sleep_time)
+        self.asyncio.sleep(sleep_time)
         return tests_medias.get_sample_generated_music_path()
 
     async def get_music_generation_keywords_async(
         self, text, sleep_time: int = 0
     ) -> str:
-        sleep(sleep_time)  # Simulate a long process with time.sleep
+        asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
         return "KEYWORDS FROM MUSIC GENERATION"
 
     async def interpolate_async(self, link_to_video: str, sleep_time: int = 0):
-        sleep(sleep_time)  # Simulate a long process with time.sleep
+        asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
         local_file_path = Path(os.path.join(_sample_media_dir, STUDENT_ARM_WRITING))
         local_file_url = urljoin("file:", pathname2url(str(local_file_path)))
         return local_file_url
 
+    async def get_keywords_from_prompt(
+        self, subtitleText, excluded_words: str = None, sleep_time: int = 0
+    ):
+        asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
+        return "KEYWORDS FROM PROMPT", "keywords_from_prompt_file"
+
     async def get_keywords_from_prompt_async(
         self, subtitleText, excluded_words: str = None, sleep_time: int = 0
     ):
-        sleep(sleep_time)  # Simulate a long process with time.sleep
-        return "KEYWORDS FROM PROMPT", "keywords_from_prompt_file"
+        # TODO: work on a cleaner way to prevent circular deps
+        from vikit.prompt.text_prompt import TextPrompt
 
-    async def get_enhanced_prompt_async(self, subtitleText):
-        return "ENHANCED FROM PROMPT", "enhanced_from_prompt_file"
+        asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
+        return (
+            TextPrompt(
+                prompt_text="KEYWORDS FROM PROMPT",
+            ),
+            {"title", "test title"},
+        )
+
+    async def get_enhanced_prompt_async(
+        self, subtitleText, excluded_words: str = None, sleep_time: int = 0
+    ):
+        # TODO: work on a cleaner way to prevent circular deps
+        from vikit.prompt.text_prompt import TextPrompt
+
+        asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
+        return (
+            TextPrompt(
+                prompt_text="ENHANCED FROM PROMPT",
+            ),
+            {"title", "test title"},
+        )
 
     async def get_subtitles_async(self, audiofile_path, sleep_time: int = 0):
 
-        asyncio.run(
-            self.get_subtitles_async(
-                audiofile_path=audiofile_path, sleep_time=sleep_time
-            )
+        logger.trace(f"Getting subtitles for {audiofile_path}")
+        return await asyncio.run(
+            self.get_subtitles(audiofile_path=audiofile_path, sleep_time=sleep_time)
         )
 
     def get_subtitles(self, audiofile_path, sleep_time: int = 0):
-        self.sleep(sleep_time)
+        asyncio.sleep(sleep_time)
         subs = None
         with open(os.path.join(_sample_media_dir, "subtitles.srt"), "r") as f:
             subs = f.read()
         return {"transcription": subs}
 
     async def generate_video_async(self, prompt: str = None, sleep_time: int = 0):
-        self.sleep(sleep_time)
+        self.asyncio.sleep(sleep_time)
 
         return ft.create_non_colliding_file_name_async(
             tests_medias.get_cat_video_path()[:-4], extension="mp4"
@@ -120,6 +152,6 @@ class FakeMLModelsGateway(MLModelsGateway):
     async def extract_audio_slice_async(
         self, i, end, audiofile_path, target_file_name: str = None, sleep_time: int = 0
     ):
-        self.sleep(sleep_time)
+        self.asyncio.sleep(sleep_time)
 
         return tests_medias.get_test_prompt_recording_trainboy()

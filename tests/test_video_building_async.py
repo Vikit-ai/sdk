@@ -1,4 +1,3 @@
-import unittest
 import pytest
 
 import warnings
@@ -16,7 +15,7 @@ from vikit.music_building_context import MusicBuildingContext
 prompt_mystic = tools.test_prompt_library["moss_stones-train_boy"]
 
 
-class TestVideoBuildingAsync(unittest.TestCase):
+class TestVideoBuildingAsync:
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.sample_cat_video_path = test_media.get_cat_video_path()
@@ -32,10 +31,10 @@ class TestVideoBuildingAsync(unittest.TestCase):
 
     @pytest.mark.local_integration
     @log_function_params
-    def test_generate_bg_music_async(self):
+    async def test_generate_bg_music_async(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo(prompt_mystic.text)
-            video._media_url = self.sample_cat_video_path
+            video.media_url = self.sample_cat_video_path
             bg_music_file = video._build_background_music(
                 build_settings=VideoBuildSettings(
                     test_mode=True,
@@ -53,7 +52,7 @@ class TestVideoBuildingAsync(unittest.TestCase):
     @pytest.mark.local_integration
     @pytest.mark.skip(reason="Test is not yet implemented")
     @log_function_params
-    def test_generate_video_async(self):
+    async def test_generate_video_async(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo(prompt_mystic.text)
             video.build(

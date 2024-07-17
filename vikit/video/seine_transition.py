@@ -20,7 +20,7 @@ class SeineTransition(Transition):
         super().__init__(source_video=source_video, target_video=target_video)
 
     @log_function_params
-    def build(self, build_settings: VideoBuildSettings = None) -> Transition:
+    async def build(self, build_settings: VideoBuildSettings = None) -> Transition:
         """
         Apply the Seine transition between the source and target video
 
@@ -31,17 +31,17 @@ class SeineTransition(Transition):
             str: The path to the generated transition video
         """
         if self.are_build_settings_prepared:
-            build_settings = self._build_settings
+            build_settings = self.build_settings
 
-        super().build(build_settings)
+        await super().build(build_settings)
 
         if self.is_video_generated:
             return self
 
         if not self._source_video.is_video_generated:
-            self._source_video.build(build_settings=build_settings)
+            await self._source_video.build(build_settings=build_settings)
         if not self._target_video.is_video_generated:
-            self._target_video.build(build_settings=build_settings)
+            await self._target_video.build(build_settings=build_settings)
 
         assert self._source_video.is_video_generated, "source video must be generated"
         assert self._target_video.is_video_generated, "target video must be generated"

@@ -1,8 +1,11 @@
 import os
 import asyncio
 import aiohttp
-
+import base64
+import json
 import subprocess
+
+import requests
 
 from tenacity import retry, before_log, after_log, stop_after_attempt
 from loguru import logger
@@ -11,10 +14,8 @@ from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.common.decorators import log_function_params
 from vikit.common.secrets import get_replicate_api_token, get_vikit_api_token
+import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
 from vikit.common.config import get_nb_retries_http_calls
-import requests
-import base64
-import json
 
 
 os.environ["REPLICATE_API_TOKEN"] = get_replicate_api_token()
@@ -32,7 +33,26 @@ class VikitGateway(MLModelsGateway):
         super().__init__()
 
     @log_function_params
-    def generate_background_music_async(
+    async def generate_mp3_from_text_async(prompt_text, target_file):
+        """
+        Generate an mp3 file from a text prompt.
+        TODO: May be isolated into
+        another gatesay later
+
+        Args:
+            - prompt_text: str - the text to generate the mp3 from
+            - target_file: str - the path to the target file
+
+        Returns:
+            - None
+        """
+        await elevenlabs_gateway.generate_mp3_from_text_async(
+            text=prompt_text, target_file=target_file
+        )
+        assert os.path.exists(target_file), "The generated audio file does not exists"
+
+    @log_function_params
+    async def generate_background_music_async(
         self, duration: int = 3, prompt: str = None
     ) -> str:
         """
@@ -60,7 +80,7 @@ class VikitGateway(MLModelsGateway):
         # Then we generate the music
         clean_prompt_without_title = outputLLM[:-title_length]
         logger.debug(f"Clean GPT Prompt : {clean_prompt_without_title}")
-        output_music_link = self.compose_music_from_text(
+        output_music_link = await self.compose_music_from_text_async(
             clean_prompt_without_title, duration=duration
         )
 
@@ -95,7 +115,9 @@ class VikitGateway(MLModelsGateway):
         after=after_log(logger, logger.level("TRACE").no),
     )
     @log_function_params
-    async def generate_seine_transition(self, source_image_path, target_image_path):
+    async def generate_seine_transition_async(
+        self, source_image_path, target_image_path
+    ):
         """
         Generate a transition between two videos
 
@@ -151,7 +173,7 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
-    async def compose_music_from_text(self, prompt_text: str, duration: int):
+    async def compose_music_from_text_async(self, prompt_text: str, duration: int):
         """
         Compose a music for a prompt text
 
@@ -259,7 +281,7 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("DEBUG").no),
         after=after_log(logger, logger.level("DEBUG").no),
     )
-    async def interpolate(self, video):
+    async def interpolate_async(self, video):
         """
         Run some interpolation magic. This model may fail after timeout, so you
         should call it with retry logic
@@ -291,7 +313,9 @@ class VikitGateway(MLModelsGateway):
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     @log_function_params
-    async def get_keywords_from_prompt(self, subtitleText, excluded_words: str = None):
+    async def get_keywords_from_prompt_async(
+        self, subtitleText, excluded_words: str = None
+    ):
         """
         Generates keywords from a subtitle text using the Replicate API.
 
@@ -344,7 +368,7 @@ class VikitGateway(MLModelsGateway):
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     @log_function_params
-    async def get_enhanced_prompt(self, subtitleText):
+    async def get_enhanced_prompt_async(self, subtitleText):
         """
         Generates an enhanced prompt from an original one, probably written by a user or
         translated from an audio
@@ -385,7 +409,7 @@ class VikitGateway(MLModelsGateway):
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     @log_function_params
-    async def get_subtitles(self, audiofile_path):
+    async def get_subtitles_async(self, audiofile_path):
         # Obtain subtitles using Replicate API
         """
         Extract subtitles from an audio file using the Replicate API
@@ -429,7 +453,7 @@ class VikitGateway(MLModelsGateway):
         return json.loads(subs.text)
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def generate_video(self, prompt: str):
+    async def generate_video_async(self, prompt: str):
         """
         Generate a video from the given prompt
 

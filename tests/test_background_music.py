@@ -1,5 +1,5 @@
 import os
-import unittest
+
 import pytest
 from loguru import logger
 
@@ -10,7 +10,7 @@ from vikit.common.context_managers import WorkingFolderContext
 TEST_PROMPT = "A group of stones in a forest, with symbols"
 
 
-class TestBackgroundMusic(unittest.TestCase):
+class TestBackgroundMusic:
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
@@ -21,7 +21,8 @@ class TestBackgroundMusic(unittest.TestCase):
         logger.add("log_test_background_music.txt", rotation="10 MB")
 
     @pytest.mark.integration
-    def test_generate_background_music_from_empty_prompt(self):
+    @pytest.mark.asyncio
+    async def test_generate_background_music_from_empty_prompt(self):
         with WorkingFolderContext():
             ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
                 test_mode=False
@@ -30,7 +31,7 @@ class TestBackgroundMusic(unittest.TestCase):
             _ = ml_gw.generate_background_music_async(duration=3, prompt="")
 
     @pytest.mark.local_integration
-    def test_generate_background_music_from_short_prompt(self):
+    async def test_generate_background_music_from_short_prompt(self):
         with pytest.raises(TypeError):
             ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
                 test_mode=True
@@ -38,7 +39,8 @@ class TestBackgroundMusic(unittest.TestCase):
             _ = ml_gw.generate_background_music_async(duration="a")
 
     @pytest.mark.integration
-    def test_generate_background_music_from_prompt(self):
+    @pytest.mark.asyncio
+    async def test_generate_background_music_from_prompt(self):
         with WorkingFolderContext():
             ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
                 test_mode=False

@@ -1,5 +1,6 @@
 import os
 from abc import ABC
+from typing import Any
 
 import pysrt
 
@@ -7,6 +8,8 @@ from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.common.decorators import log_function_params
 import vikit.common.secrets as secrets
+from vikit.wrappers.ffmpeg_wrapper import get_media_duration
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 
 os.environ["REPLICATE_API_TOKEN"] = secrets.get_replicate_api_token()
@@ -34,18 +37,24 @@ class Prompt(ABC):
 
     @log_function_params
     def __init__(self, ml_gateway: MLModelsGateway = None):
-        self._text = None
+        self.text = None
         self._subtitles: list[pysrt.SubRipItem] = None
         self._subtitle_extractor = None
         if ml_gateway is None:
             self._models_gateway = MLModelsGatewayFactory().get_ml_models_gateway()
+        self.build_settings: PromptBuildSettings = PromptBuildSettings()
+        self.title = "NoTitle"
+        self._extended_fields: dict[str, Any] = {}
 
     @property
-    def text(self) -> str:
-        """
-        Returns the text of the prompt.
-        """
-        return self._text
+    def extended_fields(self) -> dict[str, Any]:
+        return self._extended_fields
+
+    @extended_fields.setter
+    def extended_fields(self, value: dict[str, Any]):
+        self._extended_fields = value
+        if "title" in value:
+            self.title = value["title"]
 
     @property
     def subtitles(self) -> list[pysrt.SubRipItem]:
@@ -62,13 +71,9 @@ class Prompt(ABC):
 
     def get_duration(self) -> float:
         """
-        Returns the duration of the prompt in seconds. This is not ideal and should be used only if
-        we don't have the recording of the prompt.
+        Returns the duration of the recording
         """
-        if self.subtitles is None:
-            raise ValueError("The subtitles have not been prepared yet")
-        else:
-            total_length = (
-                self.subtitles[-1].end.minutes * 60 + self.subtitles[-1].end.seconds
-            )
-            return total_length
+        if self._recorded_audio_prompt_path is None:
+            raise ValueError("The recording is not there or generated yet")
+        total_length = get_media_duration(self._recorded_audio_prompt_path)
+        return total_length

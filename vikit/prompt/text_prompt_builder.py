@@ -19,7 +19,7 @@ class TextPromptBuilder:
     def set_prompt_text(self, text: str):
         if text is None:
             raise ValueError("The text prompt is not provided")
-        self.prompt._text = text
+        self.prompt.text = text
         return self
 
     @log_function_params
@@ -35,7 +35,7 @@ class TextPromptBuilder:
         """
         set the recording path
         """
-        self.prompt._recorded_audio_prompt_path = recording_path
+        self.prompt.recorded_audio_prompt_path = recording_path
         return self
 
     def build(self):

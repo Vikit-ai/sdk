@@ -159,9 +159,9 @@ class VideoFileName:
         parts = file_name.split("_")
         title = parts[0]
         bld_settings = VideoBuildSettings()
-        bld_settings._id = parts[3]
-        bld_settings._build_date = datetime.date.fromisoformat(parts[4])
-        bld_settings._build_time = datetime.time.fromisoformat(parts[5])
+        bld_settings.id = parts[3]
+        bld_settings.build_date = datetime.date.fromisoformat(parts[4])
+        bld_settings.build_time = datetime.time.fromisoformat(parts[5])
 
         video_file_name = VideoFileName(
             build_settings=bld_settings, video_metadata=VideoMetadata(title=title)

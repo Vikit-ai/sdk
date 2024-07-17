@@ -44,7 +44,7 @@ class ImportedVideo(Video):
             return self._media_url.split("/")[-1].split(".")[0]
 
     @log_function_params
-    def build(self, build_settings: VideoBuildSettings = None):
+    async def build(self, build_settings: VideoBuildSettings = None):
         """
         Build the video
 
@@ -55,22 +55,22 @@ class ImportedVideo(Video):
             ImportedVideo: The built video
         """
         if self.are_build_settings_prepared:
-            build_settings = self._build_settings
+            build_settings = self.build_settings
 
-        super().build(build_settings)
+        await super().build(build_settings)
 
-        if build_settings.music_building_context.apply_background_music:
-            music_file = asyncio.run(
-                self._build_background_music(
-                    VideoBuildSettings(
-                        music_building_context=MusicBuildingContext(
-                            generate_background_music=build_settings.music_building_context.generate_background_music
-                        )
-                    )
-                )
-            )
+        # if build_settings.music_building_context.apply_background_music:
+        #     music_file = asyncio.run(
+        #         self._build_background_music(
+        #             VideoBuildSettings(
+        #                 music_building_context=MusicBuildingContext(
+        #                     generate_background_music=build_settings.music_building_context.generate_background_music
+        #                 )
+        #             )
+        #         )
+        #     )
 
-            self._apply_background_music(background_music_file=music_file)
+        #     self._apply_background_music(background_music_file=music_file)
 
         return self
 

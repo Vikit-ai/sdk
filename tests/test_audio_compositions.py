@@ -2,7 +2,7 @@
 # like using background music, adding subtitles, etc.
 # It does not map exactly to one single file to test
 
-import unittest
+
 import warnings
 
 import pytest
@@ -21,7 +21,7 @@ from tests.tests_tools import test_prompt_library
 from vikit.music_building_context import MusicBuildingContext
 
 
-class TestAudioCompositions(unittest.TestCase):
+class TestAudioCompositions:
 
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
@@ -34,7 +34,8 @@ class TestAudioCompositions(unittest.TestCase):
         warnings.simplefilter("ignore", category=UserWarning)
 
     @pytest.mark.unit
-    def test_insert_subtitle_audio_no_prompt(self):
+    @pytest.mark.asyncio
+    async def test_insert_subtitle_audio_no_prompt(self):
         # This test should work as we fail open: if the prompt is not provided, we should not raise an error
         vid = CompositeVideo()
         vid._insert_subtitles_audio_recording(
@@ -42,7 +43,8 @@ class TestAudioCompositions(unittest.TestCase):
         )
 
     @pytest.mark.integration
-    def test_vcomp_w_bkg_music_and_prompt_based_subtitles(self):
+    @pytest.mark.asyncio
+    async def test_vcomp_w_bkg_music_and_prompt_based_subtitles(self):
         with WorkingFolderContext():
             video_start = ImportedVideo(get_generated_3s_forest_video_1_path())
             video_end = ImportedVideo(get_generated_3s_forest_video_2_path())
@@ -50,7 +52,7 @@ class TestAudioCompositions(unittest.TestCase):
             final_video = test_video_mixer.append_video(video_start).append_video(
                 video_end
             )
-            final_video = final_video.build(
+            final_video = await final_video.build(
                 VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True
@@ -64,7 +66,8 @@ class TestAudioCompositions(unittest.TestCase):
             assert final_video.background_music is not None
 
     @pytest.mark.integration
-    def test_apply_generated_bg_sound_on_existing_gen_videos_composite(self):
+    @pytest.mark.asyncio
+    async def test_apply_generated_bg_sound_on_existing_gen_videos_composite(self):
         """
         Create a single video mix with 3 imported video and default bg music
         """
@@ -74,7 +77,7 @@ class TestAudioCompositions(unittest.TestCase):
 
             video_comp = CompositeVideo()
             video_comp.append_video(vid1).append_video(vid2)
-            video_comp.build(
+            await video_comp.build(
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True

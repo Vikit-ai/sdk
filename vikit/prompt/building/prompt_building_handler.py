@@ -1,10 +1,7 @@
 from abc import ABC, abstractmethod
-import asyncio
 
+from typing import Any, Tuple
 from loguru import logger
-
-from vikit.video.video_build_settings import VideoBuildSettings
-from vikit.prompt.prompt import Prompt
 
 """
 We do build Prompt using chain of responsability pattern. Each handler is responsible for a specific task
@@ -18,11 +15,10 @@ depending on the build settings, and let you implement the actual logic in one o
 class PromptBuildingHandler(ABC):
 
     def __init__(self, next_handler: "PromptBuildingHandler" = None):
-        self.supports_async = None
         self.next_handler = next_handler
 
     @abstractmethod
-    def supports_async(self):
+    def supports_async(self) -> bool:
         """
         Check if the handler supports async execution
         While this could have been infered using introspection,
@@ -32,75 +28,89 @@ class PromptBuildingHandler(ABC):
             bool: True if the handler supports async execution, False otherwise
         """
 
-    def execute(
-        self, Prompt: Prompt, build_settings: VideoBuildSettings, **kwargs
-    ) -> Prompt:
+    async def execute_async(self, prompt, **kwargs) -> Tuple[Any, dict[str, Any]]:
         """
-        Execute the handler synchronously or asynchronously if the handler supports it
+        Execute the handler asynchronously if supporting it
 
         Args:
             Prompt (Prompt): The Prompt to process
             **kwargs: Additional arguments
 
         Returns:
-            Prompt: The processed Prompt
+            A tuple made of the processed prompt and any additional data that may by usefull down the
+            call stack
         """
         logger.info(
-            f"Running handler {type(self).__name__} on Prompt {Prompt.id}, could take somne time "
+            f"Running handler {type(self).__name__} on Prompt {prompt.title}, could take some time "
         )
-
-        if self.supports_async and Prompt.build_settings.run_async:
-            handled_Prompt = asyncio.run(self.execute_async(Prompt))
-        else:
-            handled_Prompt = self._execute_logic(Prompt, build_settings, **kwargs)
+        logger.trace("Running handler asynchronously")
+        handled_prompt = await self._execute_logic_async(prompt=prompt, **kwargs)
 
         if not self.next_handler:  # No more handlers to process
-            return handled_Prompt
+            return handled_prompt
+        else:
+            logger.info(
+                f"Handler {type(self).__name__} executed successfully, passing to next handler"
+            )
+            return await self.next_handler.execute(handled_prompt, **kwargs)
+
+    async def execute(self, prompt, **kwargs):
+        """
+         Execute the handler synchronously
+
+         Args:
+             Prompt (Prompt): The Prompt to process
+             **kwargs: Additional arguments
+
+        Returns:
+             A tuple made of the processed prompt and any additional data that may by usefull down the
+             call stack
+        """
+        logger.info(
+            f"Running handler {type(self).__name__} on Prompt {prompt.title}, could take some time "
+        )
+        logger.trace("Running handler synchronously")
+        handled_prompt = self._execute_logic(prompt=prompt, **kwargs)
+
+        if not self.next_handler:  # No more handlers to process
+            return handled_prompt
         else:
             logger.info(
                 f"Handler {type(self).__name__} executed successfully, passing to next handler"
             )
 
-            return self.next_handler.execute(handled_Prompt, build_settings, **kwargs)
+            return self.next_handler.execute(handled_prompt, **kwargs)
 
-    async def execute_async(
-        self, Prompt: Prompt, build_settings: VideoBuildSettings, **kwargs
-    ):
+    @abstractmethod
+    async def _execute_logic_async(
+        self, prompt, **kwargs
+    ) -> Tuple[Any, dict[str, Any]]:
         """
-        Execute the handler asynchronously, to be called if you want to
-        execute the handler asynchronously explicitly
+        Execute the handler asynchronously, to be imlpemented by the concrete handler
+        using await and async as needed
 
         Args:
-            Prompt (Prompt): The Prompt to process
+            prompt (Prompt): The Prompt to process
+            build_settings (PromptBuildSettings): The build settings
             **kwargs: Additional arguments
 
         Returns:
-            Prompt: The processed Prompt
+            A tuple made of the processed prompt and any additional data that may by usefull down the
+            call stack
         """
-        await self._execute_logic_async(Prompt, build_settings, **kwargs)
 
     @abstractmethod
-    def _execute_logic_async(self, Prompt: Prompt, **kwargs) -> Prompt:
+    def _execute_logic(self, prompt, **kwargs) -> Tuple[Any, dict[str, Any]]:
         """
-        Execute the handler logic asynchronously
+        Execute the handler synchronously, to be imlpemented by the concrete handler
+        Don't use await in this call chain
 
         Args:
-            Prompt (Prompt): The Prompt to process
+            prompt (Prompt): The Prompt to process
+            build_settings (PromptBuildSettings): The build settings
+            **kwargs: Additional arguments
 
         Returns:
-            Prompt: The processed Prompt
+            A tuple made of the processed prompt and any additional data that may by usefull down the
+            call stack
         """
-        pass
-
-    @abstractmethod
-    def _execute_logic(self, Prompt: Prompt, **kwargs) -> Prompt:
-        """
-        Execute the handler logic
-
-        Args:
-            Prompt (Prompt): The Prompt to process
-
-        Returns:
-            Prompt: The processed Prompt
-        """
-        pass

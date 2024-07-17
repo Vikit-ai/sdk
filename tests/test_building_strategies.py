@@ -1,6 +1,7 @@
-import unittest
 import warnings
 import pytest
+
+from loguru import logger
 
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.prompt_based_video import PromptBasedVideo
@@ -9,22 +10,20 @@ import tests.tests_tools as tools
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.transition import Transition
-from vikit.video.video_building import (
+from vikit.video.building.build_order import (
     get_lazy_dependency_chain_build_order,
-    get_first_videos_first_build_order,
-    build_using_cloud,  # TO be implemented and tested
-    build_using_local_resources,
 )
 
 
-class TestVideoBuildingStrategies(unittest.TestCase):
+class TestVideoBuildingStrategies:
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
 
     @pytest.mark.unit
-    def test_generate_video_tree_default_strategy_single_composite(self):
+    @pytest.mark.asyncio
+    async def test_generate_video_tree_default_strategy_single_composite(self):
         """
         Test that the video tree is correctly generated, with right order,
         using a simple video tree
@@ -56,7 +55,8 @@ class TestVideoBuildingStrategies(unittest.TestCase):
             assert isinstance(video_build_order[1], CompositeVideo)
 
     @pytest.mark.unit
-    def test_generate_video_tree_default_strategy_mixed_composites(self):
+    @pytest.mark.asyncio
+    async def test_generate_video_tree_default_strategy_mixed_composites(self):
         """
         Test that the video tree is correctly generated, with right order,
         using a  video tree including root and child composite videos
@@ -69,7 +69,7 @@ class TestVideoBuildingStrategies(unittest.TestCase):
             pbv = PromptBasedVideo(
                 tools.test_prompt_library["train_boy"]
             )  # 4 subtitles -> 4 composite videos of 3 vids each
-            pbv.compose_inner_composite(build_settings=build_settings)
+            await pbv.compose_inner_composite(build_settings=build_settings)
 
             assert (
                 pbv.inner_composite is not None
@@ -148,8 +148,9 @@ class TestVideoBuildingStrategies(unittest.TestCase):
             assert isinstance(video_build_order[16], CompositeVideo)
 
     @pytest.mark.unit
-    @unittest.skip("Skipping")
-    def test_generate_video_tree_get_first_videos_first_build_order_strategy_from_prompt_based_video(
+    @pytest.mark.asyncio
+    @pytest.mark.skip
+    async def test_generate_video_tree_get_first_videos_first_build_order_strategy_from_prompt_based_video(
         self,
     ):
         """
@@ -240,7 +241,7 @@ class TestVideoBuildingStrategies(unittest.TestCase):
             assert isinstance(video_build_order[7], CompositeVideo)
             assert isinstance(video_build_order[16], CompositeVideo)
 
-    # def test_async_call_to_generate_video(self):
+    # async def test_async_call_to_generate_video(self):
     #     """
     #     Test that the video is generated asynchronously with ProcessPool
     #     """

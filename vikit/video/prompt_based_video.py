@@ -1,13 +1,17 @@
 import os
 
-from loguru import logger
-
 from vikit.video.video import VideoBuildSettings
 from vikit.video.video import Video
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.seine_transition import SeineTransition
 from vikit.video.video_types import VideoType
+from vikit.prompt.prompt_factory import PromptFactory
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
+from vikit.video.building.handlers.video_reencoding_handler import (
+    VideoBuildingHandlerReencoder,
+)
+from vikit.video.building.video_building_handler import VideoBuildingHandler
 
 
 class PromptBasedVideo(Video):
@@ -23,8 +27,6 @@ class PromptBasedVideo(Video):
     def __init__(self, prompt=None):
         if prompt is None:
             raise ValueError("prompt cannot be None")
-        if len(prompt.subtitles) < 1:
-            raise ValueError("No subtitles")
 
         super().__init__()
         self._prompt = prompt
@@ -78,7 +80,7 @@ class PromptBasedVideo(Video):
         """
         return super().get_file_name_by_state(build_settings)
 
-    def compose_inner_composite(self, build_settings: VideoBuildSettings):
+    async def compose_inner_composite(self, build_settings: VideoBuildSettings):
         """
         Compose the inner composite video
 
@@ -93,8 +95,12 @@ class PromptBasedVideo(Video):
 
         for sub in self._prompt.subtitles:
             vid_cp_sub = CompositeVideo()
-            keyword_based_vid, prompt_based_vid, transit = (
-                self._build_basic_building_block(sub.text, build_stgs=build_settings)
+            (
+                keyword_based_vid,
+                prompt_based_vid,
+                transit,
+            ) = await self._prepare_basic_building_block(
+                sub.text, build_stgs=build_settings
             )
 
             vid_cp_sub.append_video(keyword_based_vid).append_video(
@@ -110,7 +116,7 @@ class PromptBasedVideo(Video):
             self._inner_composite = vid_cp_final
         return vid_cp_final
 
-    def build(self, build_settings=VideoBuildSettings()):
+    async def prepare_build(self, build_settings=VideoBuildSettings()):
         """
         Generate the actual inner video
 
@@ -120,28 +126,20 @@ class PromptBasedVideo(Video):
         Returns:
             The current instance
         """
-        if self.are_build_settings_prepared:
-            build_settings = self._build_settings
-        super().build(build_settings)
-
-        if self._is_video_generated:
-            return self
-
-        vid_cp_final = self.compose_inner_composite(build_settings=build_settings)
-        logger.info(
-            "Generating several videos from the prompt, this could take some time "
+        await super().prepare(build_settings)
+        self.inner_composite = await self.compose_inner_composite(
+            build_settings=build_settings
         )
         build_settings.prompt = self._prompt
-        vid_cp_final.build(build_settings=build_settings)
-
-        self._is_video_generated = True
-        self.metadata = vid_cp_final.metadata
-        self._media_url = vid_cp_final.media_url
-        self._background_music_file_name = vid_cp_final.background_music
 
         return self
 
-    def _build_basic_building_block(
+    def run_post_build_actions(self):
+        self.metadata = self.inner_composite.metadata
+        self.media_url = self.inner_composite.media_url
+        self._background_music_file_name = self.inner_composite.background_music
+
+    async def _prepare_basic_building_block(
         self, sub_text: str, build_stgs: VideoBuildSettings = None
     ):
         """
@@ -159,18 +157,37 @@ class PromptBasedVideo(Video):
             - prompt_based_vid: the video generated from the prompt
             - transit: the transition between the two
         """
-        keyword_based_vid = RawTextBasedVideo(sub_text).prepare_build(
+
+        prompt_fact = PromptFactory(
+            prompt_build_settings=PromptBuildSettings(test_mode=build_stgs.test_mode)
+        )
+        enhanced_prompt_from_keywords = (
+            await prompt_fact.get_reengineered_prompt_from_text(
+                prompt=sub_text,
+                prompt_build_settings=PromptBuildSettings(
+                    test_mode=build_stgs.test_mode
+                ),
+            )
+        )
+
+        keyword_based_vid = await RawTextBasedVideo(sub_text).prepare_build(
             build_settings=VideoBuildSettings(
-                generate_from_llm_keyword=True,
-                generate_from_llm_prompt=False,
+                prompt=enhanced_prompt_from_keywords,
                 test_mode=build_stgs.test_mode,
             )
         )
 
-        prompt_based_vid = RawTextBasedVideo(sub_text).prepare_build(
+        enhanced_prompt_from_prompt_text = (
+            await prompt_fact.get_reengineered_prompt_from_text(
+                prompt=sub_text,
+                prompt_build_settings=PromptBuildSettings(
+                    test_mode=build_stgs.test_mode
+                ),
+            )
+        )
+        prompt_based_vid = await RawTextBasedVideo(sub_text).prepare_build(
             build_settings=VideoBuildSettings(
-                generate_from_llm_prompt=True,
-                generate_from_llm_keyword=False,
+                prompt=enhanced_prompt_from_prompt_text,
                 test_mode=build_stgs.test_mode,
             )
         )
@@ -181,3 +198,18 @@ class PromptBasedVideo(Video):
         )
 
         return keyword_based_vid, prompt_based_vid, transit
+
+    def get_video_handler_chain(self) -> list[VideoBuildingHandler]:
+        """
+        Get the handler chain of the video.
+        Defining the handler chain is the main way to define how the video is built
+        so it is up to the child classes to implement this method
+
+        Returns:
+            list: The list of handlers to use for building the video
+        """
+        handlers = []
+        if self._needs_reencoding:
+            handlers.append(VideoBuildingHandlerReencoder())
+
+        return handlers

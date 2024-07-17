@@ -1,18 +1,37 @@
+// {
+//     // Use IntelliSense to learn about possible attributes.
+//     // Hover to view descriptions of existing attributes.
+//     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+//     "version": "0.2.0",
+//     "configurations": [
+//         {
+//             "name": "Python: pytest",
+//             "type": "debugpy",
+//             "request": "launch",
+//             "module": "pytest",
+//             "args": [
+//                 "tests/test_video_building_handler.py",
+//             ],
+//             "console": "integratedTerminal"
+//         }
+//     ]
+// }
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
             "name": "Python: pytest",
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
             "args": [
-                "tests/test_composite_video.py::TestCompositeVideo::test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life",
-            ],
+               // "-v",
+                "--tb=short",
+                "--capture=no",
+                "-p", "pytest_asyncio",
+                "tests/test_video_building_handler.py::TestVideoBuildingHandler::test_VideoBuildingHandlerGenerateFomApi"
+            ],           
+            "env": {},
             "console": "integratedTerminal"
         }
     ]

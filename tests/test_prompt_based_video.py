@@ -1,5 +1,5 @@
 import os
-import unittest
+
 import pytest
 
 from loguru import logger
@@ -20,7 +20,7 @@ import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
 TEST_PROMPT = "A group of stones in a forest, with symbols"
 
 
-class TestPromptBasedVideo(unittest.TestCase):
+class TestPromptBasedVideo:
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
@@ -28,23 +28,25 @@ class TestPromptBasedVideo(unittest.TestCase):
         logger.add("log_test_prompt_based_video.txt", rotation="10 MB")
 
     @pytest.mark.unit
-    def test_no_prompt_text(self):
+    @pytest.mark.asyncio
+    async def test_no_prompt_text(self):
         with pytest.raises(ValueError):
             _ = PromptBasedVideo(TextPrompt(""))
 
     @pytest.mark.unit
-    def test_get_title(self):
+    @pytest.mark.asyncio
+    async def test_get_title(self):
         with WorkingFolderContext():
-            video_title = PromptBasedVideo(
-                PromptFactory(
-                    ml_gateway=ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway()
-                ).create_prompt_from_text("A group of stones")
-            ).get_title()
-            logger.debug(f"Test get_title, video title: {video_title}")
+            build_settings = VideoBuildSettings()
+            prompt = await PromptFactory(
+                ml_gateway=build_settings.get_ml_models_gateway(),
+            ).create_prompt_from_text("A group of stones", generate_recording=False)
+
+            video_title = PromptBasedVideo(prompt=prompt).get_title()
             assert len(video_title) > 0  # we should have a file of at least 1 character
 
     @pytest.mark.local_integration
-    def test_build_single_video_no_bg_music_without_subs(self):
+    async def test_build_single_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
 
             pbvid = PromptBasedVideo(
@@ -52,17 +54,17 @@ class TestPromptBasedVideo(unittest.TestCase):
                     TEST_PROMPT, generate_recording=True
                 )
             )
-            pbvid.build()
+            await pbvid.build()
 
             assert pbvid.media_url, "media URL was not updated"
             assert pbvid._background_music_file_name is None
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.local_integration
-    def test_build_single_video_no_bg_music_with_subtitles(self):
+    async def test_build_single_video_no_bg_music_with_subtitles(self):
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(tools.test_prompt_library["moss_stones-train_boy"])
-            pbvid.build(
+            await pbvid.build(
                 build_settings=VideoBuildSettings(include_audio_read_subtitles=True)
             )
 
@@ -71,10 +73,10 @@ class TestPromptBasedVideo(unittest.TestCase):
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.local_integration
-    def test_build_single_video_with_default_bg_music_with_subtitles(self):
+    async def test_build_single_video_with_default_bg_music_with_subtitles(self):
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(tools.test_prompt_library["moss_stones-train_boy"])
-            pbvid.build(
+            await pbvid.build(
                 build_settings=VideoBuildSettings(
                     include_audio_read_subtitles=True,
                     music_building_context=MusicBuildingContext(
@@ -87,7 +89,8 @@ class TestPromptBasedVideo(unittest.TestCase):
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.integration
-    def test_build_single_video_with_generated_bg_music_with_subtitles(self):
+    @pytest.mark.asyncio
+    async def test_build_single_video_with_generated_bg_music_with_subtitles(self):
         with WorkingFolderContext():
 
             bld_settings = VideoBuildSettings(
@@ -99,60 +102,35 @@ class TestPromptBasedVideo(unittest.TestCase):
                 test_mode=False,
             )
 
-            pbvid = PromptBasedVideo(
-                PromptFactory(
-                    ml_gateway=bld_settings.get_ml_models_gateway()
-                ).create_prompt_from_text(TEST_PROMPT, generate_recording=True)
-            )
-            pbvid.build(
+            prompt = await PromptFactory(
+                ml_gateway=bld_settings.get_ml_models_gateway()
+            ).create_prompt_from_text(TEST_PROMPT, generate_recording=True)
+            pbvid = PromptBasedVideo(prompt=prompt)
+
+            pbvid = await pbvid.build(
                 build_settings=bld_settings,
             )
             assert pbvid.media_url, "media URL was not updated"
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.local_integration
-    def test_generate_short_video_single_sub(self):
+    async def test_generate_short_video_single_sub(self):
         with WorkingFolderContext():
-            pbv = PromptBasedVideo(
-                PromptFactory().create_prompt_from_text("A group of stones in a forest")
+
+            prompt = await PromptFactory().create_prompt_from_text(
+                "A group of stones in a forest"
             )
-            result = pbv.build()
+            pbv = PromptBasedVideo(prompt=prompt)
+            result = await pbv.build()
             assert result is not None
             assert os.path.exists(result.media_url)
 
     # @pytest.mark.local_integration
-    # @unittest.skip("To be activated on case by case basis")
-    # def test_use_sound_of_silence_original_audio_infer_subs_from_audio(self):
-    #     """
-    #     Test generating video from music prompt with original audio
-    #     """
-    #     with WorkingFolderContext():
-
-    #         build_settings = VideoBuildSettings(
-    #             music_building_context=MusicBuildingContext(
-    #                 apply_background_music=True, use_recorded_prompt_as_audio=True
-    #             ),
-    #             include_audio_read_subtitles=False,
-    #             test_mode=True,
-    #         )
-
-    #         original_recording_prompt = tools.test_prompt_library["sound of silence"]
-    #         infered_prompt = PromptFactory(
-    #             ml_gateway=build_settings.get_ml_models_gateway()
-    #         ).create_prompt_from_audio_file(  # Here we create a prompt from audio
-    #             original_recording_prompt._recorded_audio_prompt_path
-    #         )
-    #         build_settings.prompt = infered_prompt
-    #         vid_sof = PromptBasedVideo(infered_prompt)
-    #         vid_final = vid_sof.build(build_settings=build_settings)
-
-    #         assert vid_final.media_url is not None
-    #         assert vid_final.background_music is not None
-
 
     @pytest.mark.integration
-    @unittest.skip("To be activated on case by case basis")
-    def test_sound_of_silence(self):
+    @pytest.mark.asyncio
+    @pytest.mark.skip
+    async def test_sound_of_silence(self):
 
         with WorkingFolderContext():
             bld_settings = VideoBuildSettings(
@@ -173,13 +151,14 @@ class TestPromptBasedVideo(unittest.TestCase):
             bld_settings.prompt = test_prompt
 
             video = PromptBasedVideo(test_prompt)
-            vid_final = video.build(build_settings=bld_settings)
+            vid_final = await video.build(build_settings=bld_settings)
 
             assert vid_final.media_url is not None
             assert vid_final.background_music is not None
 
     @pytest.mark.integration
-    def test_build_nominal_prompt_without_bk_music_wthout_subs(self):
+    @pytest.mark.asyncio
+    async def test_build_nominal_prompt_without_bk_music_wthout_subs(self):
         with WorkingFolderContext():
             build_settings = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
@@ -190,14 +169,15 @@ class TestPromptBasedVideo(unittest.TestCase):
             )
             test_prompt = tools.test_prompt_library["moss_stones-train_boy"]
             video = PromptBasedVideo(test_prompt)
-            video.build(build_settings=build_settings)
+            await video.build(build_settings=build_settings)
 
             assert video.media_url is not None
             assert os.path.exists(video.media_url)
 
     @pytest.mark.integration
+    @pytest.mark.asyncio
     # @unittest.skip("To be activated on case by case basis")
-    def test_reunion_island_prompt_with_bk_music_subs(self):
+    async def test_reunion_island_prompt_with_bk_music_subs(self):
         with WorkingFolderContext():
             bld_sett = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
@@ -216,14 +196,15 @@ class TestPromptBasedVideo(unittest.TestCase):
             )
 
             video = PromptBasedVideo(prompt=test_prompt)
-            video.build(bld_sett)
+            await video.build(bld_sett)
 
             assert video.media_url is not None
             assert os.path.exists(video.media_url)
 
     @pytest.mark.integration
-    @unittest.skip("To be activated on case by case basis")
-    def test_reunion_island_prompt_with_generated_bk_music_subs(self):
+    @pytest.mark.asyncio
+    @pytest.mark.skip
+    async def test_reunion_island_prompt_with_generated_bk_music_subs(self):
         with WorkingFolderContext():
             bld_sett = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
@@ -243,14 +224,14 @@ class TestPromptBasedVideo(unittest.TestCase):
             )
 
             video = PromptBasedVideo(prompt=test_prompt)
-            video.build(bld_sett)
+            await video.build(bld_sett)
 
             assert video.media_url is not None
             assert os.path.exists(video.media_url)
 
     @pytest.mark.local_integration
-    @unittest.skip("To be activated on case by case basis")
-    def test_local_int_reunion_island_prompt_with_bk_music_subs(self):
+    @pytest.mark.skip
+    async def test_local_int_reunion_island_prompt_with_bk_music_subs(self):
         with WorkingFolderContext():
             bld_sett = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
@@ -269,13 +250,13 @@ class TestPromptBasedVideo(unittest.TestCase):
             )
 
             video = PromptBasedVideo(prompt=test_prompt)
-            video.build(bld_sett)
+            await video.build(bld_sett)
 
             assert video.media_url is not None
             assert os.path.exists(video.media_url)
 
     @pytest.mark.local_integration
-    def test_collab_integration(self):
+    async def test_collab_integration(self):
         with WorkingFolderContext():
             video_build_settings = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
@@ -292,4 +273,4 @@ class TestPromptBasedVideo(unittest.TestCase):
 
             video = PromptBasedVideo(prompt=prompt)
 
-            video.build(build_settings=video_build_settings)
+            await video.build(build_settings=video_build_settings)

@@ -1,6 +1,6 @@
 from urllib.request import urlretrieve
 
-from vikit.video_building import video_building_handler
+from vikit.video.building import video_building_handler
 from vikit.video.video import Video
 
 
@@ -8,7 +8,7 @@ class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHan
     def __init__(self):
         super().__init__()
 
-    def supports_async(self):
+    def is_supporting_async(self):
         return True
 
     async def _execute_logic_async(self, video: Video, **kwargs) -> Video:
@@ -35,7 +35,7 @@ class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHan
         )
 
         file_name = self.get_file_name_by_state(video.build_settings)
-        video._media_url = urlretrieve(
+        video.media_url = urlretrieve(
             video_link_from_prompt,
             file_name,
         )[0]
@@ -50,12 +50,12 @@ class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHan
         super()._execute_logic(video)
         video_link_from_prompt = (  # Should give a link on a web storage
             video.build_settings.get_ml_models_gateway().generate_video_async(
-                kwargs["enhanced_prompt"]
+                video.build_settings.prompt.text
             )
         )
 
         file_name = self.get_file_name_by_state(video.build_settings)
-        video._media_url = urlretrieve(
+        video.media_url = urlretrieve(
             video_link_from_prompt,
             file_name,
         )[0]
