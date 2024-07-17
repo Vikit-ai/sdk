@@ -266,7 +266,7 @@ class VikitGateway(MLModelsGateway):
 
         logger.debug(f"Video to interpolate {video}")
 
-        return requests.post(
+        returnedVideo = requests.post(
             vikit_backend_url,
             json={
                 "key": vikit_api_key,
@@ -279,6 +279,10 @@ class VikitGateway(MLModelsGateway):
                 },
             },
         ).text
+        if not returnedVideo:
+            raise AttributeError("The returned video is empty")
+        else:
+            return returnedVideo
 
     ##################  Replicate API calls for video prompt keywords or sentence  ##################
 
