@@ -1,7 +1,9 @@
 from urllib.request import urlretrieve
+from loguru import logger
 
 from vikit.video.building import video_building_handler
 from vikit.video.video import Video
+from vikit.common.file_tools import get_validated_path
 
 
 class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHandler):
@@ -12,7 +14,7 @@ class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHan
         return True
 
     async def _execute_logic_async(self, video: Video, **kwargs) -> Video:
-        super()._execute_logic_async(video)
+        await super()._execute_logic_async(video)
         """
         Process the video generation binaries: we actually do ask the video to build itself
         as a video binary (typically an MP4 generated from Gen AI, hosted behind an API),
@@ -24,41 +26,47 @@ class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHan
         Returns:
             CompositeVideo: The composite video
         """
-        super()._execute_logic_async(video, **kwargs)
+        await super()._execute_logic_async(video, **kwargs)
 
         video_link_from_prompt = (
             await (  # Should give a link on a web storage
                 video.build_settings.get_ml_models_gateway().generate_video_async(
-                    kwargs["enhanced_prompt"]
+                    prompt=video.build_settings.prompt.text
                 )
             )
         )
 
-        file_name = self.get_file_name_by_state(video.build_settings)
+        file_name = video.get_file_name_by_state(video.build_settings)
+        path_multi = get_validated_path(video_link_from_prompt)
+        if path_multi["type"] == "local":
+            video.media_url = "file:" + video_link_from_prompt
+
         video.media_url = urlretrieve(
             video_link_from_prompt,
             file_name,
         )[0]
         video.metadata.is_video_generated = True
 
-        return video
+        logger.debug(f"Video generated from prompt: {video.media_url}")
+        return video, kwargs
 
     def _execute_logic(self, video: Video, **kwargs) -> Video:
         """
         Process the video generation  synchronously
         """
-        super()._execute_logic(video)
-        video_link_from_prompt = (  # Should give a link on a web storage
-            video.build_settings.get_ml_models_gateway().generate_video_async(
-                video.build_settings.prompt.text
-            )
-        )
+        pass
+        # super()._execute_logic(video)
+        # video_link_from_prompt = (  # Should give a link on a web storage
+        #     video.build_settings.get_ml_models_gateway().generate_video(
+        #         video.build_settings.prompt.text
+        #     )
+        # )
 
-        file_name = self.get_file_name_by_state(video.build_settings)
-        video.media_url = urlretrieve(
-            video_link_from_prompt,
-            file_name,
-        )[0]
-        video.metadata.is_video_generated = True
+        # file_name = video.get_file_name_by_state(video.build_settings)
+        # video.media_url = urlretrieve(
+        #     video_link_from_prompt,
+        #     file_name,
+        # )[0]
+        # video.metadata.is_video_generated = True
 
-        return video
+        # return video

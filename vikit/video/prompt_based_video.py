@@ -191,6 +191,8 @@ class PromptBasedVideo(Video):
                 test_mode=build_stgs.test_mode,
             )
         )
+        assert keyword_based_vid is not None, "keyword_based_vid cannot be None"
+        assert prompt_based_vid is not None, "prompt_based_vid cannot be None"
 
         transit = SeineTransition(
             source_video=keyword_based_vid,

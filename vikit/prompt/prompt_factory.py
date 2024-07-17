@@ -165,8 +165,6 @@ class PromptFactory:
             text_prompt, additional_args = await handler_chain[0].execute_async(
                 prompt=text_prompt, build_settings=prompt_build_settings
             )
-            logger.debug(f"Ze Prompt: {text_prompt}")
-
             if additional_args:
                 text_prompt.extended_fields = additional_args
 

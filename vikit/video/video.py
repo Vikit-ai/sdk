@@ -276,6 +276,10 @@ class Video(ABC):
         """
         self.build_settings = build_settings
         self.are_build_settings_prepared = True
+        self._source = type(
+            build_settings.get_ml_models_gateway()  # TODO: this is hacky anbd should be refactored
+            # so that we infer source from the different handlers (initial video generator, interpolation, etc)
+        ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
 
     @log_function_params
     def _fit_standard_background_music(self, expected_music_duration: float = None):

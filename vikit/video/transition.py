@@ -7,6 +7,16 @@ from vikit.video.video import Video
 from vikit.common.decorators import log_function_params
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
+from vikit.video.building.video_building_handler import VideoBuildingHandler
+from vikit.video.building.handlers.video_reencoding_handler import (
+    VideoBuildingHandlerReencoder,
+)
+from vikit.video.building.handlers.videogen_handler import (
+    VideoBuildingHandlerGenerateFomApi,
+)
+from vikit.video.building.handlers.interpolation_handler import (
+    VideoBuildingHandlerInterpolate,
+)
 
 TIMEOUT = 5  # TODO: set to global config , seconds before stopping the request to check an URL exists
 
@@ -65,12 +75,12 @@ class Transition(Video):
         assert source_video is not None, "source_video cannot be None"
         assert target_video is not None, "target_video cannot be None"
 
-        self._target_video = target_video
-        self._source_video = source_video
+        self.target_video = target_video
+        self.source_video = source_video
         self.video_dependencies.extend([source_video, target_video])
 
     def get_title(self):
-        return str(self._source_video.id)[:5] + "-to-" + str(self._target_video.id)[:5]
+        return str(self.source_video.id)[:5] + "-to-" + str(self.target_video.id)[:5]
 
     @property
     def short_type_name(self):
@@ -92,5 +102,40 @@ class Transition(Video):
         """
         return super().get_file_name_by_state(build_settings)
 
-    async def build(self, build_settings: VideoBuildSettings = None):
-        await super().build(build_settings)
+    @log_function_params
+    async def prepare_build(
+        self,
+        build_settings=VideoBuildSettings(),
+    ):
+        """
+        prepare the actual inner video
+
+        Params:
+            - build_settings: allow some customization
+
+        Returns:
+            The current instance
+        """
+        await super().prepare_build(build_settings)
+
+    def get_video_handler_chain(
+        self, build_settings: VideoBuildSettings
+    ) -> list[VideoBuildingHandler]:
+        """
+        Get the handler chain of the video.
+        Defining the handler chain is the main way to define how the video is built
+        so it is up to the child classes to implement this method
+
+        At this stage, we should already have the enhanced prompt and title for this video
+
+        Returns:
+            list: The list of handlers to use for building the video
+        """
+        handlers = []
+        handlers.append(VideoBuildingHandlerGenerateFomApi())
+        if build_settings.interpolate:
+            handlers.append(VideoBuildingHandlerInterpolate())
+        if self._needs_reencoding:
+            handlers.append(VideoBuildingHandlerReencoder())
+
+        return handlers

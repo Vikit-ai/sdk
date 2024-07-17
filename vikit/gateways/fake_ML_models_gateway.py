@@ -54,7 +54,7 @@ class FakeMLModelsGateway(MLModelsGateway):
     async def generate_background_music_async(
         self, duration: float = 3, prompt: str = None, sleep_time: int = 0
     ) -> str:
-        self.asyncio.sleep(sleep_time)
+        asyncio.sleep(sleep_time)
 
         if type(duration) is not float:
             raise TypeError("Duration must be a float")
@@ -79,7 +79,7 @@ class FakeMLModelsGateway(MLModelsGateway):
     async def compose_music_from_text_async(
         self, prompt_text: str, duration: int, sleep_time: int = 0
     ):
-        self.asyncio.sleep(sleep_time)
+        asyncio.sleep(sleep_time)
         return tests_medias.get_sample_generated_music_path()
 
     async def get_music_generation_keywords_async(
@@ -143,15 +143,14 @@ class FakeMLModelsGateway(MLModelsGateway):
         return {"transcription": subs}
 
     async def generate_video_async(self, prompt: str = None, sleep_time: int = 0):
-        self.asyncio.sleep(sleep_time)
-
-        return ft.create_non_colliding_file_name_async(
+        asyncio.sleep(sleep_time)
+        return ft.create_non_colliding_file_name(
             tests_medias.get_cat_video_path()[:-4], extension="mp4"
         )
 
     async def extract_audio_slice_async(
         self, i, end, audiofile_path, target_file_name: str = None, sleep_time: int = 0
     ):
-        self.asyncio.sleep(sleep_time)
+        asyncio.sleep(sleep_time)
 
         return tests_medias.get_test_prompt_recording_trainboy()

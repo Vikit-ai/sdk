@@ -43,13 +43,12 @@ class VideoBuildingHandler(ABC):
             Video: The processed video
         """
         logger.info(
-            f"Running handler {type(self).__name__} on video {video.id}, could take somne time "
+            f"Running async handler {type(self).__name__} on video {video.id}, could take somne time "
         )
-        logger.trace("Running handler asynchronously")
-        handled_video = await self._execute_logic_async(video=video, **kwargs)
+        handled_video, kwargs = await self._execute_logic_async(video=video, **kwargs)
 
         if not self.next_handler:  # No more handlers to process
-            return handled_video
+            return handled_video, kwargs
         else:
             logger.info(
                 f"Handler {type(self).__name__} executed successfully, passing to next handler"
@@ -68,7 +67,7 @@ class VideoBuildingHandler(ABC):
             Video: The processed video
         """
         logger.info(
-            f"Running handler {type(self).__name__} on video {video.id}, could take somne time "
+            f"Running sync  handler {type(self).__name__} on video {video.id}, could take somne time "
         )
         logger.trace("Running handler synchronously")
         handled_video = self._execute_logic(video=video, **kwargs)

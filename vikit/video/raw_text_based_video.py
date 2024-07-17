@@ -115,10 +115,8 @@ class RawTextBasedVideo(Video):
             self._title = ft.get_safe_filename(
                 self.build_settings.prompter_prompt.extended_fields["title"]
             )
-        self._source = type(
-            build_settings.get_ml_models_gateway()  # TODO: this is hacky anbd should be refactored
-            # so that we infer source from the different handlers (initial video generator, interpolation, etc)
-        ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
+
+        return self
 
     def get_video_handler_chain(
         self, build_settings: VideoBuildSettings

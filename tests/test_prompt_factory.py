@@ -17,10 +17,12 @@ class TestPromptFactory:
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_create_prompt_from_text(self):
-        text_prompt = PromptFactory().create_prompt_from_text(
+        text_prompt = await PromptFactory().create_prompt_from_text(
             prompt_text="this is a test prompt", generate_recording=False
         )
-        assert isinstance(text_prompt, TextPrompt), "Prompt should be a TextPrompt"
+        assert isinstance(
+            text_prompt, TextPrompt
+        ), f"Prompt should be a TextPrompt, got {type(text_prompt)}"
         assert text_prompt is not None, "Prompt built should not be None"
         assert (
             text_prompt.text == "this is a test prompt"

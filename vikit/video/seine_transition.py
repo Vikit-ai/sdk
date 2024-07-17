@@ -38,25 +38,25 @@ class SeineTransition(Transition):
         if self.is_video_generated:
             return self
 
-        if not self._source_video.is_video_generated:
-            await self._source_video.build(build_settings=build_settings)
-        if not self._target_video.is_video_generated:
-            await self._target_video.build(build_settings=build_settings)
+        if not self.source_video.is_video_generated:
+            await self.source_video.build(build_settings=build_settings)
+        if not self.target_video.is_video_generated:
+            await self.target_video.build(build_settings=build_settings)
 
-        assert self._source_video.is_video_generated, "source video must be generated"
-        assert self._target_video.is_video_generated, "target video must be generated"
-        assert url_exists(self._source_video.media_url), "source_video must exist"
-        assert url_exists(self._target_video.media_url), "target_video must exist"
+        assert self.source_video.is_video_generated, "source video must be generated"
+        assert self.target_video.is_video_generated, "target video must be generated"
+        assert url_exists(self.source_video.media_url), "source_video must exist"
+        assert url_exists(self.target_video.media_url), "target_video must exist"
 
         logger.debug(
-            f"Applying transition from {self._source_video.media_url} to {self._target_video.media_url}"
+            f"Applying transition from {self.source_video.media_url} to {self.target_video.media_url}"
         )
         ml_gw = build_settings.get_ml_models_gateway()
         # We generate a transition
         link_to_transition_video = asyncio.run(
             ml_gw.generate_seine_transition_async(
-                source_image_path=self._source_video.get_last_frame_as_image(),
-                target_image_path=self._target_video.get_first_frame_as_image(),
+                source_image_path=self.source_video.get_last_frame_as_image(),
+                target_image_path=self.target_video.get_first_frame_as_image(),
             )
         )
         if link_to_transition_video is None:
