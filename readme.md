@@ -18,9 +18,8 @@ To see the video in full resolution, click on the GIF.
 
 ## How to use Vikit.ai SDK?
 You need a personal access token, which you can easily obtain from [here](https://www.vikit.ai/#/platform).  
-Vikit.ai SDK is easy to test standalone using [Google Colab](https://colab.research.google.com/drive/1jLiwbezF-myky21tIWSxG6LRlcU9ivya)
-It is easy to develop through Dev Containers.
-- Dev container file and instructions will be published soon.
+Vikit.ai SDK is easy to test standalone using [Google Colab](https://colab.research.google.com/drive/1jLiwbezF-myky21tIWSxG6LRlcU9ivya).
+It is easy to develop through Dev Containers. Dev container file and instructions will be published soon.
 ### Requirements for local installation
 - Python 3.8+ 
 - `requirements.txt` contains requirements for python environment
@@ -50,10 +49,7 @@ video = PromptBasedVideo(prompt=prompt)
 video.build(build_settings=video_build_settings)
 
 ```
-Output videos will be saved under ```video.media_url```. 
-
-You can orchestrate several videos, using ```CompositeVideo()```. Here is an example to generate two videos from a ```subtitle```:
-
+You can orchestrate several videos, using ```CompositeVideo()```. Here is an example showing how to generate two videos from a ```subtitle```:
 ```python
 vid_cp_sub = CompositeVideo()
 
