@@ -14,12 +14,15 @@ TESTS_MEDIA_FOLDER = "medias/"
 SMALL_VIDEO_CHAT_FILE = "chat_video_super8.mp4"
 
 
+def get_cat():
+    dir_path = os.path.dirname(os.path.abspath(__file__))
+    media_dir = os.path.join(dir_path, TESTS_MEDIA_FOLDER)
+    return os.path.join(media_dir, SMALL_VIDEO_CHAT_FILE)
+
+
 class TestVideo:
 
     def setUp(self) -> None:
-        dir_path = os.path.dirname(os.path.abspath(__file__))
-        media_dir = os.path.join(dir_path, TESTS_MEDIA_FOLDER)
-        self.sample_video_path = os.path.join(media_dir, SMALL_VIDEO_CHAT_FILE)
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
         warnings.simplefilter("ignore", category=DeprecationWarning)
@@ -54,7 +57,7 @@ class TestVideo:
 
     @pytest.mark.local_integration
     async def test_get_first_frame_as_image_path_with_sample_video(self):
-        sample_video_path = os.path.join(self.sample_video_path)
+        sample_video_path = os.path.join(get_cat())
         with WorkingFolderContext():
             logger.debug(f"sample_video_path : {sample_video_path}")
             video = ImportedVideo(video_file_path=sample_video_path)
@@ -67,7 +70,7 @@ class TestVideo:
     @pytest.mark.local_integration
     async def test_get_last_frame_as_image_path_with_sample_video(self):
         with WorkingFolderContext():
-            video = ImportedVideo(video_file_path=self.sample_video_path)
+            video = ImportedVideo(video_file_path=get_cat())
             image_path = video.get_last_frame_as_image()
 
             assert image_path is not None

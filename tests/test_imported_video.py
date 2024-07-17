@@ -19,13 +19,12 @@ class TestImportedVideo:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
         logger.add("log_test_imported_video.txt", rotation="10 MB")
-        self.sample_video_path = get_cat_video_path()
 
     @pytest.mark.local_integration
     async def test_apply_default_bg_sound_on_existing_video(self):
         with WorkingFolderContext():
-            logger.debug(f"self.sample_video_path {self.sample_video_path}")
-            vid = ImportedVideo(self.sample_video_path)
+            logger.debug(f"get_cat_video_path() {get_cat_video_path()}")
+            vid = ImportedVideo(get_cat_video_path())
             logger.debug(f"pbv.media_url : {vid.media_url}")
             assert vid.media_url, "We should have a media_url set"
             # here we expect the default background music to be sliced and used

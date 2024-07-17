@@ -58,7 +58,7 @@ class TestSubtitlesExtrators:
     async def test_reunion_island_prompt(self):
         with WorkingFolderContext():  # we work in the temp folder once for all the script
             gw = replicate_gateway.ReplicateGateway()
-            test_prompt = PromptFactory(ml_gateway=gw).create_prompt_from_text(
+            test_prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(
                 """A travel over Reunion Island, taken fomm birdview at 2000meters above 
                 the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
                 , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",

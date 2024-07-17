@@ -5,6 +5,16 @@ import asyncio
 from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
 from vikit.video.transition import Transition, url_exists
+from vikit.video.building.video_building_handler import VideoBuildingHandler
+from vikit.video.building.handlers.transition_handler import (
+    VideoBuildingHandlerTransitioni,
+)
+from vikit.video.building.handlers.interpolation_handler import (
+    VideoBuildingHandlerInterpolate,
+)
+from vikit.video.building.handlers.video_reencoding_handler import (
+    VideoBuildingHandlerReencoder,
+)
 
 
 class SeineTransition(Transition):
@@ -78,3 +88,25 @@ class SeineTransition(Transition):
         self._media_url = target_file_name
 
         return self
+
+    def get_video_handler_chain(
+        self, build_settings: VideoBuildSettings
+    ) -> list[VideoBuildingHandler]:
+        """
+        Get the handler chain of the video.
+        Defining the handler chain is the main way to define how the video is built
+        so it is up to the child classes to implement this method
+
+        At this stage, we should already have the enhanced prompt and title for this video
+
+        Returns:
+            list: The list of handlers to use for building the video
+        """
+        handlers = []
+        handlers.append(VideoBuildingHandlerTransitioni())
+        if build_settings.interpolate:
+            handlers.append(VideoBuildingHandlerInterpolate())
+        if self._needs_reencoding:
+            handlers.append(VideoBuildingHandlerReencoder())
+
+        return handlers

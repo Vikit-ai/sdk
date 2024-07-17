@@ -201,7 +201,9 @@ class PromptBasedVideo(Video):
 
         return keyword_based_vid, prompt_based_vid, transit
 
-    def get_video_handler_chain(self) -> list[VideoBuildingHandler]:
+    def get_video_handler_chain(
+        self, build_settings: VideoBuildSettings
+    ) -> list[VideoBuildingHandler]:
         """
         Get the handler chain of the video.
         Defining the handler chain is the main way to define how the video is built

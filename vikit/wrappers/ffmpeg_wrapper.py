@@ -169,7 +169,7 @@ def convert_as_mp3_file(fileName, target_file_name: str):
     return target_file_name
 
 
-def concatenate_videos(
+async def concatenate_videos(
     input_file: str, target_file_name=None, ratioToMultiplyAnimations=1, bias=0.33
 ):
     """
@@ -215,7 +215,9 @@ def concatenate_videos(
         "192k",
         target_file_name,
     ]
-    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = await subprocess.run(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
 
     logger.debug(f"Concatenating videos: {result.stdout}")
     logger.debug(f"Concatenating videos: {result.stderr}")
@@ -397,19 +399,19 @@ def _merge_audio_and_video_without_audio_track(
     return target_file_name
 
 
-def reencode_video(params):
+def reencode_video(video_url, target_video_name):
     """
     Reencode the video, doing this for imported video that might not concatenate well
     with generated ones or among themselves
 
     Args:
         params (tuple): The parameters to reencode the video
-        video, build_settings, video.media_url
+        video,
+        video.media_url
 
     Returns:
         Video: The reencoded video
     """
-    video, _, video_url, target_video_name = params
     if not target_video_name:
         target_video_name = "reencoded_" + get_canonical_name(video_url) + ".mp4"
 
@@ -446,6 +448,5 @@ def reencode_video(params):
         f"Subprocess run stderr for _apply_background_music :  {result.stderr}"
     )
     result.check_returncode()
-    video._media_url = target_video_name
 
-    return video
+    return target_video_name

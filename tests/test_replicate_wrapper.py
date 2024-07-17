@@ -29,7 +29,7 @@ class TestReplicateWrapper:
                 test_mode=False
             )
 
-            test_prompt = PromptFactory(ml_gateway=ml_gw).create_prompt_from_text(
+            test_prompt = await PromptFactory(ml_gateway=ml_gw).create_prompt_from_text(
                 SAMPLE_PROMPT_TEXT
             )
             keywords, title = ml_gw.get_keywords_from_prompt_async(

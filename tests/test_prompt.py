@@ -48,7 +48,7 @@ class TestPrompt():
     @pytest.mark.asyncio
     async def test_build_basic_text_prompt(self):
         with WorkingFolderContext():  # we work in the temp folder once for all the script
-            prompt = PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_text(prompt_text="This is a fake prompt")
+            prompt = await PromptFactory(ml_gateway=replicate_gateway.ReplicateGateway()).create_prompt_from_text(prompt_text="This is a fake prompt")
             assert prompt.text == "This is a fake prompt", "Prompt text is not the one expected"
 
 

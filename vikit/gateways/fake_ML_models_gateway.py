@@ -42,15 +42,6 @@ class FakeMLModelsGateway(MLModelsGateway):
             src=tests_medias.get_test_prompt_recording_trainboy(), dst=target_file
         )
 
-    def generate_background_music(
-        self, duration: float = 3, prompt: str = None, sleep_time: int = 0
-    ):
-        asyncio.run(
-            self.generate_background_music_async(
-                duration=duration, sleep_time=sleep_time
-            )
-        )
-
     async def generate_background_music_async(
         self, duration: float = 3, prompt: str = None, sleep_time: int = 0
     ) -> str:
@@ -131,9 +122,7 @@ class FakeMLModelsGateway(MLModelsGateway):
     async def get_subtitles_async(self, audiofile_path, sleep_time: int = 0):
 
         logger.trace(f"Getting subtitles for {audiofile_path}")
-        return await asyncio.run(
-            self.get_subtitles(audiofile_path=audiofile_path, sleep_time=sleep_time)
-        )
+        await self.get_subtitles(audiofile_path=audiofile_path, sleep_time=sleep_time)
 
     async def get_subtitles(self, audiofile_path, sleep_time: int = 0):
         await asyncio.sleep(sleep_time)

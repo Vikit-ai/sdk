@@ -1,10 +1,8 @@
 import os
-import asyncio
-
-from vikit.music_building_context import MusicBuildingContext
 from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
 from vikit.video.video_types import VideoType
+from vikit.video.building.video_building_handler import VideoBuildingHandler
 
 
 class ImportedVideo(Video):
@@ -25,7 +23,7 @@ class ImportedVideo(Video):
         super().__init__()
         if video_file_path:
             if os.path.exists(video_file_path):
-                self._media_url = os.path.abspath(video_file_path)
+                self.media_url = os.path.abspath(video_file_path)
             else:
                 raise ValueError("the provided video file path does not exists")
         else:
@@ -38,10 +36,10 @@ class ImportedVideo(Video):
         """
         Returns the title of the video.
         """
-        if self._media_url is None:
+        if self.media_url is None:
             return "nomedia"
         else:
-            return self._media_url.split("/")[-1].split(".")[0]
+            return self.media_url.split("/")[-1].split(".")[0]
 
     @log_function_params
     async def build(self, build_settings: VideoBuildSettings = None):
@@ -58,19 +56,6 @@ class ImportedVideo(Video):
             build_settings = self.build_settings
 
         await super().build(build_settings)
-
-        # if build_settings.music_building_context.apply_background_music:
-        #     music_file = asyncio.run(
-        #         self._build_background_music(
-        #             VideoBuildSettings(
-        #                 music_building_context=MusicBuildingContext(
-        #                     generate_background_music=build_settings.music_building_context.generate_background_music
-        #                 )
-        #             )
-        #         )
-        #     )
-
-        #     self._apply_background_music(background_music_file=music_file)
 
         return self
 
@@ -93,3 +78,38 @@ class ImportedVideo(Video):
             str: The file name of the video
         """
         return super().get_file_name_by_state(build_settings)
+
+    @log_function_params
+    async def prepare_build(
+        self,
+        build_settings=VideoBuildSettings(),
+    ):
+        """
+        prepare the actual video,
+
+        Params:
+            - build_settings: allow some customization
+
+        Returns:
+            The current instance
+        """
+        await super().prepare_build(build_settings)
+
+        return self
+
+    def get_video_handler_chain(
+        self, build_settings: VideoBuildSettings
+    ) -> list[VideoBuildingHandler]:
+        """
+        Get the handler chain of the video.
+        Defining the handler chain is the main way to define how the video is built
+        so it is up to the child classes to implement this method
+
+        At this stage, we should already have the enhanced prompt and title for this video
+
+        Returns:
+            list: The list of handlers to use for building the video
+        """
+        handlers = []
+
+        return handlers

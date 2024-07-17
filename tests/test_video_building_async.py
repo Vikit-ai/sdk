@@ -22,17 +22,16 @@ class TestVideoBuildingAsync:
         warnings.simplefilter("ignore", category=UserWarning)
         warnings.simplefilter("ignore", category=DeprecationWarning)
         logger.add("log_test_video.txt", rotation="10 MB")
-        self.sample_cat_video_path = test_media.get_cat_video_path()
         self.prompt_loosing_faith = None
         logger.add("log_test_composite_video.txt", rotation="10 MB")
 
     @pytest.mark.local_integration
-    @log_function_params
+    @pytest.mark.asyncio
     async def test_generate_bg_music_async(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo(prompt_mystic.text)
-            video.media_url = self.sample_cat_video_path
-            bg_music_file = video._build_background_music(
+            video.media_url = test_media.get_cat_video_path()
+            bg_music_file = await video._build_background_music(
                 build_settings=VideoBuildSettings(
                     test_mode=True,
                     music_building_context=MusicBuildingContext(

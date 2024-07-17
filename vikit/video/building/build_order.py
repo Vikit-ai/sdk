@@ -38,6 +38,7 @@ def get_lazy_dependency_chain_build_order(
     Returns:
         list: The build order
     """
+    logger.debug(f"Getting lazy dependency chain build order for {(video_tree)} videos")
     for video in video_tree:
         logger.trace(f"type(video) is {type(video)}")
         if isinstance(video, is_composite_video) and len(video.video_list) > 0:

@@ -60,8 +60,6 @@ class VideoFileName:
             video_metadata.title, max_length=self.VIDEO_TITLE_MAX_LENGTH
         )
         self._video_type = video_type if video_type is not None else "undefined"
-        if build_settings is None:
-            raise ValueError("build_settings cannot be None")
         self._build_settings = build_settings
 
         self._build_id = build_settings.id

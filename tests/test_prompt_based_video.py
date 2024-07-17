@@ -44,13 +44,12 @@ class TestPromptBasedVideo:
             assert len(video_title) > 0  # we should have a file of at least 1 character
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_build_single_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
-
-            pbvid = PromptBasedVideo(
-                PromptFactory().create_prompt_from_text(
-                    TEST_PROMPT, generate_recording=True
-                )
+            fact = PromptBasedVideo(PromptFactory())
+            pbvid = await fact.create_prompt_from_text(
+                TEST_PROMPT, generate_recording=True
             )
             await pbvid.build()
 
@@ -59,6 +58,7 @@ class TestPromptBasedVideo:
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_build_single_video_no_bg_music_with_subtitles(self):
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(tools.test_prompt_library["moss_stones-train_boy"])
@@ -71,6 +71,7 @@ class TestPromptBasedVideo:
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_build_single_video_with_default_bg_music_with_subtitles(self):
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(tools.test_prompt_library["moss_stones-train_boy"])
@@ -112,6 +113,7 @@ class TestPromptBasedVideo:
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_generate_short_video_single_sub(self):
         with WorkingFolderContext():
 
@@ -122,8 +124,6 @@ class TestPromptBasedVideo:
             result = await pbv.build()
             assert result is not None
             assert os.path.exists(result.media_url)
-
-    # @pytest.mark.local_integration
 
     @pytest.mark.integration
     @pytest.mark.asyncio
@@ -141,7 +141,7 @@ class TestPromptBasedVideo:
                 test_mode=False,
             )
 
-            test_prompt = PromptFactory(
+            test_prompt = await PromptFactory(
                 bld_settings.get_ml_models_gateway()
             ).create_prompt_from_text(
                 test_media.SOUND_OF_SILENCE, generate_recording=True
@@ -174,7 +174,7 @@ class TestPromptBasedVideo:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
-    # @unittest.skip("To be activated on case by case basis")
+    @pytest.mark.skip("To be activated on case by case basis")
     async def test_reunion_island_prompt_with_bk_music_subs(self):
         with WorkingFolderContext():
             bld_sett = VideoBuildSettings(
@@ -184,7 +184,7 @@ class TestPromptBasedVideo:
                 include_audio_read_subtitles=True,
                 test_mode=False,
             )
-            test_prompt = PromptFactory(
+            test_prompt = await PromptFactory(
                 bld_sett.get_ml_models_gateway()
             ).create_prompt_from_text(
                 """A travel over Reunion Island, taken fomm birdview at 2000meters above 
@@ -212,7 +212,7 @@ class TestPromptBasedVideo:
                 include_audio_read_subtitles=True,
                 test_mode=False,
             )
-            test_prompt = PromptFactory(
+            test_prompt = await PromptFactory(
                 bld_sett.get_ml_models_gateway()
             ).create_prompt_from_text(
                 """A travel over Reunion Island, taken fomm birdview at 2000meters above 
@@ -229,6 +229,7 @@ class TestPromptBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.skip
+    @pytest.mark.asyncio
     async def test_local_int_reunion_island_prompt_with_bk_music_subs(self):
         with WorkingFolderContext():
             bld_sett = VideoBuildSettings(
@@ -238,7 +239,7 @@ class TestPromptBasedVideo:
                 include_audio_read_subtitles=True,
                 test_mode=False,
             )
-            test_prompt = PromptFactory(
+            test_prompt = await PromptFactory(
                 bld_sett.get_ml_models_gateway()
             ).create_prompt_from_text(
                 """A travel over Reunion Island, taken fomm birdview at 2000meters above 
@@ -265,7 +266,7 @@ class TestPromptBasedVideo:
             )
 
             gw = video_build_settings.get_ml_models_gateway()
-            prompt = PromptFactory(ml_gateway=gw).create_prompt_from_text(
+            prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(
                 "A young girl traveling in the train alongside Mediterranean coast"
             )  # @param {type:"string"}
 

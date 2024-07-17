@@ -1,11 +1,7 @@
 import os
-import asyncio
 
 from loguru import logger
 
-from vikit.wrappers.ffmpeg_wrapper import (
-    merge_audio,
-)
 from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
 from vikit.video.video_types import VideoType
@@ -18,12 +14,12 @@ from vikit.video.building.video_building_handler import VideoBuildingHandler
 from vikit.video.building.handlers.video_reencoding_handler import (
     VideoBuildingHandlerReencoder,
 )
-from vikit.video.building.handlers.video_concatenation_handler import (
-    VideoBuildingHandlerConcatenate,
-)
 from vikit.video.building.handlers.music_audio_merging_handler import (
     MusicAudioMergingHandler,
 )
+from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.music_building_context import MusicBuildingContext
+from vikit.wrappers.ffmpeg_wrapper import concatenate_videos, merge_audio
 
 
 class CompositeVideo(Video, is_composite_video):
@@ -88,7 +84,7 @@ class CompositeVideo(Video, is_composite_video):
 
         return f"Composite Video: {videos_output}"
 
-    def prepare_build(self, build_settings: VideoBuildSettings, strategy) -> list:
+    async def prepare_build(self, build_settings: VideoBuildSettings) -> list:
         """
         Prepare the video build order
 
@@ -99,12 +95,29 @@ class CompositeVideo(Video, is_composite_video):
         Returns:
             list: The video build order
         """
-        already_added = set()
+        self.build_settings = build_settings
+        for video in self.video_list:
+            if not video.are_build_settings_prepared:
+                await video.prepare_build(
+                    build_settings=self.get_cascaded_build_settings()
+                )
+        self._source = type(
+            self
+        ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
+        self.are_build_settings_prepared = True
 
-        return strategy(
-            video_tree=self._composite_video.video_list,
-            build_settings=build_settings,
-            already_added=already_added,
+        return self
+
+    def get_cascaded_build_settings(self):
+        """
+        Get the cascaded build settings
+        """
+        return VideoBuildSettings(
+            interpolate=True,
+            run_async=self.build_settings.run_async,
+            include_audio_read_subtitles=False,
+            music_building_context=MusicBuildingContext(apply_background_music=False),
+            test_mode=self.build_settings.test_mode,
         )
 
     def append_video(self, video: Video = None):
@@ -168,19 +181,21 @@ class CompositeVideo(Video, is_composite_video):
 
         returns:
             str: The target file name
-        """
-        if build_settings is None:
-            raise ValueError("build_settings cannot be None")
 
+        """
         video_type = (
             str(VideoType.COMPROOT)
             if self._is_root_video_composite
             else str(VideoType.COMPCHILD)
         )
-        video_fname = super().get_file_name_by_state(
-            build_settings=build_settings, video_type=video_type
+
+        return str(
+            super().get_file_name_by_state(
+                build_settings=build_settings,
+                video_type=video_type,
+                metadata=self.metadata,
+            )
         )
-        return str(video_fname)
 
     def update_metadata_post_building(self):
         """
@@ -206,7 +221,7 @@ class CompositeVideo(Video, is_composite_video):
         """
         Cleanse the video list by removing any empty composites videos
         """
-        list(
+        return list(
             filter(
                 lambda video: not (
                     isinstance(video, CompositeVideo) and len(video._video_list) == 0
@@ -216,10 +231,9 @@ class CompositeVideo(Video, is_composite_video):
         )
 
     @log_function_params
-    def build(
+    async def build(
         self,
         build_settings=VideoBuildSettings(),
-        build_order=get_lazy_dependency_chain_build_order,
     ):
         """
         Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,
@@ -235,8 +249,57 @@ class CompositeVideo(Video, is_composite_video):
         if self._is_video_generated:
             return self
 
+        await self.prepare_build(build_settings=build_settings)
+
         # Cleanse the video list by removing any empty composites videos
         self._video_list = self.cleanse_video_list()
+        logger.debug(f"self._video_list length: {len(self._video_list)}")
+
+        ordered_video_list = get_lazy_dependency_chain_build_order(
+            video_tree=self.video_list,
+            build_settings=build_settings,
+            already_added=set(),
+        )
+
+        logger.debug(f"To reencode?: {(self._video_list[0].metadata.is_reencoded)}")
+
+        # Here we apply all the handlers on the ordered video list
+        [
+            await self.get_video_handler_chain()[0].execute_async(video=vid)
+            for vid in ordered_video_list
+        ]
+
+        # if self._is_root_video_composite:
+        #     # Handle the background music
+        #     if build_settings.music_building_context.apply_background_music:
+        #         if build_settings.music_building_context.use_recorded_prompt_as_audio:
+        #             # As there is recursivity, we may already be in an eventloop
+        #             if asyncio.get_event_loop().is_running():
+        #                 generated_vid_composite._apply_background_music(
+        #                     build_settings.prompt.audio_recording
+        #                 )
+        #             else:
+        #                 asyncio.run(
+        #                     generated_vid_composite._apply_background_music(
+        #                         build_settings.prompt.audio_recording
+        #                     )
+        #                 )
+
+        #         else:  # we generate the background music (either trough a model or use a default music to fail open)
+
+        #             generated_vid_composite._apply_background_music(music_file)
+        logger.debug(f"To reencode?: {(self._video_list[0].metadata.is_reencoded)}")
+
+        self.media_url = self.concatenate()
+
+    def concatenate(self):
+        """
+        Concatenate the videos in the list
+
+        Args:
+            video_list_file (str): The video list file
+            short_title (str): The short title
+        """
 
         short_title = self.get_title()
         # TODO: change this hard truncate!!
@@ -249,34 +312,47 @@ class CompositeVideo(Video, is_composite_video):
                 config.get_video_list_file_name(),
             ]
         )
-        generated_vid_composite = self.get_handler_chain(build_settings)[0].execute(
-            self, build_settings
+        ratio = self._get_ratio_to_multiply_animations(
+            build_settings=self.build_settings, video_composite=self
         )
 
-        self.update_metadata()
+        # We have the final file names (they may have changed between initial video instanciation and
+        # inference of a name after querying an LLM
+        # In a future version, the ordering of concatenations may vary to accelerate the
+        # production of composites before others, to start the first one asap
+        with open(video_list_file, "w") as myfile:
+            for video in self.video_list:
+                file_name = video.media_url
+                myfile.write("file " + file_name + os.linesep)
 
-        if self._is_root_video_composite:
-            # Handle the background music
-            if build_settings.music_building_context.apply_background_music:
-                if build_settings.music_building_context.use_recorded_prompt_as_audio:
-                    # As there is recursivity, we may already be in an eventloop
-                    if asyncio.get_event_loop().is_running():
-                        generated_vid_composite._apply_background_music(
-                            build_settings.prompt.audio_recording
-                        )
-                    else:
-                        asyncio.run(
-                            generated_vid_composite._apply_background_music(
-                                build_settings.prompt.audio_recording
-                            )
-                        )
+        return concatenate_videos(
+            input_file=os.path.abspath(video_list_file),
+            target_file_name=self.get_file_name_by_state(
+                build_settings=video.build_settings,
+            ),
+            ratioToMultiplyAnimations=ratio,
+        )  # keeping one consistent file name
 
-                else:  # we generate the background music (either trough a model or use a default music to fail open)
+    def _get_ratio_to_multiply_animations(self, build_settings, video_composite):
+        # Now we box the video composing this composite into the expected length, typically the one of a prompt
+        if build_settings.expected_length is None:
+            if build_settings.prompt is not None:
+                ratioToMultiplyAnimations = (
+                    video_composite.get_duration()
+                    / build_settings.prompt.get_duration()
+                )
+            else:
+                ratioToMultiplyAnimations = 1
+        else:
+            if build_settings.expected_length <= 0:
+                raise ValueError(
+                    f"Expected length should be greater than 0. Got {build_settings.expected_length}"
+                )
+            ratioToMultiplyAnimations = (
+                video_composite.get_duration() / build_settings.expected_length
+            )
 
-                    generated_vid_composite._apply_background_music(music_file)
-
-        self.metadata.is_video_generated = True
-        return generated_vid_composite
+        return ratioToMultiplyAnimations
 
     @log_function_params
     def _insert_subtitles_audio_recording(self, build_settings: VideoBuildSettings):
@@ -325,13 +401,11 @@ class CompositeVideo(Video, is_composite_video):
         """
         handlers = []
 
-        handlers.append(VideoBuildingHandlerConcatenate())
-
         if self._needs_reencoding:
             handlers.append(VideoBuildingHandlerReencoder())
 
-        if self.build_settings.music_building_context.apply_background_music:
-            if self.build_settings.music_building_context.generate_background_music:
-                handlers.append(MusicAudioMergingHandler())
+        # if self.build_settings.music_building_context.apply_background_music:
+        #     if self.build_settings.music_building_context.generate_background_music:
+        #         handlers.append(MusicAudioMergingHandler())
 
         return handlers

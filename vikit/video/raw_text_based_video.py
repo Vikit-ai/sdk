@@ -94,7 +94,7 @@ class RawTextBasedVideo(Video):
         build_settings=VideoBuildSettings(),
     ):
         """
-        prepare the actual inner video
+        prepare the video before building
 
         Params:
             - build_settings: allow some customization

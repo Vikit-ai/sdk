@@ -26,8 +26,6 @@ class TestCompositeVideo:
 
     def setUp(self) -> None:
         logger.add("log_test_composite_video.txt", rotation="10 MB")
-        self.sample_cat_video_path = test_media.get_cat_video_path()
-        self.prompt_loosing_faith = None
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
 
@@ -53,7 +51,7 @@ class TestCompositeVideo:
         self,
     ):
         with WorkingFolderContext():
-            video = ImportedVideo(self.sample_cat_video_path)
+            video = ImportedVideo(test_media.get_cat_video_path())
             assert video.media_url, "Media URL should not be null"
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video)
@@ -72,8 +70,10 @@ class TestCompositeVideo:
 
     @pytest.mark.local_integration
     async def test_int_create_video_mix_with_preexiting_video_bin_no_bkg_music(self):
+        logger.add("log_test_composite_video.txt", rotation="10 MB", level="TRACE")
+
         with WorkingFolderContext():
-            video = ImportedVideo(self.sample_cat_video_path)
+            video = ImportedVideo(test_media.get_cat_video_path())
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video)
             await test_video_mixer.build()
@@ -88,7 +88,7 @@ class TestCompositeVideo:
             video = RawTextBasedVideo(
                 tools.test_prompt_library["moss_stones-train_boy"].text
             )
-            video_imp = ImportedVideo(self.sample_cat_video_path)
+            video_imp = ImportedVideo(test_media.get_cat_video_path())
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video).append_video(video_imp)
             await test_video_mixer.build(VideoBuildSettings(test_mode=True))
@@ -224,7 +224,7 @@ class TestCompositeVideo:
             build_stgs = VideoBuildSettings(test_mode=False)
             test_prompt = tools.test_prompt_library["train_boy"]
             video = RawTextBasedVideo(test_prompt.text)
-            video2 = ImportedVideo(self.sample_cat_video_path)
+            video2 = ImportedVideo(test_media.get_cat_video_path())
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video).append_video(video2)
             await test_video_mixer.build(build_settings=build_stgs)

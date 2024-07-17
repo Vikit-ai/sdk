@@ -244,14 +244,18 @@ class Video(ABC):
         """
         if self._is_video_generated:
             return self
-
+        built_video = None
         self.prepare_build(build_settings=build_settings)
 
-        handler_chain = self.get_handler_chain()
-        built_video = await handler_chain[0].execute(video=self)
-
-        self._is_video_generated = True
-        self.run_post_build_actions()
+        handler_chain = self.get_video_handler_chain(build_settings=self.build_settings)
+        if not handler_chain:
+            logger.warning(
+                f"No handler chain defined for the video of type {self.short_type_name}"
+            )
+        else:
+            built_video = await handler_chain[0].execute(video=self)
+            self._is_video_generated = True
+            self.run_post_build_actions()
 
         return built_video
 
@@ -275,11 +279,11 @@ class Video(ABC):
             Video: The prepared video
         """
         self.build_settings = build_settings
-        self.are_build_settings_prepared = True
         self._source = type(
             build_settings.get_ml_models_gateway()  # TODO: this is hacky anbd should be refactored
             # so that we infer source from the different handlers (initial video generator, interpolation, etc)
         ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
+        self.are_build_settings_prepared = True
 
     @log_function_params
     def _fit_standard_background_music(self, expected_music_duration: float = None):
@@ -393,4 +397,4 @@ class Video(ABC):
         Returns:
             list: The list of handlers to use for building the video
         """
-        pass
+        return []

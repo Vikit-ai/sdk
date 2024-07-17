@@ -47,6 +47,9 @@ class VideoBuildingHandler(ABC):
         handled_video, kwargs = await self._execute_logic_async(video=video, **kwargs)
 
         if not self.next_handler:  # No more handlers to process
+            logger.info(
+                f"Handler {type(self).__name__} executed successfully, finished the handler chain"
+            )
             return handled_video, kwargs
         else:
             logger.info(
