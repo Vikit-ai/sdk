@@ -8,7 +8,7 @@ class VideoBuildingHandlerTransitioni(video_building_handler.VideoBuildingHandle
     def __init__(self):
         super().__init__()
 
-    def is_supporting_async(self):
+    def is_supporting_async_mode(self):
         return True
 
     async def _execute_logic_async(self, transition_video: Video, **kwargs) -> Video:

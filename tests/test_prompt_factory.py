@@ -45,6 +45,7 @@ class TestPromptFactory:
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_reengineer_prompt_from_text_noinputs(self):
-        _ = PromptFactory().get_reengineered_prompt_from_text(
-            prompt=None, prompt_build_settings=None
-        )
+        with pytest.raises(ValueError):
+            _ = await PromptFactory().get_reengineered_prompt_from_text(
+                prompt=None, prompt_build_settings=None
+            )

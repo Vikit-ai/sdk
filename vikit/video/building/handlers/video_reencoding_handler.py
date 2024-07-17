@@ -7,7 +7,7 @@ class VideoBuildingHandlerReencoder(video_building_handler.VideoBuildingHandler)
     def __init__(self):
         super().__init__()
 
-    def is_supporting_async(self):
+    def is_supporting_async_mode(self):
         return False
 
     def execute_async(self, video: Video, build_settings: VideoBuildSettings):

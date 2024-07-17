@@ -18,12 +18,13 @@ class TestVideoBuildingHandler:
 
     @pytest.mark.unit
     @pytest.mark.asyncio
-    @pytest.mark.debug
     async def test_VideoBuildingHandlerGenerateFomApi(self):
         api_handler = VideoBuildingHandlerGenerateFomApi()
         vid = RawTextBasedVideo("test")
         vid.build_settings = VideoBuildSettings()
-        await vid.prepare_build(build_settings=vid.build_settings)
+        vid = await vid.prepare_build(build_settings=vid.build_settings)
         video_built = await api_handler.execute_async(video=vid)
         assert video_built is not None, "Video built should not be None"
-        assert api_handler.is_supporting_async(), "This handler should support async"
+        assert (
+            api_handler.is_supporting_async_mode()
+        ), f"This handler should support async, but it does not: {api_handler}"

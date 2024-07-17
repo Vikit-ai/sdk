@@ -8,7 +8,7 @@ class VideoBuildingHandlerInterpolate(video_building_handler.VideoBuildingHandle
     def __init__(self):
         super().__init__()
 
-    def is_supporting_async(self):
+    def is_supporting_async_mode(self):
         return True
 
     def _execute_logic(self, video: Video, **kwargs) -> Video:

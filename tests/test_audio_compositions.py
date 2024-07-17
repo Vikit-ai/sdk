@@ -23,13 +23,10 @@ from vikit.music_building_context import MusicBuildingContext
 
 class TestAudioCompositions:
 
-    def __init__(self, methodName: str = "runTest") -> None:
-        super().__init__(methodName)
+    def setUp(self) -> None:
         self.sample_video_path = get_cat_video_path()
         self.prompt_loosing_faith = None
         logger.add("log_test_audio_compositions.txt", rotation="10 MB")
-
-    def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
 

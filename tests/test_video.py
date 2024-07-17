@@ -16,13 +16,10 @@ SMALL_VIDEO_CHAT_FILE = "chat_video_super8.mp4"
 
 class TestVideo:
 
-    def __init__(self, methodName: str = "runTest") -> None:
-        super().__init__(methodName)
+    def setUp(self) -> None:
         dir_path = os.path.dirname(os.path.abspath(__file__))
         media_dir = os.path.join(dir_path, TESTS_MEDIA_FOLDER)
         self.sample_video_path = os.path.join(media_dir, SMALL_VIDEO_CHAT_FILE)
-
-    def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
         warnings.simplefilter("ignore", category=DeprecationWarning)

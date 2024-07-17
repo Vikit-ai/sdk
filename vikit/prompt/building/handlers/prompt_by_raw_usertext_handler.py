@@ -44,26 +44,4 @@ class PromptByRawUserTextHandler(PromptBuildingHandler):
     def _execute_logic(
         self, prompt: TextPrompt, build_settings: PromptBuildSettings, **kwargs
     ) -> dict[str, Any]:
-        super()._execute_logic_async(prompt)
-        """
-        Process the text prompt to generate a list of keywords, and a title
-        summarizing those keywords
-
-        We do some forme of "keywords decay" by passing keywords not to be used in the targer
-        keyword list. Those are typically the keywords that have already been inserted 
-        in the prompt text, with some forgetting of the older ones
-
-        Args:
-            prompt (str): The prompt to generate the keywords from
-            build_settings (VideoBuildSettings): The build settings
-            **kwargs: Additional arguments
-
-        Returns:
-            an list of keywords to be used for video generation
-        """
-        super()._execute_logic_async(prompt, **kwargs)
-        (
-            enhanced_prompt,
-            enhanced_title,
-        ) = build_settings.get_ml_models_gateway().get_enhanced_prompt_async(self._text)
-        return enhanced_prompt, enhanced_title
+        pass

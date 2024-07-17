@@ -10,7 +10,7 @@ class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHan
     def __init__(self):
         super().__init__()
 
-    def is_supporting_async(self):
+    def is_supporting_async_mode(self):
         return True
 
     async def _execute_logic_async(self, video: Video, **kwargs) -> Video:
@@ -35,16 +35,20 @@ class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHan
                 )
             )
         )
-
         file_name = video.get_file_name_by_state(video.build_settings)
-        path_multi = get_validated_path(video_link_from_prompt)
-        if path_multi["type"] == "local":
-            video.media_url = "file:" + video_link_from_prompt
+        path_info = get_validated_path(video_link_from_prompt)
+        if path_info["type"] == "local":
+            video.media_url = video_link_from_prompt
+            logger.debug(
+                f"Video URL already on local file system, nothing to do. Path is: {video.media_url}"
+            )
+        else:
+            logger.debug(f"Retrieving file from remote URL :  {video_link_from_prompt}")
+            video.media_url = urlretrieve(
+                video_link_from_prompt,
+                file_name,
+            )[0]
 
-        video.media_url = urlretrieve(
-            video_link_from_prompt,
-            file_name,
-        )[0]
         video.metadata.is_video_generated = True
 
         logger.debug(f"Video generated from prompt: {video.media_url}")
@@ -55,18 +59,3 @@ class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHan
         Process the video generation  synchronously
         """
         pass
-        # super()._execute_logic(video)
-        # video_link_from_prompt = (  # Should give a link on a web storage
-        #     video.build_settings.get_ml_models_gateway().generate_video(
-        #         video.build_settings.prompt.text
-        #     )
-        # )
-
-        # file_name = video.get_file_name_by_state(video.build_settings)
-        # video.media_url = urlretrieve(
-        #     video_link_from_prompt,
-        #     file_name,
-        # )[0]
-        # video.metadata.is_video_generated = True
-
-        # return video

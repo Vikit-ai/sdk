@@ -12,7 +12,7 @@ class MusicAudioMergingHandler(video_building_handler.VideoBuildingHandler):
     def __init__(self, **kwargs):
         super().__init__()
 
-    def is_supporting_async(self):
+    def is_supporting_async_mode(self):
         return True
 
     async def _execute_logic_async(self, video: Video) -> Video:

@@ -25,7 +25,7 @@ class TestPromptBuildingHandlers:
     async def test_PromptBuildingHandler_Gen_keywords(self):
         prompt_handler = PromptByKeywordsHandler()
         text_prompt = TextPrompt("test")
-        prompt_built = prompt_handler.execute(
+        prompt_built = await prompt_handler.execute_async(
             prompt=text_prompt, build_settings=PromptBuildSettings()
         )
         assert prompt_built is not None, "Prompt built should not be None"
@@ -36,7 +36,7 @@ class TestPromptBuildingHandlers:
     async def test_PromptBuildingHandler_Gen_from_user_text(self):
         prompt_handler = PromptByRawUserTextHandler()
         text_prompt = TextPrompt("test")
-        prompt_built = prompt_handler.execute(
+        prompt_built = await prompt_handler.execute_async(
             prompt=text_prompt, build_settings=PromptBuildSettings()
         )
         assert prompt_built is not None, "Prompt built should not be None"

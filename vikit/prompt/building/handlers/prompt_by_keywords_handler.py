@@ -31,6 +31,9 @@ class PromptByKeywordsHandler(PromptBuildingHandler):
         Returns:
             an enhanced prompt to be used for video generation
         """
+        await super()._execute_logic_async(
+            prompt=prompt, build_settings=build_settings, kwargs=kwargs
+        )
         (
             enhanced_prompt,
             enhanced_title,
@@ -43,13 +46,12 @@ class PromptByKeywordsHandler(PromptBuildingHandler):
     def _execute_logic(
         self, prompt: TextPrompt, build_settings: PromptBuildSettings, **kwargs
     ) -> Tuple[TextPrompt, dict[str, Any]]:
-        super()._execute_logic_async(prompt, build_settings=build_settings, **kwargs)
         """
         Process the text prompt to generate a list of keywords, and a title
         summarizing those keywords
 
         We do some forme of "keywords decay" by passing keywords not to be used in the targer
-        keyword list. Those are typically the keywords that have already been inserted 
+        keyword list. Those are typically the keywords that have already been inserted
         in the prompt text, with some forgetting of the older ones
 
         Args:
@@ -60,17 +62,4 @@ class PromptByKeywordsHandler(PromptBuildingHandler):
         Returns:
             an list of keywords to be used for video generation
         """
-        super()._execute_logic_async(
-            prompt=prompt, build_settings=build_settings, kwargs=kwargs
-        )
-        (
-            enhanced_prompt,
-            enhanced_title,
-        ) = build_settings.get_ml_models_gateway().get_keywords_from_prompt_async(
-            subtitleText=prompt.text,
-            excluded_words={
-                "excluded_words",
-                kwargs["excluded_words"] if "excluded_words" in kwargs else "",
-            },
-        )
-        return enhanced_prompt, {"title": enhanced_title}
+        pass

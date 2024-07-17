@@ -54,7 +54,7 @@ class PromptBuildingHandler(ABC):
             )
             return await self.next_handler.execute(handled_prompt, **kwargs)
 
-    async def execute(self, prompt, **kwargs):
+    def execute(self, prompt, **kwargs):
         """
          Execute the handler synchronously
 

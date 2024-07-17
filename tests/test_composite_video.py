@@ -24,13 +24,10 @@ prompt_mystic = tools.test_prompt_library["moss_stones-train_boy"]
 
 class TestCompositeVideo:
 
-    def __init__(self, methodName: str = "runTest") -> None:
-        super().__init__(methodName)
+    def setUp(self) -> None:
+        logger.add("log_test_composite_video.txt", rotation="10 MB")
         self.sample_cat_video_path = test_media.get_cat_video_path()
         self.prompt_loosing_faith = None
-        logger.add("log_test_composite_video.txt", rotation="10 MB")
-
-    def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
 

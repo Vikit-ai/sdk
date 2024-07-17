@@ -19,9 +19,6 @@ class TestImportedVideo:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
         logger.add("log_test_imported_video.txt", rotation="10 MB")
-
-    def __init__(self, methodName: str = "runTest") -> None:
-        super().__init__(methodName)
         self.sample_video_path = get_cat_video_path()
 
     @pytest.mark.local_integration
@@ -32,7 +29,7 @@ class TestImportedVideo:
             logger.debug(f"pbv.media_url : {vid.media_url}")
             assert vid.media_url, "We should have a media_url set"
             # here we expect the default background music to be sliced and used
-            vid_result = vid.build(
+            vid_result = await vid.build(
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=False

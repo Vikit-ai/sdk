@@ -12,9 +12,6 @@ TEST_PROMPT = "A group of stones in a forest, with symbols"
 
 class TestBackgroundMusic:
 
-    def __init__(self, methodName: str = "runTest") -> None:
-        super().__init__(methodName)
-
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)

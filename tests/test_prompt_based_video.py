@@ -15,7 +15,6 @@ from vikit.video.video import VideoBuildSettings
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
 import tests.tests_tools as tools  # used to get a library of test prompts
-import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
 
 TEST_PROMPT = "A group of stones in a forest, with symbols"
 

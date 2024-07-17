@@ -12,7 +12,7 @@ class VideoBuildingHandlerConcatenate(video_building_handler.VideoBuildingHandle
             raise ValueError("video_list_file must be provided")
         self.video_list_file_path = kwargs["video_list_file"]
 
-    def is_supporting_async(self):
+    def is_supporting_async_mode(self):
         return True
 
     def _execute_logic_async(self, video: Video, **kwargs):

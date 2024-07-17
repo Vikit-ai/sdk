@@ -17,11 +17,10 @@ class VideoBuildingHandler(ABC):
     process_pool_executor = ProcessPoolExecutor()
 
     def __init__(self, next_handler: "VideoBuildingHandler" = None):
-        self.is_supporting_async = None
         self.next_handler = next_handler
 
     @abstractmethod
-    def is_supporting_async(self):
+    def is_supporting_async_mode(self):
         """
         Check if the handler supports async execution
         While this could have been infered using introspection,

@@ -39,7 +39,7 @@ def get_lazy_dependency_chain_build_order(
         list: The build order
     """
     for video in video_tree:
-        logger.debug(f"type(video) is {type(video)}")
+        logger.trace(f"type(video) is {type(video)}")
         if isinstance(video, is_composite_video) and len(video.video_list) > 0:
             logger.trace(f"Going down the dependency chain for {video.id}")
             get_lazy_dependency_chain_build_order(
@@ -59,7 +59,7 @@ def get_lazy_dependency_chain_build_order(
                     already_added=already_added,
                 )
         if video.id not in already_added:
-            logger.debug(f"Adding video {video.id} to the build order")
+            logger.trace(f"Adding video {video.id} to the build order")
             video_build_order.append(video)
             already_added.add(video.id)
 
