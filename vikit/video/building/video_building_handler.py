@@ -16,8 +16,9 @@ class VideoBuildingHandler(ABC):
     # Create a new process pool executor singleton
     process_pool_executor = ProcessPoolExecutor()
 
-    def __init__(self, next_handler: "VideoBuildingHandler" = None):
+    def __init__(self, next_handler: "VideoBuildingHandler" = None, **kwargs):
         self.next_handler = next_handler
+        self.additional_args = kwargs
 
     @abstractmethod
     def is_supporting_async_mode(self):

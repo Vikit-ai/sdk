@@ -58,10 +58,10 @@ class TestCompositeVideo:
             built = await test_video_mixer.build(
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
-                        generate_background_music=True
+                        apply_background_music=True, generate_background_music=True
                     ),
                     test_mode=True,
-                    include_audio_read_subtitles=True,
+                    include_read_aloud_prompt=True,
                     prompt=tools.test_prompt_library["tired"],
                 )
             )
@@ -138,7 +138,7 @@ class TestCompositeVideo:
                         apply_background_music=True,
                         generate_background_music=False,
                     ),
-                    include_audio_read_subtitles=False,
+                    include_read_aloud_prompt=False,
                     prompt=test_prompt_library["moss_stones-train_boy"],
                 )
             )
@@ -152,7 +152,6 @@ class TestCompositeVideo:
             final_composite_video = CompositeVideo()
             for subtitle in prompt_with_recording.subtitles:
                 video = RawTextBasedVideo(subtitle.text)
-                # video.build(build_settings=VideoBuildSettings(test_mode=True))
                 final_composite_video.append_video(video)
 
             await final_composite_video.build(
@@ -161,10 +160,14 @@ class TestCompositeVideo:
                         generate_background_music=False, apply_background_music=True
                     ),
                     test_mode=True,
-                    include_audio_read_subtitles=False,
+                    include_read_aloud_prompt=False,
                     prompt=prompt_with_recording,
                 )
             )
+
+            assert final_composite_video.media_url is not None
+            assert final_composite_video.background_music is not None
+            assert not final_composite_video.metadata.is_prompt_read_aloud
 
     @pytest.mark.local_integration
     async def test_use_recording_ratio_on_existing_gen_default_bg_music_include_subs_loseFaitprompt(
@@ -185,7 +188,7 @@ class TestCompositeVideo:
                     music_building_context=MusicBuildingContext(
                         generate_background_music=False, apply_background_music=True
                     ),
-                    include_audio_read_subtitles=True,
+                    include_read_aloud_prompt=True,
                     prompt=tools.test_prompt_library["tired"],
                 )
             )
@@ -208,7 +211,7 @@ class TestCompositeVideo:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True
                     ),
-                    include_audio_read_subtitles=True,
+                    include_read_aloud_prompt=True,
                     prompt=tools.test_prompt_library["tired"],
                     expected_length=5,
                 )
@@ -248,7 +251,7 @@ class TestCompositeVideo:
                         apply_background_music=True, generate_background_music=True
                     ),
                     test_mode=True,
-                    include_audio_read_subtitles=True,
+                    include_read_aloud_prompt=True,
                     prompt=tired_prompt_with_recording,
                 )
             )
@@ -267,10 +270,9 @@ class TestCompositeVideo:
                     apply_background_music=True, generate_background_music=True
                 ),
                 test_mode=True,
-                include_audio_read_subtitles=True,
+                include_read_aloud_prompt=True,
                 prompt=test_prompt_library["train_boy"],
             )
-
             comp_start = CompositeVideo().append_video(
                 ImportedVideo(test_media.get_cat_video_path())
             )
@@ -281,14 +283,12 @@ class TestCompositeVideo:
             from vikit.video.seine_transition import SeineTransition
 
             transition = SeineTransition(comp_start, comp_end)
-
             vid_cp_final = CompositeVideo()
-
             vid_cp_final.append_video(comp_start).append_video(transition).append_video(
                 comp_end
             )
-            # with pytest.raises(AssertionError):
             await vid_cp_final.build(build_settings=bld_settings)
+            assert vid_cp_final.media_url is not None, "Media URL should not be null"
 
     @pytest.mark.local_integration
     @pytest.mark.non_regression
@@ -304,7 +304,7 @@ class TestCompositeVideo:
                     apply_background_music=True, generate_background_music=True
                 ),
                 test_mode=True,
-                include_audio_read_subtitles=True,
+                include_read_aloud_prompt=True,
             )
 
             comp_start = CompositeVideo().append_video(

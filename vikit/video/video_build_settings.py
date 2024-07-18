@@ -10,7 +10,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         run_async: bool = True,
         test_mode: bool = True,
         expected_length: float = None,  # The expected length in seconds of the video, will be used when actually building the video
-        include_audio_read_subtitles: bool = False,  # Include subtitles in the final video
+        include_read_aloud_prompt: bool = False,  # Include a synthetic voice that reads the prompts in the final video
         prompt: Prompt = None,  # Include subtitles in the final video and fit videos to match the prompt subtitles timelines
         generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt
         generate_from_llm_prompt: bool = True,
@@ -27,7 +27,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         )
 
         self.expected_length = expected_length
-        self.include_audio_subtitles = include_audio_read_subtitles
+        self.include_read_aloud_prompt = include_read_aloud_prompt
         self.prompt = prompt
         self.generate_from_llm_keyword = generate_from_llm_keyword
         self.generate_from_llm_prompt = generate_from_llm_prompt

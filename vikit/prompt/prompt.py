@@ -57,6 +57,16 @@ class Prompt(ABC):
             self.title = value["title"]
 
     @property
+    def full_text(self) -> str:
+        """
+        Returns the full text of the prompt
+        """
+        if self.subtitles is None or len(self.subtitles) == 0:
+            return self.text if self.text is not None else ""
+        else:
+            return " ".join([subtitle.text for subtitle in self.subtitles])
+
+    @property
     def subtitles(self) -> list[pysrt.SubRipItem]:
         """
         Returns the subtitles of the prompt.

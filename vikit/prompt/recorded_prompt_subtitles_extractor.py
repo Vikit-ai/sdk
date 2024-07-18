@@ -52,7 +52,7 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
                 else i + video_length_per_subtitle
             )
             # Generate the audio slice from the audio file
-            generated_slice = extract_audio_slice(
+            generated_slice = await extract_audio_slice(
                 start=i, end=end, audiofile_path=recorded_prompt_file_path
             )
             logger.debug(f"Generated slice {generated_slice}")

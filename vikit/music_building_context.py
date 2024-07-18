@@ -11,3 +11,4 @@ class MusicBuildingContext:
         self.apply_background_music = apply_background_music
         self.generate_background_music = generate_background_music
         self.expected_music_length = expected_music_length
+        self._generated_background_music_file = None

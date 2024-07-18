@@ -1,5 +1,6 @@
 import os
 import subprocess
+import asyncio
 
 from tenacity import retry, before_log, after_log, stop_after_attempt
 from loguru import logger
@@ -35,7 +36,7 @@ class ReplicateGateway(MLModelsGateway):
 
     @log_function_params
     async def generate_background_music_async(
-        self, duration: int = 3, prompt: str = None
+        self, duration: int = 3, prompt: str = None, target_file_name: str = None
     ) -> str:
         """
         Here we generate the music to add as background music
@@ -43,6 +44,7 @@ class ReplicateGateway(MLModelsGateway):
         Args:
             duration: int - the duration of the music in seconds
             prompt: str - the prompt to generate the music from
+            target_file_name: str - the name of the file to save the music to
 
         Returns:
             str: the path to the generated music
@@ -55,7 +57,11 @@ class ReplicateGateway(MLModelsGateway):
         logger.debug(f"outputLLM: {outputLLM}")
 
         # je veux le dernier mot de la liste de mots générés pour le nom du fichier
-        prompt_based_music_file_name = str(outputLLM.split()[-1:][0]) + ".mp3"
+        prompt_based_music_file_name = (
+            target_file_name
+            if target_file_name
+            else str(outputLLM.split()[-1:][0]) + ".mp3"
+        )
         logger.debug(f"prompt_based_music_file_name: {prompt_based_music_file_name}")
         title_length = len(prompt_based_music_file_name)  # remove the .mp3 extension
 
@@ -73,20 +79,22 @@ class ReplicateGateway(MLModelsGateway):
         lowered_music_filename = f"lowered_{prompt_based_music_file_name}"
 
         logger.debug("Lowering the volume of the music")
-        result = subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-i",
-                gen_music_file_path,
-                "-filter_complex",
-                "[a]loudnorm,volume=0.2",
-                lowered_music_filename,
-            ],
+        process = await asyncio.create_subprocess_exec(
+            "ffmpeg",
+            "-y",
+            "-i",
+            gen_music_file_path,
+            "-filter_complex",
+            "[a]loudnorm,volume=0.2",
+            lowered_music_filename,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        result.check_returncode()
+
+        stdout, stderr = await process.communicate()
+        if process.returncode != 0:
+            logger.error(f"ffmpeg command failed with: {stderr.decode()}")
+            raise Exception("ffmpeg command failed")
 
         return lowered_music_filename
 

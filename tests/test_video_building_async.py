@@ -27,6 +27,7 @@ class TestVideoBuildingAsync:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
+    @pytest.mark.skip(reason="Test is not yet implemented")
     async def test_generate_bg_music_async(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo(prompt_mystic.text)

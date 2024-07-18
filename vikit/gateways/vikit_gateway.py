@@ -33,7 +33,9 @@ class VikitGateway(MLModelsGateway):
         super().__init__()
 
     @log_function_params
-    async def generate_mp3_from_text_async(prompt_text, target_file):
+    async def generate_mp3_from_text_async(
+        prompt_text, target_file, target_file_name: str = None
+    ):
         """
         Generate an mp3 file from a text prompt.
         TODO: May be isolated into
@@ -47,7 +49,7 @@ class VikitGateway(MLModelsGateway):
             - None
         """
         await elevenlabs_gateway.generate_mp3_from_text_async(
-            text=prompt_text, target_file=target_file
+            text=prompt_text, target_file=target_file, target_file_name=target_file_name
         )
         assert os.path.exists(target_file), "The generated audio file does not exists"
 
@@ -91,20 +93,23 @@ class VikitGateway(MLModelsGateway):
         lowered_music_filename = f"lowered_{prompt_based_music_file_name}"
 
         logger.debug("Lowering the volume of the music")
-        result = subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-i",
-                gen_music_file_path,
-                "-filter_complex",
-                "[a]loudnorm,volume=0.2",
-                lowered_music_filename,
-            ],
+        process = await asyncio.create_subprocess_exec(
+            "ffmpeg",
+            "-y",
+            "-i",
+            gen_music_file_path,
+            "-filter_complex",
+            "[a]loudnorm,volume=0.2",
+            lowered_music_filename,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        result.check_returncode()
+
+        stdout, stderr = await process.communicate()
+
+        if process.returncode != 0:
+            logger.error(f"ffmpeg command failed with: {stderr.decode()}")
+            raise Exception("ffmpeg command failed")
 
         return lowered_music_filename
 

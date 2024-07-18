@@ -4,6 +4,7 @@ from loguru import logger
 from vikit.video.building import video_building_handler
 from vikit.video.video import Video
 from vikit.common.file_tools import get_validated_path
+from vikit.common.decorators import log_function_params
 
 
 class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHandler):
@@ -13,7 +14,8 @@ class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHan
     def is_supporting_async_mode(self):
         return True
 
-    async def _execute_logic_async(self, video: Video, **kwargs) -> Video:
+    @log_function_params
+    async def _execute_logic_async(self, video: Video, **kwargs):
         await super()._execute_logic_async(video)
         """
         Process the video generation binaries: we actually do ask the video to build itself

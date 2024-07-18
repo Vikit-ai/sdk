@@ -3,15 +3,17 @@ from loguru import logger
 from vikit.video.building import video_building_handler
 from vikit.video.video import Video
 from vikit.wrappers.ffmpeg_wrapper import reencode_video
+from vikit.common.decorators import log_function_params
 
 
-class VideoBuildingHandlerReencoder(video_building_handler.VideoBuildingHandler):
+class VideoReencodingHandler(video_building_handler.VideoBuildingHandler):
     def __init__(self):
         super().__init__()
 
     def is_supporting_async_mode(self):
         return True
 
+    @log_function_params
     async def _execute_logic_async(self, video: Video, **kwargs):
         await super()._execute_logic_async(video)
         """
@@ -27,10 +29,12 @@ class VideoBuildingHandlerReencoder(video_building_handler.VideoBuildingHandler)
         """
         logger.debug(f"Reencoding video: {video.id}, {video.media_url}")
         await super()._execute_logic_async(video, **kwargs)
+        if not video.media_url:
+            raise ValueError(f"Video {video.id} has no media url")
 
         logger.debug(f"Video video.media_url : {video.media_url}")
         if video._needs_reencoding:
-            video._media_url = reencode_video(
+            video._media_url = await reencode_video(
                 video_url=video.media_url,
                 target_video_name=video.get_file_name_by_state(
                     build_settings=video.build_settings

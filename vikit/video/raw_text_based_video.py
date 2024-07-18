@@ -7,14 +7,14 @@ from vikit.common.decorators import log_function_params
 from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
-from vikit.video.building.handlers.video_reencoding_handler import (
-    VideoBuildingHandlerReencoder,
-)
 from vikit.video.building.handlers.videogen_handler import (
     VideoBuildingHandlerGenerateFomApi,
 )
 from vikit.video.building.handlers.interpolation_handler import (
-    VideoBuildingHandlerInterpolate,
+    VideoInterpolationHandler,
+)
+from vikit.video.building.handlers.video_reencoding_handler import (
+    VideoReencodingHandler,
 )
 from vikit.video.building.video_building_handler import VideoBuildingHandler
 from vikit.prompt.prompt_factory import PromptFactory
@@ -118,15 +118,24 @@ class RawTextBasedVideo(Video):
 
         return self
 
-    def get_video_handler_chain(
+    def get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings
     ) -> list[VideoBuildingHandler]:
         """
-        Get the handler chain of the video.
-        Defining the handler chain is the main way to define how the video is built
-        so it is up to the child classes to implement this method
+        Get the handler chain of the video. Order matters here.
+
 
         At this stage, we should already have the enhanced prompt and title for this video
+
+        In the raw text based video, we consider the video timing is too short to set
+        any useful background music, maybe that will come later for longer videos.
+        Use Composites if you want background music, same for read aloud prompts
+        though this may change later if needed
+
+        Later version may include room for sound effects too
+
+        Args:
+            build_settings (VideoBuildSettings): The settings for building the video
 
         Returns:
             list: The list of handlers to use for building the video
@@ -134,8 +143,8 @@ class RawTextBasedVideo(Video):
         handlers = []
         handlers.append(VideoBuildingHandlerGenerateFomApi())
         if build_settings.interpolate:
-            handlers.append(VideoBuildingHandlerInterpolate())
+            handlers.append(VideoInterpolationHandler())
         if self._needs_reencoding:
-            handlers.append(VideoBuildingHandlerReencoder())
+            handlers.append(VideoReencodingHandler())
 
         return handlers

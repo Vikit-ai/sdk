@@ -9,7 +9,7 @@ from vikit.video.video_types import VideoType
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.video.building.handlers.video_reencoding_handler import (
-    VideoBuildingHandlerReencoder,
+    VideoReencodingHandler,
 )
 from vikit.video.building.video_building_handler import VideoBuildingHandler
 
@@ -201,7 +201,7 @@ class PromptBasedVideo(Video):
 
         return keyword_based_vid, prompt_based_vid, transit
 
-    def get_video_handler_chain(
+    def get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings
     ) -> list[VideoBuildingHandler]:
         """
@@ -214,6 +214,6 @@ class PromptBasedVideo(Video):
         """
         handlers = []
         if self._needs_reencoding:
-            handlers.append(VideoBuildingHandlerReencoder())
+            handlers.append(VideoReencodingHandler())
 
         return handlers

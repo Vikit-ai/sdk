@@ -74,7 +74,6 @@ class PromptFactory:
         if len(prompt_text) == 0:
             raise ValueError("The prompt text is empty")
         extractor = None
-
         if generate_recording:
             await self._ml_gateway.generate_mp3_from_text_async(
                 prompt_text=prompt_text, target_file=config.get_prompt_mp3_file_name()
@@ -135,14 +134,12 @@ class PromptFactory:
             subs, min_duration=config.get_subtitles_min_duration()
         )
         text = extractor.build_subtitles_as_text_tokens(merged_subs)
-        prompt = (
-            RecordedPromptBuilder()
-            .convert_recorded_audio_prompt_path(recorded_audio_prompt_path)
-            .set_subtitles(merged_subs)
-            .set_text(text)
-            .build()
+        prompt = RecordedPromptBuilder().set_subtitles(merged_subs).set_text(text)
+        prompt = await prompt.convert_recorded_audio_prompt_path(
+            recorded_audio_prompt_path
         )
-        return prompt
+
+        return prompt.build()
 
     async def get_reengineered_prompt_from_text(
         self, prompt: str, prompt_build_settings: PromptBuildSettings

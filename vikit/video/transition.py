@@ -9,13 +9,13 @@ from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
 from vikit.video.building.video_building_handler import VideoBuildingHandler
 from vikit.video.building.handlers.video_reencoding_handler import (
-    VideoBuildingHandlerReencoder,
+    VideoReencodingHandler,
 )
 from vikit.video.building.handlers.videogen_handler import (
     VideoBuildingHandlerGenerateFomApi,
 )
 from vikit.video.building.handlers.interpolation_handler import (
-    VideoBuildingHandlerInterpolate,
+    VideoInterpolationHandler,
 )
 
 TIMEOUT = 5  # TODO: set to global config , seconds before stopping the request to check an URL exists
@@ -118,7 +118,7 @@ class Transition(Video):
         """
         await super().prepare_build(build_settings)
 
-    def get_video_handler_chain(
+    def get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings
     ) -> list[VideoBuildingHandler]:
         """
@@ -134,8 +134,8 @@ class Transition(Video):
         handlers = []
         handlers.append(VideoBuildingHandlerGenerateFomApi())
         if build_settings.interpolate:
-            handlers.append(VideoBuildingHandlerInterpolate())
+            handlers.append(VideoInterpolationHandler())
         if self._needs_reencoding:
-            handlers.append(VideoBuildingHandlerReencoder())
+            handlers.append(VideoReencodingHandler())
 
         return handlers

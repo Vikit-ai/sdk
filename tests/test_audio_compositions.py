@@ -35,8 +35,8 @@ class TestAudioCompositions:
     async def test_insert_subtitle_audio_no_prompt(self):
         # This test should work as we fail open: if the prompt is not provided, we should not raise an error
         vid = CompositeVideo()
-        vid._insert_subtitles_audio_recording(
-            VideoBuildSettings(include_audio_read_subtitles=True, prompt=None)
+        await vid._insert_subtitles_audio_recording(
+            VideoBuildSettings(include_read_aloud_prompt=True, prompt=None)
         )
 
     @pytest.mark.integration
@@ -54,7 +54,7 @@ class TestAudioCompositions:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True
                     ),
-                    include_audio_read_subtitles=True,
+                    include_read_aloud_prompt=True,
                     prompt=test_prompt_library["moss_stones-train_boy"],
                     test_mode=False,
                 )

@@ -137,7 +137,7 @@ class TestVideoFileNames:
         bld_set.build_date = datetime.date(2024, 7, 1)
         bld_set.build_time = datetime.time(23, 4, 42)
         bld_set.output_path = "output_path"
-        bld_set.include_audio_subtitles = False
+        bld_set.include_read_aloud_prompt = False
         bld_set.interpolate = False
         bld_set.music_building_context.apply_background_music = True
         bld_set.music_building_context.generate_background_music = True

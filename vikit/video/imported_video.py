@@ -3,6 +3,12 @@ from vikit.video.video import Video, VideoBuildSettings
 from vikit.common.decorators import log_function_params
 from vikit.video.video_types import VideoType
 from vikit.video.building.video_building_handler import VideoBuildingHandler
+from vikit.video.building.handlers.video_reencoding_handler import (
+    VideoReencodingHandler,
+)
+from vikit.video.building.handlers.interpolation_handler import (
+    VideoInterpolationHandler,
+)
 
 
 class ImportedVideo(Video):
@@ -40,24 +46,6 @@ class ImportedVideo(Video):
             return "nomedia"
         else:
             return self.media_url.split("/")[-1].split(".")[0]
-
-    @log_function_params
-    async def build(self, build_settings: VideoBuildSettings = None):
-        """
-        Build the video
-
-        Args:
-            build_settings (VideoBuildSettings): The settings for building the video
-
-        Returns:
-            ImportedVideo: The built video
-        """
-        if self.are_build_settings_prepared:
-            build_settings = self.build_settings
-
-        await super().build(build_settings)
-
-        return self
 
     @property
     def short_type_name(self):
@@ -97,19 +85,23 @@ class ImportedVideo(Video):
 
         return self
 
-    def get_video_handler_chain(
+    def get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings
     ) -> list[VideoBuildingHandler]:
         """
-        Get the handler chain of the video.
-        Defining the handler chain is the main way to define how the video is built
-        so it is up to the child classes to implement this method
+        Get the handler chain of the video. Order matters here.
 
         At this stage, we should already have the enhanced prompt and title for this video
+        not much to do on an imported video, maybe some resizing and normalization
+        on later versions
 
         Returns:
             list: The list of handlers to use for building the video
         """
         handlers = []
+        if build_settings.interpolate:
+            handlers.append(VideoInterpolationHandler())
+        if self._needs_reencoding:
+            handlers.append(VideoReencodingHandler())
 
         return handlers

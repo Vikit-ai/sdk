@@ -19,7 +19,7 @@ class MLModelsGateway(BaseModel, ABC):
 
     @abstractmethod
     def generate_background_music_async(
-        self, duration: int = 3, prompt: str = None
+        self, duration: int = 3, prompt: str = None, target_file_name: str = None
     ) -> str:
         pass
 

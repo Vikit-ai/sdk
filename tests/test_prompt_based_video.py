@@ -63,7 +63,7 @@ class TestPromptBasedVideo:
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(tools.test_prompt_library["moss_stones-train_boy"])
             await pbvid.build(
-                build_settings=VideoBuildSettings(include_audio_read_subtitles=True)
+                build_settings=VideoBuildSettings(include_read_aloud_prompt=True)
             )
 
             assert pbvid._background_music_file_name is None
@@ -77,7 +77,7 @@ class TestPromptBasedVideo:
             pbvid = PromptBasedVideo(tools.test_prompt_library["moss_stones-train_boy"])
             await pbvid.build(
                 build_settings=VideoBuildSettings(
-                    include_audio_read_subtitles=True,
+                    include_read_aloud_prompt=True,
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=False
                     ),
@@ -93,7 +93,7 @@ class TestPromptBasedVideo:
         with WorkingFolderContext():
 
             bld_settings = VideoBuildSettings(
-                include_audio_read_subtitles=True,
+                include_read_aloud_prompt=True,
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True,
                     generate_background_music=True,
@@ -132,7 +132,7 @@ class TestPromptBasedVideo:
 
         with WorkingFolderContext():
             bld_settings = VideoBuildSettings(
-                include_audio_read_subtitles=True,
+                include_read_aloud_prompt=True,
                 musicBuildingContext=MusicBuildingContext(
                     generate_background_music=False,
                     apply_background_music=True,
@@ -162,7 +162,7 @@ class TestPromptBasedVideo:
                 music_building_context=MusicBuildingContext(
                     apply_background_music=False
                 ),
-                include_audio_read_subtitles=False,
+                include_read_aloud_prompt=False,
                 test_mode=False,
             )
             test_prompt = tools.test_prompt_library["moss_stones-train_boy"]
@@ -181,7 +181,7 @@ class TestPromptBasedVideo:
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True
                 ),
-                include_audio_read_subtitles=True,
+                include_read_aloud_prompt=True,
                 test_mode=False,
             )
             test_prompt = await PromptFactory(
@@ -209,7 +209,7 @@ class TestPromptBasedVideo:
                     apply_background_music=True,
                     generate_background_music=True,
                 ),
-                include_audio_read_subtitles=True,
+                include_read_aloud_prompt=True,
                 test_mode=False,
             )
             test_prompt = await PromptFactory(
@@ -236,7 +236,7 @@ class TestPromptBasedVideo:
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True
                 ),
-                include_audio_read_subtitles=True,
+                include_read_aloud_prompt=True,
                 test_mode=False,
             )
             test_prompt = await PromptFactory(
@@ -262,7 +262,7 @@ class TestPromptBasedVideo:
                     apply_background_music=True, generate_background_music=True
                 ),
                 test_mode=True,
-                include_audio_read_subtitles=True,
+                include_read_aloud_prompt=True,
             )
 
             gw = video_build_settings.get_ml_models_gateway()

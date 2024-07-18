@@ -2,15 +2,14 @@ import subprocess
 import os
 from abc import abstractmethod, ABC
 import uuid as uid
-import asyncio
 
 from loguru import logger
 
 from vikit.common.decorators import log_function_params
-import vikit.common.config as config
 from vikit.wrappers.ffmpeg_wrapper import (
     get_media_duration,
-    extract_audio_slice,
+    get_first_frame_as_image_ffmpeg,
+    get_last_frame_as_image_ffmpeg,
 )
 from vikit.video.video_build_settings import VideoBuildSettings
 import vikit.common.file_tools as ft
@@ -157,62 +156,29 @@ class Video(ABC):
         """
         return "notitle"
 
-    def get_first_frame_as_image(self):
+    async def get_first_frame_as_image(self):
         """
         Get the first frame of the video
         """
-        assert self.media_url, "no media URL provided"
-        assert os.path.exists(self.media_url), "The video file does not exist yet"
-
-        result_path = ft.create_non_colliding_file_name(
+        target_path = ft.create_non_colliding_file_name(
             canonical_name="fst_frm_" + self.get_title()[0], extension=".jpg"
         )
-        result = subprocess.run(
-            [
-                "ffmpeg",
-                "-i",
-                self.media_url,
-                "-vf",
-                "select=eq(n\\,0)",  # c'est un filtre vidéo qui sélectionne les frames à extraire. eq(n\,0)
-                # signifie qu'il sélectionne la frame où n (le numéro de la frame) est égal à 0, c'est-à-dire la première frame
-                "-vframes",  # spécifie le nombre de frames vidéo à sortir
-                "1",  # on veut une seule frame
-                result_path,
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        result.check_returncode()
-        return result_path
 
-    def get_last_frame_as_image(self):
+        return await get_first_frame_as_image_ffmpeg(
+            media_url=self.media_url, target_path=target_path
+        )
+
+    async def get_last_frame_as_image(self):
         """
         Get the last frame of the video
         """
-        assert self.media_url, "no media URL provided"
-        assert os.path.exists(self.media_url), "The video file does not exist"
+        target_path = ft.create_non_colliding_file_name(
+            canonical_name="lst_frm_" + self.get_title()[0], extension=".jpg"
+        )
 
-        result_path = ft.create_non_colliding_file_name(
-            canonical_name="last_frm_" + self.get_title()[0], extension=".jpg"
+        return await get_last_frame_as_image_ffmpeg(
+            media_url=self.media_url, target_path=target_path
         )
-        result = subprocess.run(
-            [
-                "ffmpeg",
-                "-sseof",  # spécifie qu'il doit commencer à x secondes de la fin du fichier.
-                "-3",  # on veut les 3 dernières secondes
-                "-i",
-                self.media_url,
-                "-update",  # signifie qu'il doit mettre à jour l'image de sortie si x nouvelle frame est disponible.
-                "1",  # on veut une seule frame
-                "-q:v",  # -q:v 1 spécifie la qualité de l'image de sortie (1 étant la meilleure qualité).
-                "1",
-                result_path,
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        result.check_returncode()
-        return result_path
 
     @log_function_params
     def get_duration(self):
@@ -247,14 +213,20 @@ class Video(ABC):
         built_video = None
         self.prepare_build(build_settings=build_settings)
 
-        handler_chain = self.get_video_handler_chain(build_settings=self.build_settings)
+        handler_chain = self.get_and_initialize_video_handler_chain(
+            build_settings=self.build_settings
+        )
         if not handler_chain:
             logger.warning(
                 f"No handler chain defined for the video of type {self.short_type_name}"
             )
         else:
-            built_video = await handler_chain[0].execute(video=self)
-            self._is_video_generated = True
+            for handler in handler_chain:
+                if handler.is_supporting_async_mode():
+                    built_video, _ = await handler.execute_async(video=self)
+                else:
+                    built_video = handler.execute(video=self)
+
             self.run_post_build_actions()
 
         return built_video
@@ -286,103 +258,14 @@ class Video(ABC):
         self.are_build_settings_prepared = True
 
     @log_function_params
-    def _fit_standard_background_music(self, expected_music_duration: float = None):
-        """
-        Prepare a standard background music for the video
-
-        Args:
-            expected_music_duration (float): The expected duration of the music
-            In case the audio is shorter, we will just stop playing music when it ends, no music looping for now
-
-        """
-        return extract_audio_slice(
-            start=0,
-            end=expected_music_duration,
-            audiofile_path=config.get_default_background_music(),
-            target_file_name=self._get_bk_music_target_filemame(),
-        )
-
-    @log_function_params
     def _get_bk_music_target_filemame(self):
         """
         Get the target file name for the background music
         """
         return f"{self.media_url[:-4].split('/')[-1]}_background_music.mp3"
 
-    async def _build_background_music(
-        self, build_settings: VideoBuildSettings, prompt_text: str = ""
-    ):
-        """
-        Prepare background music for the video either by
-        - using a slice of standard background music,
-        - using a slice of the existing video background music file
-        - generating it using an LLM (not implemented yet)
-
-        Args:
-            build_settings (VideoBuildSettings): The settings to use for building
-            prompt_text (str): The prompt text to use for generating the music
-
-        Returns:
-            str: The path to the generated background music
-        """
-        logger.debug(f"self.background_music:: {self.background_music:}")
-
-        if build_settings.music_building_context.generate_background_music:
-            self._background_music_file_name = asyncio.run(
-                self._generate_music(
-                    expected_music_length=self.get_duration(),
-                    test_mode=build_settings.test_mode,
-                    prompt_text=prompt_text,
-                )
-            )
-            self.metadata.is_bg_music_generated = True
-        else:
-            if self.background_music:
-                if not os.path.exists(self.background_music):
-                    raise ValueError("background_music does not exists")
-                # Now we check the length , we may loop the background music in a future version
-                if get_media_duration(self.background_music) < self.get_duration():
-                    raise ValueError(
-                        "The given background music is too short for the video"
-                    )
-
-                extract_audio_slice(
-                    start=0,
-                    end=self.get_duration(),
-                    audiofile_path=self.background_music,
-                    target_file_name=self.self._background_music_file_name,
-                )
-            else:  # use the standard bg music
-                self._background_music_file_name = self._fit_standard_background_music(
-                    expected_music_duration=build_settings.music_building_context.expected_music_length
-                )
-
-        self._is_background_music_generated = True
-
-        return self._background_music_file_name
-
-    async def _generate_music(
-        self,
-        expected_music_length,
-        prompt_text: str = None,
-    ):
-        """
-        Generate the background music for the video
-
-        Args:
-            expected_music_length (float): The expected length of the music
-            prompt_text (str): The prompt text to use for generating the music
-            test_mode (bool): The test mode
-
-        Returns:
-            str: The path to the generated background music
-        """
-        return await self.build_settings.get_ml_models_gateway().generate_background_music_async(
-            duration=expected_music_length, prompt=prompt_text
-        )
-
     @abstractmethod
-    def get_video_handler_chain(
+    def get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings
     ) -> list[VideoBuildingHandler]:
         """
