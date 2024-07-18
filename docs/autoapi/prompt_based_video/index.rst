@@ -36,28 +36,15 @@ Module Contents
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`get_title <prompt_based_video.PromptBasedVideo.get_title>`\ ()
-        - Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
-      * - :py:obj:`get_file_name_by_state <prompt_based_video.PromptBasedVideo.get_file_name_by_state>`\ (build_settings)
-        - Get the file name of the video
       * - :py:obj:`build <prompt_based_video.PromptBasedVideo.build>`\ (build_settings)
         - Generate the actual inner video
+      * - :py:obj:`get_file_name_by_state <prompt_based_video.PromptBasedVideo.get_file_name_by_state>`\ (build_settings)
+        - Get the file name of the video
+      * - :py:obj:`get_title <prompt_based_video.PromptBasedVideo.get_title>`\ ()
+        - Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
 
 
    .. rubric:: Members
-
-   .. py:method:: get_title()
-
-      Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
-
-
-   .. py:method:: get_file_name_by_state(build_settings: vikit.video.video.VideoBuildSettings)
-
-      Get the file name of the video
-
-      Returns:
-          str: The file name of the video
-
 
    .. py:method:: build(build_settings=VideoBuildSettings())
 
@@ -68,6 +55,19 @@ Module Contents
 
       Returns:
           The current instance
+
+
+   .. py:method:: get_file_name_by_state(build_settings: vikit.video.video.VideoBuildSettings)
+
+      Get the file name of the video
+
+      Returns:
+          str: The file name of the video
+
+
+   .. py:method:: get_title()
+
+      Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
 
 
 

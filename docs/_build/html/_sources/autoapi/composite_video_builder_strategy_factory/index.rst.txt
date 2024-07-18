@@ -29,16 +29,16 @@ Module Contents
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`get_local_building_strategy <composite_video_builder_strategy_factory.CompositeVideoBuilderStrategyFactory.get_local_building_strategy>`\ ()
-        - \-
       * - :py:obj:`get_cloud_strategy <composite_video_builder_strategy_factory.CompositeVideoBuilderStrategyFactory.get_cloud_strategy>`\ ()
+        - \-
+      * - :py:obj:`get_local_building_strategy <composite_video_builder_strategy_factory.CompositeVideoBuilderStrategyFactory.get_local_building_strategy>`\ ()
         - \-
 
 
    .. rubric:: Members
 
-   .. py:method:: get_local_building_strategy() -> vikit.video.composite_video_builder_strategy.CompositeVideoBuilderStrategy
-
    .. py:method:: get_cloud_strategy() -> vikit.video.composite_video_builder_strategy.CompositeVideoBuilderStrategy
+
+   .. py:method:: get_local_building_strategy() -> vikit.video.composite_video_builder_strategy.CompositeVideoBuilderStrategy
 
 

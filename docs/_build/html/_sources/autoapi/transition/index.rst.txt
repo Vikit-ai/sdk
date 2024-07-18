@@ -25,8 +25,8 @@ Functions
 
 .. autoapisummary::
 
-   transition.web_url_exists
    transition.url_exists
+   transition.web_url_exists
 
 
 Module Contents
@@ -34,22 +34,6 @@ Module Contents
 
 .. py:data:: TIMEOUT
    :value: 5
-
-
-.. py:function:: web_url_exists(url)
-
-   Check if a URL exists on the web
-
-
-.. py:function:: url_exists(url: str)
-
-   Check if a URL exists somewhere on the internet or locally
-
-   Args:
-       url (str): The URL to check
-
-   Returns:
-       bool: True if the URL exists, False otherwise
 
 
 
@@ -68,17 +52,17 @@ Module Contents
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`get_title <transition.Transition.get_title>`\ ()
+      * - :py:obj:`build <transition.Transition.build>`\ (build_settings)
         - \-
       * - :py:obj:`get_file_name_by_state <transition.Transition.get_file_name_by_state>`\ (build_settings)
         - Get the file name of the video
-      * - :py:obj:`build <transition.Transition.build>`\ (build_settings)
+      * - :py:obj:`get_title <transition.Transition.get_title>`\ ()
         - \-
 
 
    .. rubric:: Members
 
-   .. py:method:: get_title()
+   .. py:method:: build(build_settings: vikit.video.video_build_settings.VideoBuildSettings = None)
 
    .. py:method:: get_file_name_by_state(build_settings: vikit.video.video_build_settings.VideoBuildSettings)
 
@@ -88,6 +72,22 @@ Module Contents
           str: The file name of the video
 
 
-   .. py:method:: build(build_settings: vikit.video.video_build_settings.VideoBuildSettings = None)
+   .. py:method:: get_title()
+
+
+.. py:function:: url_exists(url: str)
+
+   Check if a URL exists somewhere on the internet or locally
+
+   Args:
+       url (str): The URL to check
+
+   Returns:
+       bool: True if the URL exists, False otherwise
+
+
+.. py:function:: web_url_exists(url)
+
+   Check if a URL exists on the web
 
 

@@ -9,16 +9,28 @@ Functions
 
 .. autoapisummary::
 
+   file_tools.create_non_colliding_file_name
    file_tools.get_canonical_name
    file_tools.get_max_filename_length
-   file_tools.create_non_colliding_file_name
-   file_tools.get_safe_filename
    file_tools.get_max_remote_path_length
+   file_tools.get_safe_filename
    file_tools.get_validated_path
 
 
 Module Contents
 ---------------
+
+.. py:function:: create_non_colliding_file_name(canonical_name: str = None, extension: str = 'xyz')
+
+   Transforms the filename to prevent collisions zith other files,
+   by adding a UUID as suffix
+
+   params:
+       canonical_name: a name used as the target file name prefix
+       extension: the extension of the file
+
+   return: the non-colliding name
+
 
 .. py:function:: get_canonical_name(file_path: str)
 
@@ -35,24 +47,12 @@ Module Contents
    return: file name max length.
 
 
-.. py:function:: create_non_colliding_file_name(canonical_name: str = None, extension: str = 'xyz')
-
-   Transforms the filename to prevent collisions zith other files,
-   by adding a UUID as suffix
-
-   params:
-       canonical_name: a name used as the target file name prefix
-       extension: the extension of the file
-
-   return: the non-colliding name
-
-
-.. py:function:: get_safe_filename(filename)
-
 .. py:function:: get_max_remote_path_length()
 
    Get the maximum length of a remote path
 
+
+.. py:function:: get_safe_filename(filename)
 
 .. py:function:: get_validated_path(path: Optional[Union[str, os.PathLike]]) -> dict
 

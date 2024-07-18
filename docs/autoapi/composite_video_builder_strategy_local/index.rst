@@ -23,8 +23,6 @@ Classes
 Module Contents
 ---------------
 
-.. py:data:: executor
-
 
 .. py:class:: CompositeVideoBuilderStrategyLocal
 
@@ -80,4 +78,6 @@ Module Contents
           list: The list of processed videos
 
 
+
+.. py:data:: executor
 

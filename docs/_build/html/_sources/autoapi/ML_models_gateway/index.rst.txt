@@ -35,50 +35,50 @@ Module Contents
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`generate_background_music <ML_models_gateway.MLModelsGateway.generate_background_music>`\ (duration, prompt)
-        - \-
-      * - :py:obj:`generate_seine_transition <ML_models_gateway.MLModelsGateway.generate_seine_transition>`\ (source_image_path, target_image_path)
-        - \-
       * - :py:obj:`cleanse_llm_keywords <ML_models_gateway.MLModelsGateway.cleanse_llm_keywords>`\ ()
         - \-
       * - :py:obj:`compose_music_from_text <ML_models_gateway.MLModelsGateway.compose_music_from_text>`\ (prompt_text, duration)
         - \-
-      * - :py:obj:`get_music_generation_keywords <ML_models_gateway.MLModelsGateway.get_music_generation_keywords>`\ (text)
+      * - :py:obj:`generate_background_music <ML_models_gateway.MLModelsGateway.generate_background_music>`\ (duration, prompt)
         - \-
-      * - :py:obj:`interpolate <ML_models_gateway.MLModelsGateway.interpolate>`\ (video)
-        - \-
-      * - :py:obj:`get_keywords_from_prompt <ML_models_gateway.MLModelsGateway.get_keywords_from_prompt>`\ (subtitleText, excluded_words)
-        - \-
-      * - :py:obj:`get_enhanced_prompt <ML_models_gateway.MLModelsGateway.get_enhanced_prompt>`\ (subtitleText)
-        - \-
-      * - :py:obj:`get_subtitles <ML_models_gateway.MLModelsGateway.get_subtitles>`\ (audiofile_path)
+      * - :py:obj:`generate_seine_transition <ML_models_gateway.MLModelsGateway.generate_seine_transition>`\ (source_image_path, target_image_path)
         - \-
       * - :py:obj:`generate_video <ML_models_gateway.MLModelsGateway.generate_video>`\ (prompt)
         - :summarylabel:`abc` \-
+      * - :py:obj:`get_enhanced_prompt <ML_models_gateway.MLModelsGateway.get_enhanced_prompt>`\ (subtitleText)
+        - \-
+      * - :py:obj:`get_keywords_from_prompt <ML_models_gateway.MLModelsGateway.get_keywords_from_prompt>`\ (subtitleText, excluded_words)
+        - \-
+      * - :py:obj:`get_music_generation_keywords <ML_models_gateway.MLModelsGateway.get_music_generation_keywords>`\ (text)
+        - \-
+      * - :py:obj:`get_subtitles <ML_models_gateway.MLModelsGateway.get_subtitles>`\ (audiofile_path)
+        - \-
+      * - :py:obj:`interpolate <ML_models_gateway.MLModelsGateway.interpolate>`\ (video)
+        - \-
 
 
    .. rubric:: Members
-
-   .. py:method:: generate_background_music(duration: int = 3, prompt: str = None) -> str
-
-   .. py:method:: generate_seine_transition(source_image_path, target_image_path)
 
    .. py:method:: cleanse_llm_keywords()
 
    .. py:method:: compose_music_from_text(prompt_text: str, duration: int)
 
-   .. py:method:: get_music_generation_keywords(text) -> str
+   .. py:method:: generate_background_music(duration: int = 3, prompt: str = None) -> str
 
-   .. py:method:: interpolate(video)
-
-   .. py:method:: get_keywords_from_prompt(subtitleText, excluded_words: str = None)
-
-   .. py:method:: get_enhanced_prompt(subtitleText)
-
-   .. py:method:: get_subtitles(audiofile_path: str)
+   .. py:method:: generate_seine_transition(source_image_path, target_image_path)
 
    .. py:method:: generate_video(prompt: str)
       :abstractmethod:
 
+
+   .. py:method:: get_enhanced_prompt(subtitleText)
+
+   .. py:method:: get_keywords_from_prompt(subtitleText, excluded_words: str = None)
+
+   .. py:method:: get_music_generation_keywords(text) -> str
+
+   .. py:method:: get_subtitles(audiofile_path: str)
+
+   .. py:method:: interpolate(video)
 
 

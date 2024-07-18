@@ -32,33 +32,37 @@ Module Contents
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`COMPROOT <video_types.VideoType.COMPROOT>`
-        - \-
       * - :py:obj:`COMPCHILD <video_types.VideoType.COMPCHILD>`
         - \-
+      * - :py:obj:`COMPROOT <video_types.VideoType.COMPROOT>`
+        - \-
       * - :py:obj:`IMPORTED <video_types.VideoType.IMPORTED>`
+        - \-
+      * - :py:obj:`PRMPTBASD <video_types.VideoType.PRMPTBASD>`
         - \-
       * - :py:obj:`RAWTEXT <video_types.VideoType.RAWTEXT>`
         - \-
       * - :py:obj:`TRANSITION <video_types.VideoType.TRANSITION>`
-        - \-
-      * - :py:obj:`PRMPTBASD <video_types.VideoType.PRMPTBASD>`
         - \-
 
 
 
    .. rubric:: Members
 
-   .. py:attribute:: COMPROOT
-      :value: 0
-
-
    .. py:attribute:: COMPCHILD
       :value: 1
 
 
+   .. py:attribute:: COMPROOT
+      :value: 0
+
+
    .. py:attribute:: IMPORTED
       :value: 2
+
+
+   .. py:attribute:: PRMPTBASD
+      :value: 5
 
 
    .. py:attribute:: RAWTEXT
@@ -67,10 +71,6 @@ Module Contents
 
    .. py:attribute:: TRANSITION
       :value: 4
-
-
-   .. py:attribute:: PRMPTBASD
-      :value: 5
 
 
 

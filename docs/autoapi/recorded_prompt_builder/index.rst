@@ -32,17 +32,19 @@ Module Contents
       :widths: auto
       :class: summarytable
 
+      * - :py:obj:`build <recorded_prompt_builder.RecordedPromptBuilder.build>`\ ()
+        - \-
       * - :py:obj:`convert_recorded_audio_prompt_path <recorded_prompt_builder.RecordedPromptBuilder.convert_recorded_audio_prompt_path>`\ (recorded_audio_prompt_path, prompt_mp3_file_name)
         - Convert the recorded audio prompt to mp3
       * - :py:obj:`set_subtitles <recorded_prompt_builder.RecordedPromptBuilder.set_subtitles>`\ (subs)
         - set the prompt text using an LLM which extracts it from the recorded file
       * - :py:obj:`set_text <recorded_prompt_builder.RecordedPromptBuilder.set_text>`\ (text)
         - Set the text prompt
-      * - :py:obj:`build <recorded_prompt_builder.RecordedPromptBuilder.build>`\ ()
-        - \-
 
 
    .. rubric:: Members
+
+   .. py:method:: build()
 
    .. py:method:: convert_recorded_audio_prompt_path(recorded_audio_prompt_path: str, prompt_mp3_file_name=None)
 
@@ -65,7 +67,5 @@ Module Contents
       Args:
           text: The text prompt
 
-
-   .. py:method:: build()
 
 

@@ -200,8 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../vikit/index.html">vikit</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vikit</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../vikit/music_building_context/index.html">vikit.music_building_context</a></li>
@@ -252,6 +251,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_factory/index.html">composite_video_builder_strategy_factory</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 </ul>
 
 </div>
@@ -299,11 +300,11 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#context_managers.WorkingFolderContext" title="context_managers.WorkingFolderContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WorkingFolderContext</span></code></a></p></td>
-<td><p>This class is a context manager to change the working directory to the one specified</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#context_managers.Step" title="context_managers.Step"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Step</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#context_managers.Step" title="context_managers.Step"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Step</span></code></a></p></td>
 <td><p>This class is a context manager to print a message with an emoji before and after a block of code</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#context_managers.WorkingFolderContext" title="context_managers.WorkingFolderContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WorkingFolderContext</span></code></a></p></td>
+<td><p>This class is a context manager to change the working directory to the one specified</p></td>
 </tr>
 </tbody>
 </table>
@@ -312,17 +313,17 @@
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="context_managers.WorkingFolderContext">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">context_managers.</span></span><span class="sig-name descname"><span class="pre">WorkingFolderContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_on_exit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mark</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#context_managers.WorkingFolderContext" title="Link to this definition">¶</a></dt>
-<dd><p>This class is a context manager to change the working directory to the one specified
-in the constructor</p>
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="context_managers.Step">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">context_managers.</span></span><span class="sig-name descname"><span class="pre">Step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emoji</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#context_managers.Step" title="Link to this definition">¶</a></dt>
 <dd><p>This class is a context manager to print a message with an emoji before and after a block of code
 Maybe deprecated in the near future</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="context_managers.WorkingFolderContext">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">context_managers.</span></span><span class="sig-name descname"><span class="pre">WorkingFolderContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_on_exit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mark</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#context_managers.WorkingFolderContext" title="Link to this definition">¶</a></dt>
+<dd><p>This class is a context manager to change the working directory to the one specified
+in the constructor</p>
 </dd></dl>
 
 </section>
@@ -386,8 +387,8 @@ Maybe deprecated in the near future</p>
 <li><a class="reference internal" href="#">context_managers</a><ul>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#context_managers.WorkingFolderContext"><code class="docutils literal notranslate"><span class="pre">WorkingFolderContext</span></code></a></li>
 <li><a class="reference internal" href="#context_managers.Step"><code class="docutils literal notranslate"><span class="pre">Step</span></code></a></li>
+<li><a class="reference internal" href="#context_managers.WorkingFolderContext"><code class="docutils literal notranslate"><span class="pre">WorkingFolderContext</span></code></a></li>
 </ul>
 </li>
 </ul>

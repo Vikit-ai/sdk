@@ -55,14 +55,14 @@ Module Contents
       :widths: auto
       :class: summarytable
 
+      * - :py:obj:`extract_features_as_string <video_file_name.VideoFileName.extract_features_as_string>`\ ()
+        - Extract the features from the video features string
+      * - :py:obj:`from_file_name <video_file_name.VideoFileName.from_file_name>`\ (file_name)
+        - :summarylabel:`static` Parse a file name to extract the metadata
       * - :py:obj:`infer_features <video_file_name.VideoFileName.infer_features>`\ ()
         - Infer the features from the video features string
       * - :py:obj:`is_video_file_name <video_file_name.VideoFileName.is_video_file_name>`\ (file_name)
         - :summarylabel:`static` Check if a file name is a video file name
-      * - :py:obj:`from_file_name <video_file_name.VideoFileName.from_file_name>`\ (file_name)
-        - :summarylabel:`static` Parse a file name to extract the metadata
-      * - :py:obj:`extract_features_as_string <video_file_name.VideoFileName.extract_features_as_string>`\ ()
-        - Extract the features from the video features string
       * - :py:obj:`truncate <video_file_name.VideoFileName.truncate>`\ (gap)
         - Truncate the file name to fit the file system's limits
 
@@ -71,6 +71,24 @@ Module Contents
 
    .. py:attribute:: VIDEO_TITLE_MAX_LENGTH
       :value: 30
+
+
+   .. py:method:: extract_features_as_string()
+
+      Extract the features from the video features string
+
+
+   .. py:method:: from_file_name(file_name: str)
+      :staticmethod:
+
+
+      Parse a file name to extract the metadata
+
+      params:
+          file_name: The file name to parse
+
+      returns:
+          VideoFileName: The video file name object
 
 
    .. py:method:: infer_features()
@@ -91,24 +109,6 @@ Module Contents
 
       returns:
           bool: True if the file name is a video file name, False otherwise
-
-
-   .. py:method:: from_file_name(file_name: str)
-      :staticmethod:
-
-
-      Parse a file name to extract the metadata
-
-      params:
-          file_name: The file name to parse
-
-      returns:
-          VideoFileName: The video file name object
-
-
-   .. py:method:: extract_features_as_string()
-
-      Extract the features from the video features string
 
 
    .. py:method:: truncate(gap: int)

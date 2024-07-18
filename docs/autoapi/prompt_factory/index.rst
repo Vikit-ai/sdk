@@ -34,13 +34,25 @@ Module Contents
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`create_prompt_from_text <prompt_factory.PromptFactory.create_prompt_from_text>`\ (prompt_text, generate_recording)
-        - Create a prompt object from a prompt text by possibly creating
       * - :py:obj:`create_prompt_from_audio_file <prompt_factory.PromptFactory.create_prompt_from_audio_file>`\ (recorded_audio_prompt_path)
         - Create a prompt object from a recorded audio file
+      * - :py:obj:`create_prompt_from_text <prompt_factory.PromptFactory.create_prompt_from_text>`\ (prompt_text, generate_recording)
+        - Create a prompt object from a prompt text by possibly creating
 
 
    .. rubric:: Members
+
+   .. py:method:: create_prompt_from_audio_file(recorded_audio_prompt_path: str = None)
+
+      Create a prompt object from a recorded audio file
+
+      args:
+          - recorded_audio_prompt_path: the path to the recorded audio file
+
+      returns:
+          self
+
+
 
    .. py:method:: create_prompt_from_text(prompt_text: str = None, generate_recording: bool = True)
 
@@ -54,18 +66,6 @@ Module Contents
 
       returns:
           self
-
-
-   .. py:method:: create_prompt_from_audio_file(recorded_audio_prompt_path: str = None)
-
-      Create a prompt object from a recorded audio file
-
-      args:
-          - recorded_audio_prompt_path: the path to the recorded audio file
-
-      returns:
-          self
-
 
 
 

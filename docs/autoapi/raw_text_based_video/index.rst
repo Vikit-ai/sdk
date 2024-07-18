@@ -33,15 +33,13 @@ Module Contents
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`get_title <raw_text_based_video.RawTextBasedVideo.get_title>`\ ()
-        - \-
       * - :py:obj:`build <raw_text_based_video.RawTextBasedVideo.build>`\ (build_settings, excluded_words)
         - Generate the actual inner video
+      * - :py:obj:`get_title <raw_text_based_video.RawTextBasedVideo.get_title>`\ ()
+        - \-
 
 
    .. rubric:: Members
-
-   .. py:method:: get_title()
 
    .. py:method:: build(build_settings=VideoBuildSettings(), excluded_words='')
 
@@ -56,5 +54,7 @@ Module Contents
       Returns:
           The current instance
 
+
+   .. py:method:: get_title()
 
 

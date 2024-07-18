@@ -200,8 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../vikit/index.html">vikit</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vikit</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../vikit/music_building_context/index.html">vikit.music_building_context</a></li>
@@ -252,6 +251,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_factory/index.html">composite_video_builder_strategy_factory</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 </ul>
 
 </div>
@@ -299,20 +300,20 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#file_tools.get_canonical_name" title="file_tools.get_canonical_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_canonical_name</span></code></a>(file_path)</p></td>
-<td><p>Get the canonical name of a file, without the extension</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#file_tools.get_max_filename_length" title="file_tools.get_max_filename_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_max_filename_length</span></code></a>([path])</p></td>
-<td><p>Fit the file name to a certain length, by removing the last characters if it is too long</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#file_tools.create_non_colliding_file_name" title="file_tools.create_non_colliding_file_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_non_colliding_file_name</span></code></a>([canonical_name, extension])</p></td>
 <td><p>Transforms the filename to prevent collisions zith other files,</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#file_tools.get_safe_filename" title="file_tools.get_safe_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_safe_filename</span></code></a>(filename)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#file_tools.get_canonical_name" title="file_tools.get_canonical_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_canonical_name</span></code></a>(file_path)</p></td>
+<td><p>Get the canonical name of a file, without the extension</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#file_tools.get_max_remote_path_length" title="file_tools.get_max_remote_path_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_max_remote_path_length</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#file_tools.get_max_filename_length" title="file_tools.get_max_filename_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_max_filename_length</span></code></a>([path])</p></td>
+<td><p>Fit the file name to a certain length, by removing the last characters if it is too long</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#file_tools.get_max_remote_path_length" title="file_tools.get_max_remote_path_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_max_remote_path_length</span></code></a>()</p></td>
 <td><p>Get the maximum length of a remote path</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#file_tools.get_safe_filename" title="file_tools.get_safe_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_safe_filename</span></code></a>(filename)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#file_tools.get_validated_path" title="file_tools.get_validated_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_validated_path</span></code></a>(→ dict)</p></td>
 <td><p>Validate the path and return its type</p></td>
@@ -323,6 +324,19 @@
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="file_tools.create_non_colliding_file_name">
+<span class="sig-prename descclassname"><span class="pre">file_tools.</span></span><span class="sig-name descname"><span class="pre">create_non_colliding_file_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">canonical_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'xyz'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#file_tools.create_non_colliding_file_name" title="Link to this definition">¶</a></dt>
+<dd><p>Transforms the filename to prevent collisions zith other files,
+by adding a UUID as suffix</p>
+<dl class="simple">
+<dt>params:</dt><dd><p>canonical_name: a name used as the target file name prefix
+extension: the extension of the file</p>
+</dd>
+</dl>
+<p>return: the non-colliding name</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="file_tools.get_canonical_name">
 <span class="sig-prename descclassname"><span class="pre">file_tools.</span></span><span class="sig-name descname"><span class="pre">get_canonical_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#file_tools.get_canonical_name" title="Link to this definition">¶</a></dt>
@@ -339,28 +353,15 @@ file_name: the file name to be fitted</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="file_tools.create_non_colliding_file_name">
-<span class="sig-prename descclassname"><span class="pre">file_tools.</span></span><span class="sig-name descname"><span class="pre">create_non_colliding_file_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">canonical_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'xyz'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#file_tools.create_non_colliding_file_name" title="Link to this definition">¶</a></dt>
-<dd><p>Transforms the filename to prevent collisions zith other files,
-by adding a UUID as suffix</p>
-<dl class="simple">
-<dt>params:</dt><dd><p>canonical_name: a name used as the target file name prefix
-extension: the extension of the file</p>
-</dd>
-</dl>
-<p>return: the non-colliding name</p>
+<dt class="sig sig-object py" id="file_tools.get_max_remote_path_length">
+<span class="sig-prename descclassname"><span class="pre">file_tools.</span></span><span class="sig-name descname"><span class="pre">get_max_remote_path_length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#file_tools.get_max_remote_path_length" title="Link to this definition">¶</a></dt>
+<dd><p>Get the maximum length of a remote path</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="file_tools.get_safe_filename">
 <span class="sig-prename descclassname"><span class="pre">file_tools.</span></span><span class="sig-name descname"><span class="pre">get_safe_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#file_tools.get_safe_filename" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="file_tools.get_max_remote_path_length">
-<span class="sig-prename descclassname"><span class="pre">file_tools.</span></span><span class="sig-name descname"><span class="pre">get_max_remote_path_length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#file_tools.get_max_remote_path_length" title="Link to this definition">¶</a></dt>
-<dd><p>Get the maximum length of a remote path</p>
-</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="file_tools.get_validated_path">
@@ -435,11 +436,11 @@ extension: the extension of the file</p>
 <li><a class="reference internal" href="#">file_tools</a><ul>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#file_tools.create_non_colliding_file_name"><code class="docutils literal notranslate"><span class="pre">create_non_colliding_file_name()</span></code></a></li>
 <li><a class="reference internal" href="#file_tools.get_canonical_name"><code class="docutils literal notranslate"><span class="pre">get_canonical_name()</span></code></a></li>
 <li><a class="reference internal" href="#file_tools.get_max_filename_length"><code class="docutils literal notranslate"><span class="pre">get_max_filename_length()</span></code></a></li>
-<li><a class="reference internal" href="#file_tools.create_non_colliding_file_name"><code class="docutils literal notranslate"><span class="pre">create_non_colliding_file_name()</span></code></a></li>
-<li><a class="reference internal" href="#file_tools.get_safe_filename"><code class="docutils literal notranslate"><span class="pre">get_safe_filename()</span></code></a></li>
 <li><a class="reference internal" href="#file_tools.get_max_remote_path_length"><code class="docutils literal notranslate"><span class="pre">get_max_remote_path_length()</span></code></a></li>
+<li><a class="reference internal" href="#file_tools.get_safe_filename"><code class="docutils literal notranslate"><span class="pre">get_safe_filename()</span></code></a></li>
 <li><a class="reference internal" href="#file_tools.get_validated_path"><code class="docutils literal notranslate"><span class="pre">get_validated_path()</span></code></a></li>
 </ul>
 </li>

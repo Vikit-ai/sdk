@@ -200,8 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../vikit/index.html">vikit</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vikit</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../vikit/music_building_context/index.html">vikit.music_building_context</a></li>
@@ -252,6 +251,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_factory/index.html">composite_video_builder_strategy_factory</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 </ul>
 
 </div>
@@ -318,32 +319,31 @@
 <table class="summarytable docutils align-default" id="id1">
 <caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.set_prompt_text" title="text_prompt_builder.TextPromptBuilder.set_prompt_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_prompt_text</span></code></a>(text)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.build" title="text_prompt_builder.TextPromptBuilder.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>()</p></td>
 <td><p>-</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.set_subtitles" title="text_prompt_builder.TextPromptBuilder.set_subtitles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_subtitles</span></code></a>(subs)</p></td>
-<td><p>set the prompt text using an LLM which extracts it from the recorded file</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.set_prompt_text" title="text_prompt_builder.TextPromptBuilder.set_prompt_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_prompt_text</span></code></a>(text)</p></td>
+<td><p>-</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.set_recording" title="text_prompt_builder.TextPromptBuilder.set_recording"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_recording</span></code></a>(recording_path)</p></td>
 <td><p>set the recording path</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.build" title="text_prompt_builder.TextPromptBuilder.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>()</p></td>
-<td><p>-</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.set_subtitles" title="text_prompt_builder.TextPromptBuilder.set_subtitles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_subtitles</span></code></a>(subs)</p></td>
+<td><p>set the prompt text using an LLM which extracts it from the recorded file</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <p class="rubric">Members</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="text_prompt_builder.TextPromptBuilder.set_prompt_text">
-<span class="sig-name descname"><span class="pre">set_prompt_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#text_prompt_builder.TextPromptBuilder.set_prompt_text" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="text_prompt_builder.TextPromptBuilder.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#text_prompt_builder.TextPromptBuilder.build" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="text_prompt_builder.TextPromptBuilder.set_subtitles">
-<span class="sig-name descname"><span class="pre">set_subtitles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">pysrt.SubRipItem</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#text_prompt_builder.TextPromptBuilder.set_subtitles" title="Link to this definition">¶</a></dt>
-<dd><p>set the prompt text using an LLM which extracts it from the recorded file</p>
-</dd></dl>
+<dt class="sig sig-object py" id="text_prompt_builder.TextPromptBuilder.set_prompt_text">
+<span class="sig-name descname"><span class="pre">set_prompt_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#text_prompt_builder.TextPromptBuilder.set_prompt_text" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="text_prompt_builder.TextPromptBuilder.set_recording">
@@ -352,9 +352,10 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="text_prompt_builder.TextPromptBuilder.build">
-<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#text_prompt_builder.TextPromptBuilder.build" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="text_prompt_builder.TextPromptBuilder.set_subtitles">
+<span class="sig-name descname"><span class="pre">set_subtitles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">pysrt.SubRipItem</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#text_prompt_builder.TextPromptBuilder.set_subtitles" title="Link to this definition">¶</a></dt>
+<dd><p>set the prompt text using an LLM which extracts it from the recorded file</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -420,10 +421,10 @@
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder"><code class="docutils literal notranslate"><span class="pre">TextPromptBuilder</span></code></a><ul>
-<li><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.set_prompt_text"><code class="docutils literal notranslate"><span class="pre">TextPromptBuilder.set_prompt_text()</span></code></a></li>
-<li><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.set_subtitles"><code class="docutils literal notranslate"><span class="pre">TextPromptBuilder.set_subtitles()</span></code></a></li>
-<li><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.set_recording"><code class="docutils literal notranslate"><span class="pre">TextPromptBuilder.set_recording()</span></code></a></li>
 <li><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.build"><code class="docutils literal notranslate"><span class="pre">TextPromptBuilder.build()</span></code></a></li>
+<li><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.set_prompt_text"><code class="docutils literal notranslate"><span class="pre">TextPromptBuilder.set_prompt_text()</span></code></a></li>
+<li><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.set_recording"><code class="docutils literal notranslate"><span class="pre">TextPromptBuilder.set_recording()</span></code></a></li>
+<li><a class="reference internal" href="#text_prompt_builder.TextPromptBuilder.set_subtitles"><code class="docutils literal notranslate"><span class="pre">TextPromptBuilder.set_subtitles()</span></code></a></li>
 </ul>
 </li>
 </ul>

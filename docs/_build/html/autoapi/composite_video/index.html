@@ -200,8 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../vikit/index.html">vikit</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vikit</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../vikit/music_building_context/index.html">vikit.music_building_context</a></li>
@@ -252,6 +251,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_factory/index.html">composite_video_builder_strategy_factory</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 </ul>
 
 </div>
@@ -323,17 +324,17 @@ It could be a final video or intermediate  composing specific scenes of the fina
 <tr class="row-odd"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.append_video" title="composite_video.CompositeVideo.append_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append_video</span></code></a>(video)</p></td>
 <td><p>Append a video to the list of videos to be mixed</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.get_duration" title="composite_video.CompositeVideo.get_duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_duration</span></code></a>()</p></td>
-<td><p>Get the duration of the video, we recompute it everytime</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.build" title="composite_video.CompositeVideo.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(build_settings, building_strategy)</p></td>
+<td><p>Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.get_title" title="composite_video.CompositeVideo.get_title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_title</span></code></a>()</p></td>
-<td><p>Get the title of the video, we recompute it everytime</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.get_duration" title="composite_video.CompositeVideo.get_duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_duration</span></code></a>()</p></td>
+<td><p>Get the duration of the video, we recompute it everytime</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.get_file_name_by_state" title="composite_video.CompositeVideo.get_file_name_by_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_file_name_by_state</span></code></a>(build_settings)</p></td>
 <td><p>Get the target / expected file name for the composite video depending on its state</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.build" title="composite_video.CompositeVideo.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(build_settings, building_strategy)</p></td>
-<td><p>Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.get_title" title="composite_video.CompositeVideo.get_title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_title</span></code></a>()</p></td>
+<td><p>Get the title of the video, we recompute it everytime</p></td>
 </tr>
 </tbody>
 </table>
@@ -347,34 +348,6 @@ It could be a final video or intermediate  composing specific scenes of the fina
 <dt>params:</dt><dd><p>video: The video to be appended</p>
 </dd>
 <dt>returns:</dt><dd><p>self: The current object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="composite_video.CompositeVideo.get_duration">
-<span class="sig-name descname"><span class="pre">get_duration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#composite_video.CompositeVideo.get_duration" title="Link to this definition">¶</a></dt>
-<dd><p>Get the duration of the video, we recompute it everytime
-as the duration of the video can change if we add or remove videos</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="composite_video.CompositeVideo.get_title">
-<span class="sig-name descname"><span class="pre">get_title</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#composite_video.CompositeVideo.get_title" title="Link to this definition">¶</a></dt>
-<dd><p>Get the title of the video, we recompute it everytime
-as the title of the video can change if we add or remove videos</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="composite_video.CompositeVideo.get_file_name_by_state">
-<span class="sig-name descname"><span class="pre">get_file_name_by_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">build_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vikit.video.video.VideoBuildSettings</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#composite_video.CompositeVideo.get_file_name_by_state" title="Link to this definition">¶</a></dt>
-<dd><p>Get the target / expected file name for the composite video depending on its state
-State is build progressively from Instantiation to the final build, where steps like
-adding music or audio prompt are carried out</p>
-<dl class="simple">
-<dt>params:</dt><dd><p>build_settings: The settings to be used for the build</p>
-</dd>
-<dt>returns:</dt><dd><p>str: The target file name</p>
 </dd>
 </dl>
 </dd></dl>
@@ -397,6 +370,34 @@ as we call external services and run video mixing locally.</p>
 <dt>Returns:</dt><dd><p>self: The current object</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="composite_video.CompositeVideo.get_duration">
+<span class="sig-name descname"><span class="pre">get_duration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#composite_video.CompositeVideo.get_duration" title="Link to this definition">¶</a></dt>
+<dd><p>Get the duration of the video, we recompute it everytime
+as the duration of the video can change if we add or remove videos</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="composite_video.CompositeVideo.get_file_name_by_state">
+<span class="sig-name descname"><span class="pre">get_file_name_by_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">build_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vikit.video.video.VideoBuildSettings</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#composite_video.CompositeVideo.get_file_name_by_state" title="Link to this definition">¶</a></dt>
+<dd><p>Get the target / expected file name for the composite video depending on its state
+State is build progressively from Instantiation to the final build, where steps like
+adding music or audio prompt are carried out</p>
+<dl class="simple">
+<dt>params:</dt><dd><p>build_settings: The settings to be used for the build</p>
+</dd>
+<dt>returns:</dt><dd><p>str: The target file name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="composite_video.CompositeVideo.get_title">
+<span class="sig-name descname"><span class="pre">get_title</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#composite_video.CompositeVideo.get_title" title="Link to this definition">¶</a></dt>
+<dd><p>Get the title of the video, we recompute it everytime
+as the title of the video can change if we add or remove videos</p>
 </dd></dl>
 
 </dd></dl>
@@ -464,10 +465,10 @@ as we call external services and run video mixing locally.</p>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#composite_video.CompositeVideo"><code class="docutils literal notranslate"><span class="pre">CompositeVideo</span></code></a><ul>
 <li><a class="reference internal" href="#composite_video.CompositeVideo.append_video"><code class="docutils literal notranslate"><span class="pre">CompositeVideo.append_video()</span></code></a></li>
-<li><a class="reference internal" href="#composite_video.CompositeVideo.get_duration"><code class="docutils literal notranslate"><span class="pre">CompositeVideo.get_duration()</span></code></a></li>
-<li><a class="reference internal" href="#composite_video.CompositeVideo.get_title"><code class="docutils literal notranslate"><span class="pre">CompositeVideo.get_title()</span></code></a></li>
-<li><a class="reference internal" href="#composite_video.CompositeVideo.get_file_name_by_state"><code class="docutils literal notranslate"><span class="pre">CompositeVideo.get_file_name_by_state()</span></code></a></li>
 <li><a class="reference internal" href="#composite_video.CompositeVideo.build"><code class="docutils literal notranslate"><span class="pre">CompositeVideo.build()</span></code></a></li>
+<li><a class="reference internal" href="#composite_video.CompositeVideo.get_duration"><code class="docutils literal notranslate"><span class="pre">CompositeVideo.get_duration()</span></code></a></li>
+<li><a class="reference internal" href="#composite_video.CompositeVideo.get_file_name_by_state"><code class="docutils literal notranslate"><span class="pre">CompositeVideo.get_file_name_by_state()</span></code></a></li>
+<li><a class="reference internal" href="#composite_video.CompositeVideo.get_title"><code class="docutils literal notranslate"><span class="pre">CompositeVideo.get_title()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -200,8 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../vikit/index.html">vikit</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vikit</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../vikit/music_building_context/index.html">vikit.music_building_context</a></li>
@@ -252,6 +251,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_factory/index.html">composite_video_builder_strategy_factory</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 </ul>
 
 </div>
@@ -345,37 +346,50 @@
 <table class="summarytable docutils align-default" id="id1">
 <caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.generate_background_music" title="replicate_gateway.ReplicateGateway.generate_background_music"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_background_music</span></code></a>(duration, prompt)</p></td>
-<td><p>Here we generate the music to add as background music</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.generate_seine_transition" title="replicate_gateway.ReplicateGateway.generate_seine_transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_seine_transition</span></code></a>(source_image_path, target_image_path)</p></td>
-<td><p>Generate a transition between two videos</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.compose_music_from_text" title="replicate_gateway.ReplicateGateway.compose_music_from_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compose_music_from_text</span></code></a>(prompt_text, duration)</p></td>
 <td><p>Compose a music for a prompt text</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_music_generation_keywords" title="replicate_gateway.ReplicateGateway.get_music_generation_keywords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_music_generation_keywords</span></code></a>(text)</p></td>
-<td><p>Generate keywords from a text using the Replicate API</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.generate_background_music" title="replicate_gateway.ReplicateGateway.generate_background_music"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_background_music</span></code></a>(duration, prompt)</p></td>
+<td><p>Here we generate the music to add as background music</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.interpolate" title="replicate_gateway.ReplicateGateway.interpolate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate</span></code></a>(video)</p></td>
-<td><p>Run some interpolation magic. This model may fail after timeout, so you</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.generate_seine_transition" title="replicate_gateway.ReplicateGateway.generate_seine_transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_seine_transition</span></code></a>(source_image_path, target_image_path)</p></td>
+<td><p>Generate a transition between two videos</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_keywords_from_prompt" title="replicate_gateway.ReplicateGateway.get_keywords_from_prompt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keywords_from_prompt</span></code></a>(subtitleText, excluded_words)</p></td>
-<td><p>Generates keywords from a subtitle text using the Replicate API.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.generate_video" title="replicate_gateway.ReplicateGateway.generate_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_video</span></code></a>(prompt)</p></td>
+<td><p>Generate a video from the given prompt</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_enhanced_prompt" title="replicate_gateway.ReplicateGateway.get_enhanced_prompt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_enhanced_prompt</span></code></a>(subtitleText)</p></td>
 <td><p>Generates an enhanced prompt from an original one, probably written by a user or</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_keywords_from_prompt" title="replicate_gateway.ReplicateGateway.get_keywords_from_prompt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keywords_from_prompt</span></code></a>(subtitleText, excluded_words)</p></td>
+<td><p>Generates keywords from a subtitle text using the Replicate API.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_music_generation_keywords" title="replicate_gateway.ReplicateGateway.get_music_generation_keywords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_music_generation_keywords</span></code></a>(text)</p></td>
+<td><p>Generate keywords from a text using the Replicate API</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_subtitles" title="replicate_gateway.ReplicateGateway.get_subtitles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_subtitles</span></code></a>(audiofile_path)</p></td>
 <td><p>Extract subtitles from an audio file using the Replicate API</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.generate_video" title="replicate_gateway.ReplicateGateway.generate_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_video</span></code></a>(prompt)</p></td>
-<td><p>Generate a video from the given prompt</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#replicate_gateway.ReplicateGateway.interpolate" title="replicate_gateway.ReplicateGateway.interpolate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate</span></code></a>(video)</p></td>
+<td><p>Run some interpolation magic. This model may fail after timeout, so you</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <p class="rubric">Members</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.compose_music_from_text">
+<span class="sig-name descname"><span class="pre">compose_music_from_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.compose_music_from_text" title="Link to this definition">¶</a></dt>
+<dd><p>Compose a music for a prompt text</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>prompt_text: The text prompt
+duration: The duration of the music</p>
+</dd>
+<dt>Returns:</dt><dd><p>The link to the generated music</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.generate_background_music">
 <span class="sig-name descname"><span class="pre">generate_background_music</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.generate_background_music" title="Link to this definition">¶</a></dt>
@@ -403,14 +417,38 @@ initial: Whether this is the initial video</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.compose_music_from_text">
-<span class="sig-name descname"><span class="pre">compose_music_from_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.compose_music_from_text" title="Link to this definition">¶</a></dt>
-<dd><p>Compose a music for a prompt text</p>
+<dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.generate_video">
+<span class="sig-name descname"><span class="pre">generate_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.generate_video" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a video from the given prompt</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>prompt_text: The text prompt
-duration: The duration of the music</p>
+<dt>Args:</dt><dd><p>prompt: The prompt to generate the video from</p>
 </dd>
-<dt>Returns:</dt><dd><p>The link to the generated music</p>
+<dt>returns:</dt><dd><p>the video</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.get_enhanced_prompt">
+<span class="sig-name descname"><span class="pre">get_enhanced_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitleText</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.get_enhanced_prompt" title="Link to this definition">¶</a></dt>
+<dd><p>Generates an enhanced prompt from an original one, probably written by a user or
+translated from an audio</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>subtitleText: The original prompt</p>
+</dd>
+<dt>Returns:</dt><dd><p>A white space separated string of keywords composing the enhanced prompt</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.get_keywords_from_prompt">
+<span class="sig-name descname"><span class="pre">get_keywords_from_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitleText</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excluded_words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.get_keywords_from_prompt" title="Link to this definition">¶</a></dt>
+<dd><p>Generates keywords from a subtitle text using the Replicate API.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>A subtitle text</p>
+</dd>
+<dt>Returns:</dt><dd><p>A white space separated string of keywords</p>
 </dd>
 </dl>
 </dd></dl>
@@ -430,44 +468,6 @@ the generated keywords</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.interpolate">
-<span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.interpolate" title="Link to this definition">¶</a></dt>
-<dd><p>Run some interpolation magic. This model may fail after timeout, so you
-should call it with retry logic</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>video: The video to interpolate</p>
-</dd>
-<dt>Returns:</dt><dd><p>a link to the interpolated video</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.get_keywords_from_prompt">
-<span class="sig-name descname"><span class="pre">get_keywords_from_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitleText</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excluded_words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.get_keywords_from_prompt" title="Link to this definition">¶</a></dt>
-<dd><p>Generates keywords from a subtitle text using the Replicate API.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>A subtitle text</p>
-</dd>
-<dt>Returns:</dt><dd><p>A white space separated string of keywords</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.get_enhanced_prompt">
-<span class="sig-name descname"><span class="pre">get_enhanced_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitleText</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.get_enhanced_prompt" title="Link to this definition">¶</a></dt>
-<dd><p>Generates an enhanced prompt from an original one, probably written by a user or
-translated from an audio</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>subtitleText: The original prompt</p>
-</dd>
-<dt>Returns:</dt><dd><p>A white space separated string of keywords composing the enhanced prompt</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.get_subtitles">
 <span class="sig-name descname"><span class="pre">get_subtitles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">audiofile_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.get_subtitles" title="Link to this definition">¶</a></dt>
 <dd><p>Extract subtitles from an audio file using the Replicate API</p>
@@ -480,13 +480,14 @@ translated from an audio</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.generate_video">
-<span class="sig-name descname"><span class="pre">generate_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.generate_video" title="Link to this definition">¶</a></dt>
-<dd><p>Generate a video from the given prompt</p>
+<dt class="sig sig-object py" id="replicate_gateway.ReplicateGateway.interpolate">
+<span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#replicate_gateway.ReplicateGateway.interpolate" title="Link to this definition">¶</a></dt>
+<dd><p>Run some interpolation magic. This model may fail after timeout, so you
+should call it with retry logic</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>prompt: The prompt to generate the video from</p>
+<dt>Args:</dt><dd><p>video: The video to interpolate</p>
 </dd>
-<dt>returns:</dt><dd><p>the video</p>
+<dt>Returns:</dt><dd><p>a link to the interpolated video</p>
 </dd>
 </dl>
 </dd></dl>
@@ -557,15 +558,15 @@ translated from an audio</p>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#replicate_gateway.KEYWORDS_FORMAT_PROMPT"><code class="docutils literal notranslate"><span class="pre">KEYWORDS_FORMAT_PROMPT</span></code></a></li>
 <li><a class="reference internal" href="#replicate_gateway.ReplicateGateway"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway</span></code></a><ul>
+<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.compose_music_from_text"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.compose_music_from_text()</span></code></a></li>
 <li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.generate_background_music"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.generate_background_music()</span></code></a></li>
 <li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.generate_seine_transition"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.generate_seine_transition()</span></code></a></li>
-<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.compose_music_from_text"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.compose_music_from_text()</span></code></a></li>
-<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_music_generation_keywords"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.get_music_generation_keywords()</span></code></a></li>
-<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.interpolate"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.interpolate()</span></code></a></li>
-<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_keywords_from_prompt"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.get_keywords_from_prompt()</span></code></a></li>
-<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_enhanced_prompt"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.get_enhanced_prompt()</span></code></a></li>
-<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_subtitles"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.get_subtitles()</span></code></a></li>
 <li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.generate_video"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.generate_video()</span></code></a></li>
+<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_enhanced_prompt"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.get_enhanced_prompt()</span></code></a></li>
+<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_keywords_from_prompt"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.get_keywords_from_prompt()</span></code></a></li>
+<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_music_generation_keywords"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.get_music_generation_keywords()</span></code></a></li>
+<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.get_subtitles"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.get_subtitles()</span></code></a></li>
+<li><a class="reference internal" href="#replicate_gateway.ReplicateGateway.interpolate"><code class="docutils literal notranslate"><span class="pre">ReplicateGateway.interpolate()</span></code></a></li>
 </ul>
 </li>
 </ul>

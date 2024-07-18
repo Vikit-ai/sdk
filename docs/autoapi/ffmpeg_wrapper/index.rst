@@ -9,11 +9,11 @@ Functions
 
 .. autoapisummary::
 
-   ffmpeg_wrapper.has_audio_track
-   ffmpeg_wrapper.get_media_duration
-   ffmpeg_wrapper.extract_audio_slice
-   ffmpeg_wrapper.convert_as_mp3_file
    ffmpeg_wrapper.concatenate_videos
+   ffmpeg_wrapper.convert_as_mp3_file
+   ffmpeg_wrapper.extract_audio_slice
+   ffmpeg_wrapper.get_media_duration
+   ffmpeg_wrapper.has_audio_track
    ffmpeg_wrapper.merge_audio
    ffmpeg_wrapper.reencode_video
 
@@ -21,27 +21,30 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: has_audio_track(video_path)
+.. py:function:: concatenate_videos(input_file: str, target_file_name=None, ratioToMultiplyAnimations=1, bias=0.33)
 
-   Check if the video has an audio track
-
-   Args:
-       video_path (str): The path to the video file
-
-   Returns:
-       bool: True if the video has an audio track, False otherwise
-
-
-
-.. py:function:: get_media_duration(input_video_path)
-
-   Get the duration of a media file.
+   Concatenate all the videos in the list using a concatenation file
 
    Args:
-       input_video_path (str): The path to the input video file.
+       input_file (str): The path to the input file
+       target_file_name (str): The target file name
+       ratioToMultiplyAnimations (int): The ratio to multiply animations
+       bias (int): The bias to add to the ratio for the sound to be in sync with video frames
 
    Returns:
-       float: The duration of the media file in seconds.
+       str: The path to the concatenated video file
+
+
+.. py:function:: convert_as_mp3_file(fileName, target_file_name: str)
+
+   Save the incoming audio file to a regular mp3 file with a standardised filename
+
+   Args:
+
+       fileName (str): The path to the audio file to convert
+
+   Returns:
+       str: The path to the converted audio file
 
 
 .. py:function:: extract_audio_slice(audiofile_path: str, start: float = 0, end: float = 1, target_file_name: str = None)
@@ -58,30 +61,27 @@ Module Contents
        str: The path to the extracted audio slice
 
 
-.. py:function:: convert_as_mp3_file(fileName, target_file_name: str)
+.. py:function:: get_media_duration(input_video_path)
 
-   Save the incoming audio file to a regular mp3 file with a standardised filename
-
-   Args:
-
-       fileName (str): The path to the audio file to convert
-
-   Returns:
-       str: The path to the converted audio file
-
-
-.. py:function:: concatenate_videos(input_file: str, target_file_name=None, ratioToMultiplyAnimations=1, bias=0.33)
-
-   Concatenate all the videos in the list using a concatenation file
+   Get the duration of a media file.
 
    Args:
-       input_file (str): The path to the input file
-       target_file_name (str): The target file name
-       ratioToMultiplyAnimations (int): The ratio to multiply animations
-       bias (int): The bias to add to the ratio for the sound to be in sync with video frames
+       input_video_path (str): The path to the input video file.
 
    Returns:
-       str: The path to the concatenated video file
+       float: The duration of the media file in seconds.
+
+
+.. py:function:: has_audio_track(video_path)
+
+   Check if the video has an audio track
+
+   Args:
+       video_path (str): The path to the video file
+
+   Returns:
+       bool: True if the video has an audio track, False otherwise
+
 
 
 .. py:function:: merge_audio(media_url: str, audio_file_path: str, audio_file_relative_volume: float = None, target_file_name=None)

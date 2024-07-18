@@ -23,14 +23,7 @@ autoapi_type = "python"
 autoapi_template_dir = "_templates/autoapi"
 autoapi_keep_files = True
 autodoc_member_order = 'alphabetical'
-
-autodoc_default_options = {
-    'members': 'var1, var2',
-    'member-order': 'alphabetical',
-    'special-members': '__init__',
-    'undoc-members': True,
-    'exclude-members': '__weakref__'
-}
+autoapi_member_order = 'alphabetical'
 
 autoapi_options = [
     "members",

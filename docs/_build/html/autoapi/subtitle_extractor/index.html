@@ -200,8 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../vikit/index.html">vikit</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vikit</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../vikit/music_building_context/index.html">vikit.music_building_context</a></li>
@@ -252,6 +251,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_factory/index.html">composite_video_builder_strategy_factory</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 </ul>
 
 </div>
@@ -318,22 +319,16 @@ merge short subtitles into longer ones, or extract them as text tokens</p>
 <table class="summarytable docutils align-default" id="id1">
 <caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#subtitle_extractor.SubtitleExtractor.merge_short_subtitles" title="subtitle_extractor.SubtitleExtractor.merge_short_subtitles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_short_subtitles</span></code></a>(subtitles, min_duration)</p></td>
-<td><p>Merge subtitles which total duration is less than 7 seconds</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#subtitle_extractor.SubtitleExtractor.build_subtitles_as_text_tokens" title="subtitle_extractor.SubtitleExtractor.build_subtitles_as_text_tokens"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_subtitles_as_text_tokens</span></code></a>(subtitles)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#subtitle_extractor.SubtitleExtractor.build_subtitles_as_text_tokens" title="subtitle_extractor.SubtitleExtractor.build_subtitles_as_text_tokens"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_subtitles_as_text_tokens</span></code></a>(subtitles)</p></td>
 <td><p>Create blocks of subtitles</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#subtitle_extractor.SubtitleExtractor.merge_short_subtitles" title="subtitle_extractor.SubtitleExtractor.merge_short_subtitles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_short_subtitles</span></code></a>(subtitles, min_duration)</p></td>
+<td><p>Merge subtitles which total duration is less than 7 seconds</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <p class="rubric">Members</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="subtitle_extractor.SubtitleExtractor.merge_short_subtitles">
-<span class="sig-name descname"><span class="pre">merge_short_subtitles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subtitle_extractor.SubtitleExtractor.merge_short_subtitles" title="Link to this definition">¶</a></dt>
-<dd><p>Merge subtitles which total duration is less than 7 seconds</p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="subtitle_extractor.SubtitleExtractor.build_subtitles_as_text_tokens">
 <span class="sig-name descname"><span class="pre">build_subtitles_as_text_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitles</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#subtitle_extractor.SubtitleExtractor.build_subtitles_as_text_tokens" title="Link to this definition">¶</a></dt>
@@ -345,6 +340,12 @@ merge short subtitles into longer ones, or extract them as text tokens</p>
 of human readeable format</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subtitle_extractor.SubtitleExtractor.merge_short_subtitles">
+<span class="sig-name descname"><span class="pre">merge_short_subtitles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subtitle_extractor.SubtitleExtractor.merge_short_subtitles" title="Link to this definition">¶</a></dt>
+<dd><p>Merge subtitles which total duration is less than 7 seconds</p>
 </dd></dl>
 
 </dd></dl>
@@ -411,8 +412,8 @@ of human readeable format</p>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#subtitle_extractor.SubtitleExtractor"><code class="docutils literal notranslate"><span class="pre">SubtitleExtractor</span></code></a><ul>
-<li><a class="reference internal" href="#subtitle_extractor.SubtitleExtractor.merge_short_subtitles"><code class="docutils literal notranslate"><span class="pre">SubtitleExtractor.merge_short_subtitles()</span></code></a></li>
 <li><a class="reference internal" href="#subtitle_extractor.SubtitleExtractor.build_subtitles_as_text_tokens"><code class="docutils literal notranslate"><span class="pre">SubtitleExtractor.build_subtitles_as_text_tokens()</span></code></a></li>
+<li><a class="reference internal" href="#subtitle_extractor.SubtitleExtractor.merge_short_subtitles"><code class="docutils literal notranslate"><span class="pre">SubtitleExtractor.merge_short_subtitles()</span></code></a></li>
 </ul>
 </li>
 </ul>

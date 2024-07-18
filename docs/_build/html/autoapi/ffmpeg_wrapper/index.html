@@ -200,8 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../vikit/index.html">vikit</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vikit</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../vikit/music_building_context/index.html">vikit.music_building_context</a></li>
@@ -252,6 +251,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_factory/index.html">composite_video_builder_strategy_factory</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 </ul>
 
 </div>
@@ -299,20 +300,20 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.has_audio_track" title="ffmpeg_wrapper.has_audio_track"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_audio_track</span></code></a>(video_path)</p></td>
-<td><p>Check if the video has an audio track</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#ffmpeg_wrapper.get_media_duration" title="ffmpeg_wrapper.get_media_duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_media_duration</span></code></a>(input_video_path)</p></td>
-<td><p>Get the duration of a media file.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.extract_audio_slice" title="ffmpeg_wrapper.extract_audio_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_audio_slice</span></code></a>(audiofile_path[, start, end, ...])</p></td>
-<td><p>Extract a slice of the audio file using ffmpeg</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.concatenate_videos" title="ffmpeg_wrapper.concatenate_videos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concatenate_videos</span></code></a>(input_file[, target_file_name, ...])</p></td>
+<td><p>Concatenate all the videos in the list using a concatenation file</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ffmpeg_wrapper.convert_as_mp3_file" title="ffmpeg_wrapper.convert_as_mp3_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_as_mp3_file</span></code></a>(fileName, target_file_name)</p></td>
 <td><p>Save the incoming audio file to a regular mp3 file with a standardised filename</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.concatenate_videos" title="ffmpeg_wrapper.concatenate_videos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concatenate_videos</span></code></a>(input_file[, target_file_name, ...])</p></td>
-<td><p>Concatenate all the videos in the list using a concatenation file</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.extract_audio_slice" title="ffmpeg_wrapper.extract_audio_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_audio_slice</span></code></a>(audiofile_path[, start, end, ...])</p></td>
+<td><p>Extract a slice of the audio file using ffmpeg</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ffmpeg_wrapper.get_media_duration" title="ffmpeg_wrapper.get_media_duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_media_duration</span></code></a>(input_video_path)</p></td>
+<td><p>Get the duration of a media file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.has_audio_track" title="ffmpeg_wrapper.has_audio_track"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_audio_track</span></code></a>(video_path)</p></td>
+<td><p>Check if the video has an audio track</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ffmpeg_wrapper.merge_audio" title="ffmpeg_wrapper.merge_audio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_audio</span></code></a>(media_url, audio_file_path[, ...])</p></td>
 <td><p>Merge audio with the video</p></td>
@@ -327,25 +328,30 @@
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="ffmpeg_wrapper.has_audio_track">
-<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">has_audio_track</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.has_audio_track" title="Link to this definition">¶</a></dt>
-<dd><p>Check if the video has an audio track</p>
+<dt class="sig sig-object py" id="ffmpeg_wrapper.concatenate_videos">
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">concatenate_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratioToMultiplyAnimations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.33</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.concatenate_videos" title="Link to this definition">¶</a></dt>
+<dd><p>Concatenate all the videos in the list using a concatenation file</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>video_path (str): The path to the video file</p>
+<dt>Args:</dt><dd><p>input_file (str): The path to the input file
+target_file_name (str): The target file name
+ratioToMultiplyAnimations (int): The ratio to multiply animations
+bias (int): The bias to add to the ratio for the sound to be in sync with video frames</p>
 </dd>
-<dt>Returns:</dt><dd><p>bool: True if the video has an audio track, False otherwise</p>
+<dt>Returns:</dt><dd><p>str: The path to the concatenated video file</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="ffmpeg_wrapper.get_media_duration">
-<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">get_media_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.get_media_duration" title="Link to this definition">¶</a></dt>
-<dd><p>Get the duration of a media file.</p>
+<dt class="sig sig-object py" id="ffmpeg_wrapper.convert_as_mp3_file">
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">convert_as_mp3_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.convert_as_mp3_file" title="Link to this definition">¶</a></dt>
+<dd><p>Save the incoming audio file to a regular mp3 file with a standardised filename</p>
+<p>Args:</p>
+<blockquote>
+<div><p>fileName (str): The path to the audio file to convert</p>
+</div></blockquote>
 <dl class="simple">
-<dt>Args:</dt><dd><p>input_video_path (str): The path to the input video file.</p>
-</dd>
-<dt>Returns:</dt><dd><p>float: The duration of the media file in seconds.</p>
+<dt>Returns:</dt><dd><p>str: The path to the converted audio file</p>
 </dd>
 </dl>
 </dd></dl>
@@ -366,30 +372,25 @@ target_file_name : the target file name</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="ffmpeg_wrapper.convert_as_mp3_file">
-<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">convert_as_mp3_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.convert_as_mp3_file" title="Link to this definition">¶</a></dt>
-<dd><p>Save the incoming audio file to a regular mp3 file with a standardised filename</p>
-<p>Args:</p>
-<blockquote>
-<div><p>fileName (str): The path to the audio file to convert</p>
-</div></blockquote>
+<dt class="sig sig-object py" id="ffmpeg_wrapper.get_media_duration">
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">get_media_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.get_media_duration" title="Link to this definition">¶</a></dt>
+<dd><p>Get the duration of a media file.</p>
 <dl class="simple">
-<dt>Returns:</dt><dd><p>str: The path to the converted audio file</p>
+<dt>Args:</dt><dd><p>input_video_path (str): The path to the input video file.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The duration of the media file in seconds.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="ffmpeg_wrapper.concatenate_videos">
-<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">concatenate_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratioToMultiplyAnimations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.33</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.concatenate_videos" title="Link to this definition">¶</a></dt>
-<dd><p>Concatenate all the videos in the list using a concatenation file</p>
+<dt class="sig sig-object py" id="ffmpeg_wrapper.has_audio_track">
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">has_audio_track</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.has_audio_track" title="Link to this definition">¶</a></dt>
+<dd><p>Check if the video has an audio track</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>input_file (str): The path to the input file
-target_file_name (str): The target file name
-ratioToMultiplyAnimations (int): The ratio to multiply animations
-bias (int): The bias to add to the ratio for the sound to be in sync with video frames</p>
+<dt>Args:</dt><dd><p>video_path (str): The path to the video file</p>
 </dd>
-<dt>Returns:</dt><dd><p>str: The path to the concatenated video file</p>
+<dt>Returns:</dt><dd><p>bool: True if the video has an audio track, False otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -484,11 +485,11 @@ video, build_settings, video.media_url</p>
 <li><a class="reference internal" href="#">ffmpeg_wrapper</a><ul>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#ffmpeg_wrapper.has_audio_track"><code class="docutils literal notranslate"><span class="pre">has_audio_track()</span></code></a></li>
-<li><a class="reference internal" href="#ffmpeg_wrapper.get_media_duration"><code class="docutils literal notranslate"><span class="pre">get_media_duration()</span></code></a></li>
-<li><a class="reference internal" href="#ffmpeg_wrapper.extract_audio_slice"><code class="docutils literal notranslate"><span class="pre">extract_audio_slice()</span></code></a></li>
-<li><a class="reference internal" href="#ffmpeg_wrapper.convert_as_mp3_file"><code class="docutils literal notranslate"><span class="pre">convert_as_mp3_file()</span></code></a></li>
 <li><a class="reference internal" href="#ffmpeg_wrapper.concatenate_videos"><code class="docutils literal notranslate"><span class="pre">concatenate_videos()</span></code></a></li>
+<li><a class="reference internal" href="#ffmpeg_wrapper.convert_as_mp3_file"><code class="docutils literal notranslate"><span class="pre">convert_as_mp3_file()</span></code></a></li>
+<li><a class="reference internal" href="#ffmpeg_wrapper.extract_audio_slice"><code class="docutils literal notranslate"><span class="pre">extract_audio_slice()</span></code></a></li>
+<li><a class="reference internal" href="#ffmpeg_wrapper.get_media_duration"><code class="docutils literal notranslate"><span class="pre">get_media_duration()</span></code></a></li>
+<li><a class="reference internal" href="#ffmpeg_wrapper.has_audio_track"><code class="docutils literal notranslate"><span class="pre">has_audio_track()</span></code></a></li>
 <li><a class="reference internal" href="#ffmpeg_wrapper.merge_audio"><code class="docutils literal notranslate"><span class="pre">merge_audio()</span></code></a></li>
 <li><a class="reference internal" href="#ffmpeg_wrapper.reencode_video"><code class="docutils literal notranslate"><span class="pre">reencode_video()</span></code></a></li>
 </ul>

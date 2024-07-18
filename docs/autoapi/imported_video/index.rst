@@ -31,20 +31,15 @@ Module Contents
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`get_title <imported_video.ImportedVideo.get_title>`\ ()
-        - Returns the title of the video.
       * - :py:obj:`build <imported_video.ImportedVideo.build>`\ (build_settings)
         - Build the video
       * - :py:obj:`get_file_name_by_state <imported_video.ImportedVideo.get_file_name_by_state>`\ (build_settings)
         - Get the file name of the video
+      * - :py:obj:`get_title <imported_video.ImportedVideo.get_title>`\ ()
+        - Returns the title of the video.
 
 
    .. rubric:: Members
-
-   .. py:method:: get_title()
-
-      Returns the title of the video.
-
 
    .. py:method:: build(build_settings: vikit.video.video.VideoBuildSettings = None)
 
@@ -63,6 +58,11 @@ Module Contents
 
       Returns:
           str: The file name of the video
+
+
+   .. py:method:: get_title()
+
+      Returns the title of the video.
 
 
 

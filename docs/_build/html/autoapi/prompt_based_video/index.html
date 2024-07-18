@@ -200,8 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../vikit/index.html">vikit</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vikit</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../vikit/music_building_context/index.html">vikit.music_building_context</a></li>
@@ -252,6 +251,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_factory/index.html">composite_video_builder_strategy_factory</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 </ul>
 
 </div>
@@ -321,23 +322,31 @@ in the given prompt.</p>
 <table class="summarytable docutils align-default" id="id1">
 <caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#prompt_based_video.PromptBasedVideo.get_title" title="prompt_based_video.PromptBasedVideo.get_title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_title</span></code></a>()</p></td>
-<td><p>Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#prompt_based_video.PromptBasedVideo.build" title="prompt_based_video.PromptBasedVideo.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(build_settings)</p></td>
+<td><p>Generate the actual inner video</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#prompt_based_video.PromptBasedVideo.get_file_name_by_state" title="prompt_based_video.PromptBasedVideo.get_file_name_by_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_file_name_by_state</span></code></a>(build_settings)</p></td>
 <td><p>Get the file name of the video</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#prompt_based_video.PromptBasedVideo.build" title="prompt_based_video.PromptBasedVideo.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(build_settings)</p></td>
-<td><p>Generate the actual inner video</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#prompt_based_video.PromptBasedVideo.get_title" title="prompt_based_video.PromptBasedVideo.get_title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_title</span></code></a>()</p></td>
+<td><p>Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <p class="rubric">Members</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="prompt_based_video.PromptBasedVideo.get_title">
-<span class="sig-name descname"><span class="pre">get_title</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#prompt_based_video.PromptBasedVideo.get_title" title="Link to this definition">¶</a></dt>
-<dd><p>Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt</p>
+<dt class="sig sig-object py" id="prompt_based_video.PromptBasedVideo.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">build_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">VideoBuildSettings()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prompt_based_video.PromptBasedVideo.build" title="Link to this definition">¶</a></dt>
+<dd><p>Generate the actual inner video</p>
+<dl class="simple">
+<dt>Params:</dt><dd><ul class="simple">
+<li><p>build_settings: allow some customization</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>The current instance</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -351,17 +360,9 @@ in the given prompt.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="prompt_based_video.PromptBasedVideo.build">
-<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">build_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">VideoBuildSettings()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prompt_based_video.PromptBasedVideo.build" title="Link to this definition">¶</a></dt>
-<dd><p>Generate the actual inner video</p>
-<dl class="simple">
-<dt>Params:</dt><dd><ul class="simple">
-<li><p>build_settings: allow some customization</p></li>
-</ul>
-</dd>
-<dt>Returns:</dt><dd><p>The current instance</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="prompt_based_video.PromptBasedVideo.get_title">
+<span class="sig-name descname"><span class="pre">get_title</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#prompt_based_video.PromptBasedVideo.get_title" title="Link to this definition">¶</a></dt>
+<dd><p>Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt</p>
 </dd></dl>
 
 </dd></dl>
@@ -428,9 +429,9 @@ in the given prompt.</p>
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#prompt_based_video.PromptBasedVideo"><code class="docutils literal notranslate"><span class="pre">PromptBasedVideo</span></code></a><ul>
-<li><a class="reference internal" href="#prompt_based_video.PromptBasedVideo.get_title"><code class="docutils literal notranslate"><span class="pre">PromptBasedVideo.get_title()</span></code></a></li>
-<li><a class="reference internal" href="#prompt_based_video.PromptBasedVideo.get_file_name_by_state"><code class="docutils literal notranslate"><span class="pre">PromptBasedVideo.get_file_name_by_state()</span></code></a></li>
 <li><a class="reference internal" href="#prompt_based_video.PromptBasedVideo.build"><code class="docutils literal notranslate"><span class="pre">PromptBasedVideo.build()</span></code></a></li>
+<li><a class="reference internal" href="#prompt_based_video.PromptBasedVideo.get_file_name_by_state"><code class="docutils literal notranslate"><span class="pre">PromptBasedVideo.get_file_name_by_state()</span></code></a></li>
+<li><a class="reference internal" href="#prompt_based_video.PromptBasedVideo.get_title"><code class="docutils literal notranslate"><span class="pre">PromptBasedVideo.get_title()</span></code></a></li>
 </ul>
 </li>
 </ul>

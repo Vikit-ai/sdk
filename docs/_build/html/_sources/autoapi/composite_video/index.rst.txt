@@ -36,14 +36,14 @@ Module Contents
 
       * - :py:obj:`append_video <composite_video.CompositeVideo.append_video>`\ (video)
         - Append a video to the list of videos to be mixed
-      * - :py:obj:`get_duration <composite_video.CompositeVideo.get_duration>`\ ()
-        - Get the duration of the video, we recompute it everytime
-      * - :py:obj:`get_title <composite_video.CompositeVideo.get_title>`\ ()
-        - Get the title of the video, we recompute it everytime
-      * - :py:obj:`get_file_name_by_state <composite_video.CompositeVideo.get_file_name_by_state>`\ (build_settings)
-        - Get the target / expected file name for the composite video depending on its state
       * - :py:obj:`build <composite_video.CompositeVideo.build>`\ (build_settings, building_strategy)
         - Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,
+      * - :py:obj:`get_duration <composite_video.CompositeVideo.get_duration>`\ ()
+        - Get the duration of the video, we recompute it everytime
+      * - :py:obj:`get_file_name_by_state <composite_video.CompositeVideo.get_file_name_by_state>`\ (build_settings)
+        - Get the target / expected file name for the composite video depending on its state
+      * - :py:obj:`get_title <composite_video.CompositeVideo.get_title>`\ ()
+        - Get the title of the video, we recompute it everytime
 
 
    .. rubric:: Members
@@ -59,16 +59,24 @@ Module Contents
           self: The current object
 
 
+   .. py:method:: build(build_settings=VideoBuildSettings(), building_strategy: vikit.video.composite_video_builder_strategy.CompositeVideoBuilderStrategy = None)
+
+      Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,
+      as we call external services and run video mixing locally.
+
+      The actual algorithm depends on the provided strategy (local, cloud, etc.)
+
+      :param build_settings: The settings to be used for the build
+      :param building_strategy: The strategy to be used for the build
+
+      Returns:
+          self: The current object
+
+
    .. py:method:: get_duration()
 
       Get the duration of the video, we recompute it everytime
       as the duration of the video can change if we add or remove videos
-
-
-   .. py:method:: get_title()
-
-      Get the title of the video, we recompute it everytime
-      as the title of the video can change if we add or remove videos
 
 
    .. py:method:: get_file_name_by_state(build_settings: vikit.video.video.VideoBuildSettings = None)
@@ -84,18 +92,10 @@ Module Contents
           str: The target file name
 
 
-   .. py:method:: build(build_settings=VideoBuildSettings(), building_strategy: vikit.video.composite_video_builder_strategy.CompositeVideoBuilderStrategy = None)
+   .. py:method:: get_title()
 
-      Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,
-      as we call external services and run video mixing locally.
-
-      The actual algorithm depends on the provided strategy (local, cloud, etc.)
-
-      :param build_settings: The settings to be used for the build
-      :param building_strategy: The strategy to be used for the build
-
-      Returns:
-          self: The current object
+      Get the title of the video, we recompute it everytime
+      as the title of the video can change if we add or remove videos
 
 
 

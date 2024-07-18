@@ -200,8 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../vikit/index.html">vikit</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vikit</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../vikit/music_building_context/index.html">vikit.music_building_context</a></li>
@@ -252,6 +251,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_factory/index.html">composite_video_builder_strategy_factory</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 </ul>
 
 </div>
@@ -319,22 +320,22 @@
 <table class="summarytable docutils align-default" id="id1">
 <caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#video_types.VideoType.COMPROOT" title="video_types.VideoType.COMPROOT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">COMPROOT</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#video_types.VideoType.COMPCHILD" title="video_types.VideoType.COMPCHILD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">COMPCHILD</span></code></a></p></td>
 <td><p>-</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#video_types.VideoType.COMPCHILD" title="video_types.VideoType.COMPCHILD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">COMPCHILD</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#video_types.VideoType.COMPROOT" title="video_types.VideoType.COMPROOT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">COMPROOT</span></code></a></p></td>
 <td><p>-</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#video_types.VideoType.IMPORTED" title="video_types.VideoType.IMPORTED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IMPORTED</span></code></a></p></td>
 <td><p>-</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#video_types.VideoType.RAWTEXT" title="video_types.VideoType.RAWTEXT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RAWTEXT</span></code></a></p></td>
-<td><p>-</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#video_types.VideoType.TRANSITION" title="video_types.VideoType.TRANSITION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TRANSITION</span></code></a></p></td>
-<td><p>-</p></td>
-</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#video_types.VideoType.PRMPTBASD" title="video_types.VideoType.PRMPTBASD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRMPTBASD</span></code></a></p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#video_types.VideoType.RAWTEXT" title="video_types.VideoType.RAWTEXT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RAWTEXT</span></code></a></p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#video_types.VideoType.TRANSITION" title="video_types.VideoType.TRANSITION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TRANSITION</span></code></a></p></td>
 <td><p>-</p></td>
 </tr>
 </tbody>
@@ -342,18 +343,23 @@
 </div>
 <p class="rubric">Members</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="video_types.VideoType.COMPROOT">
-<span class="sig-name descname"><span class="pre">COMPROOT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#video_types.VideoType.COMPROOT" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="video_types.VideoType.COMPCHILD">
 <span class="sig-name descname"><span class="pre">COMPCHILD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#video_types.VideoType.COMPCHILD" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="video_types.VideoType.COMPROOT">
+<span class="sig-name descname"><span class="pre">COMPROOT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#video_types.VideoType.COMPROOT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="video_types.VideoType.IMPORTED">
 <span class="sig-name descname"><span class="pre">IMPORTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#video_types.VideoType.IMPORTED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="video_types.VideoType.PRMPTBASD">
+<span class="sig-name descname"><span class="pre">PRMPTBASD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#video_types.VideoType.PRMPTBASD" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -364,11 +370,6 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="video_types.VideoType.TRANSITION">
 <span class="sig-name descname"><span class="pre">TRANSITION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#video_types.VideoType.TRANSITION" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="video_types.VideoType.PRMPTBASD">
-<span class="sig-name descname"><span class="pre">PRMPTBASD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#video_types.VideoType.PRMPTBASD" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -435,12 +436,12 @@
 <li><a class="reference internal" href="#classes">Classes</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#video_types.VideoType"><code class="docutils literal notranslate"><span class="pre">VideoType</span></code></a><ul>
-<li><a class="reference internal" href="#video_types.VideoType.COMPROOT"><code class="docutils literal notranslate"><span class="pre">VideoType.COMPROOT</span></code></a></li>
 <li><a class="reference internal" href="#video_types.VideoType.COMPCHILD"><code class="docutils literal notranslate"><span class="pre">VideoType.COMPCHILD</span></code></a></li>
+<li><a class="reference internal" href="#video_types.VideoType.COMPROOT"><code class="docutils literal notranslate"><span class="pre">VideoType.COMPROOT</span></code></a></li>
 <li><a class="reference internal" href="#video_types.VideoType.IMPORTED"><code class="docutils literal notranslate"><span class="pre">VideoType.IMPORTED</span></code></a></li>
+<li><a class="reference internal" href="#video_types.VideoType.PRMPTBASD"><code class="docutils literal notranslate"><span class="pre">VideoType.PRMPTBASD</span></code></a></li>
 <li><a class="reference internal" href="#video_types.VideoType.RAWTEXT"><code class="docutils literal notranslate"><span class="pre">VideoType.RAWTEXT</span></code></a></li>
 <li><a class="reference internal" href="#video_types.VideoType.TRANSITION"><code class="docutils literal notranslate"><span class="pre">VideoType.TRANSITION</span></code></a></li>
-<li><a class="reference internal" href="#video_types.VideoType.PRMPTBASD"><code class="docutils literal notranslate"><span class="pre">VideoType.PRMPTBASD</span></code></a></li>
 </ul>
 </li>
 </ul>

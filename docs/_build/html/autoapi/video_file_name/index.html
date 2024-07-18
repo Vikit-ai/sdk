@@ -200,8 +200,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+  <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 has-children"><a class="reference internal" href="../vikit/index.html">vikit</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vikit</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../vikit/music_building_context/index.html">vikit.music_building_context</a></li>
@@ -252,6 +251,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../composite_video_builder_strategy_factory/index.html">composite_video_builder_strategy_factory</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
 </ul>
 
 </div>
@@ -348,17 +349,17 @@ and the bare minimum is here to simplify processing even if the metadata store i
 <table class="summarytable docutils align-default" id="id2">
 <caption><span class="caption-text">Methods</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#video_file_name.VideoFileName.extract_features_as_string" title="video_file_name.VideoFileName.extract_features_as_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_features_as_string</span></code></a>()</p></td>
+<td><p>Extract the features from the video features string</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#video_file_name.VideoFileName.from_file_name" title="video_file_name.VideoFileName.from_file_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_file_name</span></code></a>(file_name)</p></td>
+<td><p><span class="summarylabel">static</span> Parse a file name to extract the metadata</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#video_file_name.VideoFileName.infer_features" title="video_file_name.VideoFileName.infer_features"><code class="xref py py-obj docutils literal notranslate"><span class="pre">infer_features</span></code></a>()</p></td>
 <td><p>Infer the features from the video features string</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#video_file_name.VideoFileName.is_video_file_name" title="video_file_name.VideoFileName.is_video_file_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_video_file_name</span></code></a>(file_name)</p></td>
 <td><p><span class="summarylabel">static</span> Check if a file name is a video file name</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#video_file_name.VideoFileName.from_file_name" title="video_file_name.VideoFileName.from_file_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_file_name</span></code></a>(file_name)</p></td>
-<td><p><span class="summarylabel">static</span> Parse a file name to extract the metadata</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#video_file_name.VideoFileName.extract_features_as_string" title="video_file_name.VideoFileName.extract_features_as_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_features_as_string</span></code></a>()</p></td>
-<td><p>Extract the features from the video features string</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#video_file_name.VideoFileName.truncate" title="video_file_name.VideoFileName.truncate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">truncate</span></code></a>(gap)</p></td>
 <td><p>Truncate the file name to fit the file system’s limits</p></td>
@@ -371,6 +372,24 @@ and the bare minimum is here to simplify processing even if the metadata store i
 <dt class="sig sig-object py" id="video_file_name.VideoFileName.VIDEO_TITLE_MAX_LENGTH">
 <span class="sig-name descname"><span class="pre">VIDEO_TITLE_MAX_LENGTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">30</span></em><a class="headerlink" href="#video_file_name.VideoFileName.VIDEO_TITLE_MAX_LENGTH" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="video_file_name.VideoFileName.extract_features_as_string">
+<span class="sig-name descname"><span class="pre">extract_features_as_string</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#video_file_name.VideoFileName.extract_features_as_string" title="Link to this definition">¶</a></dt>
+<dd><p>Extract the features from the video features string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="video_file_name.VideoFileName.from_file_name">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_file_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_file_name.VideoFileName.from_file_name" title="Link to this definition">¶</a></dt>
+<dd><p>Parse a file name to extract the metadata</p>
+<dl class="simple">
+<dt>params:</dt><dd><p>file_name: The file name to parse</p>
+</dd>
+<dt>returns:</dt><dd><p>VideoFileName: The video file name object</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="video_file_name.VideoFileName.infer_features">
@@ -389,24 +408,6 @@ and the bare minimum is here to simplify processing even if the metadata store i
 <dt>returns:</dt><dd><p>bool: True if the file name is a video file name, False otherwise</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="video_file_name.VideoFileName.from_file_name">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_file_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video_file_name.VideoFileName.from_file_name" title="Link to this definition">¶</a></dt>
-<dd><p>Parse a file name to extract the metadata</p>
-<dl class="simple">
-<dt>params:</dt><dd><p>file_name: The file name to parse</p>
-</dd>
-<dt>returns:</dt><dd><p>VideoFileName: The video file name object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="video_file_name.VideoFileName.extract_features_as_string">
-<span class="sig-name descname"><span class="pre">extract_features_as_string</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#video_file_name.VideoFileName.extract_features_as_string" title="Link to this definition">¶</a></dt>
-<dd><p>Extract the features from the video features string</p>
 </dd></dl>
 
 <dl class="py method">
@@ -487,10 +488,10 @@ str: The truncated file name</p>
 <li><a class="reference internal" href="#video_file_name.MANAGED_FEATURES"><code class="docutils literal notranslate"><span class="pre">MANAGED_FEATURES</span></code></a></li>
 <li><a class="reference internal" href="#video_file_name.VideoFileName"><code class="docutils literal notranslate"><span class="pre">VideoFileName</span></code></a><ul>
 <li><a class="reference internal" href="#video_file_name.VideoFileName.VIDEO_TITLE_MAX_LENGTH"><code class="docutils literal notranslate"><span class="pre">VideoFileName.VIDEO_TITLE_MAX_LENGTH</span></code></a></li>
+<li><a class="reference internal" href="#video_file_name.VideoFileName.extract_features_as_string"><code class="docutils literal notranslate"><span class="pre">VideoFileName.extract_features_as_string()</span></code></a></li>
+<li><a class="reference internal" href="#video_file_name.VideoFileName.from_file_name"><code class="docutils literal notranslate"><span class="pre">VideoFileName.from_file_name()</span></code></a></li>
 <li><a class="reference internal" href="#video_file_name.VideoFileName.infer_features"><code class="docutils literal notranslate"><span class="pre">VideoFileName.infer_features()</span></code></a></li>
 <li><a class="reference internal" href="#video_file_name.VideoFileName.is_video_file_name"><code class="docutils literal notranslate"><span class="pre">VideoFileName.is_video_file_name()</span></code></a></li>
-<li><a class="reference internal" href="#video_file_name.VideoFileName.from_file_name"><code class="docutils literal notranslate"><span class="pre">VideoFileName.from_file_name()</span></code></a></li>
-<li><a class="reference internal" href="#video_file_name.VideoFileName.extract_features_as_string"><code class="docutils literal notranslate"><span class="pre">VideoFileName.extract_features_as_string()</span></code></a></li>
 <li><a class="reference internal" href="#video_file_name.VideoFileName.truncate"><code class="docutils literal notranslate"><span class="pre">VideoFileName.truncate()</span></code></a></li>
 </ul>
 </li>
