@@ -21,6 +21,16 @@ extensions = [
 autoapi_dirs = ["../vikit"]
 autoapi_type = "python"
 autoapi_template_dir = "_templates/autoapi"
+autoapi_keep_files = True
+autodoc_member_order = 'alphabetical'
+
+autodoc_default_options = {
+    'members': 'var1, var2',
+    'member-order': 'alphabetical',
+    'special-members': '__init__',
+    'undoc-members': True,
+    'exclude-members': '__weakref__'
+}
 
 autoapi_options = [
     "members",
@@ -56,5 +66,5 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "alabaster"
+html_theme = "furo"
 html_static_path = ["_static"]
