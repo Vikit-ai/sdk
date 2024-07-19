@@ -1,20 +1,26 @@
+
 recorded_prompt
 ===============
 
 .. py:module:: recorded_prompt
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`RecordedPrompt <recorded_prompt.RecordedPrompt>`
+     - A class to represent a prompt generated from a recorded audio file. You may want to use this class
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   recorded_prompt.RecordedPrompt
-
-
-Module Contents
----------------
-
 
 .. py:class:: RecordedPrompt
 
@@ -41,6 +47,10 @@ Module Contents
    .. py:method:: get_duration() -> float
 
       Returns the duration of the recording
+
+
+
+
 
 
 

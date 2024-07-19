@@ -9,6 +9,7 @@
         <title>ffmpeg_wrapper - vikit.ai SDK 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=297bf455" />
@@ -295,18 +296,19 @@
         <article role="main" id="furo-main-content">
           <section id="module-ffmpeg_wrapper">
 <span id="ffmpeg-wrapper"></span><h1>ffmpeg_wrapper<a class="headerlink" href="#module-ffmpeg_wrapper" title="Link to this heading">¶</a></h1>
-<section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
+<table class="summarytable docutils align-default" id="id1">
+<caption><span class="caption-text">Function</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.concatenate_videos" title="ffmpeg_wrapper.concatenate_videos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concatenate_videos</span></code></a>(input_file[, target_file_name, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.concatenate_videos" title="ffmpeg_wrapper.concatenate_videos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concatenate_videos</span></code></a>(input_file, target_file_name, ratioToMultiplyAnimations, bias)</p></td>
 <td><p>Concatenate all the videos in the list using a concatenation file</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ffmpeg_wrapper.convert_as_mp3_file" title="ffmpeg_wrapper.convert_as_mp3_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_as_mp3_file</span></code></a>(fileName, target_file_name)</p></td>
 <td><p>Save the incoming audio file to a regular mp3 file with a standardised filename</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.extract_audio_slice" title="ffmpeg_wrapper.extract_audio_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_audio_slice</span></code></a>(audiofile_path[, start, end, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.extract_audio_slice" title="ffmpeg_wrapper.extract_audio_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_audio_slice</span></code></a>(audiofile_path, start, end, target_file_name)</p></td>
 <td><p>Extract a slice of the audio file using ffmpeg</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ffmpeg_wrapper.get_media_duration" title="ffmpeg_wrapper.get_media_duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_media_duration</span></code></a>(input_video_path)</p></td>
@@ -315,7 +317,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.has_audio_track" title="ffmpeg_wrapper.has_audio_track"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_audio_track</span></code></a>(video_path)</p></td>
 <td><p>Check if the video has an audio track</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#ffmpeg_wrapper.merge_audio" title="ffmpeg_wrapper.merge_audio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_audio</span></code></a>(media_url, audio_file_path[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#ffmpeg_wrapper.merge_audio" title="ffmpeg_wrapper.merge_audio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_audio</span></code></a>(media_url, audio_file_path, audio_file_relative_volume, target_file_name)</p></td>
 <td><p>Merge audio with the video</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ffmpeg_wrapper.reencode_video" title="ffmpeg_wrapper.reencode_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reencode_video</span></code></a>(params)</p></td>
@@ -325,48 +327,65 @@
 </table>
 </div>
 </section>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="ffmpeg_wrapper.concatenate_videos">
-<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">concatenate_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratioToMultiplyAnimations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.33</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.concatenate_videos" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">concatenate_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratioToMultiplyAnimations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.33</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.concatenate_videos" title="Link to this definition">¶</a></dt>
 <dd><p>Concatenate all the videos in the list using a concatenation file</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>input_file (str): The path to the input file
-target_file_name (str): The target file name
-ratioToMultiplyAnimations (int): The ratio to multiply animations
-bias (int): The bias to add to the ratio for the sound to be in sync with video frames</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) -- The path to the input file</p></li>
+<li><p><strong>target_file_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) -- The target file name</p></li>
+<li><p><strong>ratioToMultiplyAnimations</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) -- The ratio to multiply animations</p></li>
+<li><p><strong>bias</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) -- The bias to add to the ratio for the sound to be in sync with video frames</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>str: The path to the concatenated video file</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the concatenated video file</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ffmpeg_wrapper.convert_as_mp3_file">
-<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">convert_as_mp3_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.convert_as_mp3_file" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">convert_as_mp3_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.convert_as_mp3_file" title="Link to this definition">¶</a></dt>
 <dd><p>Save the incoming audio file to a regular mp3 file with a standardised filename</p>
-<p>Args:</p>
-<blockquote>
-<div><p>fileName (str): The path to the audio file to convert</p>
-</div></blockquote>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>str: The path to the converted audio file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fileName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) -- The path to the audio file to convert</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the converted audio file</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ffmpeg_wrapper.extract_audio_slice">
-<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">extract_audio_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">audiofile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.extract_audio_slice" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">extract_audio_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">audiofile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.extract_audio_slice" title="Link to this definition">¶</a></dt>
 <dd><p>Extract a slice of the audio file using ffmpeg</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>start (int): The start of the slice
-end (int): The end of the slice
-audiofile_path (str): The path to the audio file
-target_file_name : the target file name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) -- The start of the slice</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) -- The end of the slice</p></li>
+<li><p><strong>audiofile_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) -- The path to the audio file</p></li>
+<li><p><strong>target_file_name</strong> -- the target file name</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>str: The path to the extracted audio slice</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the extracted audio slice</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -375,10 +394,15 @@ target_file_name : the target file name</p>
 <dt class="sig sig-object py" id="ffmpeg_wrapper.get_media_duration">
 <span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">get_media_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.get_media_duration" title="Link to this definition">¶</a></dt>
 <dd><p>Get the duration of a media file.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>input_video_path (str): The path to the input video file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_video_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) -- The path to the input video file.</p>
 </dd>
-<dt>Returns:</dt><dd><p>float: The duration of the media file in seconds.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The duration of the media file in seconds.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -387,25 +411,37 @@ target_file_name : the target file name</p>
 <dt class="sig sig-object py" id="ffmpeg_wrapper.has_audio_track">
 <span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">has_audio_track</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.has_audio_track" title="Link to this definition">¶</a></dt>
 <dd><p>Check if the video has an audio track</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>video_path (str): The path to the video file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>video_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) -- The path to the video file</p>
 </dd>
-<dt>Returns:</dt><dd><p>bool: True if the video has an audio track, False otherwise</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the video has an audio track, False otherwise</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ffmpeg_wrapper.merge_audio">
-<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">merge_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">media_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_file_relative_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.merge_audio" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">merge_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">media_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_file_relative_volume</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.merge_audio" title="Link to this definition">¶</a></dt>
 <dd><p>Merge audio with the video</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>media_url (str): The media url to merge
-audio_file_path (str): The audio file path to merge
-audio_file_relative_volume (float): The relative volume of the audio file
-target_file_name (str): The target file name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>media_url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) -- The media url to merge</p></li>
+<li><p><strong>audio_file_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) -- The audio file path to merge</p></li>
+<li><p><strong>audio_file_relative_volume</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) -- The relative volume of the audio file</p></li>
+<li><p><strong>target_file_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) -- The target file name</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>str: The merged audio file path</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The merged audio file path</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -415,11 +451,20 @@ target_file_name (str): The target file name</p>
 <span class="sig-prename descclassname"><span class="pre">ffmpeg_wrapper.</span></span><span class="sig-name descname"><span class="pre">reencode_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg_wrapper.reencode_video" title="Link to this definition">¶</a></dt>
 <dd><p>Reencode the video, doing this for imported video that might not concatenate well
 with generated ones or among themselves</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>params (tuple): The parameters to reencode the video
-video, build_settings, video.media_url</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><em>tuple</em></a>) -- The parameters to reencode the video</p></li>
+<li><p><strong>video</strong></p></li>
+<li><p><strong>build_settings</strong></p></li>
+<li><p><strong>video.media_url</strong></p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>Video: The reencoded video</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The reencoded video</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../video/index.html#video.Video" title="video.Video">Video</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -483,8 +528,8 @@ video, build_settings, video.media_url</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">ffmpeg_wrapper</a><ul>
-<li><a class="reference internal" href="#functions">Functions</a></li>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
 <li><a class="reference internal" href="#ffmpeg_wrapper.concatenate_videos"><code class="docutils literal notranslate"><span class="pre">concatenate_videos()</span></code></a></li>
 <li><a class="reference internal" href="#ffmpeg_wrapper.convert_as_mp3_file"><code class="docutils literal notranslate"><span class="pre">convert_as_mp3_file()</span></code></a></li>
 <li><a class="reference internal" href="#ffmpeg_wrapper.extract_audio_slice"><code class="docutils literal notranslate"><span class="pre">extract_audio_slice()</span></code></a></li>
@@ -509,5 +554,7 @@ video, build_settings, video.media_url</p>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

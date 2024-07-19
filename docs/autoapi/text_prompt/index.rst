@@ -1,20 +1,26 @@
+
 text_prompt
 ===========
 
 .. py:module:: text_prompt
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`TextPrompt <text_prompt.TextPrompt>`
+     - A class to represent a text prompt
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   text_prompt.TextPrompt
-
-
-Module Contents
----------------
-
 
 .. py:class:: TextPrompt(prompt_text: str = None)
 
@@ -40,6 +46,10 @@ Module Contents
    .. py:method:: get_duration() -> float
 
       Returns the duration of the recording
+
+
+
+
 
 
 

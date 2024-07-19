@@ -1,20 +1,26 @@
+
 prompt
 ======
 
 .. py:module:: prompt
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`Prompt <prompt.Prompt>`
+     - A class to represent a prompt, a user written prompt, a prompt
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   prompt.Prompt
-
-
-Module Contents
----------------
-
 
 .. py:class:: Prompt(ml_gateway: vikit.gateways.ML_models_gateway.MLModelsGateway = None)
 
@@ -45,6 +51,10 @@ Module Contents
 
       Returns the duration of the prompt in seconds. This is not ideal and should be used only if
       we don't have the recording of the prompt.
+
+
+
+
 
 
 

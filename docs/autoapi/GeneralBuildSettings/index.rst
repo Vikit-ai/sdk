@@ -1,20 +1,26 @@
+
 GeneralBuildSettings
 ====================
 
 .. py:module:: GeneralBuildSettings
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`GeneralBuildSettings <GeneralBuildSettings.GeneralBuildSettings>`
+     - General build settings for the video generation
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   GeneralBuildSettings.GeneralBuildSettings
-
-
-Module Contents
----------------
-
 
 .. py:class:: GeneralBuildSettings(delete_interim_files: bool = False, run_async: bool = False, test_mode: bool = False, output_path: str = None)
 
@@ -44,6 +50,10 @@ Module Contents
 
       Handy function to get the ML models gateway from the buildsettings, as it is used in many places
       like a context
+
+
+
+
 
 
 

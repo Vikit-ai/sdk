@@ -9,6 +9,7 @@
         <title>prompt_factory - vikit.ai SDK 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=297bf455" />
@@ -295,10 +296,11 @@
         <article role="main" id="furo-main-content">
           <section id="module-prompt_factory">
 <span id="prompt-factory"></span><h1>prompt_factory<a class="headerlink" href="#module-prompt_factory" title="Link to this heading">¶</a></h1>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
+<table class="summarytable docutils align-default" id="id1">
+<caption><span class="caption-text">Classes</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#prompt_factory.PromptFactory" title="prompt_factory.PromptFactory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PromptFactory</span></code></a></p></td>
 <td><p>Prompt factory helps getting the right sub class of Prompt depending on</p></td>
@@ -307,8 +309,8 @@
 </table>
 </div>
 </section>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="prompt_factory.PromptFactory">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">prompt_factory.</span></span><span class="sig-name descname"><span class="pre">PromptFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ml_gateway</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vikit.gateways.ML_models_gateway.MLModelsGateway</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prompt_factory.PromptFactory" title="Link to this definition">¶</a></dt>
@@ -318,9 +320,9 @@ required to build each type of prompt and optimise it</p>
 <p>This is also useful to simplify unit testing of prompts as we will inject custom made Prompt objects
 instead of letting builders run some complex stuff involving external services</p>
 <p class="rubric">Overview</p>
-<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
-<table class="summarytable docutils align-default" id="id1">
-<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id2">
+<table class="summarytable docutils align-default" id="id2">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#prompt_factory.PromptFactory.create_prompt_from_audio_file" title="prompt_factory.PromptFactory.create_prompt_from_audio_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_prompt_from_audio_file</span></code></a>(recorded_audio_prompt_path)</p></td>
 <td><p>Create a prompt object from a recorded audio file</p></td>
@@ -334,31 +336,33 @@ instead of letting builders run some complex stuff involving external services</
 <p class="rubric">Members</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="prompt_factory.PromptFactory.create_prompt_from_audio_file">
-<span class="sig-name descname"><span class="pre">create_prompt_from_audio_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recorded_audio_prompt_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prompt_factory.PromptFactory.create_prompt_from_audio_file" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_prompt_from_audio_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recorded_audio_prompt_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prompt_factory.PromptFactory.create_prompt_from_audio_file" title="Link to this definition">¶</a></dt>
 <dd><p>Create a prompt object from a recorded audio file</p>
-<dl class="simple">
-<dt>args:</dt><dd><ul class="simple">
-<li><p>recorded_audio_prompt_path: the path to the recorded audio file</p></li>
-</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>recorded_audio_prompt_path</strong> (<em>-</em>) -- the path to the recorded audio file</p>
 </dd>
-<dt>returns:</dt><dd><p>self</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="prompt_factory.PromptFactory.create_prompt_from_text">
-<span class="sig-name descname"><span class="pre">create_prompt_from_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_recording</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prompt_factory.PromptFactory.create_prompt_from_text" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_prompt_from_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_recording</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prompt_factory.PromptFactory.create_prompt_from_text" title="Link to this definition">¶</a></dt>
 <dd><p>Create a prompt object from a prompt text by possibly creating
 a recorded  audio file using a ML Model if asked to do so</p>
-<dl>
-<dt>args:</dt><dd><ul class="simple">
-<li><p>prompt_text: the text of the prompt</p></li>
-<li><p>generate_recording: a boolean to indicate if we should generate a recording from the text</p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prompt_text</strong> (<em>-</em>) -- the text of the prompt</p></li>
+<li><p><strong>generate_recording</strong> (<em>-</em>) -- a boolean to indicate if we should generate a recording from the text</p></li>
+<li><p><strong>subtitles</strong> (<em>before extracting</em>)</p></li>
 </ul>
-<p>before extracting subtitles</p>
 </dd>
-<dt>returns:</dt><dd><p>self</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
 </dd>
 </dl>
 </dd></dl>
@@ -424,8 +428,8 @@ a recorded  audio file using a ML Model if asked to do so</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">prompt_factory</a><ul>
-<li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
 <li><a class="reference internal" href="#prompt_factory.PromptFactory"><code class="docutils literal notranslate"><span class="pre">PromptFactory</span></code></a><ul>
 <li><a class="reference internal" href="#prompt_factory.PromptFactory.create_prompt_from_audio_file"><code class="docutils literal notranslate"><span class="pre">PromptFactory.create_prompt_from_audio_file()</span></code></a></li>
 <li><a class="reference internal" href="#prompt_factory.PromptFactory.create_prompt_from_text"><code class="docutils literal notranslate"><span class="pre">PromptFactory.create_prompt_from_text()</span></code></a></li>
@@ -448,5 +452,7 @@ a recorded  audio file using a ML Model if asked to do so</p>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

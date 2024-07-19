@@ -1,20 +1,26 @@
+
 build_stats
 ===========
 
 .. py:module:: build_stats
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`BuildStats <build_stats.BuildStats>`
+     - Stores and help measure the time taken to build a video.
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   build_stats.BuildStats
-
-
-Module Contents
----------------
-
 
 .. py:class:: BuildStats(video: vikit.video.video = None)
 
@@ -44,5 +50,9 @@ Module Contents
    .. py:method:: start()
 
    .. py:method:: stop()
+
+
+
+
 
 

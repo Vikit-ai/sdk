@@ -9,6 +9,7 @@
         <title>seine_transition - vikit.ai SDK 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=297bf455" />
@@ -295,28 +296,29 @@
         <article role="main" id="furo-main-content">
           <section id="module-seine_transition">
 <span id="seine-transition"></span><h1>seine_transition<a class="headerlink" href="#module-seine_transition" title="Link to this heading">¶</a></h1>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
+<table class="summarytable docutils align-default" id="id1">
+<caption><span class="caption-text">Classes</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#seine_transition.SeineTransition" title="seine_transition.SeineTransition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeineTransition</span></code></a></p></td>
-<td><p></p></td>
+<td><p>-</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </section>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="seine_transition.SeineTransition">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">seine_transition.</span></span><span class="sig-name descname"><span class="pre">SeineTransition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vikit.video.video.Video</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vikit.video.video.Video</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#seine_transition.SeineTransition" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">vikit.video.transition.Transition</span></code></p>
 <p class="rubric">Overview</p>
-<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
-<table class="summarytable docutils align-default" id="id1">
-<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id2">
+<table class="summarytable docutils align-default" id="id2">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#seine_transition.SeineTransition.build" title="seine_transition.SeineTransition.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(build_settings)</p></td>
 <td><p>Apply the Seine transition between the source and target video</p></td>
@@ -329,10 +331,15 @@
 <dt class="sig sig-object py" id="seine_transition.SeineTransition.build">
 <span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">build_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vikit.video.video.VideoBuildSettings</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">vikit.video.transition.Transition</span></span></span><a class="headerlink" href="#seine_transition.SeineTransition.build" title="Link to this definition">¶</a></dt>
 <dd><p>Apply the Seine transition between the source and target video</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>build_settings (VideoBuildSettings): The settings for building the video</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>build_settings</strong> (<a class="reference internal" href="../video_build_settings/index.html#video_build_settings.VideoBuildSettings" title="video_build_settings.VideoBuildSettings"><em>VideoBuildSettings</em></a>) -- The settings for building the video</p>
 </dd>
-<dt>Returns:</dt><dd><p>str: The path to the generated transition video</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the generated transition video</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -398,8 +405,8 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">seine_transition</a><ul>
-<li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
 <li><a class="reference internal" href="#seine_transition.SeineTransition"><code class="docutils literal notranslate"><span class="pre">SeineTransition</span></code></a><ul>
 <li><a class="reference internal" href="#seine_transition.SeineTransition.build"><code class="docutils literal notranslate"><span class="pre">SeineTransition.build()</span></code></a></li>
 </ul>
@@ -421,5 +428,7 @@
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

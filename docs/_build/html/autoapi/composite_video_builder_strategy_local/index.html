@@ -9,6 +9,7 @@
         <title>composite_video_builder_strategy_local - vikit.ai SDK 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=297bf455" />
@@ -295,22 +296,11 @@
         <article role="main" id="furo-main-content">
           <section id="module-composite_video_builder_strategy_local">
 <span id="composite-video-builder-strategy-local"></span><h1>composite_video_builder_strategy_local<a class="headerlink" href="#module-composite_video_builder_strategy_local" title="Link to this heading">¶</a></h1>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#composite_video_builder_strategy_local.executor" title="composite_video_builder_strategy_local.executor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executor</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
+<table class="summarytable docutils align-default" id="id1">
+<caption><span class="caption-text">Classes</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal" title="composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeVideoBuilderStrategyLocal</span></code></a></p></td>
 <td><p>Composite video builder strategy local is the strategy to build composite videos locally:</p></td>
@@ -318,9 +308,19 @@
 </tbody>
 </table>
 </div>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id2">
+<table class="summarytable docutils align-default" id="id2">
+<caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#composite_video_builder_strategy_local.executor" title="composite_video_builder_strategy_local.executor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">executor</span></code></a></p></td>
+<td><p>-</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">composite_video_builder_strategy_local.</span></span><span class="sig-name descname"><span class="pre">CompositeVideoBuilderStrategyLocal</span></span><a class="headerlink" href="#composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal" title="Link to this definition">¶</a></dt>
@@ -331,9 +331,9 @@
 <li><p>call ffmpeg to concatenate the videos locally using your computer resources</p></li>
 </ul>
 <p class="rubric">Overview</p>
-<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
-<table class="summarytable docutils align-default" id="id1">
-<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id3">
+<table class="summarytable docutils align-default" id="id3">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal.execute" title="composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute</span></code></a>(composite_video, build_settings)</p></td>
 <td><p>Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,</p></td>
@@ -351,11 +351,18 @@
 <dd><p>Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,
 as we call external services and run video mixing locally.
 The video mixing process happens once we have all the videos to mix</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>composite_video: The composite video
-build_settings: The build settings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>composite_video</strong> -- The composite video</p></li>
+<li><p><strong>build_settings</strong> -- The build settings</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>CompositeVideo: The composite video</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The composite video</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../composite_video/index.html#composite_video.CompositeVideo" title="composite_video.CompositeVideo">CompositeVideo</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -364,18 +371,28 @@ build_settings: The build settings</p>
 <dt class="sig sig-object py" id="composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal.process_videos_async">
 <span class="sig-name descname"><span class="pre">process_videos_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">build_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vikit.video.video_build_settings.VideoBuildSettings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function_to_invoke</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal.process_videos_async" title="Link to this definition">¶</a></dt>
 <dd><p>Process the videos asynchronously</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>build_settings (VideoBuildSettings): The build settings
-video_list (list): The list of videos
-function_to_invoke (function): The function to invoke</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>build_settings</strong> (<a class="reference internal" href="../video_build_settings/index.html#video_build_settings.VideoBuildSettings" title="video_build_settings.VideoBuildSettings"><em>VideoBuildSettings</em></a>) -- The build settings</p></li>
+<li><p><strong>video_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) -- The list of videos</p></li>
+<li><p><strong>function_to_invoke</strong> (<em>function</em>) -- The function to invoke</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>list: The list of processed videos</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The list of processed videos</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <dl class="py data">
 <dt class="sig sig-object py" id="composite_video_builder_strategy_local.executor">
 <span class="sig-prename descclassname"><span class="pre">composite_video_builder_strategy_local.</span></span><span class="sig-name descname"><span class="pre">executor</span></span><a class="headerlink" href="#composite_video_builder_strategy_local.executor" title="Link to this definition">¶</a></dt>
@@ -440,14 +457,16 @@ function_to_invoke (function): The function to invoke</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">composite_video_builder_strategy_local</a><ul>
-<li><a class="reference internal" href="#attributes">Attributes</a></li>
-<li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
 <li><a class="reference internal" href="#composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal"><code class="docutils literal notranslate"><span class="pre">CompositeVideoBuilderStrategyLocal</span></code></a><ul>
 <li><a class="reference internal" href="#composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal.execute"><code class="docutils literal notranslate"><span class="pre">CompositeVideoBuilderStrategyLocal.execute()</span></code></a></li>
 <li><a class="reference internal" href="#composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal.process_videos_async"><code class="docutils literal notranslate"><span class="pre">CompositeVideoBuilderStrategyLocal.process_videos_async()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li><a class="reference internal" href="#attributes">Attributes</a><ul>
 <li><a class="reference internal" href="#composite_video_builder_strategy_local.executor"><code class="docutils literal notranslate"><span class="pre">executor</span></code></a></li>
 </ul>
 </li>
@@ -466,5 +485,7 @@ function_to_invoke (function): The function to invoke</p>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

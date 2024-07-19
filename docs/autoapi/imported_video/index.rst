@@ -1,20 +1,26 @@
+
 imported_video
 ==============
 
 .. py:module:: imported_video
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`ImportedVideo <imported_video.ImportedVideo>`
+     - ImportedVideo is a simple way to generate a video based out of an existing video file
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   imported_video.ImportedVideo
-
-
-Module Contents
----------------
-
 
 .. py:class:: ImportedVideo(video_file_path: str = None)
 
@@ -45,24 +51,28 @@ Module Contents
 
       Build the video
 
-      Args:
-          build_settings (VideoBuildSettings): The settings for building the video
+      :param build_settings: The settings for building the video
+      :type build_settings: VideoBuildSettings
 
-      Returns:
-          ImportedVideo: The built video
+      :returns: The built video
+      :rtype: ImportedVideo
 
 
    .. py:method:: get_file_name_by_state(build_settings: vikit.video.video.VideoBuildSettings)
 
       Get the file name of the video
 
-      Returns:
-          str: The file name of the video
+      :returns: The file name of the video
+      :rtype: str
 
 
    .. py:method:: get_title()
 
       Returns the title of the video.
+
+
+
+
 
 
 

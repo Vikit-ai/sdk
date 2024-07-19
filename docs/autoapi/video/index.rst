@@ -1,20 +1,26 @@
+
 video
 =====
 
 .. py:module:: video
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`Video <video.Video>`
+     - Video is a class that helps to manage video files, be it a small video to be mixed or the final one.
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   video.Video
-
-
-Module Contents
----------------
-
 
 .. py:class:: Video(width: int = 512, height: int = 320)
 
@@ -58,20 +64,19 @@ Module Contents
       Build the video in the child classes, unless the video is already built, in  which case
       we just return ourseleves (Video gets immutable once generated)
 
-      Args:
-          build_settings (VideoBuildSettings): The settings to use for building the video
+      :param build_settings: The settings to use for building the video
+      :type build_settings: VideoBuildSettings
 
-      Returns:
-          Video: The built video
-
+      :returns: The built video
+      :rtype: Video
 
 
    .. py:method:: get_duration()
 
       Get the duration of the final video
 
-      Returns:
-          float: The duration of the final video
+      :returns: The duration of the final video
+      :rtype: float
 
 
    .. py:method:: get_file_name_by_state(build_settings: vikit.video.video_build_settings.VideoBuildSettings, metadata: vikit.video.video_metadata.VideoMetadata = None, video_type: str = None)
@@ -83,8 +88,8 @@ Module Contents
           metadata (VideoMetadata): The metadata to use for generating the file name
           video_type (str): The type of the video
 
-      Returns:
-          str: The file name of the video
+      :returns: The file name of the video
+      :rtype: str
 
 
    .. py:method:: get_first_frame_as_image()
@@ -102,6 +107,10 @@ Module Contents
 
 
       Returns the title of the video.
+
+
+
+
 
 
 

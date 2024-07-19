@@ -9,6 +9,7 @@
         <title>fake_ML_models_gateway - vikit.ai SDK 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=297bf455" />
@@ -295,25 +296,11 @@
         <article role="main" id="furo-main-content">
           <section id="module-fake_ML_models_gateway">
 <span id="fake-ml-models-gateway"></span><h1>fake_ML_models_gateway<a class="headerlink" href="#module-fake_ML_models_gateway" title="Link to this heading">¶</a></h1>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fake_ML_models_gateway.STUDENT_ARM_WRITING" title="fake_ML_models_gateway.STUDENT_ARM_WRITING"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STUDENT_ARM_WRITING</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fake_ML_models_gateway.TESTS_MEDIA_FOLDER" title="fake_ML_models_gateway.TESTS_MEDIA_FOLDER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TESTS_MEDIA_FOLDER</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
+<table class="summarytable docutils align-default" id="id1">
+<caption><span class="caption-text">Classes</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fake_ML_models_gateway.FakeMLModelsGateway" title="fake_ML_models_gateway.FakeMLModelsGateway"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FakeMLModelsGateway</span></code></a></p></td>
 <td><p>This class is a gateway to a remote API hosting Machine Learning models as a service.</p></td>
@@ -321,9 +308,22 @@
 </tbody>
 </table>
 </div>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id2">
+<table class="summarytable docutils align-default" id="id2">
+<caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fake_ML_models_gateway.STUDENT_ARM_WRITING" title="fake_ML_models_gateway.STUDENT_ARM_WRITING"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STUDENT_ARM_WRITING</span></code></a></p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fake_ML_models_gateway.TESTS_MEDIA_FOLDER" title="fake_ML_models_gateway.TESTS_MEDIA_FOLDER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TESTS_MEDIA_FOLDER</span></code></a></p></td>
+<td><p>-</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="fake_ML_models_gateway.FakeMLModelsGateway">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fake_ML_models_gateway.</span></span><span class="sig-name descname"><span class="pre">FakeMLModelsGateway</span></span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway" title="Link to this definition">¶</a></dt>
@@ -333,9 +333,9 @@ It abstracts the main features needed to interact with the API</p>
 <p>Stubs inheriting from this class may be created for each model to be used so as to prevent
 dependencies on the actual API implementation and speed up tests</p>
 <p class="rubric">Overview</p>
-<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
-<table class="summarytable docutils align-default" id="id1">
-<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id3">
+<table class="summarytable docutils align-default" id="id3">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fake_ML_models_gateway.FakeMLModelsGateway.cleanse_llm_keywords" title="fake_ML_models_gateway.FakeMLModelsGateway.cleanse_llm_keywords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cleanse_llm_keywords</span></code></a>(input)</p></td>
 <td><p>-</p></td>
@@ -381,17 +381,17 @@ dependencies on the actual API implementation and speed up tests</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fake_ML_models_gateway.FakeMLModelsGateway.compose_music_from_text">
-<span class="sig-name descname"><span class="pre">compose_music_from_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.compose_music_from_text" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compose_music_from_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.compose_music_from_text" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fake_ML_models_gateway.FakeMLModelsGateway.extract_audio_slice">
-<span class="sig-name descname"><span class="pre">extract_audio_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audiofile_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.extract_audio_slice" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">extract_audio_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audiofile_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.extract_audio_slice" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fake_ML_models_gateway.FakeMLModelsGateway.generate_background_music">
-<span class="sig-name descname"><span class="pre">generate_background_music</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.generate_background_music" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate_background_music</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.generate_background_music" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -401,7 +401,7 @@ dependencies on the actual API implementation and speed up tests</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fake_ML_models_gateway.FakeMLModelsGateway.generate_video">
-<span class="sig-name descname"><span class="pre">generate_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.generate_video" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.generate_video" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -411,12 +411,12 @@ dependencies on the actual API implementation and speed up tests</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fake_ML_models_gateway.FakeMLModelsGateway.get_keywords_from_prompt">
-<span class="sig-name descname"><span class="pre">get_keywords_from_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitleText</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excluded_words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.get_keywords_from_prompt" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_keywords_from_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitleText</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excluded_words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.get_keywords_from_prompt" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fake_ML_models_gateway.FakeMLModelsGateway.get_music_generation_keywords">
-<span class="sig-name descname"><span class="pre">get_music_generation_keywords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.get_music_generation_keywords" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_music_generation_keywords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.get_music_generation_keywords" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -426,11 +426,14 @@ dependencies on the actual API implementation and speed up tests</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fake_ML_models_gateway.FakeMLModelsGateway.interpolate">
-<span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">link_to_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.interpolate" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">link_to_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fake_ML_models_gateway.FakeMLModelsGateway.interpolate" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <dl class="py data">
 <dt class="sig sig-object py" id="fake_ML_models_gateway.STUDENT_ARM_WRITING">
 <span class="sig-prename descclassname"><span class="pre">fake_ML_models_gateway.</span></span><span class="sig-name descname"><span class="pre">STUDENT_ARM_WRITING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'student_arm_writting.mp4'</span></em><a class="headerlink" href="#fake_ML_models_gateway.STUDENT_ARM_WRITING" title="Link to this definition">¶</a></dt>
@@ -500,9 +503,8 @@ dependencies on the actual API implementation and speed up tests</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">fake_ML_models_gateway</a><ul>
-<li><a class="reference internal" href="#attributes">Attributes</a></li>
-<li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
 <li><a class="reference internal" href="#fake_ML_models_gateway.FakeMLModelsGateway"><code class="docutils literal notranslate"><span class="pre">FakeMLModelsGateway</span></code></a><ul>
 <li><a class="reference internal" href="#fake_ML_models_gateway.FakeMLModelsGateway.cleanse_llm_keywords"><code class="docutils literal notranslate"><span class="pre">FakeMLModelsGateway.cleanse_llm_keywords()</span></code></a></li>
 <li><a class="reference internal" href="#fake_ML_models_gateway.FakeMLModelsGateway.compose_music_from_text"><code class="docutils literal notranslate"><span class="pre">FakeMLModelsGateway.compose_music_from_text()</span></code></a></li>
@@ -517,6 +519,9 @@ dependencies on the actual API implementation and speed up tests</p>
 <li><a class="reference internal" href="#fake_ML_models_gateway.FakeMLModelsGateway.interpolate"><code class="docutils literal notranslate"><span class="pre">FakeMLModelsGateway.interpolate()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li><a class="reference internal" href="#attributes">Attributes</a><ul>
 <li><a class="reference internal" href="#fake_ML_models_gateway.STUDENT_ARM_WRITING"><code class="docutils literal notranslate"><span class="pre">STUDENT_ARM_WRITING</span></code></a></li>
 <li><a class="reference internal" href="#fake_ML_models_gateway.TESTS_MEDIA_FOLDER"><code class="docutils literal notranslate"><span class="pre">TESTS_MEDIA_FOLDER</span></code></a></li>
 </ul>
@@ -536,5 +541,7 @@ dependencies on the actual API implementation and speed up tests</p>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

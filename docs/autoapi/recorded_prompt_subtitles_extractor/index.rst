@@ -1,20 +1,26 @@
+
 recorded_prompt_subtitles_extractor
 ===================================
 
 .. py:module:: recorded_prompt_subtitles_extractor
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`RecordedPromptSubtitlesExtractor <recorded_prompt_subtitles_extractor.RecordedPromptSubtitlesExtractor>`
+     - A class to extract subtitles from a sound recording,
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   recorded_prompt_subtitles_extractor.RecordedPromptSubtitlesExtractor
-
-
-Module Contents
----------------
-
 
 .. py:class:: RecordedPromptSubtitlesExtractor
 
@@ -53,6 +59,10 @@ Module Contents
               inputs: NA
               returns:
                   - Subtitle Rip File object
+
+
+
+
 
 
 

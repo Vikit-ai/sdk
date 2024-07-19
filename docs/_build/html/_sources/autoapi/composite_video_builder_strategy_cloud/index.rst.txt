@@ -1,20 +1,26 @@
+
 composite_video_builder_strategy_cloud
 ======================================
 
 .. py:module:: composite_video_builder_strategy_cloud
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`CompositeVideoBuilderStrategyCloud <composite_video_builder_strategy_cloud.CompositeVideoBuilderStrategyCloud>`
+     - \-
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   composite_video_builder_strategy_cloud.CompositeVideoBuilderStrategyCloud
-
-
-Module Contents
----------------
-
 
 .. py:class:: CompositeVideoBuilderStrategyCloud
 
@@ -43,12 +49,15 @@ Module Contents
       as we call external services and run video mixing locally.
       The video mixing process happens once we have all the videos to mix
 
-      Args:
-          composite_video: The composite video
-          build_settings: The build settings
+      :param composite_video: The composite video
+      :param build_settings: The build settings
 
-      Returns:
-          root_composite_video: a built composite video
+      :returns: a built composite video
+      :rtype: root_composite_video
+
+
+
+
 
 
 

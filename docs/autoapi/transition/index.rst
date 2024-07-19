@@ -1,41 +1,44 @@
+
 transition
 ==========
 
 .. py:module:: transition
 
 
-Attributes
-----------
+Overview
+--------
 
-.. autoapisummary::
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
 
-   transition.TIMEOUT
+   * - :py:obj:`Transition <transition.Transition>`
+     - Base class for transitions between videos.
+
+
+.. list-table:: Function
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`url_exists <transition.url_exists>`\ (url)
+     - Check if a URL exists somewhere on the internet or locally
+   * - :py:obj:`web_url_exists <transition.web_url_exists>`\ (url)
+     - Check if a URL exists on the web
+
+
+.. list-table:: Attributes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`TIMEOUT <transition.TIMEOUT>`
+     - \-
 
 
 Classes
 -------
-
-.. autoapisummary::
-
-   transition.Transition
-
-
-Functions
----------
-
-.. autoapisummary::
-
-   transition.url_exists
-   transition.web_url_exists
-
-
-Module Contents
----------------
-
-.. py:data:: TIMEOUT
-   :value: 5
-
-
 
 .. py:class:: Transition(source_video: vikit.video.video.Video, target_video: vikit.video.video.Video)
 
@@ -68,26 +71,38 @@ Module Contents
 
       Get the file name of the video
 
-      Returns:
-          str: The file name of the video
+      :returns: The file name of the video
+      :rtype: str
 
 
    .. py:method:: get_title()
 
 
+
+Functions
+---------
 .. py:function:: url_exists(url: str)
 
    Check if a URL exists somewhere on the internet or locally
 
-   Args:
-       url (str): The URL to check
+   :param url: The URL to check
+   :type url: str
 
-   Returns:
-       bool: True if the URL exists, False otherwise
+   :returns: True if the URL exists, False otherwise
+   :rtype: bool
 
 
 .. py:function:: web_url_exists(url)
 
    Check if a URL exists on the web
+
+
+
+Attributes
+----------
+.. py:data:: TIMEOUT
+   :value: 5
+
+
 
 

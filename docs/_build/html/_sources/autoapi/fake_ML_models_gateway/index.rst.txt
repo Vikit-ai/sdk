@@ -1,29 +1,36 @@
+
 fake_ML_models_gateway
 ======================
 
 .. py:module:: fake_ML_models_gateway
 
 
-Attributes
-----------
+Overview
+--------
 
-.. autoapisummary::
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
 
-   fake_ML_models_gateway.STUDENT_ARM_WRITING
-   fake_ML_models_gateway.TESTS_MEDIA_FOLDER
+   * - :py:obj:`FakeMLModelsGateway <fake_ML_models_gateway.FakeMLModelsGateway>`
+     - This class is a gateway to a remote API hosting Machine Learning models as a service.
+
+
+
+.. list-table:: Attributes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`STUDENT_ARM_WRITING <fake_ML_models_gateway.STUDENT_ARM_WRITING>`
+     - \-
+   * - :py:obj:`TESTS_MEDIA_FOLDER <fake_ML_models_gateway.TESTS_MEDIA_FOLDER>`
+     - \-
 
 
 Classes
 -------
-
-.. autoapisummary::
-
-   fake_ML_models_gateway.FakeMLModelsGateway
-
-
-Module Contents
----------------
-
 
 .. py:class:: FakeMLModelsGateway
 
@@ -93,11 +100,17 @@ Module Contents
    .. py:method:: interpolate(link_to_video: str)
 
 
+
+
+Attributes
+----------
 .. py:data:: STUDENT_ARM_WRITING
    :value: 'student_arm_writting.mp4'
 
 
 .. py:data:: TESTS_MEDIA_FOLDER
    :value: 'tests/medias/'
+
+
 
 

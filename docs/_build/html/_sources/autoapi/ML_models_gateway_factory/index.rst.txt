@@ -1,20 +1,26 @@
+
 ML_models_gateway_factory
 =========================
 
 .. py:module:: ML_models_gateway_factory
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`MLModelsGatewayFactory <ML_models_gateway_factory.MLModelsGatewayFactory>`
+     - ML models gateway factory helps getting the right sub class of ML models gateway depending on
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   ML_models_gateway_factory.MLModelsGatewayFactory
-
-
-Module Contents
----------------
-
 
 .. py:class:: MLModelsGatewayFactory
 
@@ -42,6 +48,10 @@ Module Contents
 
    .. py:method:: get_ml_models_gateway_static(test_mode: bool = True)
       :staticmethod:
+
+
+
+
 
 
 

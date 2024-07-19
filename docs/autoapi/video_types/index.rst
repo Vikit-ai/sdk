@@ -1,20 +1,26 @@
+
 video_types
 ===========
 
 .. py:module:: video_types
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`VideoType <video_types.VideoType>`
+     - Generic enumeration.
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   video_types.VideoType
-
-
-Module Contents
----------------
-
 
 .. py:class:: VideoType
 
@@ -71,6 +77,10 @@ Module Contents
 
    .. py:attribute:: TRANSITION
       :value: 4
+
+
+
+
 
 
 

@@ -1,32 +1,34 @@
+
 video_file_name
 ===============
 
 .. py:module:: video_file_name
 
 
-Attributes
-----------
+Overview
+--------
 
-.. autoapisummary::
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
 
-   video_file_name.MANAGED_FEATURES
+   * - :py:obj:`VideoFileName <video_file_name.VideoFileName>`
+     - Class for Video file name manipulation.
+
+
+
+.. list-table:: Attributes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`MANAGED_FEATURES <video_file_name.MANAGED_FEATURES>`
+     - \-
 
 
 Classes
 -------
-
-.. autoapisummary::
-
-   video_file_name.VideoFileName
-
-
-Module Contents
----------------
-
-.. py:data:: MANAGED_FEATURES
-   :value: 'dogrpvi'
-
-
 
 .. py:class:: VideoFileName(build_settings: vikit.video.video_build_settings.VideoBuildSettings, video_metadata: vikit.video.video_metadata.VideoMetadata, video_type: str = None, video_features: str = None, file_extension: str = 'mp4')
 
@@ -87,8 +89,8 @@ Module Contents
       params:
           file_name: The file name to parse
 
-      returns:
-          VideoFileName: The video file name object
+      :returns: The video file name object
+      :rtype: VideoFileName
 
 
    .. py:method:: infer_features()
@@ -107,8 +109,8 @@ Module Contents
       params:
           file_name: The file name to check
 
-      returns:
-          bool: True if the file name is a video file name, False otherwise
+      :returns: True if the file name is a video file name, False otherwise
+      :rtype: bool
 
 
    .. py:method:: truncate(gap: int)
@@ -122,6 +124,16 @@ Module Contents
 
       returns:
       str: The truncated file name
+
+
+
+
+
+Attributes
+----------
+.. py:data:: MANAGED_FEATURES
+   :value: 'dogrpvi'
+
 
 
 

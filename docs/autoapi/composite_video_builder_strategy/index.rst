@@ -1,20 +1,26 @@
+
 composite_video_builder_strategy
 ================================
 
 .. py:module:: composite_video_builder_strategy
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`CompositeVideoBuilderStrategy <composite_video_builder_strategy.CompositeVideoBuilderStrategy>`
+     - Composite video builder strategy is the base class for strategies to build composite videos:
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   composite_video_builder_strategy.CompositeVideoBuilderStrategy
-
-
-Module Contents
----------------
-
 
 .. py:class:: CompositeVideoBuilderStrategy
 
@@ -47,12 +53,17 @@ Module Contents
 
       We need to use hints as strings to prevent circular dependencies
 
-      Args:
-          composite_video (CompositeVideo): The composite video
-          build_settings (VideoBuildSettings): The build settings
+      :param composite_video: The composite video
+      :type composite_video: CompositeVideo
+      :param build_settings: The build settings
+      :type build_settings: VideoBuildSettings
 
-      Returns:
-          CompositeVideo: The composite video
+      :returns: The composite video
+      :rtype: CompositeVideo
+
+
+
+
 
 
 

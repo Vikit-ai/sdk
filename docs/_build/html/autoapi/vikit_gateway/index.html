@@ -9,6 +9,7 @@
         <title>vikit_gateway - vikit.ai SDK 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=297bf455" />
@@ -295,28 +296,11 @@
         <article role="main" id="furo-main-content">
           <section id="module-vikit_gateway">
 <span id="vikit-gateway"></span><h1>vikit_gateway<a class="headerlink" href="#module-vikit_gateway" title="Link to this heading">¶</a></h1>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#vikit_gateway.KEYWORDS_FORMAT_PROMPT" title="vikit_gateway.KEYWORDS_FORMAT_PROMPT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KEYWORDS_FORMAT_PROMPT</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#vikit_gateway.vikit_api_key" title="vikit_gateway.vikit_api_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vikit_api_key</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#vikit_gateway.vikit_backend_url" title="vikit_gateway.vikit_backend_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vikit_backend_url</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
+<table class="summarytable docutils align-default" id="id1">
+<caption><span class="caption-text">Classes</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#vikit_gateway.VikitGateway" title="vikit_gateway.VikitGateway"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VikitGateway</span></code></a></p></td>
 <td><p>A Gateway to interact with the Vikit API</p></td>
@@ -324,23 +308,34 @@
 </tbody>
 </table>
 </div>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id2">
+<table class="summarytable docutils align-default" id="id2">
+<caption><span class="caption-text">Attributes</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vikit_gateway.KEYWORDS_FORMAT_PROMPT" title="vikit_gateway.KEYWORDS_FORMAT_PROMPT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KEYWORDS_FORMAT_PROMPT</span></code></a></p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#vikit_gateway.vikit_api_key" title="vikit_gateway.vikit_api_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vikit_api_key</span></code></a></p></td>
+<td><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vikit_gateway.vikit_backend_url" title="vikit_gateway.vikit_backend_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vikit_backend_url</span></code></a></p></td>
+<td><p>-</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
-<dl class="py data">
-<dt class="sig sig-object py" id="vikit_gateway.KEYWORDS_FORMAT_PROMPT">
-<span class="sig-prename descclassname"><span class="pre">vikit_gateway.</span></span><span class="sig-name descname"><span class="pre">KEYWORDS_FORMAT_PROMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;'</span> <span class="pre">Just</span> <span class="pre">list</span> <span class="pre">the</span> <span class="pre">keywords</span> <span class="pre">in</span> <span class="pre">english</span> <span class="pre">language,</span> <span class="pre">separated</span> <span class="pre">by</span> <span class="pre">a</span> <span class="pre">coma,</span> <span class="pre">do</span> <span class="pre">not</span> <span class="pre">re-output</span> <span class="pre">the</span> <span class="pre">prompt....</span></em><a class="headerlink" href="#vikit_gateway.KEYWORDS_FORMAT_PROMPT" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="vikit_gateway.VikitGateway">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vikit_gateway.</span></span><span class="sig-name descname"><span class="pre">VikitGateway</span></span><a class="headerlink" href="#vikit_gateway.VikitGateway" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">vikit.gateways.ML_models_gateway.MLModelsGateway</span></code></p>
 <p>A Gateway to interact with the Vikit API</p>
 <p class="rubric">Overview</p>
-<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
-<table class="summarytable docutils align-default" id="id1">
-<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id3">
+<table class="summarytable docutils align-default" id="id3">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#vikit_gateway.VikitGateway.compose_music_from_text" title="vikit_gateway.VikitGateway.compose_music_from_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compose_music_from_text</span></code></a>(prompt_text, duration)</p></td>
 <td><p>Compose a music for a prompt text</p></td>
@@ -378,30 +373,40 @@
 <p class="rubric">Members</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="vikit_gateway.VikitGateway.compose_music_from_text">
-<span class="sig-name descname"><span class="pre">compose_music_from_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.compose_music_from_text" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compose_music_from_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.compose_music_from_text" title="Link to this definition">¶</a></dt>
 <dd><p>Compose a music for a prompt text</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>prompt_text: The text prompt
-duration: The duration of the music</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prompt_text</strong> -- The text prompt</p></li>
+<li><p><strong>duration</strong> -- The duration of the music</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>The link to the generated music</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The link to the generated music</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="vikit_gateway.VikitGateway.generate_background_music">
-<span class="sig-name descname"><span class="pre">generate_background_music</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#vikit_gateway.VikitGateway.generate_background_music" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate_background_music</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#vikit_gateway.VikitGateway.generate_background_music" title="Link to this definition">¶</a></dt>
 <dd><p>Here we generate the music to add as background music</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><p>duration: int - the duration of the music in seconds</p></li>
-<li><p>prompt: str - the prompt to generate the music from</p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>duration</strong> (<em>-</em>) -- int - the duration of the music in seconds</p></li>
+<li><p><strong>prompt</strong> (<em>-</em>) -- str - the prompt to generate the music from</p></li>
 </ul>
 </dd>
-<dt>Returns:</dt><dd><ul class="simple">
-<li><p>str: the path to the generated music</p></li>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the path to the generated music</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>str</p></li>
 </ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
@@ -410,35 +415,43 @@ duration: The duration of the music</p>
 <dt class="sig sig-object py" id="vikit_gateway.VikitGateway.generate_seine_transition">
 <span class="sig-name descname"><span class="pre">generate_seine_transition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_image_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_image_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.generate_seine_transition" title="Link to this definition">¶</a></dt>
 <dd><p>Generate a transition between two videos</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>index: The index of the video
-initial: Whether this is the initial video</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> -- The index of the video</p></li>
+<li><p><strong>initial</strong> -- Whether this is the initial video</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>The link to the generated video</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The link to the generated video</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="vikit_gateway.VikitGateway.generate_video">
-<span class="sig-name descname"><span class="pre">generate_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.generate_video" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.generate_video" title="Link to this definition">¶</a></dt>
 <dd><p>Generate a video from the given prompt</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>prompt: The prompt to generate the video from</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>prompt</strong> -- The prompt to generate the video from</p>
 </dd>
-<dt>returns:</dt><dd><p>The link to the generated video</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The link to the generated video</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="vikit_gateway.VikitGateway.generate_video_VideoCrafter2">
-<span class="sig-name descname"><span class="pre">generate_video_VideoCrafter2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.generate_video_VideoCrafter2" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate_video_VideoCrafter2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.generate_video_VideoCrafter2" title="Link to this definition">¶</a></dt>
 <dd><p>Generate a video from the given prompt</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>prompt: The prompt to generate the video from</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>prompt</strong> -- The prompt to generate the video from</p>
 </dd>
-<dt>returns:</dt><dd><p>The link to the generated video</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The link to the generated video</p>
 </dd>
 </dl>
 </dd></dl>
@@ -448,36 +461,42 @@ initial: Whether this is the initial video</p>
 <span class="sig-name descname"><span class="pre">get_enhanced_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitleText</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.get_enhanced_prompt" title="Link to this definition">¶</a></dt>
 <dd><p>Generates an enhanced prompt from an original one, probably written by a user or
 translated from an audio</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>A subtitle text</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>A subtitle</em>)</p>
 </dd>
-<dt>Returns:</dt><dd><p>A prompt enhanced by an LLM</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A prompt enhanced by an LLM</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="vikit_gateway.VikitGateway.get_keywords_from_prompt">
-<span class="sig-name descname"><span class="pre">get_keywords_from_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitleText</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excluded_words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.get_keywords_from_prompt" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_keywords_from_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtitleText</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excluded_words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.get_keywords_from_prompt" title="Link to this definition">¶</a></dt>
 <dd><p>Generates keywords from a subtitle text using the Replicate API.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>A subtitle text</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>A subtitle</em>)</p>
 </dd>
-<dt>Returns:</dt><dd><p>A list of keywords generated by an LLM using the subtitle text</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of keywords generated by an LLM using the subtitle text</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="vikit_gateway.VikitGateway.get_music_generation_keywords">
-<span class="sig-name descname"><span class="pre">get_music_generation_keywords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#vikit_gateway.VikitGateway.get_music_generation_keywords" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_music_generation_keywords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#vikit_gateway.VikitGateway.get_music_generation_keywords" title="Link to this definition">¶</a></dt>
 <dd><p>Generate keywords from a text using the Replicate API</p>
 <p>At the end of the resulting prompt we get 3 words that will be used to generate a file name out of
 the generated keywords</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>text: The text to generate keywords from</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> -- The text to generate keywords from</p>
 </dd>
-<dt>Returns:</dt><dd><p>A list of keywords</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of keywords</p>
 </dd>
 </dl>
 </dd></dl>
@@ -486,10 +505,15 @@ the generated keywords</p>
 <dt class="sig sig-object py" id="vikit_gateway.VikitGateway.get_subtitles">
 <span class="sig-name descname"><span class="pre">get_subtitles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">audiofile_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.get_subtitles" title="Link to this definition">¶</a></dt>
 <dd><p>Extract subtitles from an audio file using the Replicate API</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>i (int): The index of the audio slice</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) -- The index of the audio slice</p>
 </dd>
-<dt>Returns:</dt><dd><p>subs: The subtitles obtained from the Replicate API</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The subtitles obtained from the Replicate API</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>subs</p>
 </dd>
 </dl>
 </dd></dl>
@@ -499,15 +523,25 @@ the generated keywords</p>
 <span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vikit_gateway.VikitGateway.interpolate" title="Link to this definition">¶</a></dt>
 <dd><p>Run some interpolation magic. This model may fail after timeout, so you
 should call it with retry logic</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>video: The video to interpolate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>video</strong> -- The video to interpolate</p>
 </dd>
-<dt>Returns:</dt><dd><p>a link to the interpolated video</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a link to the interpolated video</p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
+
+</section>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="vikit_gateway.KEYWORDS_FORMAT_PROMPT">
+<span class="sig-prename descclassname"><span class="pre">vikit_gateway.</span></span><span class="sig-name descname"><span class="pre">KEYWORDS_FORMAT_PROMPT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&quot;'</span> <span class="pre">Just</span> <span class="pre">list</span> <span class="pre">the</span> <span class="pre">keywords</span> <span class="pre">in</span> <span class="pre">english</span> <span class="pre">language,</span> <span class="pre">separated</span> <span class="pre">by</span> <span class="pre">a</span> <span class="pre">coma,</span> <span class="pre">do</span> <span class="pre">not</span> <span class="pre">re-output</span> <span class="pre">the</span> <span class="pre">prompt....</span></em><a class="headerlink" href="#vikit_gateway.KEYWORDS_FORMAT_PROMPT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="vikit_gateway.vikit_api_key">
@@ -578,10 +612,8 @@ should call it with retry logic</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">vikit_gateway</a><ul>
-<li><a class="reference internal" href="#attributes">Attributes</a></li>
-<li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#vikit_gateway.KEYWORDS_FORMAT_PROMPT"><code class="docutils literal notranslate"><span class="pre">KEYWORDS_FORMAT_PROMPT</span></code></a></li>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
 <li><a class="reference internal" href="#vikit_gateway.VikitGateway"><code class="docutils literal notranslate"><span class="pre">VikitGateway</span></code></a><ul>
 <li><a class="reference internal" href="#vikit_gateway.VikitGateway.compose_music_from_text"><code class="docutils literal notranslate"><span class="pre">VikitGateway.compose_music_from_text()</span></code></a></li>
 <li><a class="reference internal" href="#vikit_gateway.VikitGateway.generate_background_music"><code class="docutils literal notranslate"><span class="pre">VikitGateway.generate_background_music()</span></code></a></li>
@@ -595,6 +627,10 @@ should call it with retry logic</p>
 <li><a class="reference internal" href="#vikit_gateway.VikitGateway.interpolate"><code class="docutils literal notranslate"><span class="pre">VikitGateway.interpolate()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li><a class="reference internal" href="#attributes">Attributes</a><ul>
+<li><a class="reference internal" href="#vikit_gateway.KEYWORDS_FORMAT_PROMPT"><code class="docutils literal notranslate"><span class="pre">KEYWORDS_FORMAT_PROMPT</span></code></a></li>
 <li><a class="reference internal" href="#vikit_gateway.vikit_api_key"><code class="docutils literal notranslate"><span class="pre">vikit_api_key</span></code></a></li>
 <li><a class="reference internal" href="#vikit_gateway.vikit_backend_url"><code class="docutils literal notranslate"><span class="pre">vikit_backend_url</span></code></a></li>
 </ul>
@@ -614,5 +650,7 @@ should call it with retry logic</p>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

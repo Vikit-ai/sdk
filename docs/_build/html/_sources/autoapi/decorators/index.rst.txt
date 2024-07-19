@@ -1,21 +1,29 @@
+
 decorators
 ==========
 
 .. py:module:: decorators
 
 
+Overview
+--------
+
+
+.. list-table:: Function
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`delay <decorators.delay>`\ (seconds)
+     - Decorator to delay the execution of a function
+   * - :py:obj:`log_function_params <decorators.log_function_params>`\ (func)
+     - Decorator to log the parameters of a function
+
+
+
+
 Functions
 ---------
-
-.. autoapisummary::
-
-   decorators.delay
-   decorators.log_function_params
-
-
-Module Contents
----------------
-
 .. py:function:: delay(seconds)
 
    Decorator to delay the execution of a function
@@ -24,5 +32,8 @@ Module Contents
 .. py:function:: log_function_params(func)
 
    Decorator to log the parameters of a function
+
+
+
 
 

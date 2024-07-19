@@ -1,28 +1,34 @@
+
 composite_video_builder_strategy_local
 ======================================
 
 .. py:module:: composite_video_builder_strategy_local
 
 
-Attributes
-----------
+Overview
+--------
 
-.. autoapisummary::
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
 
-   composite_video_builder_strategy_local.executor
+   * - :py:obj:`CompositeVideoBuilderStrategyLocal <composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal>`
+     - Composite video builder strategy local is the strategy to build composite videos locally:
+
+
+
+.. list-table:: Attributes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`executor <composite_video_builder_strategy_local.executor>`
+     - \-
 
 
 Classes
 -------
-
-.. autoapisummary::
-
-   composite_video_builder_strategy_local.CompositeVideoBuilderStrategyLocal
-
-
-Module Contents
----------------
-
 
 .. py:class:: CompositeVideoBuilderStrategyLocal
 
@@ -57,27 +63,34 @@ Module Contents
       as we call external services and run video mixing locally.
       The video mixing process happens once we have all the videos to mix
 
-      Args:
-          composite_video: The composite video
-          build_settings: The build settings
+      :param composite_video: The composite video
+      :param build_settings: The build settings
 
-      Returns:
-          CompositeVideo: The composite video
+      :returns: The composite video
+      :rtype: CompositeVideo
 
 
    .. py:method:: process_videos_async(build_settings: vikit.video.video_build_settings.VideoBuildSettings, video_list, function_to_invoke)
 
       Process the videos asynchronously
 
-      Args:
-          build_settings (VideoBuildSettings): The build settings
-          video_list (list): The list of videos
-          function_to_invoke (function): The function to invoke
+      :param build_settings: The build settings
+      :type build_settings: VideoBuildSettings
+      :param video_list: The list of videos
+      :type video_list: list
+      :param function_to_invoke: The function to invoke
+      :type function_to_invoke: function
 
-      Returns:
-          list: The list of processed videos
+      :returns: The list of processed videos
+      :rtype: list
 
 
 
+
+
+Attributes
+----------
 .. py:data:: executor
+
+
 

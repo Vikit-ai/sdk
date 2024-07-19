@@ -1,3 +1,4 @@
+
 vikit
 =====
 
@@ -6,10 +7,10 @@ vikit
 
 Submodules
 ----------
-
 .. toctree::
+   :titlesonly:
    :maxdepth: 1
 
-   /autoapi/vikit/music_building_context/index
+   music_building_context/index.rst
 
 

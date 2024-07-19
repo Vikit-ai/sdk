@@ -1,20 +1,26 @@
+
 text_prompt_builder
 ===================
 
 .. py:module:: text_prompt_builder
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`TextPromptBuilder <text_prompt_builder.TextPromptBuilder>`
+     - Builds a text prompt
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   text_prompt_builder.TextPromptBuilder
-
-
-Module Contents
----------------
-
 
 .. py:class:: TextPromptBuilder
 
@@ -55,6 +61,10 @@ Module Contents
    .. py:method:: set_subtitles(subs: list[pysrt.SubRipItem])
 
       set the prompt text using an LLM which extracts it from the recorded file
+
+
+
+
 
 
 

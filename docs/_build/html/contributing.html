@@ -9,6 +9,7 @@
         <title>Contributing - vikit.ai SDK 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=297bf455" />
@@ -295,8 +296,43 @@
         <article role="main" id="furo-main-content">
           <section id="contributing">
 <h1>Contributing<a class="headerlink" href="#contributing" title="Link to this heading">¶</a></h1>
-<section id="how-can-you-help">
-<h2>How can you help?<a class="headerlink" href="#how-can-you-help" title="Link to this heading">¶</a></h2>
+<p>Wanna help? You’re very welcome! A typical Pull Request workflow would be like this:
+1. New PR: You submit your PR.
+2. PR validation: If the PR passes all the quality checks then Vikit.ai team assign a reviewer. We may ask for additional changes to make to PR pass quality checks.
+3. PR review: If everything looks good, the reviewer(s) will approve the PR. The reviewers might ask some modifications before approving your PR.
+4. CI tests &amp; Merge: Once the PR is approved we launch CI tests. We may ask further modifications in this step, in order to get all the tests passed before merging your PR. Once all the tests pass, vikit team merge the code internally as well as externally on GitHub.</p>
+<section id="how-to-contribute">
+<h2>How to contribute?<a class="headerlink" href="#how-to-contribute" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fork vikit repository into your own GitHub account.</p></li>
+<li><p>Create a new branch and make your changes to the code.</p></li>
+<li><p>Commit your changes and push the branch to your forked repository.</p></li>
+<li><p>Open a pull request on our repository.</p></li>
+</ul>
+</section>
+<section id="general-guidelines-and-standards">
+<h2>General guidelines and standards<a class="headerlink" href="#general-guidelines-and-standards" title="Link to this heading">¶</a></h2>
+<p>Please make sure your changes are consistent with these common guidelines:</p>
+<ul class="simple">
+<li><p>Include unit tests when you contribute new features</p></li>
+<li><p>Keep API compatibility in mind when you change code</p></li>
+<li><p>Use messages as proposed in <a class="reference external" href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commits</a> when you commit your code, which refers to the <a class="reference external" href="https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines">Angular types</a>:</p>
+<ul>
+<li><p>build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)</p></li>
+<li><p>ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)</p></li>
+<li><p>docs: Documentation only changes</p></li>
+<li><p>feat: A new feature</p></li>
+<li><p>fix: A bug fix</p></li>
+<li><p>perf: A code change that improves performance</p></li>
+<li><p>refactor: A code change that neither fixes a bug nor adds a feature</p></li>
+<li><p>style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)</p></li>
+<li><p>test: Adding missing tests or correcting existing tests</p></li>
+</ul>
+</li>
+<li><p>Update the changelog: <a class="reference external" href="https://keepachangelog.com/en/0.3.0/">Change Log best practices</a></p></li>
+<li><p>We do use Semantic Versioning <a class="reference external" href="https://semver.org/">semantic versioning</a></p></li>
+<li><p>Please identify yourself with a valid email address as explained in <a class="reference external" href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address">Setting your commit email address</a></p></li>
+</ul>
 </section>
 </section>
 
@@ -356,7 +392,8 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Contributing</a><ul>
-<li><a class="reference internal" href="#how-can-you-help">How can you help?</a></li>
+<li><a class="reference internal" href="#how-to-contribute">How to contribute?</a></li>
+<li><a class="reference internal" href="#general-guidelines-and-standards">General guidelines and standards</a></li>
 </ul>
 </li>
 </ul>
@@ -372,5 +409,7 @@
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

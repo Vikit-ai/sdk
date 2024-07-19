@@ -1,20 +1,26 @@
+
 text_prompt_subtitles_extractor
 ===============================
 
 .. py:module:: text_prompt_subtitles_extractor
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`TextPromptSubtitlesExtractor <text_prompt_subtitles_extractor.TextPromptSubtitlesExtractor>`
+     - A class to extract subtitles from a sound recording,
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   text_prompt_subtitles_extractor.TextPromptSubtitlesExtractor
-
-
-Module Contents
----------------
-
 
 .. py:class:: TextPromptSubtitlesExtractor
 
@@ -52,11 +58,13 @@ Module Contents
 
       Generate subtitles from a text prompt
 
-      Args:
-          text: The text prompt
+      :param text: The text prompt
 
-      Returns:
-          A list of subtitles generated from the text prompt as a list of pysrt.SubRipItem
+      :returns: A list of subtitles generated from the text prompt as a list of pysrt.SubRipItem
+
+
+
+
 
 
 

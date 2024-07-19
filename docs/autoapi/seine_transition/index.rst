@@ -1,20 +1,26 @@
+
 seine_transition
 ================
 
 .. py:module:: seine_transition
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`SeineTransition <seine_transition.SeineTransition>`
+     - \-
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   seine_transition.SeineTransition
-
-
-Module Contents
----------------
-
 
 .. py:class:: SeineTransition(source_video: vikit.video.video.Video, target_video: vikit.video.video.Video)
 
@@ -39,11 +45,15 @@ Module Contents
 
       Apply the Seine transition between the source and target video
 
-      Args:
-          build_settings (VideoBuildSettings): The settings for building the video
+      :param build_settings: The settings for building the video
+      :type build_settings: VideoBuildSettings
 
-      Returns:
-          str: The path to the generated transition video
+      :returns: The path to the generated transition video
+      :rtype: str
+
+
+
+
 
 
 

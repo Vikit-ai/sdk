@@ -9,6 +9,7 @@
         <title>composite_video_builder_strategy_cloud - vikit.ai SDK 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=297bf455" />
@@ -295,28 +296,29 @@
         <article role="main" id="furo-main-content">
           <section id="module-composite_video_builder_strategy_cloud">
 <span id="composite-video-builder-strategy-cloud"></span><h1>composite_video_builder_strategy_cloud<a class="headerlink" href="#module-composite_video_builder_strategy_cloud" title="Link to this heading">¶</a></h1>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
+<table class="summarytable docutils align-default" id="id1">
+<caption><span class="caption-text">Classes</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#composite_video_builder_strategy_cloud.CompositeVideoBuilderStrategyCloud" title="composite_video_builder_strategy_cloud.CompositeVideoBuilderStrategyCloud"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeVideoBuilderStrategyCloud</span></code></a></p></td>
-<td><p></p></td>
+<td><p>-</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </section>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="composite_video_builder_strategy_cloud.CompositeVideoBuilderStrategyCloud">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">composite_video_builder_strategy_cloud.</span></span><span class="sig-name descname"><span class="pre">CompositeVideoBuilderStrategyCloud</span></span><a class="headerlink" href="#composite_video_builder_strategy_cloud.CompositeVideoBuilderStrategyCloud" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">vikit.video.composite_video_builder_strategy.CompositeVideoBuilderStrategy</span></code></p>
 <p class="rubric">Overview</p>
-<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
-<table class="summarytable docutils align-default" id="id1">
-<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id2">
+<table class="summarytable docutils align-default" id="id2">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#composite_video_builder_strategy_cloud.CompositeVideoBuilderStrategyCloud.execute" title="composite_video_builder_strategy_cloud.CompositeVideoBuilderStrategyCloud.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute</span></code></a>(composite_video, build_settings)</p></td>
 <td><p><span class="summarylabel">abc</span> Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,</p></td>
@@ -331,11 +333,18 @@
 <dd><p>Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,
 as we call external services and run video mixing locally.
 The video mixing process happens once we have all the videos to mix</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>composite_video: The composite video
-build_settings: The build settings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>composite_video</strong> -- The composite video</p></li>
+<li><p><strong>build_settings</strong> -- The build settings</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>root_composite_video: a built composite video</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a built composite video</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>root_composite_video</p>
 </dd>
 </dl>
 </dd></dl>
@@ -401,8 +410,8 @@ build_settings: The build settings</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">composite_video_builder_strategy_cloud</a><ul>
-<li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
 <li><a class="reference internal" href="#composite_video_builder_strategy_cloud.CompositeVideoBuilderStrategyCloud"><code class="docutils literal notranslate"><span class="pre">CompositeVideoBuilderStrategyCloud</span></code></a><ul>
 <li><a class="reference internal" href="#composite_video_builder_strategy_cloud.CompositeVideoBuilderStrategyCloud.execute"><code class="docutils literal notranslate"><span class="pre">CompositeVideoBuilderStrategyCloud.execute()</span></code></a></li>
 </ul>
@@ -424,5 +433,7 @@ build_settings: The build settings</p>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

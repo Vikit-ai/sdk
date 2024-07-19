@@ -1,20 +1,26 @@
+
 subtitle_extractor
 ==================
 
 .. py:module:: subtitle_extractor
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`SubtitleExtractor <subtitle_extractor.SubtitleExtractor>`
+     - A class to extract subtitles from a sound recording,
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   subtitle_extractor.SubtitleExtractor
-
-
-Module Contents
----------------
-
 
 .. py:class:: SubtitleExtractor
 
@@ -42,17 +48,19 @@ Module Contents
 
       Create blocks of subtitles
 
-      Args:
-          subtitles: The subtitles to process
+      :param subtitles: The subtitles to process
 
-      returns:
-          list of text tokens corresponding to the subtitles in some sort
-          of human readeable format
+      :returns: list of text tokens corresponding to the subtitles in some sort
+                of human readeable format
 
 
    .. py:method:: merge_short_subtitles(subtitles, min_duration=7)
 
       Merge subtitles which total duration is less than 7 seconds
+
+
+
+
 
 
 

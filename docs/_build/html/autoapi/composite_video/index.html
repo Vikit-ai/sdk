@@ -9,6 +9,7 @@
         <title>composite_video - vikit.ai SDK 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=297bf455" />
@@ -295,10 +296,11 @@
         <article role="main" id="furo-main-content">
           <section id="module-composite_video">
 <span id="composite-video"></span><h1>composite_video<a class="headerlink" href="#module-composite_video" title="Link to this heading">¶</a></h1>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
+<table class="summarytable docutils align-default" id="id1">
+<caption><span class="caption-text">Classes</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#composite_video.CompositeVideo" title="composite_video.CompositeVideo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeVideo</span></code></a></p></td>
 <td><p>Composite made from the collection of videos that need to be generated altogether, as a consistent block</p></td>
@@ -307,8 +309,8 @@
 </table>
 </div>
 </section>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="composite_video.CompositeVideo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">composite_video.</span></span><span class="sig-name descname"><span class="pre">CompositeVideo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#composite_video.CompositeVideo" title="Link to this definition">¶</a></dt>
@@ -317,9 +319,9 @@
 It could be a final video or intermediate  composing specific scenes of the final video.</p>
 <p>Composite video can include other composite videos, and so on, to build a tree of videos to be generated</p>
 <p class="rubric">Overview</p>
-<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
-<table class="summarytable docutils align-default" id="id1">
-<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id2">
+<table class="summarytable docutils align-default" id="id2">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.append_video" title="composite_video.CompositeVideo.append_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append_video</span></code></a>(video)</p></td>
 <td><p>Append a video to the list of videos to be mixed</p></td>
@@ -347,7 +349,13 @@ It could be a final video or intermediate  composing specific scenes of the fina
 <dl class="simple">
 <dt>params:</dt><dd><p>video: The video to be appended</p>
 </dd>
-<dt>returns:</dt><dd><p>self: The current object</p>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current object</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
 </dd>
 </dl>
 </dd></dl>
@@ -361,13 +369,15 @@ as we call external services and run video mixing locally.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>build_settings</strong> – The settings to be used for the build</p></li>
-<li><p><strong>building_strategy</strong> – The strategy to be used for the build</p></li>
+<li><p><strong>build_settings</strong> -- The settings to be used for the build</p></li>
+<li><p><strong>building_strategy</strong> -- The strategy to be used for the build</p></li>
 </ul>
 </dd>
-</dl>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>self: The current object</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The current object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self</p>
 </dd>
 </dl>
 </dd></dl>
@@ -388,7 +398,13 @@ adding music or audio prompt are carried out</p>
 <dl class="simple">
 <dt>params:</dt><dd><p>build_settings: The settings to be used for the build</p>
 </dd>
-<dt>returns:</dt><dd><p>str: The target file name</p>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The target file name</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -461,8 +477,8 @@ as the title of the video can change if we add or remove videos</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">composite_video</a><ul>
-<li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
 <li><a class="reference internal" href="#composite_video.CompositeVideo"><code class="docutils literal notranslate"><span class="pre">CompositeVideo</span></code></a><ul>
 <li><a class="reference internal" href="#composite_video.CompositeVideo.append_video"><code class="docutils literal notranslate"><span class="pre">CompositeVideo.append_video()</span></code></a></li>
 <li><a class="reference internal" href="#composite_video.CompositeVideo.build"><code class="docutils literal notranslate"><span class="pre">CompositeVideo.build()</span></code></a></li>
@@ -488,5 +504,7 @@ as the title of the video can change if we add or remove videos</p>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

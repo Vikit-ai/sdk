@@ -1,20 +1,26 @@
+
 composite_video
 ===============
 
 .. py:module:: composite_video
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`CompositeVideo <composite_video.CompositeVideo>`
+     - Composite made from the collection of videos that need to be generated altogether, as a consistent block
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   composite_video.CompositeVideo
-
-
-Module Contents
----------------
-
 
 .. py:class:: CompositeVideo(target_file_name=None)
 
@@ -55,8 +61,8 @@ Module Contents
       params:
           video: The video to be appended
 
-      returns:
-          self: The current object
+      :returns: The current object
+      :rtype: self
 
 
    .. py:method:: build(build_settings=VideoBuildSettings(), building_strategy: vikit.video.composite_video_builder_strategy.CompositeVideoBuilderStrategy = None)
@@ -69,8 +75,8 @@ Module Contents
       :param build_settings: The settings to be used for the build
       :param building_strategy: The strategy to be used for the build
 
-      Returns:
-          self: The current object
+      :returns: The current object
+      :rtype: self
 
 
    .. py:method:: get_duration()
@@ -88,14 +94,18 @@ Module Contents
       params:
           build_settings: The settings to be used for the build
 
-      returns:
-          str: The target file name
+      :returns: The target file name
+      :rtype: str
 
 
    .. py:method:: get_title()
 
       Get the title of the video, we recompute it everytime
       as the title of the video can change if we add or remove videos
+
+
+
+
 
 
 

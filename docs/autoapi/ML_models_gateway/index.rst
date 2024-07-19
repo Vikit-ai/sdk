@@ -1,20 +1,26 @@
+
 ML_models_gateway
 =================
 
 .. py:module:: ML_models_gateway
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`MLModelsGateway <ML_models_gateway.MLModelsGateway>`
+     - This class is a gateway to a remote API hosting Machine Learning models as a service.
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   ML_models_gateway.MLModelsGateway
-
-
-Module Contents
----------------
-
 
 .. py:class:: MLModelsGateway
 
@@ -80,5 +86,9 @@ Module Contents
    .. py:method:: get_subtitles(audiofile_path: str)
 
    .. py:method:: interpolate(video)
+
+
+
+
 
 

@@ -1,20 +1,26 @@
+
 prompt_factory
 ==============
 
 .. py:module:: prompt_factory
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`PromptFactory <prompt_factory.PromptFactory>`
+     - Prompt factory helps getting the right sub class of Prompt depending on
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   prompt_factory.PromptFactory
-
-
-Module Contents
----------------
-
 
 .. py:class:: PromptFactory(ml_gateway: vikit.gateways.ML_models_gateway.MLModelsGateway = None)
 
@@ -46,12 +52,9 @@ Module Contents
 
       Create a prompt object from a recorded audio file
 
-      args:
-          - recorded_audio_prompt_path: the path to the recorded audio file
+      :param - recorded_audio_prompt_path: the path to the recorded audio file
 
-      returns:
-          self
-
+      :returns: self
 
 
    .. py:method:: create_prompt_from_text(prompt_text: str = None, generate_recording: bool = True)
@@ -59,13 +62,15 @@ Module Contents
       Create a prompt object from a prompt text by possibly creating
       a recorded  audio file using a ML Model if asked to do so
 
-      args:
-          - prompt_text: the text of the prompt
-          - generate_recording: a boolean to indicate if we should generate a recording from the text
-          before extracting subtitles
+      :param - prompt_text: the text of the prompt
+      :param - generate_recording: a boolean to indicate if we should generate a recording from the text
+      :param before extracting subtitles:
 
-      returns:
-          self
+      :returns: self
+
+
+
+
 
 
 

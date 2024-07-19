@@ -1,20 +1,26 @@
+
 composite_video_builder_strategy_factory
 ========================================
 
 .. py:module:: composite_video_builder_strategy_factory
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`CompositeVideoBuilderStrategyFactory <composite_video_builder_strategy_factory.CompositeVideoBuilderStrategyFactory>`
+     - Factory class to get the strategy to build a composite video
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   composite_video_builder_strategy_factory.CompositeVideoBuilderStrategyFactory
-
-
-Module Contents
----------------
-
 
 .. py:class:: CompositeVideoBuilderStrategyFactory
 
@@ -40,5 +46,9 @@ Module Contents
    .. py:method:: get_cloud_strategy() -> vikit.video.composite_video_builder_strategy.CompositeVideoBuilderStrategy
 
    .. py:method:: get_local_building_strategy() -> vikit.video.composite_video_builder_strategy.CompositeVideoBuilderStrategy
+
+
+
+
 
 

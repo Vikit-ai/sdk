@@ -1,24 +1,34 @@
+
 test_video_file_name
 ====================
 
 .. py:module:: test_video_file_name
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`VideoFileName <test_video_file_name.VideoFileName>`
+     - VideoFileName
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   test_video_file_name.VideoFileName
-
-
-Module Contents
----------------
-
 
 .. py:class:: VideoFileName
 
    VideoFileName
+
+
+
+
 
 
 

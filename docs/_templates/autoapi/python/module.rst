@@ -1,170 +1,112 @@
-{% if obj.display %}
-   {% if is_own_page %}
-{{ obj.id }}
-{{ "=" * obj.id|length }}
+{% import 'macros.rst' as macros %}
+
+{% if not obj.display %}
+:orphan:
+
+{% endif %}
+{{ obj.name }}
+{{ "=" * obj.name|length }}
 
 .. py:module:: {{ obj.name }}
 
-      {% if obj.docstring %}
+{% if obj.docstring %}
 .. autoapi-nested-parse::
 
    {{ obj.docstring|indent(3) }}
 
-      {% endif %}
+{% endif %}
 
-      {% block subpackages %}
-         {% set visible_subpackages = obj.subpackages|selectattr("display")|list %}
-         {% if visible_subpackages %}
+{% block subpackages %}
+{% set visible_subpackages = obj.subpackages|selectattr("display")|list %}
+{% if visible_subpackages %}
 Subpackages
 -----------
-
 .. toctree::
-   :maxdepth: 1
+   :titlesonly:
+   :maxdepth: 3
 
-            {% for subpackage in visible_subpackages %}
-   {{ subpackage.include_path }}
-            {% endfor %}
+{% for subpackage in visible_subpackages %}
+   {{ subpackage.short_name }}/index.rst
+{% endfor %}
 
 
-         {% endif %}
-      {% endblock %}
-      {% block submodules %}
-         {% set visible_submodules = obj.submodules|selectattr("display")|list %}
-         {% if visible_submodules %}
+{% endif %}
+{% endblock %}
+{% block submodules %}
+{% set visible_submodules = obj.submodules|selectattr("display")|list %}
+{% if visible_submodules %}
 Submodules
 ----------
-
 .. toctree::
+   :titlesonly:
    :maxdepth: 1
 
-            {% for submodule in visible_submodules %}
-   {{ submodule.include_path }}
-            {% endfor %}
+{% for submodule in visible_submodules %}
+   {{ submodule.short_name }}/index.rst
+{% endfor %}
 
 
-         {% endif %}
-      {% endblock %}
-      {% block content %}
-         {% set visible_children = obj.children|selectattr("display")|list %}
-         {% if visible_children %}
-            {% set visible_attributes = visible_children|selectattr("type", "equalto", "data")|list %}
-            {% if visible_attributes %}
-               {% if "attribute" in own_page_types or "show-module-summary" in autoapi_options %}
-Attributes
-----------
+{% endif %}
+{% endblock %}
+{% block content %}
+{% if obj.all is not none %}
+{% set visible_children = obj.children|selectattr("display")|selectattr("short_name", "in", obj.all)|list %}
+{% elif obj.type is equalto("package") %}
+{% set visible_children = obj.children|selectattr("display")|list %}
+{% else %}
+{% set visible_children = obj.children|selectattr("display")|rejectattr("imported")|list %}
+{% endif %}
+{% if visible_children %}
+Overview
+--------
 
-                  {% if "attribute" in own_page_types %}
-.. toctree::
-   :hidden:
+{% set visible_classes = visible_children|selectattr("type", "equalto", "class")|list %}
+{% set visible_functions = visible_children|selectattr("type", "equalto", "function")|list %}
+{% set visible_attributes = visible_children|selectattr("type", "equalto", "data")|list %}
+{% if "show-module-summary" in autoapi_options and (visible_classes or visible_functions) %}
+{% block classes scoped %}
+{% if visible_classes %}
+{{ macros.auto_summary(visible_classes, title="Classes") }}
+{% endif %}
+{% endblock %}
 
-                     {% for attribute in visible_attributes %}
-   {{ attribute.include_path }}
-                     {% endfor %}
+{% block functions scoped %}
+{% if visible_functions %}
+{{ macros.auto_summary(visible_functions, title="Function") }}
+{% endif %}
+{% endblock %}
 
-                  {% endif %}
-.. autoapisummary::
+{% block attributes scoped %}
+{% if visible_attributes %}
+{{ macros.auto_summary(visible_attributes, title="Attributes") }}
+{% endif %}
+{% endblock %}
+{% endif %}
 
-                  {% for attribute in visible_attributes %}
-   {{ attribute.id }}
-                  {% endfor %}
-               {% endif %}
-
-
-            {% endif %}
-            {% set visible_exceptions = visible_children|selectattr("type", "equalto", "exception")|list %}
-            {% if visible_exceptions %}
-               {% if "exception" in own_page_types or "show-module-summary" in autoapi_options %}
-Exceptions
-----------
-
-                  {% if "exception" in own_page_types %}
-.. toctree::
-   :hidden:
-
-                     {% for exception in visible_exceptions %}
-   {{ exception.include_path }}
-                     {% endfor %}
-
-                  {% endif %}
-.. autoapisummary::
-
-                  {% for exception in visible_exceptions %}
-   {{ exception.id }}
-                  {% endfor %}
-               {% endif %}
-
-
-            {% endif %}
-            {% set visible_classes = visible_children|selectattr("type", "equalto", "class")|list %}
-            {% if visible_classes %}
-               {% if "class" in own_page_types or "show-module-summary" in autoapi_options %}
+{% if visible_classes %}
 Classes
 -------
+{% for obj_item in visible_classes %}
+{{ obj_item.render()|indent(0) }}
+{% endfor %}
+{% endif %}
 
-                  {% if "class" in own_page_types %}
-.. toctree::
-   :hidden:
-
-                     {% for klass in visible_classes %}
-   {{ klass.include_path }}
-                     {% endfor %}
-
-                  {% endif %}
-.. autoapisummary::
-
-                  {% for klass in visible_classes %}
-   {{ klass.id }}
-                  {% endfor %}
-               {% endif %}
-
-
-            {% endif %}
-            {% set visible_functions = visible_children|selectattr("type", "equalto", "function")|list %}
-            {% if visible_functions %}
-               {% if "function" in own_page_types or "show-module-summary" in autoapi_options %}
+{% if visible_functions %}
 Functions
 ---------
-
-                  {% if "function" in own_page_types %}
-.. toctree::
-   :hidden:
-
-                     {% for function in visible_functions %}
-   {{ function.include_path }}
-                     {% endfor %}
-
-                  {% endif %}
-.. autoapisummary::
-
-                  {% for function in visible_functions %}
-   {{ function.id }}
-                  {% endfor %}
-               {% endif %}
-
-
-            {% endif %}
-            {% set this_page_children = visible_children|rejectattr("type", "in", own_page_types)|list %}
-            {% if this_page_children %}
-{{ obj.type|title }} Contents
-{{ "-" * obj.type|length }}---------
-
-               {% for obj_item in this_page_children %}
+{% for obj_item in visible_functions %}
 {{ obj_item.render()|indent(0) }}
-               {% endfor %}
-            {% endif %}
-         {% endif %}
-      {% endblock %}
-   {% else %}
-.. py:module:: {{ obj.name }}
-
-      {% if obj.docstring %}
-   .. autoapi-nested-parse::
-
-      {{ obj.docstring|indent(6) }}
-
-      {% endif %}
-      {% for obj_item in visible_children %}
-   {{ obj_item.render()|indent(3) }}
-      {% endfor %}
-   {% endif %}
+{% endfor %}
 {% endif %}
+
+{% if visible_attributes %}
+Attributes
+----------
+{% for obj_item in visible_attributes %}
+{{ obj_item.render()|indent(0) }}
+{% endfor %}
+{% endif %}
+
+
+{% endif %}
+{% endblock %}

@@ -9,6 +9,7 @@
         <title>recorded_prompt_builder - vikit.ai SDK 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=297bf455" />
@@ -295,10 +296,11 @@
         <article role="main" id="furo-main-content">
           <section id="module-recorded_prompt_builder">
 <span id="recorded-prompt-builder"></span><h1>recorded_prompt_builder<a class="headerlink" href="#module-recorded_prompt_builder" title="Link to this heading">¶</a></h1>
-<section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
+<table class="summarytable docutils align-default" id="id1">
+<caption><span class="caption-text">Classes</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#recorded_prompt_builder.RecordedPromptBuilder" title="recorded_prompt_builder.RecordedPromptBuilder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RecordedPromptBuilder</span></code></a></p></td>
 <td><p>Builds a prompt based on a recorded audio file</p></td>
@@ -307,17 +309,17 @@
 </table>
 </div>
 </section>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="recorded_prompt_builder.RecordedPromptBuilder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">recorded_prompt_builder.</span></span><span class="sig-name descname"><span class="pre">RecordedPromptBuilder</span></span><a class="headerlink" href="#recorded_prompt_builder.RecordedPromptBuilder" title="Link to this definition">¶</a></dt>
 <dd><p>Builds a prompt based on a recorded audio file</p>
 <p>Most functions are used by a prompt builder, as the way to generate a prompt may vary and get a bit complex</p>
 <p class="rubric">Overview</p>
-<div class="table-wrapper colwidths-auto summarytable docutils container" id="id1">
-<table class="summarytable docutils align-default" id="id1">
-<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<div class="table-wrapper colwidths-auto summarytable docutils container" id="id2">
+<table class="summarytable docutils align-default" id="id2">
+<caption><span class="caption-text">Methods</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#recorded_prompt_builder.RecordedPromptBuilder.build" title="recorded_prompt_builder.RecordedPromptBuilder.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>()</p></td>
 <td><p>-</p></td>
@@ -342,27 +344,31 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="recorded_prompt_builder.RecordedPromptBuilder.convert_recorded_audio_prompt_path">
-<span class="sig-name descname"><span class="pre">convert_recorded_audio_prompt_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recorded_audio_prompt_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_mp3_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#recorded_prompt_builder.RecordedPromptBuilder.convert_recorded_audio_prompt_path" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">convert_recorded_audio_prompt_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recorded_audio_prompt_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_mp3_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#recorded_prompt_builder.RecordedPromptBuilder.convert_recorded_audio_prompt_path" title="Link to this definition">¶</a></dt>
 <dd><p>Convert the recorded audio prompt to mp3</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>recorded_audio_prompt_path: The path to the recorded audio file
-prompt_mp3_file_name: The name of the mp3 file to save the recording as</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>recorded_audio_prompt_path</strong> -- The path to the recorded audio file</p></li>
+<li><p><strong>prompt_mp3_file_name</strong> -- The name of the mp3 file to save the recording as</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="recorded_prompt_builder.RecordedPromptBuilder.set_subtitles">
-<span class="sig-name descname"><span class="pre">set_subtitles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">pysrt.SubRipItem</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#recorded_prompt_builder.RecordedPromptBuilder.set_subtitles" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_subtitles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">pysrt.SubRipItem</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#recorded_prompt_builder.RecordedPromptBuilder.set_subtitles" title="Link to this definition">¶</a></dt>
 <dd><p>set the prompt text using an LLM which extracts it from the recorded file</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="recorded_prompt_builder.RecordedPromptBuilder.set_text">
-<span class="sig-name descname"><span class="pre">set_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#recorded_prompt_builder.RecordedPromptBuilder.set_text" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#recorded_prompt_builder.RecordedPromptBuilder.set_text" title="Link to this definition">¶</a></dt>
 <dd><p>Set the text prompt</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>text: The text prompt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> -- The text prompt</p>
 </dd>
 </dl>
 </dd></dl>
@@ -428,8 +434,8 @@ prompt_mp3_file_name: The name of the mp3 file to save the recording as</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">recorded_prompt_builder</a><ul>
-<li><a class="reference internal" href="#classes">Classes</a></li>
-<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
 <li><a class="reference internal" href="#recorded_prompt_builder.RecordedPromptBuilder"><code class="docutils literal notranslate"><span class="pre">RecordedPromptBuilder</span></code></a><ul>
 <li><a class="reference internal" href="#recorded_prompt_builder.RecordedPromptBuilder.build"><code class="docutils literal notranslate"><span class="pre">RecordedPromptBuilder.build()</span></code></a></li>
 <li><a class="reference internal" href="#recorded_prompt_builder.RecordedPromptBuilder.convert_recorded_audio_prompt_path"><code class="docutils literal notranslate"><span class="pre">RecordedPromptBuilder.convert_recorded_audio_prompt_path()</span></code></a></li>
@@ -454,5 +460,7 @@ prompt_mp3_file_name: The name of the mp3 file to save the recording as</p>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
     </body>
 </html>

@@ -1,20 +1,26 @@
+
 video_metadata
 ==============
 
 .. py:module:: video_metadata
 
 
+Overview
+--------
+
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`VideoMetadata <video_metadata.VideoMetadata>`
+     - Hybrid DTO class for storing video metadata.
+
+
+
+
 Classes
 -------
-
-.. autoapisummary::
-
-   video_metadata.VideoMetadata
-
-
-Module Contents
----------------
-
 
 .. py:class:: VideoMetadata(id: uuid = None, title=None, duration=None, width: int = None, height: int = None, top_parent_id=None, is_video_generated=False, is_reencoded=False, is_interpolated=False, is_bg_music_applied=False, is_subtitle_audio_applied=False, is_bg_music_generated=None, is_prompt_read_aloud=False, **custom_metadata)
 
@@ -34,6 +40,10 @@ Module Contents
    is_prompt_read_aloud (bool): Whether the prompt text is read aloud by synthetic voice.
 
    extra_metadata (dict): Extra metadata for the video.
+
+
+
+
 
 
 
