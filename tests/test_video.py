@@ -31,9 +31,10 @@ class TestVideo:
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_get_first_frame_as_image_path_with_non_generated_video(self):
-        await PromptBasedVideo(
-            tools.test_prompt_library["moss_stones-train_boy"]
-        ).get_first_frame_as_image()
+        with pytest.raises(AssertionError):
+            await PromptBasedVideo(
+                prompt=tools.test_prompt_library["moss_stones-train_boy"]
+            ).get_first_frame_as_image()
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
