@@ -5,10 +5,11 @@ Contributing
 ============
 
 Wanna help? You're very welcome! A typical Pull Request workflow would be like this:
-1. New PR: You submit your PR.
-2. PR validation: If the PR passes all the quality checks then Vikit.ai team assign a reviewer. We may ask for additional changes to make to PR pass quality checks.
-3. PR review: If everything looks good, the reviewer(s) will approve the PR. The reviewers might ask some modifications before approving your PR.
-4. CI tests & Merge: Once the PR is approved we launch CI tests. We may ask further modifications in this step, in order to get all the tests passed before merging your PR. Once all the tests pass, vikit team merge the code internally as well as externally on GitHub.
+
+1. **New PR**: You submit your PR.
+2. **PR validation**: If the PR passes all the quality checks then Vikit.ai team assign a reviewer. We may ask for additional changes to make to PR pass quality checks.
+3. **PR review**: If everything looks good, the reviewer(s) will approve the PR. The reviewers might ask some modifications before approving your PR.
+4. **CI tests & Merge**: Once the PR is approved we launch CI tests. We may ask further modifications in this step, in order to get all the tests passed before merging your PR. Once all the tests pass, vikit team merge the code internally as well as externally on GitHub.
 
 How to contribute?
 ------------------
