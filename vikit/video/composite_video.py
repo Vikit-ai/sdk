@@ -4,7 +4,6 @@ import uuid
 from loguru import logger
 from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
-from vikit.common.decorators import log_function_params
 import vikit.common.config as config
 
 from vikit.video.video_types import VideoType
@@ -163,34 +162,6 @@ class CompositeVideo(Video, is_composite_video):
         self.metadata.title = self._title
         return self._title
 
-    @log_function_params
-    def get_file_name_by_state(self, build_settings: VideoBuildSettings = None):
-        """
-        Get the target / expected file name for the composite video depending on its state
-        State is build progressively from Instantiation to the final build, where steps like
-        adding music or audio prompt are carried out
-
-        params:
-            build_settings: The settings to be used for the build
-
-        returns:
-            str: The target file name
-
-        """
-        video_type = (
-            str(VideoType.COMPROOT)
-            if self._is_root_video_composite
-            else str(VideoType.COMPCHILD)
-        )
-
-        return str(
-            super().get_file_name_by_state(
-                build_settings=build_settings,
-                video_type=video_type,
-                metadata=self.metadata,
-            )
-        )
-
     def update_metadata_post_building(self):
         """
         Update the metadata post building
@@ -238,17 +209,25 @@ class CompositeVideo(Video, is_composite_video):
         Returns:
             list: The video build order
         """
+        if self.build_settings and self.are_build_settings_prepared:
+            logger.debug(f"Video {self.id} build settings already prepared")
+            return self
+
         await super().prepare_build(build_settings=build_settings)
-        assert self.build_settings is not None, "Build settings should be provided"
-        for video in self.video_list:
-            if not video.are_build_settings_prepared:
-                await video.prepare_build(
-                    build_settings=self.get_cascaded_build_settings()
-                )
+        assert (
+            self.build_settings is not None
+        ), "Build settings should be avaialble at this stage"
+        # for video in self.video_list:
+        #     if not video.are_build_settings_prepared:
+        #         await video.prepare_build(
+        #             build_settings=self.get_cascaded_build_settings()
+        #         )
+
+        # Cleanse the video list by removing any empty composites videos
+        self._video_list = self.cleanse_video_list()
 
         return self
 
-    @log_function_params
     async def build(
         self,
         build_settings=VideoBuildSettings(),
@@ -266,11 +245,9 @@ class CompositeVideo(Video, is_composite_video):
         """
         if self._is_video_generated:
             return self
-
         await self.prepare_build(build_settings=build_settings)
+        logger.debug(f"Current - Building video {self.id}")
         if self._is_root_video_composite:
-            # Cleanse the video list by removing any empty composites videos
-            self._video_list = self.cleanse_video_list()
 
             # The list below is generated in a control and command way,
             # i.e. for the whole tree of composites, we generate the list of videos to be built
@@ -279,13 +256,14 @@ class CompositeVideo(Video, is_composite_video):
                 build_settings=build_settings,
                 already_added=set(),
             )
-            logger.debug(
-                f"Ordered video list for composite {self.get_title()}: {ordered_video_list}"
-            )
             for video in ordered_video_list:
                 await video.build(build_settings=build_settings)
 
+        # Now that we have built all children, we build ourselves
+        self.metadata.title = self.get_title()
+        self.metadata.duration = self.get_duration()
         self.media_url = await self.concatenate()
+
         for handler in self.get_and_initialize_video_handler_chain(
             build_settings=build_settings
         ):
@@ -300,11 +278,7 @@ class CompositeVideo(Video, is_composite_video):
 
     async def concatenate(self):
         """
-        Concatenate the videos in the list
-
-        Args:
-            video_list_file (str): The video list file
-            short_title (str): The short title
+        Concatenate the videos for this composite
         """
 
         short_title = self.get_title()
@@ -321,11 +295,6 @@ class CompositeVideo(Video, is_composite_video):
         ratio = self._get_ratio_to_multiply_animations(
             build_settings=self.build_settings, video_composite=self
         )
-
-        # We have the final file names (they may have changed between initial video instanciation and
-        # inference of a name after querying an LLM
-        # In a future version, the ordering of concatenations may vary to accelerate the
-        # production of composites before others, to start the first one asap
         with open(video_list_file, "w") as myfile:
             for video in self.video_list:
                 file_name = video.media_url
@@ -343,6 +312,9 @@ class CompositeVideo(Video, is_composite_video):
         # Now we box the video composing this composite into the expected length, typically the one of a prompt
         if build_settings.expected_length is None:
             if build_settings.prompt is not None:
+                logger.debug(
+                    f"parameters video_composite.get_duration() build_settings.prompt : {video_composite.get_duration()}, {build_settings.prompt}"
+                )
                 ratioToMultiplyAnimations = (
                     video_composite.get_duration()
                     / build_settings.prompt.get_duration()
@@ -360,7 +332,6 @@ class CompositeVideo(Video, is_composite_video):
 
         return ratioToMultiplyAnimations
 
-    @log_function_params
     async def _insert_subtitles_audio_recording(
         self, build_settings: VideoBuildSettings
     ):
@@ -381,7 +352,6 @@ class CompositeVideo(Video, is_composite_video):
         else:
             logger.warning("No prompt audio file provided, skipping audio insertion")
 
-    @log_function_params
     def generate_background_music_prompt(self):
         """
         Get the background music prompt from the video list.
@@ -448,7 +418,7 @@ class CompositeVideo(Video, is_composite_video):
             if build_settings.prompt:
                 handlers.append(
                     ReadAloudPromptAudioMergingHandler(
-                        audio_file=build_settings.prompt._recorded_audio_prompt_path
+                        audio_file=build_settings.prompt.audio_recording
                     )
                 )
             else:
@@ -462,7 +432,8 @@ class CompositeVideo(Video, is_composite_video):
             if build_settings._output_path:
                 handlers.append(
                     VideoBuildingHandlerTargetFileSetter(
-                        video_target_file_name=self.build_settings._output_path
+                        video_target_file_name=self.build_settings.output_file_name,
+                        video_target_dir_path=self.build_settings._output_path,
                     )
                 )
 

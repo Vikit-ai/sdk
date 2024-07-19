@@ -1,6 +1,5 @@
 from loguru import logger
 
-from vikit.common.decorators import log_function_params
 import vikit.common.config as config
 
 
@@ -10,7 +9,6 @@ class SubtitleExtractor:
     merge short subtitles into longer ones, or extract them as text tokens
     """
 
-    @log_function_params
     def merge_short_subtitles(self, subtitles, min_duration=7):
         """
         Merge subtitles which total duration is less than 7 seconds
@@ -44,7 +42,6 @@ class SubtitleExtractor:
         logger.trace(f"Subs after merge {len(subs)}")
         return subs
 
-    @log_function_params
     def build_subtitles_as_text_tokens(self, subtitles) -> list[str]:
         """
         Create blocks of subtitles

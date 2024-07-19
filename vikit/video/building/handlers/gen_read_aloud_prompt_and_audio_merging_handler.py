@@ -33,10 +33,10 @@ class ReadAloudPromptAudioMergingHandler(video_building_handler.VideoBuildingHan
             video.background_music
         ), f"File {video.background_music} does not exist"
 
-        self.media_url = await merge_audio(
-            media_url=self.media_url,
-            audio_file_path=self._background_music_file_name,
-            target_file_name="background_music_" + self.media_url.split("/")[-1],
+        video.media_url = await merge_audio(
+            media_url=video.media_url,
+            audio_file_path=video.background_music,
+            target_file_name="background_music_" + video.media_url.split("/")[-1],
         )
         video.metadata.is_prompt_read_aloud = True
 

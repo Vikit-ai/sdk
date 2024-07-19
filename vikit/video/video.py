@@ -1,11 +1,8 @@
-import subprocess
-import os
 from abc import abstractmethod, ABC
 import uuid as uid
 
 from loguru import logger
 
-from vikit.common.decorators import log_function_params
 from vikit.wrappers.ffmpeg_wrapper import (
     get_media_duration,
     get_first_frame_as_image_ffmpeg,
@@ -13,9 +10,9 @@ from vikit.wrappers.ffmpeg_wrapper import (
 )
 from vikit.video.video_build_settings import VideoBuildSettings
 import vikit.common.file_tools as ft
-from vikit.video.video_file_name import VideoFileName
 from vikit.video.video_metadata import VideoMetadata
 from vikit.video.building.video_building_handler import VideoBuildingHandler
+from vikit.video.video_file_name import VideoFileName
 
 
 class Video(ABC):
@@ -68,7 +65,7 @@ class Video(ABC):
         )
 
         self.media_url = None
-        self.build_settings = None
+        self.build_settings: VideoBuildSettings = None
         self.are_build_settings_prepared = False
         self.video_dependencies = (
             []
@@ -108,6 +105,10 @@ class Video(ABC):
     def background_music(self):
         return self._background_music_file_name
 
+    @background_music.setter
+    def background_music(self, file_name):
+        self._background_music_file_name = file_name
+
     @property
     def duration(self):
         return self.metadata.duration
@@ -119,35 +120,6 @@ class Video(ABC):
     @property
     def title(self):
         return self.get_title()
-
-    def get_file_name_by_state(
-        self,
-        build_settings: VideoBuildSettings,
-        metadata: VideoMetadata = None,
-        video_type: str = None,
-    ):
-        """
-        Get the file name of the video depending on the current metadata / vide state
-
-        params:
-            build_settings (VideoBuildSettings): used to gather build contextual information
-            metadata (VideoMetadata): The metadata to use for generating the file name
-            video_type (str): The type of the video
-
-        Returns:
-            str: The file name of the video
-        """
-        if not metadata:
-            metadata = self.metadata
-
-        vid_type = video_type if video_type else self.short_type_name
-
-        video_fname = VideoFileName(
-            video_type=vid_type,
-            video_metadata=metadata,
-            build_settings=build_settings,
-        )
-        return str(video_fname)
 
     @abstractmethod
     def get_title(self):
@@ -161,7 +133,7 @@ class Video(ABC):
         Get the first frame of the video
         """
         target_path = ft.create_non_colliding_file_name(
-            canonical_name="fst_frm_" + self.get_title()[0], extension=".jpg"
+            canonical_name="fst_frm_" + self.get_title()[0], extension="jpg"
         )
 
         return await get_first_frame_as_image_ffmpeg(
@@ -173,14 +145,13 @@ class Video(ABC):
         Get the last frame of the video
         """
         target_path = ft.create_non_colliding_file_name(
-            canonical_name="lst_frm_" + self.get_title()[0], extension=".jpg"
+            canonical_name="lst_frm_" + self.get_title()[0], extension="jpg"
         )
 
         return await get_last_frame_as_image_ffmpeg(
             media_url=self.media_url, target_path=target_path
         )
 
-    @log_function_params
     def get_duration(self):
         """
         Get the duration of the final video
@@ -194,7 +165,7 @@ class Video(ABC):
             self._duration = float(get_media_duration(self.media_url))
         return self._duration
 
-    async def build(self, build_settings: VideoBuildSettings = None):
+    async def build(self, build_settings: VideoBuildSettings = VideoBuildSettings()):
         """
         Build the video in the child classes, unless the video is already built, in  which case
         we just return ourseleves (Video gets immutable once generated)
@@ -209,9 +180,13 @@ class Video(ABC):
 
         """
         if self._is_video_generated:
+            logger.info(f"Video {self.id} is already built, returning itself")
             return self
+
+        logger.info(f"Starting the building of Video {self.id} ")
+
         built_video = None
-        self.prepare_build(build_settings=build_settings)
+        await self.prepare_build(build_settings=build_settings)
 
         handler_chain = self.get_and_initialize_video_handler_chain(
             build_settings=self.build_settings
@@ -227,7 +202,7 @@ class Video(ABC):
                 else:
                     built_video = handler.execute(video=self)
 
-            self.run_post_build_actions()
+            self.run_post_build_actions()  # self and built_video are the same here
 
         return built_video
 
@@ -257,7 +232,6 @@ class Video(ABC):
         ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
         self.are_build_settings_prepared = True
 
-    @log_function_params
     def _get_bk_music_target_filemame(self):
         """
         Get the target file name for the background music
@@ -281,3 +255,23 @@ class Video(ABC):
             list: The list of handlers to use for building the video
         """
         return []
+
+    def get_file_name_by_state(self, build_settings: VideoBuildSettings = None):
+        """
+        Get the file name of the video by its state
+
+        Shortcut method not to have to call the VideoFileName class directly
+        """
+        assert self.metadata, "metadata should be set"
+        if not build_settings and not self.build_settings:
+            raise ValueError("build_settings should be set")
+
+        return str(
+            VideoFileName(
+                video_type=self.short_type_name,
+                video_metadata=self.metadata,
+                build_settings=(
+                    self.build_settings if not build_settings else build_settings
+                ),
+            )
+        )

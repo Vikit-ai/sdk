@@ -1,6 +1,5 @@
 import pysrt
 
-from vikit.common.decorators import log_function_params
 from vikit.prompt.subtitle_extractor import SubtitleExtractor
 import vikit.common.config as config
 
@@ -21,7 +20,6 @@ class TextPromptSubtitlesExtractor(SubtitleExtractor):
 
     """
 
-    @log_function_params
     def extract_subtitles(self, text) -> list[pysrt.SubRipItem]:
         """
         Generate subtitles from a text prompt

@@ -56,6 +56,7 @@ class VideoFileName:
         if video_metadata is None:
             raise ValueError("video_metadata cannot be None")
         self._video_metadata = video_metadata
+        logger.debug(f"video_metadata: {video_metadata}")
         self._title = self._truncate_title(
             video_metadata.title, max_length=self.VIDEO_TITLE_MAX_LENGTH
         )
@@ -307,12 +308,19 @@ class VideoFileName:
             )
             # So we may truncate the file name as long as we keep a UUID, we may also afford to lose
             # the build id, the date and the time
+            logger.debug(
+                f"target path length: {len(target_path)}, len(self.file_name): {len(self.file_name)}"
+            )
+            logger.debug(f"target path: {target_path}, file name: {self.file_name}")
+
             gap = get_max_filename_length() - len(self.file_name) - len(target_path)
             if (
-                abs(gap) > 25 + 10 + 10 + 8
+                abs(gap) > 25 + 10 + 10 + 6
             ):  # 25 is the length of the title we can lose,
                 # 10 is the length of the build id, 10 is the length of the date, 6 is the length of the time
-                raise ValueError("The file name is too long, it cannot be truncated")
+                raise ValueError(
+                    f"The file name is too long, it cannot be truncated, gap: {gap}"
+                )
             else:
                 fitted_name = self.truncate(gap)
                 logger.warning(

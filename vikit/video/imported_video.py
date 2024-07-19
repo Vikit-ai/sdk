@@ -54,20 +54,6 @@ class ImportedVideo(Video):
         """
         return str(VideoType.TRANSITION)
 
-    @log_function_params
-    def get_file_name_by_state(
-        self,
-        build_settings: VideoBuildSettings,
-    ):
-        """
-        Get the file name of the video
-
-        Returns:
-            str: The file name of the video
-        """
-        return super().get_file_name_by_state(build_settings)
-
-    @log_function_params
     async def prepare_build(
         self,
         build_settings=VideoBuildSettings(),

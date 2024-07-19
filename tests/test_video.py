@@ -27,7 +27,6 @@ class TestVideo:
         warnings.simplefilter("ignore", category=UserWarning)
         warnings.simplefilter("ignore", category=DeprecationWarning)
         logger.add("log_test_video.txt", rotation="10 MB")
-        DeprecationWarning
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -37,6 +36,7 @@ class TestVideo:
         ).get_first_frame_as_image()
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_get_last_frame_as_image_path_with_non_generated_video(self):
         with pytest.raises(AssertionError):
             await PromptBasedVideo(
@@ -55,6 +55,7 @@ class TestVideo:
                 ).get_duration()
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_get_first_frame_as_image_path_with_sample_video(self):
         sample_video_path = os.path.join(get_cat())
         with WorkingFolderContext():
@@ -67,6 +68,7 @@ class TestVideo:
             assert os.path.exists(image_path)
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_get_last_frame_as_image_path_with_sample_video(self):
         with WorkingFolderContext():
             video = ImportedVideo(video_file_path=get_cat())

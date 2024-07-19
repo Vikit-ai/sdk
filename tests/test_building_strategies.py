@@ -1,8 +1,6 @@
 import warnings
 import pytest
 
-from loguru import logger
-
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.common.context_managers import WorkingFolderContext
@@ -69,23 +67,21 @@ class TestVideoBuildingStrategies:
             pbv = PromptBasedVideo(
                 tools.test_prompt_library["train_boy"]
             )  # 4 subtitles -> 4 composite videos of 3 vids each
-            await pbv.compose_inner_composite(build_settings=build_settings)
+            await pbv.compose(build_settings=build_settings)
 
-            assert (
-                pbv.inner_composite is not None
-            ), "Inner composite should be generated"
+            assert pbv is not None, "Inner composite should be generated"
 
             # Here we are testing the ordered list of video to be build
             # conforms to the expected order
             video_build_order = get_lazy_dependency_chain_build_order(
                 video_build_order=[],
-                video_tree=[pbv.inner_composite],
+                video_tree=[pbv],
                 build_settings=build_settings,
                 already_added=set(),
             )
             assert (
-                len(pbv.inner_composite.video_list) == 4
-            ), f"Should have 4 subtitles for trainboy prompt, instead we had {len(pbv.inner_composite.video_list)}"
+                len(pbv.video_list) == 4
+            ), f"Should have 4 subtitles for trainboy prompt, instead we had {len(pbv.video_list)}"
             assert video_build_order is not None
 
             # In this test, we have 4 subtitles, so with a promptbasedvideo we should have 4 prompts * 2 rawtextbasedvideo
@@ -98,18 +94,9 @@ class TestVideoBuildingStrategies:
             #  rawtextbasedvideo ->  second rawtextbasedvideo ->  transition
             # -> parent/owner composite video
             # -> second subtitle rawtextbasedvideo -> etc...
-            assert (
-                video_build_order[0].id
-                == pbv.inner_composite.video_list[0].video_list[0].id
-            )
-            assert (
-                video_build_order[1].id
-                == pbv.inner_composite.video_list[0].video_list[2].id
-            )
-            assert (
-                video_build_order[2].id
-                == pbv.inner_composite.video_list[0].video_list[1].id
-            )
+            assert video_build_order[0].id == pbv.video_list[0].video_list[0].id
+            assert video_build_order[1].id == pbv.video_list[0].video_list[2].id
+            assert video_build_order[2].id == pbv.video_list[0].video_list[1].id
 
             assert isinstance(video_build_order[0], RawTextBasedVideo)
             assert isinstance(video_build_order[1], RawTextBasedVideo)
@@ -117,22 +104,15 @@ class TestVideoBuildingStrategies:
 
             # the second composite for the first subtitle
             assert (
-                video_build_order[3].id == pbv.inner_composite.video_list[0].id
+                video_build_order[3].id == pbv.video_list[0].id
             )  # first child composite
             assert isinstance(video_build_order[3], CompositeVideo)
 
             assert (
-                video_build_order[4].id
-                == pbv.inner_composite.video_list[1].video_list[0].id
+                video_build_order[4].id == pbv.video_list[1].video_list[0].id
             ), f"Second subtitle first rawtextbasedvideo should be next, instead we had {video_build_order[4].id}"
-            assert (
-                video_build_order[5].id
-                == pbv.inner_composite.video_list[1].video_list[2].id
-            )
-            assert (
-                video_build_order[6].id
-                == pbv.inner_composite.video_list[1].video_list[1].id
-            )
+            assert video_build_order[5].id == pbv.video_list[1].video_list[2].id
+            assert video_build_order[6].id == pbv.video_list[1].video_list[1].id
 
             assert isinstance(
                 video_build_order[4], RawTextBasedVideo
@@ -147,99 +127,97 @@ class TestVideoBuildingStrategies:
             assert isinstance(video_build_order[7], CompositeVideo)
             assert isinstance(video_build_order[16], CompositeVideo)
 
-    @pytest.mark.unit
-    @pytest.mark.asyncio
-    @pytest.mark.skip
-    async def test_generate_video_tree_get_first_videos_first_build_order_strategy_from_prompt_based_video(
-        self,
-    ):
-        """
-        Test that the video tree is correctly generated, with right order, using
-        a 4 subtitles prompt based video and standard
-        """
-        with WorkingFolderContext():
-            build_settings = VideoBuildSettings(test_mode=True)
-            build_settings._ml_models_gateway = build_settings.get_ml_models_gateway()
-            pbv = PromptBasedVideo(
-                tools.test_prompt_library["train_boy"]
-            )  # 4 subtitles -> 4 composite videos of 3 vids each
-            pbv.compose_inner_composite(build_settings=build_settings)
+    # @pytest.mark.unit
+    # @pytest.mark.asyncio
+    # @pytest.mark.skip
+    # async def test_generate_video_tree_get_first_videos_first_build_order_strategy_from_prompt_based_video(
+    #     self,
+    # ):
+    #     """
+    #     Test that the video tree is correctly generated, with right order, using
+    #     a 4 subtitles prompt based video and standard
+    #     """
+    #     with WorkingFolderContext():
+    #         build_settings = VideoBuildSettings(test_mode=True)
+    #         build_settings._ml_models_gateway = build_settings.get_ml_models_gateway()
+    #         pbv = PromptBasedVideo(
+    #             tools.test_prompt_library["train_boy"]
+    #         )  # 4 subtitles -> 4 composite videos of 3 vids each
+    #         pbv.compose(build_settings=build_settings)
 
-            assert (
-                pbv.inner_composite is not None
-            ), "Inner composite should be generated"
+    #         assert pbv is not None, "Inner composite should be generated"
 
-            # Here we are testing the ordered list of video to be build
-            # conforms to the expected order
-            video_build_order = get_first_videos_first_build_order(
-                video_build_order=[],
-                video_tree=[pbv.inner_composite],
-                build_settings=build_settings,
-                already_added=set(),
-            )
-            assert (
-                len(pbv.inner_composite.video_list) == 4
-            ), f"Should have 4 subtitles for trainboy prompt, instead we had {len(pbv.inner_composite.video_list)}"
-            assert video_build_order is not None
+    #         # Here we are testing the ordered list of video to be build
+    #         # conforms to the expected order
+    #         video_build_order = get_first_videos_first_build_order(
+    #             video_build_order=[],
+    #             video_tree=[pbv],
+    #             build_settings=build_settings,
+    #             already_added=set(),
+    #         )
+    #         assert (
+    #             len(pbv.video_list) == 4
+    #         ), f"Should have 4 subtitles for trainboy prompt, instead we had {len(pbv.video_list)}"
+    #         assert video_build_order is not None
 
-            # In this test, we have 4 subtitles, so with a promptbasedvideo we should have 4 prompts * 2 rawtextbasedvideo
-            #  + 4 transitions + 4 child composite videos + one parent root composite video
-            assert (
-                len(video_build_order) == 17
-            ), f"Should have 17 videos, instead we had {len(video_build_order)}"
+    #         # In this test, we have 4 subtitles, so with a promptbasedvideo we should have 4 prompts * 2 rawtextbasedvideo
+    #         #  + 4 transitions + 4 child composite videos + one parent root composite video
+    #         assert (
+    #             len(video_build_order) == 17
+    #         ), f"Should have 17 videos, instead we had {len(video_build_order)}"
 
-            # Check we have the right order: for the first subtitle, we should have
-            #  rawtextbasedvideo ->  second rawtextbasedvideo ->  transition
-            # -> parent/owner composite video
-            # -> second subtitle rawtextbasedvideo -> etc...
-            assert (
-                video_build_order[0].id
-                == pbv.inner_composite.video_list[0].video_list[0].id
-            )
-            assert (
-                video_build_order[1].id
-                == pbv.inner_composite.video_list[0].video_list[2].id
-            )
-            assert (
-                video_build_order[2].id
-                == pbv.inner_composite.video_list[0].video_list[1].id
-            )
+    #         # Check we have the right order: for the first subtitle, we should have
+    #         #  rawtextbasedvideo ->  second rawtextbasedvideo ->  transition
+    #         # -> parent/owner composite video
+    #         # -> second subtitle rawtextbasedvideo -> etc...
+    #         assert (
+    #             video_build_order[0].id
+    #             == pbv.video_list[0].video_list[0].id
+    #         )
+    #         assert (
+    #             video_build_order[1].id
+    #             == pbv.video_list[0].video_list[2].id
+    #         )
+    #         assert (
+    #             video_build_order[2].id
+    #             == pbv.video_list[0].video_list[1].id
+    #         )
 
-            assert isinstance(video_build_order[0], RawTextBasedVideo)
-            assert isinstance(video_build_order[1], RawTextBasedVideo)
-            assert isinstance(video_build_order[2], Transition)
+    #         assert isinstance(video_build_order[0], RawTextBasedVideo)
+    #         assert isinstance(video_build_order[1], RawTextBasedVideo)
+    #         assert isinstance(video_build_order[2], Transition)
 
-            # the second composite for the first subtitle
-            assert (
-                video_build_order[3].id == pbv.inner_composite.video_list[0].id
-            )  # first child composite
-            assert isinstance(video_build_order[3], CompositeVideo)
+    #         # the second composite for the first subtitle
+    #         assert (
+    #             video_build_order[3].id == pbv.video_list[0].id
+    #         )  # first child composite
+    #         assert isinstance(video_build_order[3], CompositeVideo)
 
-            assert (
-                video_build_order[4].id
-                == pbv.inner_composite.video_list[1].video_list[0].id
-            ), f"Second subtitle first rawtextbasedvideo should be next, instead we had {video_build_order[4].id}"
-            assert (
-                video_build_order[5].id
-                == pbv.inner_composite.video_list[1].video_list[2].id
-            )
-            assert (
-                video_build_order[6].id
-                == pbv.inner_composite.video_list[1].video_list[1].id
-            )
+    #         assert (
+    #             video_build_order[4].id
+    #             == pbv.video_list[1].video_list[0].id
+    #         ), f"Second subtitle first rawtextbasedvideo should be next, instead we had {video_build_order[4].id}"
+    #         assert (
+    #             video_build_order[5].id
+    #             == pbv.video_list[1].video_list[2].id
+    #         )
+    #         assert (
+    #             video_build_order[6].id
+    #             == pbv.video_list[1].video_list[1].id
+    #         )
 
-            assert isinstance(
-                video_build_order[4], RawTextBasedVideo
-            ), f"Instead we had {type(video_build_order[5])}"
-            assert isinstance(
-                video_build_order[5], RawTextBasedVideo
-            ), f"Instead we had {type(video_build_order[6])}"
-            assert isinstance(
-                video_build_order[6], Transition
-            ), f"Instead we had {type(video_build_order[7])}"
+    #         assert isinstance(
+    #             video_build_order[4], RawTextBasedVideo
+    #         ), f"Instead we had {type(video_build_order[5])}"
+    #         assert isinstance(
+    #             video_build_order[5], RawTextBasedVideo
+    #         ), f"Instead we had {type(video_build_order[6])}"
+    #         assert isinstance(
+    #             video_build_order[6], Transition
+    #         ), f"Instead we had {type(video_build_order[7])}"
 
-            assert isinstance(video_build_order[7], CompositeVideo)
-            assert isinstance(video_build_order[16], CompositeVideo)
+    #         assert isinstance(video_build_order[7], CompositeVideo)
+    #         assert isinstance(video_build_order[16], CompositeVideo)
 
     # async def test_async_call_to_generate_video(self):
     #     """

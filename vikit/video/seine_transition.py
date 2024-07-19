@@ -24,22 +24,8 @@ class SeineTransition(Transition):
         """
         super().__init__(source_video=source_video, target_video=target_video)
 
-    def prepare_build(self, build_settings=...):
-        return super().prepare_build(build_settings)
-
-    def get_file_name_by_state(self, build_settings: VideoBuildSettings) -> str:
-        """
-        Get the file name of the video based on the state of the video
-
-        Args:
-            build_settings (VideoBuildSettings): The settings for building the video
-
-        Returns:
-            str: The file name of the video
-        """
-        if self.metadata.is_interpolated:
-            return build_settings.get_interpolated_video_path()
-        return build_settings.get_transition_video_path()
+    async def prepare_build(self, build_settings=...):
+        return await super().prepare_build(build_settings)
 
     def get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings

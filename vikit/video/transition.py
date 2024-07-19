@@ -12,7 +12,7 @@ from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
 from vikit.video.building.handlers.videogen_handler import (
-    VideoBuildingHandlerGenerateFomApi,
+    VideoGenHandler,
 )
 from vikit.video.building.handlers.interpolation_handler import (
     VideoInterpolationHandler,
@@ -89,20 +89,6 @@ class Transition(Video):
         """
         return str(VideoType.TRANSITION)
 
-    @log_function_params
-    def get_file_name_by_state(
-        self,
-        build_settings: VideoBuildSettings,
-    ):
-        """
-        Get the file name of the video
-
-        Returns:
-            str: The file name of the video
-        """
-        return super().get_file_name_by_state(build_settings)
-
-    @log_function_params
     async def prepare_build(
         self,
         build_settings=VideoBuildSettings(),
@@ -132,7 +118,7 @@ class Transition(Video):
             list: The list of handlers to use for building the video
         """
         handlers = []
-        handlers.append(VideoBuildingHandlerGenerateFomApi())
+        handlers.append(VideoGenHandler())
         if build_settings.interpolate:
             handlers.append(VideoInterpolationHandler())
         if self._needs_reencoding:

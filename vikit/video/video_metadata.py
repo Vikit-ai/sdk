@@ -55,7 +55,7 @@ class VideoMetadata:
         self.custom_metadata = custom_metadata
 
     def __str__(self):
-        return f"VideoMetadata(title={self.title}, duration={self.duration}, width={self.width}, height={self.height}, is_video_generated={self.is_video_generated}, is_reencoded={self.is_reencoded}, is_interpolated={self.is_interpolated}, bg_music_applied={self.bg_music_applied}, is_bg_music_generated={self.is_bg_music_generated}, extra_metadata={self.extra_metadata})"
+        return f"VideoMetadata(title={self.title}, duration={self.duration}, width={self.width}, height={self.height}, is_video_generated={self.is_video_generated}, is_reencoded={self.is_reencoded}, is_interpolated={self.is_interpolated}, bg_music_applied={self.bg_music_applied}, is_bg_music_generated={self.is_bg_music_generated}, custom_metadata={self.custom_metadata})"
 
     def __getitem__(self, key):
         if hasattr(self, key):

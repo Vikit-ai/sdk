@@ -47,13 +47,14 @@ class TestPromptBasedVideo:
     @pytest.mark.asyncio
     async def test_build_single_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
-            fact = PromptBasedVideo(PromptFactory())
-            pbvid = await fact.create_prompt_from_text(
-                TEST_PROMPT, generate_recording=True
+            pbvid = PromptBasedVideo(
+                await PromptFactory().create_prompt_from_text(
+                    prompt_text=TEST_PROMPT, generate_recording=True
+                )
             )
             await pbvid.build()
 
-            assert pbvid.media_url, "media URL was not updated"
+            assert pbvid.media_url, "media URL is None, was not updated"
             assert pbvid._background_music_file_name is None
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
@@ -255,6 +256,7 @@ class TestPromptBasedVideo:
             assert os.path.exists(video.media_url)
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_collab_integration(self):
         with WorkingFolderContext():
             video_build_settings = VideoBuildSettings(

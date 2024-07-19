@@ -2,6 +2,7 @@ from vikit.prompt.prompt import Prompt
 from vikit.prompt.recorded_prompt_subtitles_extractor import (
     RecordedPromptSubtitlesExtractor,
 )
+from vikit.wrappers.ffmpeg_wrapper import get_media_duration
 
 
 class RecordedPrompt(Prompt):
@@ -14,9 +15,16 @@ class RecordedPrompt(Prompt):
         """
         Initialize the prompt with the path to the recorded audio prompt after having converted it to mp3
         """
-        self._recorded_audio_prompt_path = None
+        self.audio_recording = None
         self._subtitle_extractor = RecordedPromptSubtitlesExtractor()
 
-    @property
-    def audio_recording(self):
-        return self._recorded_audio_prompt_path
+    def get_duration(self) -> float:
+        """
+        Returns the duration of the recording
+        """
+        if not self.audio_recording:
+            raise ValueError("The recording is not there or generated yet")
+        total_length = get_media_duration(self.audio_recording)
+        self._duration = total_length
+
+        return self._duration

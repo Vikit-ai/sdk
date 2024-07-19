@@ -1,8 +1,11 @@
 import os
 
+from loguru import logger
+import pysrt
+
 from vikit.video.video import VideoBuildSettings
-from vikit.video.video import Video
 from vikit.video.composite_video import CompositeVideo
+from vikit.prompt.prompt import Prompt
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.seine_transition import SeineTransition
 from vikit.video.video_types import VideoType
@@ -14,7 +17,7 @@ from vikit.video.building.handlers.video_reencoding_handler import (
 from vikit.video.building.video_building_handler import VideoBuildingHandler
 
 
-class PromptBasedVideo(Video):
+class PromptBasedVideo(CompositeVideo):
     """
     PromptBasedVideo is a simple way to generate a video based out of a text prompt
 
@@ -29,23 +32,15 @@ class PromptBasedVideo(Video):
             raise ValueError("prompt cannot be None")
 
         super().__init__()
-        self._prompt = prompt
+        self._prompt: Prompt = prompt
         self._title = None
         self.metadata.title = self._title
-        self._source = type(
-            self
-        ).__name__  # PromptBasedVideo is made of several composites
-        self._inner_composite = None
-        self._needs_reencoding = False  # PromptBasedVideo is made of several
-        # composites which themselves are made of raw text based video, so no need for reencoding
+        self._source = type(self).__name__
+        self._needs_reencoding = False
 
     def __str__(self) -> str:
         super_str = super().__str__()
         return super_str + os.linesep + f"Prompt: {self._prompt}"
-
-    @property
-    def inner_composite(self):
-        return self._inner_composite
 
     @property
     def short_type_name(self):
@@ -71,16 +66,7 @@ class PromptBasedVideo(Video):
 
         return self._title
 
-    def get_file_name_by_state(self, build_settings: VideoBuildSettings):
-        """
-        Get the file name of the video
-
-        Returns:
-            str: The file name of the video
-        """
-        return super().get_file_name_by_state(build_settings)
-
-    async def compose_inner_composite(self, build_settings: VideoBuildSettings):
+    async def compose(self, build_settings: VideoBuildSettings):
         """
         Compose the inner composite video
 
@@ -90,8 +76,7 @@ class PromptBasedVideo(Video):
         Returns:
             The inner composite video
         """
-        vid_cp_final = CompositeVideo()
-        vid_cp_final._is_root_video_composite = True
+        self._is_root_video_composite = True
 
         for sub in self._prompt.subtitles:
             vid_cp_sub = CompositeVideo()
@@ -99,9 +84,7 @@ class PromptBasedVideo(Video):
                 keyword_based_vid,
                 prompt_based_vid,
                 transit,
-            ) = await self._prepare_basic_building_block(
-                sub.text, build_stgs=build_settings
-            )
+            ) = await self._prepare_basic_building_block(sub, build_stgs=build_settings)
 
             vid_cp_sub.append_video(keyword_based_vid).append_video(
                 transit
@@ -109,12 +92,9 @@ class PromptBasedVideo(Video):
                 prompt_based_vid
             )  # Building a set of 2 videos around the same text + a transition
 
-            vid_cp_final.append_video(
-                vid_cp_sub
-            )  # Adding the comnposite to the overall video
+            self.append_video(vid_cp_sub)  # Adding the comnposite to the overall video
 
-            self._inner_composite = vid_cp_final
-        return vid_cp_final
+        return self
 
     async def prepare_build(self, build_settings=VideoBuildSettings()):
         """
@@ -126,27 +106,26 @@ class PromptBasedVideo(Video):
         Returns:
             The current instance
         """
-        await super().prepare(build_settings)
-        self.inner_composite = await self.compose_inner_composite(
-            build_settings=build_settings
-        )
         build_settings.prompt = self._prompt
+        await self.compose(build_settings=build_settings)
+        self.are_build_settings_prepared = True
 
-        return self
+        return await super().prepare_build(build_settings)
 
     def run_post_build_actions(self):
-        self.metadata = self.inner_composite.metadata
-        self.media_url = self.inner_composite.media_url
-        self._background_music_file_name = self.inner_composite.background_music
+        pass
 
     async def _prepare_basic_building_block(
-        self, sub_text: str, build_stgs: VideoBuildSettings = None
+        self, sub: pysrt.SubRipItem, build_stgs: VideoBuildSettings = None
     ):
         """
         build the basic building block of the full video/
         - One RawTextBasedVideo from the keyword
         - One RawTextBasedVideo from the prompt
         - One SeineTransition between the two
+
+        Calling prepare_build allows for injecting dedicated build settings for each video
+        and not the default on from the parent composite
 
         Params:
             - sub_text: the subtitle text
@@ -163,14 +142,17 @@ class PromptBasedVideo(Video):
         )
         enhanced_prompt_from_keywords = (
             await prompt_fact.get_reengineered_prompt_from_text(
-                prompt=sub_text,
+                prompt=sub.text,
                 prompt_build_settings=PromptBuildSettings(
-                    test_mode=build_stgs.test_mode
+                    test_mode=build_stgs.test_mode,
+                    generate_from_llm_keyword=True,
+                    generate_from_llm_prompt=False,
                 ),
+                duration=sub.duration,
             )
         )
 
-        keyword_based_vid = await RawTextBasedVideo(sub_text).prepare_build(
+        keyword_based_vid = await RawTextBasedVideo(sub.text).prepare_build(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_keywords,
                 test_mode=build_stgs.test_mode,
@@ -179,13 +161,16 @@ class PromptBasedVideo(Video):
 
         enhanced_prompt_from_prompt_text = (
             await prompt_fact.get_reengineered_prompt_from_text(
-                prompt=sub_text,
+                prompt=sub.text,
                 prompt_build_settings=PromptBuildSettings(
-                    test_mode=build_stgs.test_mode
+                    test_mode=build_stgs.test_mode,
+                    generate_from_llm_keyword=False,
+                    generate_from_llm_prompt=True,
                 ),
+                duration=sub.duration,
             )
         )
-        prompt_based_vid = await RawTextBasedVideo(sub_text).prepare_build(
+        prompt_based_vid = await RawTextBasedVideo(sub.text).prepare_build(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_prompt_text,
                 test_mode=build_stgs.test_mode,
@@ -213,7 +198,10 @@ class PromptBasedVideo(Video):
             list: The list of handlers to use for building the video
         """
         handlers = []
-        if self._needs_reencoding:
+        if (
+            len(list(filter(lambda video: video._needs_reencoding, self.video_list)))
+            >= 1
+        ):
             handlers.append(VideoReencodingHandler())
 
         return handlers

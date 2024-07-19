@@ -38,12 +38,12 @@ class FakeMLModelsGateway(MLModelsGateway):
         sleep(sleep_time)  # Simulate a long process with time.sleep
 
     async def generate_mp3_from_text_async(
-        prompt_text, target_file, target_file_name: str = None
+        self, prompt_text, target_file_name: str = None
     ):
         logger.debug(f"Creating aa prompt from text: {prompt_text}")
 
         shutil.copy(
-            src=tests_medias.get_test_prompt_recording_trainboy(), dst=target_file
+            src=tests_medias.get_test_prompt_recording_trainboy(), dst=target_file_name
         )
 
     async def generate_background_music_async(
@@ -126,7 +126,9 @@ class FakeMLModelsGateway(MLModelsGateway):
     async def get_subtitles_async(self, audiofile_path, sleep_time: int = 0):
 
         logger.trace(f"Getting subtitles for {audiofile_path}")
-        await self.get_subtitles(audiofile_path=audiofile_path, sleep_time=sleep_time)
+        return await self.get_subtitles(
+            audiofile_path=audiofile_path, sleep_time=sleep_time
+        )
 
     async def get_subtitles(self, audiofile_path, sleep_time: int = 0):
         await asyncio.sleep(sleep_time)

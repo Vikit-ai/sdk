@@ -1,6 +1,5 @@
 from urllib.request import urlretrieve
 
-from vikit.common.decorators import log_function_params
 from vikit.video.building import video_building_handler
 from vikit.video.video import Video
 
@@ -12,7 +11,6 @@ class VideoInterpolationHandler(video_building_handler.VideoBuildingHandler):
     def is_supporting_async_mode(self):
         return True
 
-    @log_function_params
     async def _execute_logic_async(self, video: Video, **kwargs):
         await super()._execute_logic_async(video, **kwargs)
 

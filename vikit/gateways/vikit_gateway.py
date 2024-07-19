@@ -12,7 +12,6 @@ from loguru import logger
 from urllib.request import urlretrieve
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
-from vikit.common.decorators import log_function_params
 from vikit.common.secrets import get_replicate_api_token, get_vikit_api_token
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
 from vikit.common.config import get_nb_retries_http_calls
@@ -32,7 +31,6 @@ class VikitGateway(MLModelsGateway):
     def __init__(self):
         super().__init__()
 
-    @log_function_params
     async def generate_mp3_from_text_async(
         prompt_text, target_file, target_file_name: str = None
     ):
@@ -53,7 +51,6 @@ class VikitGateway(MLModelsGateway):
         )
         assert os.path.exists(target_file), "The generated audio file does not exists"
 
-    @log_function_params
     async def generate_background_music_async(
         self, duration: int = 3, prompt: str = None
     ) -> str:
@@ -119,7 +116,6 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
-    @log_function_params
     async def generate_seine_transition_async(
         self, source_image_path, target_image_path
     ):
@@ -317,7 +313,6 @@ class VikitGateway(MLModelsGateway):
         ).text
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    @log_function_params
     async def get_keywords_from_prompt_async(
         self, subtitleText, excluded_words: str = None
     ):
@@ -372,7 +367,6 @@ class VikitGateway(MLModelsGateway):
         return clean_result, title_from_keywords_as_tokens
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    @log_function_params
     async def get_enhanced_prompt_async(self, subtitleText):
         """
         Generates an enhanced prompt from an original one, probably written by a user or
@@ -413,7 +407,6 @@ class VikitGateway(MLModelsGateway):
         return clean_result, title_from_keywords_as_tokens
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    @log_function_params
     async def get_subtitles_async(self, audiofile_path):
         # Obtain subtitles using Replicate API
         """

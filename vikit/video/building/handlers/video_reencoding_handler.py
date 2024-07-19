@@ -13,7 +13,6 @@ class VideoReencodingHandler(video_building_handler.VideoBuildingHandler):
     def is_supporting_async_mode(self):
         return True
 
-    @log_function_params
     async def _execute_logic_async(self, video: Video, **kwargs):
         await super()._execute_logic_async(video)
         """

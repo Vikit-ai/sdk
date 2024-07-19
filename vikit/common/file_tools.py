@@ -2,8 +2,10 @@ import os
 import re
 import uuid as uuid
 import urllib.parse
+import sys
 
 from typing import Union, Optional
+from loguru import logger
 
 
 def get_canonical_name(file_path: str):
@@ -15,10 +17,10 @@ def get_canonical_name(file_path: str):
 
 def get_max_filename_length(path="."):
     """
-    Fit the file name to a certain length, by removing the last characters if it is too long
+    get the max file name for the current OS
 
     params:
-    file_name: the file name to be fitted
+        path: the file path
 
     return: file name max length.
     """
@@ -42,8 +44,14 @@ def create_non_colliding_file_name(canonical_name: str = None, extension: str = 
     return: the non-colliding name
     """
     target_name = canonical_name + "_UID_" + str(uuid.uuid4()) + "." + extension
-    val_target_name = get_validated_path(target_name)
 
+    val_target_name = get_path_type(target_name)
+    if val_target_name["type"] == "error":
+        logger.warning(
+            f"Error creating non-colliding file name: {val_target_name['path']}"
+        )
+
+    logger.debug(f"val_target_name['path']: {val_target_name['path']}")
     return val_target_name["path"]
 
 
@@ -58,33 +66,94 @@ def get_max_remote_path_length():
     return 2048
 
 
-def get_validated_path(path: Optional[Union[str, os.PathLike]]) -> dict:
+def is_valid_path(path: Optional[Union[str, os.PathLike]]) -> bool:
     """
-    Validate the path and return its type
+    Check if the path is valid
 
     Args:
         path (str, os.PathLike): The path to validate
 
     Returns:
-        dict: The path type and the path itself
+        bool: True if the path is valid, False otherwise
     """
+    path = get_path_type(path)
+    if path["type"] == "error" or path["type"] == "none":
+        return False
+    return True
+
+
+def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
+    """
+    Validate the path and return its type
+
+    Args:
+        path (str, os.PathLike, ): The path to validate
+
+    Returns:
+        dict: The path type and the path itself
+        Can be local, http, https, s3, gs, None, undefined, error,
+    """
+    logger.debug(f"Checking path: {path}")
+
+    result = {"type": "undefined", "path": "undefined"}
     if path is None:
         return {"type": "none", "path": None}
 
-    if isinstance(path, os.PathLike) or os.path.isabs(path):
-        if len(path) > get_max_filename_length():
-            raise ValueError("The file name is too long for local filesystem storage")
-        return {"type": "local", "path": path}
+    if len(path) > get_max_filename_length():
+        return {
+            "type": "error",
+            "path": "The file name is too long for local filesystem storage",
+        }
 
-    # Check if the path is a URL
-    parsed_uri = urllib.parse.urlparse(str(path))
-    if parsed_uri.scheme in ["http", "https", "s3", "gs"]:
-        if len(parsed_uri.path) > get_max_remote_path_length():
-            raise ValueError("The file name is too long for remote storage")
-        if "stream" in parsed_uri.path:
-            return {"type": "streaming", "path": path}
-        else:
-            return {"type": "cloud", "path": path}
+    if os.path.exists(path) or is_valid_filename(filename=os.path.basename(path)):
+        logger.debug(f"Path is a PathLike object: {path}")
+        return {"type": "local", "path": path}
+    else:
+        # Check if the path is a URL
+        parsed_uri = urllib.parse.urlparse(str(path))
+
+        if parsed_uri.scheme in ["http", "https", "s3", "gs"]:
+            if len(parsed_uri.path) > get_max_remote_path_length():
+                raise ValueError("The file name is too long for remote storage")
+            return {"type": parsed_uri.scheme, "path": path}
 
     # by default, consider it as a local path
-    return {"type": "local", "path": path}
+    return result
+
+
+def is_valid_filename(filename: str) -> bool:
+    """
+    Check if the provided string is a valid filename for the local file system.
+
+    Args:
+        filename (str): The filename to check.
+
+    Returns:
+        bool: True if valid, False otherwise.
+    """
+    logger.debug(f"Checking filename: {filename}")
+    # Check for invalid characters
+    if sys.platform.startswith("win"):
+        # Windows filename restrictions
+        invalid_chars = r'[<>:"/\\|?*\x00-\x1F]'
+        reserved_names = ["CON", "PRN", "AUX", "NUL"] + [
+            f"{name}{i}" for name in ["COM", "LPT"] for i in range(1, 10)
+        ]
+        if any(filename.upper().startswith(reserved) for reserved in reserved_names):
+            return False
+    else:
+        # Unix/Linux/MacOS filename restrictions
+        invalid_chars = r"/"
+
+    if re.search(invalid_chars, filename):
+        return False
+
+    # Check for leading or trailing spaces or dots which can be problematic
+    if filename.strip(" .") != filename:
+        return False
+
+    # Check the length of the filename
+    if len(filename) > get_max_filename_length():
+        return False
+
+    return True

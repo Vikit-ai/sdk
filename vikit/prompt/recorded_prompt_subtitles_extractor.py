@@ -4,7 +4,6 @@ import subprocess
 from loguru import logger
 import pysrt
 
-from vikit.common.decorators import log_function_params
 from vikit.wrappers.ffmpeg_wrapper import extract_audio_slice, get_media_duration
 import vikit.common.config as config
 from vikit.prompt.subtitle_extractor import SubtitleExtractor
@@ -25,7 +24,6 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
     Yes this is kind of hacky, but it works for now.
     """
 
-    @log_function_params
     async def extract_subtitles_async(
         self, recorded_prompt_file_path, ml_models_gateway: MLModelsGateway = None
     ):
@@ -60,7 +58,7 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
             subs = await ml_models_gateway.get_subtitles_async(
                 audiofile_path=generated_slice
             )
-            logger.debug(f"Subtitles: {subs}")
+            logger.debug(f"Subtitles in subtitle extractor: {subs}")
 
             subtitle_file_path = "_".join(["subSubtitle", str(i), str(end)]) + ".srt"
             # Write subtitles to a temporary SRT file

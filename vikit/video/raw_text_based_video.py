@@ -8,7 +8,7 @@ from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
 from vikit.video.building.handlers.videogen_handler import (
-    VideoBuildingHandlerGenerateFomApi,
+    VideoGenHandler,
 )
 from vikit.video.building.handlers.interpolation_handler import (
     VideoInterpolationHandler,
@@ -70,7 +70,6 @@ class RawTextBasedVideo(Video):
         """
         return str(VideoType.RAWTEXT)
 
-    @log_function_params
     def get_title(self):
         if self._title:
             return self._title
@@ -88,7 +87,6 @@ class RawTextBasedVideo(Video):
             self._title = summarised_title
             return self._title
 
-    @log_function_params
     async def prepare_build(
         self,
         build_settings=VideoBuildSettings(),
@@ -102,19 +100,22 @@ class RawTextBasedVideo(Video):
         Returns:
             The current instance
         """
-        await super().prepare_build(build_settings)
+        if self.build_settings and self.are_build_settings_prepared:
+            logger.debug(f"Video {self.id} build settings already prepared")
+            return self
 
-        prompt_factory = PromptFactory(PromptBuildSettings)
-        self.build_settings.prompt = (
-            await prompt_factory.get_reengineered_prompt_from_text(
-                self._text, prompt_build_settings=build_settings
-            )
-        )
-        if self._title is None:
-            logger.trace(f"Video Title: {self._title}")
+        await super().prepare_build(build_settings)
+        # prompt_factory = PromptFactory(PromptBuildSettings)
+        # self.build_settings.prompt = (
+        #     await prompt_factory.get_reengineered_prompt_from_text(
+        #         self._text, prompt_build_settings=build_settings
+        #     )
+        # )
+        if not self._title:
             self._title = ft.get_safe_filename(
                 self.build_settings.prompter_prompt.extended_fields["title"]
             )
+            logger.trace(f"Video Title: {self._title}")
 
         return self
 
@@ -141,7 +142,7 @@ class RawTextBasedVideo(Video):
             list: The list of handlers to use for building the video
         """
         handlers = []
-        handlers.append(VideoBuildingHandlerGenerateFomApi())
+        handlers.append(VideoGenHandler())
         if build_settings.interpolate:
             handlers.append(VideoInterpolationHandler())
         if self._needs_reencoding:

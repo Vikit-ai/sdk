@@ -6,7 +6,6 @@ from vikit.prompt.text_prompt_subtitles_extractor import TextPromptSubtitlesExtr
 from vikit.prompt.recorded_prompt_subtitles_extractor import (
     RecordedPromptSubtitlesExtractor,
 )
-from vikit.common.decorators import log_function_params
 import vikit.common.config as config
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.building.prompt_building_handler import PromptBuildingHandler
@@ -51,7 +50,6 @@ class PromptFactory:
         else:
             self._ml_gateway = prompt_build_settings.get_ml_models_gateway()
 
-    @log_function_params
     async def create_prompt_from_text(
         self,
         prompt_text: str = None,
@@ -74,13 +72,16 @@ class PromptFactory:
         if len(prompt_text) == 0:
             raise ValueError("The prompt text is empty")
         extractor = None
+        logger.debug(f"Creating prompt from text: {prompt_text}")
         if generate_recording:
+            # calling a model like Whisper from openAI
             await self._ml_gateway.generate_mp3_from_text_async(
-                prompt_text=prompt_text, target_file=config.get_prompt_mp3_file_name()
+                prompt_text=prompt_text,
+                target_file_name=config.get_prompt_mp3_file_name(),
             )
 
             extractor = RecordedPromptSubtitlesExtractor()
-            subs = extractor.extract_subtitles_async(
+            subs = await extractor.extract_subtitles_async(
                 recorded_prompt_file_path=config.get_prompt_mp3_file_name(),
                 ml_models_gateway=self._ml_gateway,
             )
@@ -89,9 +90,10 @@ class PromptFactory:
             )
 
             prompt = (
-                TextPromptBuilder()
+                RecordedPromptBuilder()
                 .set_prompt_text(prompt_text)
                 .set_subtitles(merged_subs)
+                .set_audio_recording(config.get_prompt_mp3_file_name())
                 .build()
             )
             prompt.recorded_audio_prompt_path = config.get_prompt_mp3_file_name()
@@ -107,10 +109,8 @@ class PromptFactory:
                 .set_subtitles(merged_subs)
                 .build()
             )
-
         return prompt
 
-    @log_function_params
     async def create_prompt_from_audio_file(
         self,
         recorded_audio_prompt_path: str = None,
@@ -134,15 +134,20 @@ class PromptFactory:
             subs, min_duration=config.get_subtitles_min_duration()
         )
         text = extractor.build_subtitles_as_text_tokens(merged_subs)
-        prompt = RecordedPromptBuilder().set_subtitles(merged_subs).set_text(text)
-        prompt = await prompt.convert_recorded_audio_prompt_path(
+        prompt = (
+            RecordedPromptBuilder().set_subtitles(merged_subs).set_prompt_text(text)
+        )
+        prompt = await prompt.convert_recorded_audio_prompt_path_to_mp3(
             recorded_audio_prompt_path
         )
 
         return prompt.build()
 
     async def get_reengineered_prompt_from_text(
-        self, prompt: str, prompt_build_settings: PromptBuildSettings
+        self,
+        prompt: str,
+        prompt_build_settings: PromptBuildSettings,
+        duration: float = 0,
     ) -> TextPrompt:
         """
         Get a reengineered prompt from a text prompt, using build settings
@@ -154,7 +159,9 @@ class PromptFactory:
         Returns:
             Prompt: The prompt object
         """
-        text_prompt = TextPromptBuilder().set_prompt_text(prompt).build()
+        text_prompt = (
+            TextPromptBuilder().set_prompt_text(prompt).set_duration(duration).build()
+        )
         handler_chain = self.get_prompt_handler_chain(prompt_build_settings)
         if len(handler_chain) == 0:
             return text_prompt

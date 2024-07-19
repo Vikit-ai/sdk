@@ -17,7 +17,6 @@ class UsePromptAudioTrackAndAudioMergingHandler(
     def is_supporting_async_mode(self):
         return True
 
-    @log_function_params
     async def _execute_logic_async(self, video: Video, **kwargs):
         await super()._execute_logic_async(video)
         """
@@ -32,7 +31,7 @@ class UsePromptAudioTrackAndAudioMergingHandler(
         if video.build.prompt._recorded_audio_prompt_path is None:
             raise ValueError("Audio file path is required for the prompt")
 
-        self.media_url = await merge_audio(
+        video.media_url = await merge_audio(
             media_url=video.media_url,
             audio_file_path=video.build.prompt._recorded_audio_prompt_path,
             target_file_name=f"audio_{random.getrandbits(16)}_"

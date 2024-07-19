@@ -6,7 +6,6 @@ import pysrt
 from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
 from vikit.prompt.recorded_prompt import RecordedPrompt
 import vikit.common.config as config
-from vikit.common.decorators import log_function_params
 
 
 class RecordedPromptBuilder:
@@ -20,8 +19,7 @@ class RecordedPromptBuilder:
     def __init__(self):
         self.prompt = RecordedPrompt()
 
-    @log_function_params
-    def convert_recorded_audio_prompt_path(
+    async def convert_recorded_audio_prompt_path_to_mp3(
         self, recorded_audio_prompt_path: str, prompt_mp3_file_name=None
     ):
         """
@@ -38,7 +36,7 @@ class RecordedPromptBuilder:
             recorded_audio_prompt_path
         ), f"The provided target recording path does not exists/ {recorded_audio_prompt_path}"
 
-        self.prompt._recorded_audio_prompt_path = convert_as_mp3_file(
+        self.prompt.audio_recording = await convert_as_mp3_file(
             recorded_audio_prompt_path,
             (
                 prompt_mp3_file_name
@@ -47,13 +45,10 @@ class RecordedPromptBuilder:
             ),
         )
 
-        logger.debug(
-            f"Recorded audio prompt path {self.prompt._recorded_audio_prompt_path}"
-        )
+        logger.debug(f"Recorded audio prompt path {self.prompt.audio_recording}")
 
         return self
 
-    @log_function_params
     def set_subtitles(self, subs: list[pysrt.SubRipItem]):
         """
         set the prompt text using an LLM which extracts it from the recorded file
@@ -62,7 +57,11 @@ class RecordedPromptBuilder:
 
         return self
 
-    def set_text(self, text: str):
+    def set_audio_recording(self, audio_recording: bool):
+        self.prompt._audio_recording = audio_recording
+        return self
+
+    def set_prompt_text(self, text: str):
         """
         Set the text prompt
 

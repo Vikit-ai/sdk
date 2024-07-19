@@ -35,7 +35,7 @@ class WorkingFolderContext:
                 date_string,
                 "".join(random.choice(string.hexdigits) for i in range(20)),
             )
-            temp_folder = temp_folder + ("-" + mark) if mark else temp_folder
+            # temp_folder = temp_folder + ("-" + mark) if mark else temp_folder
             os.makedirs(temp_folder)
         else:
             if not os.path.exists(path):

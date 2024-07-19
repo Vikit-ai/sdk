@@ -48,7 +48,7 @@ class TestVideoBuildingAsync:
 
     @pytest.mark.local_integration
     @pytest.mark.skip(reason="Test is not yet implemented")
-    @log_function_params
+    @pytest.mark.asyncio
     async def test_generate_video_async(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo(prompt_mystic.text)

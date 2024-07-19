@@ -21,6 +21,7 @@ class GeneralBuildSettings:
         test_mode: bool = False,
         use_multiprocessing: bool = False,
         output_path: str = None,  # The path where the video will be saved, could be local or remote (i.e. a cloud bucket or a streaming service)
+        output_file_name: str = None,  # The final output file name
     ):
         self.delete_interim_files = delete_interim_files  # Not deleting the intermediate video files, first and last frames TODO: to be implemented
         # and any other resources is useful for debugging purposes and to reuse the data for further
@@ -35,7 +36,8 @@ class GeneralBuildSettings:
         self.id = str(randint(1, 9999999999)).zfill(10)
         self.build_date = datetime.date.today().strftime("%Y-%m-%d")
         self.build_time = datetime.datetime.now().time().strftime("%H:%M")
-        self._output_path = output_path if output_path else "."
+        self._output_path = output_path
+        self.output_file_name = output_file_name
 
     def get_ml_models_gateway(self):
         """

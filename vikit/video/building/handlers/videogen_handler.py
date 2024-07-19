@@ -3,18 +3,16 @@ from loguru import logger
 
 from vikit.video.building import video_building_handler
 from vikit.video.video import Video
-from vikit.common.file_tools import get_validated_path
-from vikit.common.decorators import log_function_params
+from vikit.common.file_tools import get_path_type
 
 
-class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHandler):
+class VideoGenHandler(video_building_handler.VideoBuildingHandler):
     def __init__(self):
         super().__init__()
 
     def is_supporting_async_mode(self):
         return True
 
-    @log_function_params
     async def _execute_logic_async(self, video: Video, **kwargs):
         await super()._execute_logic_async(video)
         """
@@ -38,7 +36,7 @@ class VideoBuildingHandlerGenerateFomApi(video_building_handler.VideoBuildingHan
             )
         )
         file_name = video.get_file_name_by_state(video.build_settings)
-        path_info = get_validated_path(video_link_from_prompt)
+        path_info = get_path_type(video_link_from_prompt)
         if path_info["type"] == "local":
             video.media_url = video_link_from_prompt
             logger.debug(

@@ -9,7 +9,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         delete_interim_files: bool = False,
         run_async: bool = True,
         test_mode: bool = True,
-        expected_length: float = None,  # The expected length in seconds of the video, will be used when actually building the video
+        expected_length: float = 1,  # The expected length in seconds of the video, will be used when actually building the video
         include_read_aloud_prompt: bool = False,  # Include a synthetic voice that reads the prompts in the final video
         prompt: Prompt = None,  # Include subtitles in the final video and fit videos to match the prompt subtitles timelines
         generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt
@@ -17,6 +17,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         interpolate: bool = True,  # Ask to interpolate the video
         music_building_context: MusicBuildingContext = MusicBuildingContext(),
         target_path: str = None,  # The path where the video will be saved, could be local or remote (i.e. a cloud bucket or a streaming service)
+        output_video_file_name: str = None,  # The file name of the output video, if needs to be set explicitely
     ):
 
         super().__init__(
@@ -24,6 +25,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
             run_async=run_async,
             test_mode=test_mode,
             output_path=target_path,
+            output_file_name=output_video_file_name,
         )
 
         self.expected_length = expected_length

@@ -15,14 +15,12 @@ class TextPromptBuilder:
         super().__init__()
         self.prompt = TextPrompt()
 
-    @log_function_params
     def set_prompt_text(self, text: str):
         if text is None:
             raise ValueError("The text prompt is not provided")
         self.prompt.text = text
         return self
 
-    @log_function_params
     def set_subtitles(self, subs: list[pysrt.SubRipItem]):
         """
         set the prompt text using an LLM which extracts it from the recorded file
@@ -36,6 +34,13 @@ class TextPromptBuilder:
         set the recording path
         """
         self.prompt.recorded_audio_prompt_path = recording_path
+        return self
+
+    def set_duration(self, duration: float):
+        """
+        set the duration of the prompt
+        """
+        self.prompt._duration = duration
         return self
 
     def build(self):

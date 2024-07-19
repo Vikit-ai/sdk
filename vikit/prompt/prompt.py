@@ -4,11 +4,7 @@ from typing import Any
 
 import pysrt
 
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-from vikit.gateways.ML_models_gateway import MLModelsGateway
-from vikit.common.decorators import log_function_params
 import vikit.common.secrets as secrets
-from vikit.wrappers.ffmpeg_wrapper import get_media_duration
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 
@@ -35,16 +31,14 @@ class Prompt(ABC):
     they are accepted by LLM's, like an image, a video, or an embedding...
     """
 
-    @log_function_params
-    def __init__(self, ml_gateway: MLModelsGateway = None):
+    def __init__(self, duration: float = 0):
         self.text = None
         self._subtitles: list[pysrt.SubRipItem] = None
         self._subtitle_extractor = None
-        if ml_gateway is None:
-            self._models_gateway = MLModelsGatewayFactory().get_ml_models_gateway()
         self.build_settings: PromptBuildSettings = PromptBuildSettings()
         self.title = "NoTitle"
         self._extended_fields: dict[str, Any] = {}
+        self._duration = duration
 
     @property
     def extended_fields(self) -> dict[str, Any]:
@@ -66,6 +60,13 @@ class Prompt(ABC):
         else:
             return " ".join([subtitle.text for subtitle in self.subtitles])
 
+    def get_duration(self) -> float:
+        """
+        Returns the duration of the recording
+        """
+        if self._duration:
+            return self._duration
+
     @property
     def subtitles(self) -> list[pysrt.SubRipItem]:
         """
@@ -74,16 +75,4 @@ class Prompt(ABC):
         Raises:
             ValueError: If the subtitles have not been prepared yet
         """
-        if self._subtitles is None:
-            raise ValueError("The subtitles have not been prepared yet")
-
         return self._subtitles
-
-    def get_duration(self) -> float:
-        """
-        Returns the duration of the recording
-        """
-        if self._recorded_audio_prompt_path is None:
-            raise ValueError("The recording is not there or generated yet")
-        total_length = get_media_duration(self._recorded_audio_prompt_path)
-        return total_length

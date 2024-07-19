@@ -47,6 +47,7 @@ class TestCompositeVideo:
             _ = Video()
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life(
         self,
     ):
@@ -69,6 +70,7 @@ class TestCompositeVideo:
             assert built.media_url is not None
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_int_create_video_mix_with_preexiting_video_bin_no_bkg_music(self):
         logger.add("log_test_composite_video.txt", rotation="10 MB", level="TRACE")
 
@@ -81,8 +83,10 @@ class TestCompositeVideo:
                 f"Test video mix with preexisting video bin: {test_video_mixer}"
             )
             assert test_video_mixer.media_url is not None
+            assert test_video_mixer.background_music is None
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_combine_generated_and_preexiting_video_based_video(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo(
@@ -96,6 +100,7 @@ class TestCompositeVideo:
             assert test_video_mixer.media_url is not None
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_build_video_composite_2_prompt_vids_music_no_subs_no_transition(
         self,
     ):
@@ -120,6 +125,7 @@ class TestCompositeVideo:
             ), "Background music should not be null"
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_build_video_composite_with_default_bkg_music_and_audio_subtitle(
         self,
     ):
@@ -146,6 +152,7 @@ class TestCompositeVideo:
             assert final_video.background_music is not None
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_prompt_recording_synchro_tired(self):
         with WorkingFolderContext():
             prompt_with_recording = tools.test_prompt_library["tired"]
@@ -170,6 +177,7 @@ class TestCompositeVideo:
             assert not final_composite_video.metadata.is_prompt_read_aloud
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_use_recording_ratio_on_existing_gen_default_bg_music_include_subs_loseFaitprompt(
         self,
     ):
@@ -195,6 +203,7 @@ class TestCompositeVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.skip
+    @pytest.mark.asyncio
     async def test_video_build_expected_video_length(self):
         """
         Create a single video mix with 2 imported video initially nade from gen video
@@ -235,14 +244,20 @@ class TestCompositeVideo:
             assert test_video_mixer.media_url is not None
 
     @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_tired_local_no_transitions_with_music_and_prompts(self):
 
         with WorkingFolderContext():
-            tired_prompt_with_recording = tools.create_fake_prompt_tired()
+            tired_prompt_with_recording = tools.create_fake_prompt_trainboy()
             final_composite_video = CompositeVideo()
             for subtitle in tired_prompt_with_recording.subtitles:
                 video = RawTextBasedVideo(subtitle.text)
-                await video.build(build_settings=VideoBuildSettings(test_mode=True))
+                await video.build(
+                    build_settings=VideoBuildSettings(
+                        test_mode=True,
+                        music_building_context=MusicBuildingContext(),
+                    )
+                )
                 final_composite_video.append_video(video)
 
             await final_composite_video.build(
@@ -257,7 +272,7 @@ class TestCompositeVideo:
             )
 
     @pytest.mark.local_integration
-    # @pytest.mark.non_regression
+    @pytest.mark.asyncio
     async def test_issue_6(self):
         """
         Transition between two compositve videos won't work #6
@@ -291,7 +306,7 @@ class TestCompositeVideo:
             assert vid_cp_final.media_url is not None, "Media URL should not be null"
 
     @pytest.mark.local_integration
-    @pytest.mark.non_regression
+    @pytest.mark.asyncio
     async def test_issue_6_generated_subvids(self):
         """
         Transition between two compositve videos won't work #6
