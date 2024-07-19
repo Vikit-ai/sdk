@@ -105,7 +105,7 @@ Wanna help? You're very welcome! A typical Pull Request workflow would be like t
 Please make sure your changes are consistent with these common guidelines:
 - Include unit tests when you contribute new features
 - Keep API compatibility in mind when you change code
-- use messages as proposed here [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) when you commit your code, which refers to the [Angular](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines) types: 
+- Use messages as proposed here [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) when you commit your code, which refers to the [Angular](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines) types: 
   - build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
   - ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
   - docs: Documentation only changes
