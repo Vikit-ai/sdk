@@ -18,7 +18,6 @@ class VideoBuildingHandler(ABC):
 
     def __init__(self, next_handler: "VideoBuildingHandler" = None, **kwargs):
         self.next_handler = next_handler
-        self.additional_args = kwargs
 
     @abstractmethod
     def is_supporting_async_mode(self):

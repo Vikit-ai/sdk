@@ -53,24 +53,27 @@ class RecordedPromptBuilder:
         """
         set the prompt text using an LLM which extracts it from the recorded file
         """
-        self.prompt._subtitles = subs
+        self.prompt.subtitles = subs
 
         return self
 
     def set_audio_recording(self, audio_recording: bool):
-        self.prompt._audio_recording = audio_recording
+        self.prompt.audio_recording = audio_recording
         return self
 
     def set_prompt_text(self, text: str):
-        """
-        Set the text prompt
-
-        Args:
-            text: The text prompt
-        """
         if text is None:
             raise ValueError("The text prompt is not provided")
         self.prompt.text = text
+        return self
+
+    def set_duration(self, duration: float):
+        if duration is None:
+            raise ValueError("The duration is not provided")
+        if duration <= 0:
+            raise ValueError("The duration is not valid")
+        self.prompt._duration = duration
+
         return self
 
     def build(self):

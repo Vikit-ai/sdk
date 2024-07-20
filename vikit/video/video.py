@@ -65,7 +65,7 @@ class Video(ABC):
         )
 
         self.media_url = None
-        self.build_settings: VideoBuildSettings = None
+        self.build_settings: VideoBuildSettings = VideoBuildSettings()
         self.are_build_settings_prepared = False
         self.video_dependencies = (
             []

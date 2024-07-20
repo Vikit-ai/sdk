@@ -12,8 +12,13 @@ class TextPrompt(Prompt):
         # for now a TextPrompt can have a recordedAudioprompt path
         # which might have been generated from an LLM so we can extract subtitles with some
         # fidelity to a human like reader that reads the prompt.
-        self.recorded_audio_prompt_path = None
         self.text = prompt_text
         if kwargs:
             self.extended_fields = kwargs
         self._subtitle_extractor = TextPromptSubtitlesExtractor()
+
+    def get_full_text(self) -> str:
+        """
+        Returns the full text of the prompt
+        """
+        return self.text

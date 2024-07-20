@@ -22,10 +22,8 @@ class TestVideoBuildingHandler:
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_VideoBuildingHandlerGenerateFomApi(self):
-        api_handler = VideoGenHandler()
-        vid = RawTextBasedVideo("test")
-        vid.build_settings = VideoBuildSettings(prompt=TextPrompt("test"))
-        vid = await vid.prepare_build(build_settings=vid.build_settings)
+        vid = RawTextBasedVideo(raw_text_prompt="test")
+        api_handler = VideoGenHandler(video_gen_prompt_text="test")
         video_built = await api_handler.execute_async(video=vid)
         assert video_built is not None, "Video built should not be None"
         assert (

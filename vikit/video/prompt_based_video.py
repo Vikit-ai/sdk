@@ -106,10 +106,13 @@ class PromptBasedVideo(CompositeVideo):
         Returns:
             The current instance
         """
-        build_settings.prompt = self._prompt
+        if not build_settings.prompt:
+            build_settings.prompt = self._prompt
+        if not build_settings.prompt:
+            raise ValueError(
+                "Prompt is not set in the build settings neither gathered from instanciation"
+            )
         await self.compose(build_settings=build_settings)
-        self.are_build_settings_prepared = True
-
         return await super().prepare_build(build_settings)
 
     def run_post_build_actions(self):

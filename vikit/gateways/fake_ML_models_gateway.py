@@ -98,16 +98,9 @@ class FakeMLModelsGateway(MLModelsGateway):
     async def get_keywords_from_prompt_async(
         self, subtitleText, excluded_words: str = None, sleep_time: int = 0
     ):
-        # TODO: work on a cleaner way to prevent circular deps
-        from vikit.prompt.text_prompt import TextPrompt
 
         await asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
-        return (
-            TextPrompt(
-                prompt_text="KEYWORDS FROM PROMPT",
-            ),
-            {"title", "test title"},
-        )
+        return "KEYWORDS FROM PROMPT", "test title"
 
     async def get_enhanced_prompt_async(
         self, subtitleText, excluded_words: str = None, sleep_time: int = 0

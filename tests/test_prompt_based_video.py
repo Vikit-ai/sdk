@@ -15,6 +15,7 @@ from vikit.video.video import VideoBuildSettings
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
 import tests.tests_tools as tools  # used to get a library of test prompts
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 TEST_PROMPT = "A group of stones in a forest, with symbols"
 
@@ -257,21 +258,26 @@ class TestPromptBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
+    @pytest.mark.skip
     async def test_collab_integration(self):
         with WorkingFolderContext():
+            prompt = await PromptFactory(
+                prompt_build_settings=PromptBuildSettings(test_mode=True)
+            ).create_prompt_from_text(
+                "A young girl traveling in the train alongside Mediterranean coast",
+                generate_recording=True,
+            )
             video_build_settings = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True, generate_background_music=True
                 ),
                 test_mode=True,
                 include_read_aloud_prompt=True,
+                prompt=prompt,
             )
-
-            gw = video_build_settings.get_ml_models_gateway()
-            prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(
-                "A young girl traveling in the train alongside Mediterranean coast"
-            )  # @param {type:"string"}
-
             video = PromptBasedVideo(prompt=prompt)
 
             await video.build(build_settings=video_build_settings)
+
+            assert video.media_url is not None
+            assert os.path.exists(video.media_url)

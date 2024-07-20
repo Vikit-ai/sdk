@@ -18,6 +18,7 @@ from vikit.prompt.building.handlers.prompt_by_keywords_handler import (
 from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
     PromptByRawUserTextHandler,
 )
+from vikit.wrappers.ffmpeg_wrapper import get_media_duration
 
 
 class PromptFactory:
@@ -85,7 +86,7 @@ class PromptFactory:
                 recorded_prompt_file_path=config.get_prompt_mp3_file_name(),
                 ml_models_gateway=self._ml_gateway,
             )
-            merged_subs = extractor.merge_short_subtitles(
+            merged_subs = extractor.merge_short_subtitles(  # merge short subtitles into larger ones
                 subs, min_duration=config.get_subtitles_min_duration()
             )
 
@@ -94,6 +95,7 @@ class PromptFactory:
                 .set_prompt_text(prompt_text)
                 .set_subtitles(merged_subs)
                 .set_audio_recording(config.get_prompt_mp3_file_name())
+                .set_duration(get_media_duration(config.get_prompt_mp3_file_name()))
                 .build()
             )
             prompt.recorded_audio_prompt_path = config.get_prompt_mp3_file_name()
@@ -159,18 +161,14 @@ class PromptFactory:
         Returns:
             Prompt: The prompt object
         """
-        text_prompt = (
-            TextPromptBuilder().set_prompt_text(prompt).set_duration(duration).build()
-        )
         handler_chain = self.get_prompt_handler_chain(prompt_build_settings)
         if len(handler_chain) == 0:
-            return text_prompt
+            return prompt
         else:
-            text_prompt, additional_args = await handler_chain[0].execute_async(
-                prompt=text_prompt, build_settings=prompt_build_settings
-            )
-            if additional_args:
-                text_prompt.extended_fields = additional_args
+            for handler in handler_chain:
+                text_prompt, video_suggested_title = await handler.execute_async(
+                    text_prompt=prompt, prompt_build_settings=prompt_build_settings
+                )
 
         return text_prompt
 

@@ -45,7 +45,7 @@ def create_fake_prompt_for_local_tests():
     ]
     prompt = RecordedPrompt()
     prompt.audio_recording = get_test_prompt_recording_trainboy()
-    prompt._subtitles = test_subs
+    prompt.subtitles = test_subs
     prompt.text = """A group of ancient moss-covered stones come to life in an abandoned forest, revealing intricate carvings and symbols
     A young boy traveling in the train alongside Mediterranean coast, contemplating the sea and loving it."""
     prompt._subtitle_as_text_tokens = [
@@ -65,9 +65,9 @@ def create_fake_prompt_for_local_tests_moss_stones_train_boy():
         SAMPLE_MEDIA_FOLDER,
     )
     prompt = RecordedPrompt()
-    prompt._subtitles = pysrt.open(os.path.join(_sample_media_dir, "subtitles.srt"))
+    prompt.subtitles = pysrt.open(os.path.join(_sample_media_dir, "subtitles.srt"))
     subs_as_text_tokens = SubtitleExtractor().build_subtitles_as_text_tokens(
-        prompt._subtitles
+        prompt.subtitles
     )
     prompt.audio_recording = get_test_prompt_recording_stones_trainboy_path()
     prompt.text = " ".join(subs_as_text_tokens)
@@ -82,9 +82,9 @@ def create_fake_prompt_trainboy():
         SAMPLE_MEDIA_FOLDER,
     )
     prompt = RecordedPrompt()
-    prompt._subtitles = pysrt.open(os.path.join(_sample_media_dir, "subtitles.srt"))
+    prompt.subtitles = pysrt.open(os.path.join(_sample_media_dir, "subtitles.srt"))
     subs_as_text_tokens = SubtitleExtractor().build_subtitles_as_text_tokens(
-        prompt._subtitles
+        prompt.subtitles
     )
     prompt.audio_recording = get_test_recorded_prompt_path()
     prompt.text = " ".join(subs_as_text_tokens)

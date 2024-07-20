@@ -3,7 +3,6 @@ import os
 from loguru import logger
 
 from vikit.common import file_tools as ft
-from vikit.common.decorators import log_function_params
 from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
@@ -17,8 +16,6 @@ from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
 from vikit.video.building.video_building_handler import VideoBuildingHandler
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 
 class RawTextBasedVideo(Video):
@@ -50,18 +47,19 @@ class RawTextBasedVideo(Video):
 
         super().__init__()
 
-        self._text = raw_text_prompt
+        self.text = raw_text_prompt
         self._title = None
         if title:
             self._title = title
         else:
             self._title = self.get_title()
-            self.metadata.title = self._title
-        self._keywords = None
-        self._needs_reencoding = False
+        self.metadata.title = self._title
+        self._needs_reencoding = (
+            False  # We usually don't need reencoding for raw text based videos
+        )
 
     def __str__(self) -> str:
-        return super().__str__() + os.linesep + f"text: {self._text}"
+        return super().__str__() + os.linesep + f"text: {self.text}"
 
     @property
     def short_type_name(self):
@@ -76,7 +74,7 @@ class RawTextBasedVideo(Video):
         else:
             # If no title existing yet (should be generated straight from an LLM)
             # then get the first and last words of the prompt
-            splitted_prompt = self._text.split(" ")
+            splitted_prompt = self.text.split(" ")
             clean_title_words = [word for word in splitted_prompt if word.isalnum()]
             if len(clean_title_words) == 1:
                 summarised_title = clean_title_words[0]
@@ -105,12 +103,6 @@ class RawTextBasedVideo(Video):
             return self
 
         await super().prepare_build(build_settings)
-        # prompt_factory = PromptFactory(PromptBuildSettings)
-        # self.build_settings.prompt = (
-        #     await prompt_factory.get_reengineered_prompt_from_text(
-        #         self._text, prompt_build_settings=build_settings
-        #     )
-        # )
         if not self._title:
             self._title = ft.get_safe_filename(
                 self.build_settings.prompter_prompt.extended_fields["title"]
@@ -142,7 +134,7 @@ class RawTextBasedVideo(Video):
             list: The list of handlers to use for building the video
         """
         handlers = []
-        handlers.append(VideoGenHandler())
+        handlers.append(VideoGenHandler(video_gen_prompt_text=self.text))
         if build_settings.interpolate:
             handlers.append(VideoInterpolationHandler())
         if self._needs_reencoding:

@@ -7,8 +7,11 @@ from vikit.common.file_tools import get_path_type
 
 
 class VideoGenHandler(video_building_handler.VideoBuildingHandler):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
+        self.video_gen_prompt_text = None
+        if "video_gen_prompt_text" in kwargs:
+            self.video_gen_prompt_text = kwargs["video_gen_prompt_text"]
 
     def is_supporting_async_mode(self):
         return True
@@ -27,11 +30,13 @@ class VideoGenHandler(video_building_handler.VideoBuildingHandler):
             CompositeVideo: The composite video
         """
         await super()._execute_logic_async(video, **kwargs)
+        if not self.video_gen_prompt_text:
+            raise ValueError("Prompt text is not set")
 
         video_link_from_prompt = (
             await (  # Should give a link on a web storage
                 video.build_settings.get_ml_models_gateway().generate_video_async(
-                    prompt=video.build_settings.prompt.text
+                    prompt=self.video_gen_prompt_text
                 )
             )
         )

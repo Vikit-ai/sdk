@@ -1,8 +1,9 @@
+import pysrt
+
 from vikit.prompt.prompt import Prompt
 from vikit.prompt.recorded_prompt_subtitles_extractor import (
     RecordedPromptSubtitlesExtractor,
 )
-from vikit.wrappers.ffmpeg_wrapper import get_media_duration
 
 
 class RecordedPrompt(Prompt):
@@ -16,15 +17,14 @@ class RecordedPrompt(Prompt):
         Initialize the prompt with the path to the recorded audio prompt after having converted it to mp3
         """
         self.audio_recording = None
+        self.subtitles: list[pysrt.SubRipItem] = None
         self._subtitle_extractor = RecordedPromptSubtitlesExtractor()
 
-    def get_duration(self) -> float:
+    def get_full_text(self) -> str:
         """
-        Returns the duration of the recording
+        Returns the full text of the prompt
         """
-        if not self.audio_recording:
-            raise ValueError("The recording is not there or generated yet")
-        total_length = get_media_duration(self.audio_recording)
-        self._duration = total_length
-
-        return self._duration
+        if len(self.subtitles) == 0:
+            return ""
+        else:
+            return " ".join([subtitle.text for subtitle in self.subtitles])

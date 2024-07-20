@@ -1,8 +1,6 @@
 import os
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any
-
-import pysrt
 
 import vikit.common.secrets as secrets
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
@@ -33,7 +31,6 @@ class Prompt(ABC):
 
     def __init__(self, duration: float = 0):
         self.text = None
-        self._subtitles: list[pysrt.SubRipItem] = None
         self._subtitle_extractor = None
         self.build_settings: PromptBuildSettings = PromptBuildSettings()
         self.title = "NoTitle"
@@ -50,29 +47,9 @@ class Prompt(ABC):
         if "title" in value:
             self.title = value["title"]
 
-    @property
-    def full_text(self) -> str:
+    @abstractmethod
+    def get_full_text(self) -> str:
         """
         Returns the full text of the prompt
         """
-        if self.subtitles is None or len(self.subtitles) == 0:
-            return self.text if self.text is not None else ""
-        else:
-            return " ".join([subtitle.text for subtitle in self.subtitles])
-
-    def get_duration(self) -> float:
-        """
-        Returns the duration of the recording
-        """
-        if self._duration:
-            return self._duration
-
-    @property
-    def subtitles(self) -> list[pysrt.SubRipItem]:
-        """
-        Returns the subtitles of the prompt.
-
-        Raises:
-            ValueError: If the subtitles have not been prepared yet
-        """
-        return self._subtitles
+        pass

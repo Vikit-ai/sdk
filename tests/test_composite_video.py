@@ -89,8 +89,9 @@ class TestCompositeVideo:
     @pytest.mark.asyncio
     async def test_combine_generated_and_preexiting_video_based_video(self):
         with WorkingFolderContext():
-            video = RawTextBasedVideo(
-                tools.test_prompt_library["moss_stones-train_boy"].text
+            video = RawTextBasedVideo("Some text")
+            video.build_settings = VideoBuildSettings(
+                prompt=tools.test_prompt_library["moss_stones-train_boy"]
             )
             video_imp = ImportedVideo(test_media.get_cat_video_path())
             test_video_mixer = CompositeVideo()

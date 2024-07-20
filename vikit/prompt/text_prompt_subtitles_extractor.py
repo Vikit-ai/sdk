@@ -6,8 +6,7 @@ import vikit.common.config as config
 
 class TextPromptSubtitlesExtractor(SubtitleExtractor):
     """
-    A class to extract subtitles from a sound recording,
-    merge short subtitles into longer ones, or extract them as text tokens
+    A class to extract subtitles from a text,
 
     We do use an heuristic, so it is not as good
     as creating a recording and getting the prompts from LLMs in the right language

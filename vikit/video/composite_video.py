@@ -217,11 +217,11 @@ class CompositeVideo(Video, is_composite_video):
         assert (
             self.build_settings is not None
         ), "Build settings should be avaialble at this stage"
-        # for video in self.video_list:
-        #     if not video.are_build_settings_prepared:
-        #         await video.prepare_build(
-        #             build_settings=self.get_cascaded_build_settings()
-        #         )
+        for video in self.video_list:
+            if not video.are_build_settings_prepared:
+                await video.prepare_build(
+                    build_settings=self.get_cascaded_build_settings()
+                )
 
         # Cleanse the video list by removing any empty composites videos
         self._video_list = self.cleanse_video_list()
@@ -390,24 +390,31 @@ class CompositeVideo(Video, is_composite_video):
         # and if you think it is long enough to add them
         if build_settings.music_building_context.apply_background_music:
             if build_settings.music_building_context.generate_background_music:
-                bg_music_prompt = self.generate_background_music_prompt()
-                if not bg_music_prompt or bg_music_prompt == "":
+                if build_settings.prompt:  # use the prompt if we have one
+                    bg_music = build_settings.prompt.get_full_text
+                else:
+                    bg_music = self.generate_background_music_prompt()
+
+                if not bg_music or bg_music == "":
                     logger.warning(
-                        "No prompt provided for background music generation, using the prompt full text to inspire the music"
+                        "No prompt provided for background music generation, skipping background music generation"
                     )
-                    bg_music_prompt = build_settings.prompt.full_text
-                music_file_name = f"generated_music_uid_{str(uuid.uuid4())}.mp3"
-                handlers.append(
-                    VideoMusicBuildingHandlerGenerateFomApi(
-                        target_music_file_name=music_file_name,
-                        bg_music_prompt=bg_music_prompt,
-                        duration=(
-                            build_settings.music_building_context.expected_music_length
-                            if build_settings.music_building_context.expected_music_length
-                            else build_settings.prompt.get_duration()
-                        ),
+                else:
+                    logger.debug(
+                        f"Generating background music using text prompt: {bg_music}"
                     )
-                )
+                    music_file_name = f"generated_music_uid_{str(uuid.uuid4())}.mp3"
+                    handlers.append(
+                        VideoMusicBuildingHandlerGenerateFomApi(
+                            target_music_file_name=music_file_name,
+                            bg_music_prompt=bg_music,
+                            duration=(
+                                build_settings.music_building_context.expected_music_length
+                                if build_settings.music_building_context.expected_music_length
+                                else build_settings.prompt.get_duration()
+                            ),
+                        )
+                    )
             else:
                 if build_settings.music_building_context.use_recorded_prompt_as_audio:
                     handlers.append(UsePromptAudioTrackAndAudioMergingHandler())

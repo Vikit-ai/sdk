@@ -26,7 +26,7 @@ class TestPromptBuildingHandlers:
         prompt_handler = PromptByKeywordsHandler()
         text_prompt = TextPrompt("test")
         prompt_built = await prompt_handler.execute_async(
-            prompt=text_prompt, build_settings=PromptBuildSettings()
+            text_prompt=text_prompt, build_settings=PromptBuildSettings()
         )
         assert prompt_built is not None, "Prompt built should not be None"
         assert prompt_handler.supports_async, "This handler should support async"
@@ -37,7 +37,7 @@ class TestPromptBuildingHandlers:
         prompt_handler = PromptByRawUserTextHandler()
         text_prompt = TextPrompt("test")
         prompt_built = await prompt_handler.execute_async(
-            prompt=text_prompt, build_settings=PromptBuildSettings()
+            text_prompt=text_prompt, build_settings=PromptBuildSettings()
         )
         assert prompt_built is not None, "Prompt built should not be None"
         assert prompt_handler.supports_async, "This handler should support async"
