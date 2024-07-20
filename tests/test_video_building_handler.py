@@ -3,13 +3,10 @@ import warnings
 import pytest
 from loguru import logger
 
-from vikit.prompt.text_prompt import TextPrompt
-
 from vikit.video.building.handlers.videogen_handler import (
     VideoGenHandler,
 )
 from vikit.video.raw_text_based_video import RawTextBasedVideo
-from vikit.video.video_build_settings import VideoBuildSettings
 
 
 class TestVideoBuildingHandler:

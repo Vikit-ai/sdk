@@ -9,6 +9,8 @@ class PromptBuildSettings(GeneralBuildSettings):
         delete_interim_files: bool = False,
         run_async: bool = True,
         test_mode: bool = True,
+        # exclude_words: str = "",  # used to prevent reusing the same words into close prompts,
+        # although this might be counterproductive. Feature flipped off until further experimentations
         ml_models_gateway: MLModelsGateway = None,
         generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt
         generate_from_llm_prompt: bool = True,
@@ -24,6 +26,7 @@ class PromptBuildSettings(GeneralBuildSettings):
         self._ml_models_gateway = ml_models_gateway
         self.generate_from_llm_keyword = generate_from_llm_keyword
         self.generate_from_llm_prompt = generate_from_llm_prompt
+        # self.excluded_words = ""
         self._additional_args = kwargs
 
     def get_ml_models_gateway(self):

@@ -10,7 +10,6 @@ from vikit.prompt.building.handlers.prompt_by_keywords_handler import (
 from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
     PromptByRawUserTextHandler,
 )
-from vikit.prompt.text_prompt import TextPrompt
 
 
 class TestPromptBuildingHandlers:
@@ -24,20 +23,18 @@ class TestPromptBuildingHandlers:
     @pytest.mark.asyncio
     async def test_PromptBuildingHandler_Gen_keywords(self):
         prompt_handler = PromptByKeywordsHandler()
-        text_prompt = TextPrompt("test")
+        text_prompt = str("test")
         prompt_built = await prompt_handler.execute_async(
-            text_prompt=text_prompt, build_settings=PromptBuildSettings()
+            text_prompt=text_prompt, prompt_build_settings=PromptBuildSettings()
         )
         assert prompt_built is not None, "Prompt built should not be None"
-        assert prompt_handler.supports_async, "This handler should support async"
 
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_PromptBuildingHandler_Gen_from_user_text(self):
         prompt_handler = PromptByRawUserTextHandler()
-        text_prompt = TextPrompt("test")
+        text_prompt = str("test")
         prompt_built = await prompt_handler.execute_async(
-            text_prompt=text_prompt, build_settings=PromptBuildSettings()
+            text_prompt=text_prompt, prompt_build_settings=PromptBuildSettings()
         )
         assert prompt_built is not None, "Prompt built should not be None"
-        assert prompt_handler.supports_async, "This handler should support async"

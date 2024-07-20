@@ -72,7 +72,7 @@ class RecordedPromptBuilder:
             raise ValueError("The duration is not provided")
         if duration <= 0:
             raise ValueError("The duration is not valid")
-        self.prompt._duration = duration
+        self.prompt.duration = duration
 
         return self
 

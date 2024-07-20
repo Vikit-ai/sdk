@@ -105,16 +105,8 @@ class FakeMLModelsGateway(MLModelsGateway):
     async def get_enhanced_prompt_async(
         self, subtitleText, excluded_words: str = None, sleep_time: int = 0
     ):
-        # TODO: work on a cleaner way to prevent circular deps
-        from vikit.prompt.text_prompt import TextPrompt
-
         await asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
-        return (
-            TextPrompt(
-                prompt_text="ENHANCED FROM PROMPT",
-            ),
-            {"title", "test title"},
-        )
+        return "ENHANCED FROM PROMPT", "test title"
 
     async def get_subtitles_async(self, audiofile_path, sleep_time: int = 0):
 

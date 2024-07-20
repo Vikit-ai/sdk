@@ -308,16 +308,15 @@ class CompositeVideo(Video, is_composite_video):
             ratioToMultiplyAnimations=ratio,
         )  # keeping one consistent file name
 
-    def _get_ratio_to_multiply_animations(self, build_settings, video_composite):
+    def _get_ratio_to_multiply_animations(self, build_settings: VideoBuildSettings):
         # Now we box the video composing this composite into the expected length, typically the one of a prompt
         if build_settings.expected_length is None:
             if build_settings.prompt is not None:
                 logger.debug(
-                    f"parameters video_composite.get_duration() build_settings.prompt : {video_composite.get_duration()}, {build_settings.prompt}"
+                    f"parameters video_composite.get_duration() build_settings.prompt : {self.get_duration()}, {build_settings.prompt}"
                 )
                 ratioToMultiplyAnimations = (
-                    video_composite.get_duration()
-                    / build_settings.prompt.get_duration()
+                    self.get_duration() / build_settings.prompt.duration
                 )
             else:
                 ratioToMultiplyAnimations = 1
@@ -327,7 +326,7 @@ class CompositeVideo(Video, is_composite_video):
                     f"Expected length should be greater than 0. Got {build_settings.expected_length}"
                 )
             ratioToMultiplyAnimations = (
-                video_composite.get_duration() / build_settings.expected_length
+                self.get_duration() / build_settings.expected_length
             )
 
         return ratioToMultiplyAnimations

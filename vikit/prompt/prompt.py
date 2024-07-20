@@ -29,13 +29,10 @@ class Prompt(ABC):
     they are accepted by LLM's, like an image, a video, or an embedding...
     """
 
-    def __init__(self, duration: float = 0):
-        self.text = None
-        self._subtitle_extractor = None
+    def __init__(self):
         self.build_settings: PromptBuildSettings = PromptBuildSettings()
         self.title = "NoTitle"
         self._extended_fields: dict[str, Any] = {}
-        self._duration = duration
 
     @property
     def extended_fields(self) -> dict[str, Any]:
@@ -46,10 +43,3 @@ class Prompt(ABC):
         self._extended_fields = value
         if "title" in value:
             self.title = value["title"]
-
-    @abstractmethod
-    def get_full_text(self) -> str:
-        """
-        Returns the full text of the prompt
-        """
-        pass

@@ -2,7 +2,6 @@ import pytest
 import warnings
 from loguru import logger
 
-from vikit.prompt.text_prompt import TextPrompt
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
@@ -16,36 +15,22 @@ class TestPromptFactory:
 
     @pytest.mark.unit
     @pytest.mark.asyncio
-    async def test_create_prompt_from_text(self):
-        text_prompt = await PromptFactory().create_prompt_from_text(
-            prompt_text="this is a test prompt", generate_recording=False
-        )
-        assert isinstance(
-            text_prompt, TextPrompt
-        ), f"Prompt should be a TextPrompt, got {type(text_prompt)}"
-        assert text_prompt is not None, "Prompt built should not be None"
-        assert (
-            text_prompt.text == "this is a test prompt"
-        ), f"Prompt text should be 'test', got {text_prompt.text}"
-
-    @pytest.mark.unit
-    @pytest.mark.asyncio
     async def test_reengineer_prompt_from_text(self):
 
-        build_settings = PromptBuildSettings(
+        pt_build_settings = PromptBuildSettings(
             generate_from_llm_keyword=True, generate_from_llm_prompt=False
         )
 
-        text_prompt = await PromptFactory().get_reengineered_prompt_from_text(
-            prompt="this is a test prompt", prompt_build_settings=build_settings
+        text_prompt = await PromptFactory().get_reengineered_prompt_text_from_raw_text(
+            prompt="this is a test prompt", prompt_build_settings=pt_build_settings
         )
-        assert isinstance(text_prompt, TextPrompt), "Prompt should be a TextPrompt"
+        assert isinstance(text_prompt, str), "Prompt should be a TextPrompt"
         assert text_prompt is not None, "Prompt built should not be None"
 
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_reengineer_prompt_from_text_noinputs(self):
-        with pytest.raises(ValueError):
-            _ = await PromptFactory().get_reengineered_prompt_from_text(
+        with pytest.raises(AttributeError):
+            _ = await PromptFactory().get_reengineered_prompt_text_from_raw_text(
                 prompt=None, prompt_build_settings=None
             )

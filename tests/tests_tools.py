@@ -89,6 +89,7 @@ def create_fake_prompt_trainboy():
     prompt.audio_recording = get_test_recorded_prompt_path()
     prompt.text = " ".join(subs_as_text_tokens)
     prompt._subtitle_as_text_tokens = subs_as_text_tokens
+    prompt.duration = 10
 
     return prompt
 

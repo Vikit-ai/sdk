@@ -19,6 +19,7 @@ class RecordedPrompt(Prompt):
         self.audio_recording = None
         self.subtitles: list[pysrt.SubRipItem] = None
         self._subtitle_extractor = RecordedPromptSubtitlesExtractor()
+        self.duration = None
 
     def get_full_text(self) -> str:
         """

@@ -9,7 +9,6 @@ import warnings
 # from unittest.mock import patch, MagicMock, Mock
 import tests.tests_medias as test_media
 from vikit.video.prompt_based_video import PromptBasedVideo
-from vikit.prompt.text_prompt import TextPrompt
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.video import VideoBuildSettings
 from vikit.common.context_managers import WorkingFolderContext
@@ -30,7 +29,7 @@ class TestPromptBasedVideo:
     @pytest.mark.unit
     def test_no_prompt_text(self):
         # with pytest.raises(ValueError):
-        _ = PromptBasedVideo(TextPrompt(""))
+        _ = PromptBasedVideo(str(""))
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -39,7 +38,9 @@ class TestPromptBasedVideo:
             build_settings = VideoBuildSettings()
             prompt = await PromptFactory(
                 ml_gateway=build_settings.get_ml_models_gateway(),
-            ).create_prompt_from_text("A group of stones", generate_recording=False)
+            ).create_prompt_from_text(
+                "A group of stones",
+            )
 
             video_title = PromptBasedVideo(prompt=prompt).get_title()
             assert len(video_title) > 0  # we should have a file of at least 1 character
@@ -50,7 +51,7 @@ class TestPromptBasedVideo:
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(
                 await PromptFactory().create_prompt_from_text(
-                    prompt_text=TEST_PROMPT, generate_recording=True
+                    prompt_text=TEST_PROMPT,
                 )
             )
             await pbvid.build()
@@ -105,7 +106,7 @@ class TestPromptBasedVideo:
 
             prompt = await PromptFactory(
                 ml_gateway=bld_settings.get_ml_models_gateway()
-            ).create_prompt_from_text(TEST_PROMPT, generate_recording=True)
+            ).create_prompt_from_text(TEST_PROMPT)
             pbvid = PromptBasedVideo(prompt=prompt)
 
             pbvid = await pbvid.build(
@@ -146,7 +147,7 @@ class TestPromptBasedVideo:
             test_prompt = await PromptFactory(
                 bld_settings.get_ml_models_gateway()
             ).create_prompt_from_text(
-                test_media.SOUND_OF_SILENCE, generate_recording=True
+                test_media.SOUND_OF_SILENCE,
             )
             bld_settings.prompt = test_prompt
 
@@ -192,7 +193,6 @@ class TestPromptBasedVideo:
                 """A travel over Reunion Island, taken fomm birdview at 2000meters above 
                 the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
                 , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
-                generate_recording=True,
             )
 
             video = PromptBasedVideo(prompt=test_prompt)
@@ -220,7 +220,6 @@ class TestPromptBasedVideo:
                 """A travel over Reunion Island, taken fomm birdview at 2000meters above 
                 the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
                 , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
-                generate_recording=True,
             )
 
             video = PromptBasedVideo(prompt=test_prompt)
@@ -247,7 +246,6 @@ class TestPromptBasedVideo:
                 """A travel over Reunion Island, taken fomm birdview at 2000meters above 
                 the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
                 , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
-                generate_recording=True,
             )
 
             video = PromptBasedVideo(prompt=test_prompt)
@@ -265,7 +263,6 @@ class TestPromptBasedVideo:
                 prompt_build_settings=PromptBuildSettings(test_mode=True)
             ).create_prompt_from_text(
                 "A young girl traveling in the train alongside Mediterranean coast",
-                generate_recording=True,
             )
             video_build_settings = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(

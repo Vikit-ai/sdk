@@ -1,47 +1,35 @@
-from typing import Any, Tuple
+from loguru import logger
 
-from vikit.prompt.building.prompt_building_handler import PromptBuildingHandler
+from vikit.common.handler import Handler
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
-from vikit.prompt.text_prompt import TextPrompt
 
 
-class PromptByRawUserTextHandler(PromptBuildingHandler):
-    def __init__(self):
-        super().__init__()
+class PromptByRawUserTextHandler(Handler):
 
-    def supports_async(self):
-        return True
-
-    async def _execute_logic_async(
-        self, prompt: TextPrompt, build_settings: PromptBuildSettings, **kwargs
-    ) -> Tuple[TextPrompt, dict[str, Any]]:
-        await super()._execute_logic_async(
-            prompt, build_settings=build_settings, **kwargs
-        )
+    async def execute_async(
+        self,
+        text_prompt: str,
+        prompt_build_settings: PromptBuildSettings,
+    ):
         """
         Process the text prompt to generate a better one more suited to generate a video,  and a title
         summarizing the prompt.
 
         Args:
             prompt (str): The prompt to generate the keywords from
-            build_settings (VideoBuildSettings): The build settings
-            **kwargs: Additional arguments
+            build_settings (PromptBuildSettings): The build settings
 
         Returns:
-            an list of keywords to be used for video generation
+            a string containing a list of keywords to be used for video generation
         """
-        await super()._execute_logic_async(
-            prompt, build_settings=build_settings, **kwargs
-        )
+        logger.info(f"Processing prompt: {text_prompt}")
         (
             enhanced_prompt,
-            enhanced_title,
-        ) = await build_settings.get_ml_models_gateway().get_enhanced_prompt_async(
-            prompt.text
+            title,
+        ) = await prompt_build_settings.get_ml_models_gateway().get_enhanced_prompt_async(
+            text_prompt
         )
-        return enhanced_prompt, {"title": enhanced_title}
-
-    def _execute_logic(
-        self, prompt: TextPrompt, build_settings: PromptBuildSettings, **kwargs
-    ) -> dict[str, Any]:
-        pass
+        logger.info(
+            f"Finished processing prompt, Enhanced prompt: {enhanced_prompt}, title: {title}"
+        )
+        return enhanced_prompt, title
