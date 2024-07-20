@@ -448,8 +448,8 @@ class VikitGateway(MLModelsGateway):
                 "model": "stability_text2image_core",
                 "input": {
                     "prompt": prompt,  # + ", 4k",
-                    "output_format": "png"
-                    "aspect_ratio": "16:9"
+                    "output_format": "png",
+                    "aspect_ratio": "16:9",
                 },
             },
         )
@@ -476,7 +476,7 @@ class VikitGateway(MLModelsGateway):
                 },
             },
         )
-        
+
         return "data:video/mp4;base64," + output.json()["video"]
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
