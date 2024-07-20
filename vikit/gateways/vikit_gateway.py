@@ -454,6 +454,7 @@ class VikitGateway(MLModelsGateway):
             },
         )
 
+        logger.debug(f"Resizing image for video generator")
         #Convert result to Base64
         buffer = io.BytesIO()
         imgdata = base64.b64decode(output.json()['image'])
@@ -462,6 +463,7 @@ class VikitGateway(MLModelsGateway):
         new_img.save(buffer, format="PNG")
         img_b64 = "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode('utf-8')
         
+        logger.debug(f"Generating video from image")
         #Ask for a video
         output = requests.post(
             "https://videho.replit.app/models",
