@@ -12,6 +12,9 @@ from vikit.common.config import get_nb_retries_http_calls
 import requests
 import base64
 import json
+from base64 import b64decode
+import io
+from PIL import Image
 
 
 os.environ["REPLICATE_API_TOKEN"] = get_replicate_api_token()
@@ -424,9 +427,62 @@ class VikitGateway(MLModelsGateway):
         )
 
         return json.loads(subs.text)
-        
+
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     def generate_video(self, prompt: str):
+        """
+        Generate a video from the given prompt
+
+        Args:
+            prompt: The prompt to generate the video from
+
+        returns:
+                The link to the generated video
+        """
+
+        logger.debug(f"Generating image from prompt: {prompt}")
+        output = requests.post(
+            vikit_backend_url,
+            json={
+                "key": vikit_api_key,
+                "model": "stability_text2image_core",
+                "input": {
+                    "prompt": prompt,  # + ", 4k",
+                    "output_format": "png",
+                    "aspect_ratio": "16:9",
+                },
+            },
+        )
+
+        logger.debug(f"Resizing image for video generator")
+        #Convert result to Base64
+        buffer = io.BytesIO()
+        imgdata = base64.b64decode(output.json()['image'])
+        img = Image.open(io.BytesIO(imgdata))
+        new_img = img.resize((1024, 576))  # x, y
+        new_img.save(buffer, format="PNG")
+        img_b64 = "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode('utf-8')
+        
+        logger.debug(f"Generating video from image")
+        #Ask for a video
+        output = requests.post(
+            "https://videho.replit.app/models",
+            json={
+                "key": vikit_api_key,
+                "model": "stability_image2video",
+                "input": {
+                    "image": img_b64,
+                    "seed": 0,
+                    "cfg_scale": 1.8,
+                    "motion_bucket_id": 127,
+                },
+            },
+        )
+
+        return "data:video/mp4;base64," + output.json()["video"]
+
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    def generate_video_haiper(self, prompt: str):
         """
         Generate a video from the given prompt
 
