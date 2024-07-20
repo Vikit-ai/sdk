@@ -17,6 +17,12 @@ import vikit.common.file_tools as ft
 import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
 from vikit.video.video_file_name import VideoFileName
 from vikit.video.video_metadata import VideoMetadata
+from IPython import display
+from base64 import b64decode
+import io
+import base64
+from PIL import Image
+
 
 
 class Video(ABC):
@@ -332,7 +338,7 @@ class Video(ABC):
 
         if build_settings.music_building_context.generate_background_music:
             self._background_music_file_name = self._generate_music(
-                expected_music_length=self.get_duration(),
+                expected_music_length=build_settings.music_building_context.expected_music_length,
                 test_mode=build_settings.test_mode,
                 prompt_text=prompt_text,
             )
