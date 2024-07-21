@@ -14,6 +14,7 @@ TEST_PROMPT_RECORDING_TRAIN_BOY = "sub_audio_for_subtitle_from_0_to_13.mp3"
 TEST_PROMPT_RECORDING_STONES_TRAIN_BOY = "sub_audio_for_subtitle_from_0_to_14.mp3"
 SAMPLE_GENERATED_MUSIC = "knowledgeStones_Forest_Symbols.mp3"
 SAMPLE_GENERATED_BG_MUSIC = "PodcastSerenity.mp3"
+SAMPLE_IMAGE_PROMPT = "image_prompt.jpeg"
 
 _media_dir = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), TESTS_MEDIA_FOLDER
@@ -51,6 +52,13 @@ def get_test_prompt_recording():
     Return the path of a short prompt recording
     """
     return os.path.join(_media_dir, TEST_PROMPT_RECORDING)
+
+
+def get_test_prompt_image():
+    """
+    Return the path of a image prompt input
+    """
+    return os.path.join(_media_dir, SAMPLE_IMAGE_PROMPT)
 
 
 def get_test_prompt_recording_trainboy():
