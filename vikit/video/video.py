@@ -11,7 +11,7 @@ from vikit.wrappers.ffmpeg_wrapper import (
 from vikit.video.video_build_settings import VideoBuildSettings
 import vikit.common.file_tools as ft
 from vikit.video.video_metadata import VideoMetadata
-from vikit.video.building.video_building_handler import VideoBuildingHandler
+from vikit.common.handler import Handler
 from vikit.video.video_file_name import VideoFileName
 
 
@@ -197,10 +197,7 @@ class Video(ABC):
             )
         else:
             for handler in handler_chain:
-                if handler.is_supporting_async_mode():
-                    built_video, _ = await handler.execute_async(video=self)
-                else:
-                    built_video = handler.execute(video=self)
+                built_video = await handler.execute_async(video=self)
 
             self.run_post_build_actions()  # self and built_video are the same here
 
@@ -238,24 +235,6 @@ class Video(ABC):
         """
         return f"{self.media_url[:-4].split('/')[-1]}_background_music.mp3"
 
-    @abstractmethod
-    def get_and_initialize_video_handler_chain(
-        self, build_settings: VideoBuildSettings
-    ) -> list[VideoBuildingHandler]:
-        """
-        Get the handler chain of the video.
-        Defining the handler chain is the main way to define how the video is built
-        so it is up to the child classes to implement this method as a complement
-        of this music building logic, or to redefine it.
-
-        Args:
-            build_settings (VideoBuildSettings): The settings to use for building the video
-
-        Returns:
-            list: The list of handlers to use for building the video
-        """
-        return []
-
     def get_file_name_by_state(self, build_settings: VideoBuildSettings = None):
         """
         Get the file name of the video by its state
@@ -275,3 +254,21 @@ class Video(ABC):
                 ),
             )
         )
+
+    @abstractmethod
+    def get_and_initialize_video_handler_chain(
+        self, build_settings: VideoBuildSettings
+    ) -> list[Handler]:
+        """
+        Get the handler chain of the video.
+        Defining the handler chain is the main way to define how the video is built
+        so it is up to the child classes to implement this method as a complement
+        of this music building logic, or to redefine it.
+
+        Args:
+            build_settings (VideoBuildSettings): The settings to use for building the video
+
+        Returns:
+            list: The list of handlers to use for building the video
+        """
+        return []

@@ -1,14 +1,13 @@
 import os
 from vikit.video.video import Video, VideoBuildSettings
-from vikit.common.decorators import log_function_params
 from vikit.video.video_types import VideoType
-from vikit.video.building.video_building_handler import VideoBuildingHandler
 from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
 from vikit.video.building.handlers.interpolation_handler import (
     VideoInterpolationHandler,
 )
+from vikit.common.handler import Handler
 
 
 class ImportedVideo(Video):
@@ -73,7 +72,7 @@ class ImportedVideo(Video):
 
     def get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings
-    ) -> list[VideoBuildingHandler]:
+    ) -> list[Handler]:
         """
         Get the handler chain of the video. Order matters here.
 

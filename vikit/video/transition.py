@@ -7,7 +7,7 @@ from vikit.video.video import Video
 from vikit.common.decorators import log_function_params
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
-from vikit.video.building.video_building_handler import VideoBuildingHandler
+from vikit.common.handler import Handler
 from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
@@ -106,7 +106,7 @@ class Transition(Video):
 
     def get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings
-    ) -> list[VideoBuildingHandler]:
+    ) -> list[Handler]:
         """
         Get the handler chain of the video.
         Defining the handler chain is the main way to define how the video is built

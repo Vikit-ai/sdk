@@ -15,7 +15,7 @@ from vikit.video.building.handlers.interpolation_handler import (
 from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
-from vikit.video.building.video_building_handler import VideoBuildingHandler
+from vikit.common.handler import Handler
 
 
 class RawTextBasedVideo(Video):
@@ -113,7 +113,7 @@ class RawTextBasedVideo(Video):
 
     def get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings
-    ) -> list[VideoBuildingHandler]:
+    ) -> list[Handler]:
         """
         Get the handler chain of the video. Order matters here.
 
@@ -134,7 +134,7 @@ class RawTextBasedVideo(Video):
             list: The list of handlers to use for building the video
         """
         handlers = []
-        handlers.append(VideoGenHandler(video_gen_prompt_text=self.text))
+        handlers.append(VideoGenHandler(video_gen_text_prompt=self.text))
         if build_settings.interpolate:
             handlers.append(VideoInterpolationHandler())
         if self._needs_reencoding:

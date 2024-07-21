@@ -13,7 +13,7 @@ from vikit.video.building.build_order import (
 )
 from vikit.music_building_context import MusicBuildingContext
 from vikit.wrappers.ffmpeg_wrapper import concatenate_videos, merge_audio
-from vikit.video.building.video_building_handler import VideoBuildingHandler
+from vikit.common.handler import Handler
 from vikit.video.building.handlers.video_target_file_name_handler import (
     VideoBuildingHandlerTargetFileSetter,
 )
@@ -32,10 +32,6 @@ from vikit.video.building.handlers.gen_music_and_audio_merging_handler import (
 from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
-
-# from vikit.video.building.handlers.interpolation_handler import (
-#     VideoBuildingHandlerInterpolate,
-# )
 
 
 class CompositeVideo(Video, is_composite_video):
@@ -267,14 +263,13 @@ class CompositeVideo(Video, is_composite_video):
         for handler in self.get_and_initialize_video_handler_chain(
             build_settings=build_settings
         ):
-            if handler.is_supporting_async_mode():
-                built_video, _ = await handler.execute_async(video=self)
-            else:
-                built_video = handler.execute(video=self)
+            built_video = await handler.execute_async(
+                video=self,
+            )
 
-        self.run_post_build_actions()
+        built_video.run_post_build_actions()
 
-        return self
+        return built_video
 
     async def concatenate(self):
         """
@@ -293,7 +288,7 @@ class CompositeVideo(Video, is_composite_video):
             ]
         )
         ratio = self._get_ratio_to_multiply_animations(
-            build_settings=self.build_settings, video_composite=self
+            build_settings=self.build_settings
         )
         with open(video_list_file, "w") as myfile:
             for video in self.video_list:
@@ -364,7 +359,7 @@ class CompositeVideo(Video, is_composite_video):
 
     def get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings
-    ) -> list[VideoBuildingHandler]:
+    ) -> list[Handler]:
         """
         Get the handler chain of the video.
         Defining the handler chain is the main way to define how the video is built
@@ -393,7 +388,6 @@ class CompositeVideo(Video, is_composite_video):
                     bg_music = build_settings.prompt.get_full_text
                 else:
                     bg_music = self.generate_background_music_prompt()
-
                 if not bg_music or bg_music == "":
                     logger.warning(
                         "No prompt provided for background music generation, skipping background music generation"
@@ -402,15 +396,13 @@ class CompositeVideo(Video, is_composite_video):
                     logger.debug(
                         f"Generating background music using text prompt: {bg_music}"
                     )
-                    music_file_name = f"generated_music_uid_{str(uuid.uuid4())}.mp3"
                     handlers.append(
                         VideoMusicBuildingHandlerGenerateFomApi(
-                            target_music_file_name=music_file_name,
                             bg_music_prompt=bg_music,
-                            duration=(
+                            music_duration=(
                                 build_settings.music_building_context.expected_music_length
                                 if build_settings.music_building_context.expected_music_length
-                                else build_settings.prompt.get_duration()
+                                else build_settings.prompt.duration
                             ),
                         )
                     )
@@ -422,11 +414,7 @@ class CompositeVideo(Video, is_composite_video):
 
         if build_settings.include_read_aloud_prompt:
             if build_settings.prompt:
-                handlers.append(
-                    ReadAloudPromptAudioMergingHandler(
-                        audio_file=build_settings.prompt.audio_recording
-                    )
-                )
+                handlers.append(ReadAloudPromptAudioMergingHandler())
             else:
                 logger.warning(
                     "No prompt audio file provided, skipping audio insertion"
@@ -435,7 +423,7 @@ class CompositeVideo(Video, is_composite_video):
         if (
             self._is_root_video_composite
         ):  # set the target file name only for the final root composite
-            if build_settings._output_path:
+            if build_settings.output_file_name:
                 handlers.append(
                     VideoBuildingHandlerTargetFileSetter(
                         video_target_file_name=self.build_settings.output_file_name,

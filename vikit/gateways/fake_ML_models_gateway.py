@@ -51,9 +51,6 @@ class FakeMLModelsGateway(MLModelsGateway):
     ) -> str:
         await asyncio.sleep(sleep_time)
 
-        if type(duration) is not float:
-            raise TypeError("Duration must be a float")
-
         if duration < 0:
             raise ValueError("Duration must be a positive float")
 

@@ -9,7 +9,7 @@ class PromptByKeywordsHandler(Handler):
     async def execute_async(
         self,
         text_prompt: str,
-        prompt_build_settings: PromptBuildSettings,
+        **kwargs,
     ):
         """
         Process the text prompt to generate a better one more suited to generate a video,  and a title
@@ -26,6 +26,10 @@ class PromptByKeywordsHandler(Handler):
         Returns:
             a string containing a list of keywords to be used for video generation
         """
+        prompt_build_settings: PromptBuildSettings = kwargs.get("prompt_build_settings")
+        if not prompt_build_settings:
+            raise ValueError("PromptBuildSettings is required to process prompt")
+
         logger.info(f"Processing prompt: {text_prompt}")
         (
             enhanced_prompt,

@@ -1,20 +1,13 @@
 from loguru import logger
 
-from vikit.video.building import video_building_handler
+from vikit.common.handler import Handler
 from vikit.video.video import Video
 from vikit.wrappers.ffmpeg_wrapper import reencode_video
-from vikit.common.decorators import log_function_params
 
 
-class VideoReencodingHandler(video_building_handler.VideoBuildingHandler):
-    def __init__(self):
-        super().__init__()
+class VideoReencodingHandler(Handler):
 
-    def is_supporting_async_mode(self):
-        return True
-
-    async def _execute_logic_async(self, video: Video, **kwargs):
-        await super()._execute_logic_async(video)
+    async def execute_async(self, video: Video):
         """
         Process the video to reencode and normalize binaries, i.e. make it so the
         different video composing a composite have the same format
@@ -27,7 +20,6 @@ class VideoReencodingHandler(video_building_handler.VideoBuildingHandler):
 
         """
         logger.debug(f"Reencoding video: {video.id}, {video.media_url}")
-        await super()._execute_logic_async(video, **kwargs)
         if not video.media_url:
             raise ValueError(f"Video {video.id} has no media url")
 
@@ -39,16 +31,11 @@ class VideoReencodingHandler(video_building_handler.VideoBuildingHandler):
                     build_settings=video.build_settings
                 ),
             )
+            video.metadata.is_reencoded = True
+            logger.trace(f"Video reencoded: {video.id}, {video.media_url}")
         else:
-            return video, kwargs
+            logger.warning(
+                f"Video {video.id} does not need reencoding, handler should not have been called"
+            )
 
-        video.metadata.is_reencoded = True
-
-        logger.trace(f"Video reencoded: {video.id}, {video.media_url}")
-        return video, kwargs
-
-    def _execute_logic(self, video: Video, **kwargs):
-        """
-        Process the video generation  synchronously
-        """
-        pass
+        return video

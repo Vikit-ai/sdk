@@ -3,20 +3,14 @@ from urllib.request import urlretrieve
 from loguru import logger
 
 from vikit.video.transition import url_exists
-from vikit.video.building import video_building_handler
+from vikit.common.handler import Handler
 from vikit.video.video import Video
 from vikit.common.file_tools import get_path_type
 
 
-class VideoBuildingHandlerTransition(video_building_handler.VideoBuildingHandler):
-    def __init__(self):
-        super().__init__()
+class VideoBuildingHandlerTransition(Handler):
 
-    def is_supporting_async_mode(self):
-        return True
-
-    async def _execute_logic_async(self, video: Video, **kwargs):
-        await super()._execute_logic_async(video, kwargs=kwargs)
+    async def execute_async(self, video: Video):
         """
         Process the video generation binaries: we actually do ask the video to build itself
         as a video binary (typically an MP4 generated from Gen AI, hosted behind an API),
@@ -28,8 +22,6 @@ class VideoBuildingHandlerTransition(video_building_handler.VideoBuildingHandler
         Returns:
             CompositeVideo: The composite video
         """
-        await super()._execute_logic_async(video, **kwargs)
-
         assert video.source_video.is_video_generated, "source video must be generated"
         assert video.target_video.is_video_generated, "target video must be generated"
         assert url_exists(video.source_video.media_url), "source_video must exist"
@@ -65,10 +57,4 @@ class VideoBuildingHandlerTransition(video_building_handler.VideoBuildingHandler
         video.metadata.is_video_generated = True
         video._media_url = target_file_name
 
-        return video, kwargs
-
-    def _execute_logic(self, video: Video, **kwargs) -> Video:
-        """
-        Process the video generation  synchronously
-        """
-        pass
+        return video

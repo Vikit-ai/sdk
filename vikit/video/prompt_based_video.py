@@ -14,7 +14,7 @@ from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
-from vikit.video.building.video_building_handler import VideoBuildingHandler
+from vikit.common.handler import Handler
 
 
 class PromptBasedVideo(CompositeVideo):
@@ -189,7 +189,7 @@ class PromptBasedVideo(CompositeVideo):
 
     def get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings
-    ) -> list[VideoBuildingHandler]:
+    ) -> list[Handler]:
         """
         Get the handler chain of the video.
         Defining the handler chain is the main way to define how the video is built

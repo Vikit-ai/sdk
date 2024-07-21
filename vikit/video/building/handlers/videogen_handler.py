@@ -1,23 +1,18 @@
 from urllib.request import urlretrieve
 from loguru import logger
 
-from vikit.video.building import video_building_handler
 from vikit.video.video import Video
 from vikit.common.file_tools import get_path_type
+from vikit.common.handler import Handler
 
 
-class VideoGenHandler(video_building_handler.VideoBuildingHandler):
-    def __init__(self, **kwargs):
-        super().__init__()
-        self.video_gen_prompt_text = None
-        if "video_gen_prompt_text" in kwargs:
-            self.video_gen_prompt_text = kwargs["video_gen_prompt_text"]
+class VideoGenHandler(Handler):
+    def __init__(self, video_gen_text_prompt: str = None):
+        if not video_gen_text_prompt:
+            raise ValueError("Prompt text is not set")
+        self.video_gen_prompt_text = video_gen_text_prompt
 
-    def is_supporting_async_mode(self):
-        return True
-
-    async def _execute_logic_async(self, video: Video, **kwargs):
-        await super()._execute_logic_async(video)
+    async def execute_async(self, video: Video):
         """
         Process the video generation binaries: we actually do ask the video to build itself
         as a video binary (typically an MP4 generated from Gen AI, hosted behind an API),
@@ -29,10 +24,6 @@ class VideoGenHandler(video_building_handler.VideoBuildingHandler):
         Returns:
             CompositeVideo: The composite video
         """
-        await super()._execute_logic_async(video, **kwargs)
-        if not self.video_gen_prompt_text:
-            raise ValueError("Prompt text is not set")
-
         video_link_from_prompt = (
             await (  # Should give a link on a web storage
                 video.build_settings.get_ml_models_gateway().generate_video_async(
@@ -57,10 +48,4 @@ class VideoGenHandler(video_building_handler.VideoBuildingHandler):
         video.metadata.is_video_generated = True
 
         logger.debug(f"Video generated from prompt: {video.media_url}")
-        return video, kwargs
-
-    def _execute_logic(self, video: Video, **kwargs) -> Video:
-        """
-        Process the video generation  synchronously
-        """
-        pass
+        return video

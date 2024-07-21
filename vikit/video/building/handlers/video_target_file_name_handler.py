@@ -2,36 +2,27 @@ import shutil
 import os
 
 from loguru import logger
-from vikit.video.building import video_building_handler
 from vikit.video.video import Video
 from vikit.common.file_tools import get_path_type, is_valid_path
+from vikit.common.handler import Handler
 
 
-class VideoBuildingHandlerTargetFileSetter(video_building_handler.VideoBuildingHandler):
-    def __init__(self, **kwargs):
-        super().__init__(kwargs=kwargs)
-        self._target_file_name = None
-
-        if "video_target_path" in kwargs:
-            self._target_file_name = kwargs["video_target_file_name"]
-        else:
+class VideoBuildingHandlerTargetFileSetter(Handler):
+    def __init__(self, video_target_path: str, video_target_file_name: str):
+        if not video_target_file_name:
             raise ValueError("Video target file name is required")
+        self._target_file_name = video_target_file_name
 
-        if "video_target_path" in kwargs:
-            self._target_dir_path = kwargs["video_target_dir_path"]
-        else:
-            raise ValueError("video_target_path file name is required")
+        if not video_target_path:
+            raise ValueError("Video target path is required")
+        self._target_dir_path = video_target_path
 
-    def is_supporting_async_mode(self):
-        return True
-
-    async def _execute_logic_async(self, video: Video, **kwargs):
-        await super()._execute_logic_async(video)
+    async def execute_async(self, video: Video):
         """
         Rename the video media file to the target file name if not already set
-        to the target file name. 
+        to the target file name.
         Todday this function only works for local files.
-        We fail open: in case no target file name works, we just keep the video 
+        We fail open: in case no target file name works, we just keep the video
         as it is and where it stands. We send a warning to the logger though.
 
         Args:
@@ -43,12 +34,6 @@ class VideoBuildingHandlerTargetFileSetter(video_building_handler.VideoBuildingH
         continue_processing = True
         if not self._target_file_name:
             if is_valid_path(video.video.build_settings.target_file_name):
-                logger.warning(
-                    f"Video target file name is not set. Using the one from the video build settings"
-                )
-                logger.debug(
-                    f"Video target file name from build settings: {video.build_settings.target_file_name}"
-                )
                 self._target_file_name = video.build_settings.output_file_name
             else:
                 logger.warning(
@@ -85,14 +70,8 @@ class VideoBuildingHandlerTargetFileSetter(video_building_handler.VideoBuildingH
                     )
                     video.media_url = self._target_file_name
             else:
-                logger.warning(
+                raise ValueError(
                     f"Video media url is not local: {video.media_url}. Cannot rename to target file name yet"
                 )
 
-        return video, kwargs
-
-    def _execute_logic(self, video: Video, **kwargs) -> Video:
-        """
-        Process the video generation  synchronously
-        """
-        pass
+        return video

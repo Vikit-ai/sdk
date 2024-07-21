@@ -1,27 +1,23 @@
 import os
 import random
 
-from vikit.video.building import video_building_handler
+from vikit.common.handler import Handler
 from vikit.video.video import Video
 import vikit.common.config as config
 from vikit.wrappers.ffmpeg_wrapper import merge_audio, extract_audio_slice
 
 
-class DefaultBGMusicAndAudioMergingHandler(video_building_handler.VideoBuildingHandler):
+class DefaultBGMusicAndAudioMergingHandler(Handler):
 
-    def is_supporting_async_mode(self):
-        return True
-
-    async def _execute_logic_async(self, video: Video, **kwargs):
-        await super()._execute_logic_async(video)
+    async def execute_async(self, video: Video):
         """
         Merge background music and video  as a single media file
-        
+
         Args:
             video (Video): The video to process
 
         Returns:
-            The video including bg music 
+            The video including bg music
         """
         assert video.media_url is not None, "Media URL is required for the video"
         expected_music_duration = (
@@ -41,11 +37,7 @@ class DefaultBGMusicAndAudioMergingHandler(video_building_handler.VideoBuildingH
         video._is_background_music_generated = True
         video.metadata.bg_music_applied = True
 
-        return video, kwargs
-
-    def _execute_logic(self, video: Video) -> Video:
-        return super()._execute_logic(video)
-        pass
+        return video
 
     async def _fit_standard_background_music(
         self, video, expected_music_duration: float = None
