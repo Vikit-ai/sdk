@@ -24,6 +24,9 @@ class ReadAloudPromptAudioMergingHandler(Handler):
         Returns:
             The video including generated synthetic voice that reads the prompt
         """
+        video.metadata.is_prompt_read_aloud = True
+        video.metadata.bg_music_applied = True
+
         video.media_url = await merge_audio(
             media_url=video.media_url,
             audio_file_path=self.recorded_prompt.audio_recording,
@@ -31,7 +34,6 @@ class ReadAloudPromptAudioMergingHandler(Handler):
                 build_settings=video.build_settings
             ),
         )
-        video.metadata.is_prompt_read_aloud = True
         assert video.media_url, "Media URL was not generated properly"
 
         return video

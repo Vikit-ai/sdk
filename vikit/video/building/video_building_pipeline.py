@@ -14,12 +14,6 @@ from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handl
 from vikit.video.building.handlers.generate_music_and_merge_handler import (
     GenerateMusicAndMergeHandler,
 )
-from vikit.video.building.handlers.video_reencoding_handler import (
-    VideoReencodingHandler,
-)
-from vikit.video.building.handlers.interpolation_handler import (
-    VideoInterpolationHandler,
-)
 
 
 class VideoBuildingPipeline:
@@ -27,33 +21,14 @@ class VideoBuildingPipeline:
     def get_handlers(self, video, build_settings: VideoBuildSettings):
         """
         Get the handlers for the video building pipeline, in the right order
-        - based on the build settings (interpolation)
-        - based on the video itself (reencoding)
         - background music based on the build settings (background music)
         - read aloud prompt based on the build settings (read aloud prompt)
 
         """
         handlers = []
-        handlers.extend(self.get_handlers_from_build_settings(video, build_settings))
+
         handlers.extend(self.get_background_music_handlers(build_settings))
         handlers.extend(self.get_read_aloud_prompt_handlers(build_settings))
-        return handlers
-
-    def get_handlers_from_build_settings(
-        self, video, build_settings: VideoBuildSettings
-    ):
-        """
-        Get the handlers for the video building pipeline, respect the order
-        (i.e. interpolation before reencoding)
-        """
-        handlers = []
-
-        if build_settings.interpolate:
-            handlers.append(VideoInterpolationHandler())
-
-        if video._needs_reencoding:
-            handlers.append(VideoReencodingHandler())
-
         return handlers
 
     def get_background_music_handlers(self, build_settings: VideoBuildSettings):

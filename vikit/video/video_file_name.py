@@ -1,4 +1,4 @@
-import uuid as uuid
+import random
 import datetime
 import os
 
@@ -66,8 +66,8 @@ class VideoFileName:
 
         self._build_id = build_settings.id
         self._build_date = build_settings.build_date
-        self._build_time = build_settings.build_time
-        self._unique_id = uuid.uuid4()
+        # self._build_time = build_settings.build_time
+        self._unique_id = random.getrandbits(16)
         self._file_extension = file_extension
 
         self._video_features = None
@@ -136,7 +136,8 @@ class VideoFileName:
             return False
 
         try:
-            uuid.UUID(parts[7].split(".")[0])  # 6 is the string UID
+            value = int(parts[7], 16)
+            return 0 <= value <= 0xFFFF
         except ValueError:
             return False
 
@@ -161,14 +162,14 @@ class VideoFileName:
         bld_settings = VideoBuildSettings()
         bld_settings.id = parts[3]
         bld_settings.build_date = datetime.date.fromisoformat(parts[4])
-        bld_settings.build_time = datetime.time.fromisoformat(parts[5])
+        # bld_settings.build_time = datetime.time.fromisoformat(parts[5])
 
         video_file_name = VideoFileName(
             build_settings=bld_settings, video_metadata=VideoMetadata(title=title)
         )
         video_file_name._video_type = parts[1]
         video_file_name._video_features = parts[2]
-        video_file_name._unique_id = uuid.UUID(parts[7].split(".")[0])
+        video_file_name._unique_id = parts[7].split(".")[0]
 
         return video_file_name
 
@@ -237,13 +238,13 @@ class VideoFileName:
         """
         Get the file name of the video,  as a string
         """
-        return f"{self._title}_{str(self.video_type)}_{self.video_features}_{self.build_id}_{self._build_date}_{self._build_time}_UID_{self.unique_id}.{self._file_extension}"
+        return f"{self._title}_{str(self.video_type)}_{self.video_features}_{self.build_id}_{self._build_date}_UID_{self.unique_id}.{self._file_extension}"
 
     def __str__(self):
         return self._fit(target_path=self._build_settings.output_path)
 
     def __repr__(self):
-        return f"Title: {self._title}, Video Type: {self._video_type}, Video Features: {self._video_features} , Build ID: {self._build_id}, Build Date: {self._build_date},  Build Time: {self._build_time}, Unique ID: {self._unique_id},"
+        return f"Title: {self._title}, Video Type: {self._video_type}, Video Features: {self._video_features} , Build ID: {self._build_id}, Build Date: {self._build_date}, Unique ID: {self._unique_id},"
 
     @property
     def video_features(self):

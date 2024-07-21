@@ -1,5 +1,3 @@
-import random
-
 from vikit.common.handler import Handler
 from vikit.wrappers.ffmpeg_wrapper import (
     merge_audio,
@@ -21,14 +19,13 @@ class UsePromptAudioTrackAndAudioMergingHandler(Handler):
 
         if video.build.prompt._recorded_audio_prompt_path is None:
             raise ValueError("Audio file path is required for the prompt")
+        video.metadata.bg_music_applied = True
+        video.metadata.is_subtitle_audio_applied = True
 
         video.media_url = await merge_audio(
             media_url=video.media_url,
             audio_file_path=video.build.prompt._recorded_audio_prompt_path,
-            target_file_name=f"audio_{random.getrandbits(16)}_"
-            + video.media_url.split("/")[-1],
+            target_file_name=video.get_file_name_by_state(),
         )
-        video.metadata.bg_music_applied = True
-        video.metadata.is_subtitle_audio_applied = True
 
         return video

@@ -1,4 +1,6 @@
 import os
+import shutil
+import uuid as uid
 
 from loguru import logger
 from vikit.video.video import Video
@@ -16,6 +18,7 @@ from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
 from vikit.common.handler import Handler
+from vikit.common.file_tools import get_path_type
 
 
 class CompositeVideo(Video, is_composite_video):
@@ -168,10 +171,6 @@ class CompositeVideo(Video, is_composite_video):
         Returns:
             list: The video build order
         """
-        logger.debug(f"Preparing video {self.id} build settings")
-        assert (
-            self.build_settings is not None
-        ), "Build settings should be avaialble at this stage"
         for video in self.video_list:
             if not video.are_build_settings_prepared:
                 await video.prepare_build_hook(
@@ -197,14 +196,18 @@ class CompositeVideo(Video, is_composite_video):
         Returns:
             self: The current object
         """
-        # if self._is_root_video_composite:
-        ordered_video_list = get_lazy_dependency_chain_build_order(
-            video_tree=self.video_list,
-            build_settings=build_settings,
-            already_added=set(),
-        )
-        for video in ordered_video_list:
-            await video.build(build_settings=build_settings)
+        if (
+            self._is_root_video_composite
+        ):  # This check is important: we generate an ordered video list
+            # for the whole video tree at once
+            ordered_video_list = get_lazy_dependency_chain_build_order(
+                video_tree=self.video_list,
+                build_settings=build_settings,
+                already_added=set(),
+            )
+            for video in ordered_video_list:
+                await video.build(build_settings=build_settings)
+
         self.media_url = await self.concatenate()
 
         return self
@@ -267,6 +270,69 @@ class CompositeVideo(Video, is_composite_video):
 
         return ratioToMultiplyAnimations
 
+    async def run_post_build_actions_hook(self, build_settings: VideoBuildSettings):
+        if not build_settings.output_file_name:
+            name, extension = os.path.splitext(os.path.basename(self.media_url))
+            new_name = f"{name}_{uid.uuid4()}{extension}"
+            build_settings.output_file_name = os.path.join(
+                os.path.dirname(self.media_url), new_name
+            )
+            logger.warning(
+                f"Output file name not set, using a random name: {build_settings.output_file_name}"
+            )
+
+        if self._is_root_video_composite:
+            self.set_final_video_name(
+                target_dir_path=build_settings.output_path,
+                output_file_name=build_settings.output_file_name,
+            )
+
+    def set_final_video_name(self, target_dir_path: str, output_file_name: str):
+        """
+        Rename the video media file to the target file name if not already set
+        to the target file name.
+        Todday this function only works for local files.
+        We fail open: in case no target file name works, we just keep the video
+        as it is and where it stands. We send a warning to the logger though.
+
+        Args:
+            target_file_path (str): The target file path
+            output_file_name (str): The output file name
+
+        Returns:
+            The video with the target file name
+        """
+        # Rename the video media file to the target file name
+        if not target_dir_path or get_path_type(target_dir_path)["type"] == "local":
+            current_dir_name = os.path.dirname(self.media_url)
+            current_file_name = os.path.basename(self.media_url)
+            if (
+                current_dir_name != target_dir_path
+                or current_file_name != output_file_name
+            ):
+                new_file_path = (
+                    output_file_name
+                    if not target_dir_path
+                    else os.path.join(target_dir_path, output_file_name)
+                )
+                logger.debug(
+                    f"Copying video media file from {self.media_url} to {new_file_path}"
+                )
+                if target_dir_path:
+                    assert os.path.exists(
+                        target_dir_path
+                    ), f"File {target_dir_path} does not exist"
+
+                shutil.copyfile(
+                    self.media_url,
+                    new_file_path,
+                )
+                self.media_url = new_file_path
+        else:
+            raise ValueError(
+                f"Target dir path is not local: {target_dir_path}. Cannot rename to target file name yet"
+            )
+
     def generate_background_music_prompt(self):
         """
         Get the background music prompt from the video list.
@@ -278,7 +344,7 @@ class CompositeVideo(Video, is_composite_video):
             [video.get_title() for video in self.video_list if video.get_title()]
         )
 
-    def get_core_handlers(self) -> list[Handler]:
+    def get_core_handlers(self, build_settings) -> list[Handler]:
         """
          Get the handler chain of the video. Order matters here.
 

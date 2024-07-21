@@ -3,6 +3,9 @@ from vikit.video.transition import Transition
 from vikit.video.building.handlers.transition_handler import (
     VideoBuildingHandlerTransition,
 )
+from vikit.video.building.handlers.interpolation_handler import (
+    VideoInterpolationHandler,
+)
 from vikit.common.handler import Handler
 
 
@@ -34,5 +37,7 @@ class SeineTransition(Transition):
         """
         handlers = []
         handlers.append(VideoBuildingHandlerTransition())
+        if build_settings.interpolate:
+            handlers.append(VideoInterpolationHandler())
 
         return handlers

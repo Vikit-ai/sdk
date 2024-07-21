@@ -15,9 +15,7 @@ class GenerateMusicAndMergeHandler(Handler):
 
     async def execute_async(self, video):
         """
-        Process the video generation binaries: we actually do ask the video to build itself
-        as a video binary (typically an MP4 generated from Gen AI, hosted behind an API),
-        or to compose from its inner videos in case of a child composite video
+        Generate a background music based on the prompt and merge it with the video
 
         Args:
             video (Video): The video to process
@@ -36,6 +34,9 @@ class GenerateMusicAndMergeHandler(Handler):
         )
         video.background_music = bg_music_file
 
+        video.metadata.is_bg_music_generated = True
+        video.metadata.bg_music_applied = True
+
         video.media_url = await merge_audio(
             media_url=video.media_url,
             audio_file_path=video.background_music,
@@ -44,4 +45,5 @@ class GenerateMusicAndMergeHandler(Handler):
         assert (
             video.background_music is not None
         ), "Background music was not generated properly"
+
         return video

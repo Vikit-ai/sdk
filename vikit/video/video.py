@@ -210,16 +210,16 @@ class Video(ABC):
             return self
 
         current_dir = os.getcwd()
-        logger.warning(
+        logger.trace(
             f"Starting the pre build hook for Video {self.id}, current_dir {current_dir} "
         )
 
-        wfolder_changed = self._set_working_folder_path(
-            build_settings.working_folder_path
-        )
-        logger.warning(f"Working folder changed: {wfolder_changed}")
+        wfolder_changed = self._set_working_folder_path(build_settings.output_path)
+        logger.trace(f"Working folder changed: {wfolder_changed}")
 
-        logger.debug(f"Starting the pre build hook for Video {self.id} ")
+        logger.trace(
+            f"Starting the pre build hook for Video {self.id} of type {self.short_type_name} / {type(self)}"
+        )
         await self.run_pre_build_actions_hook(build_settings=build_settings)
 
         built_video = None
@@ -243,7 +243,9 @@ class Video(ABC):
         logger.debug(f"Starting the post build hook for Video {self.id} ")
         await self.run_post_build_actions_hook(build_settings=build_settings)
         if wfolder_changed:
-            self._set_working_folder_path(current_dir)
+            self._set_working_folder_path(
+                current_dir
+            )  # go back to the original working folder
 
         self.is_video_generated = True
 
@@ -263,10 +265,12 @@ class Video(ABC):
                 f"No handler chain defined for the video of type {self.short_type_name}"
             )
         else:
+            logger.debug(
+                f"about to run {len(handler_chain)} handlers for video {self.id} of type {self.short_type_name} / {type(self)}"
+            )
             for handler in handler_chain:
                 built_video = await handler.execute_async(video=self)
                 assert built_video, "The video was not built properly"
-                self.metadata = built_video.metadata
 
         self.metadata.title = self.get_title()
         self.metadata.duration = self.get_duration()

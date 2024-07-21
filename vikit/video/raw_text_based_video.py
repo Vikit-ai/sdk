@@ -5,6 +5,9 @@ from vikit.video.video_types import VideoType
 from vikit.video.building.handlers.videogen_handler import (
     VideoGenHandler,
 )
+from vikit.video.building.handlers.interpolation_handler import (
+    VideoInterpolationHandler,
+)
 from vikit.common.handler import Handler
 
 
@@ -89,7 +92,7 @@ class RawTextBasedVideo(Video):
 
         return self
 
-    def get_core_handlers(self) -> list[Handler]:
+    def get_core_handlers(self, build_settings) -> list[Handler]:
         """
          Get the handler chain of the video. Order matters here.
          At this stage, we should already have the enhanced prompt and title for this video
@@ -102,4 +105,6 @@ class RawTextBasedVideo(Video):
         """
         handlers = []
         handlers.append(VideoGenHandler(video_gen_text_prompt=self.text))
+        if build_settings.interpolate:
+            handlers.append(VideoInterpolationHandler())
         return handlers

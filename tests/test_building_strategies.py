@@ -127,6 +127,34 @@ class TestVideoBuildingStrategies:
             assert isinstance(video_build_order[7], CompositeVideo)
             assert isinstance(video_build_order[16], CompositeVideo)
 
+    @pytest.mark.unit
+    @pytest.mark.asyncio
+    async def test_get_lazy_dependency_chain_build_order(self):
+        # Create a sample video tree
+        video1 = RawTextBasedVideo("a")
+        video2 = RawTextBasedVideo("b")
+        video3 = RawTextBasedVideo("c")
+        video4 = RawTextBasedVideo("d")
+        video5 = RawTextBasedVideo("e")
+
+        # Set video dependencies
+        video1.video_dependencies = [video2, video3]
+        video3.video_dependencies = [video4, video5]
+
+        # Create a sample build settings
+        build_settings = VideoBuildSettings()
+
+        # Call the function
+        build_order = get_lazy_dependency_chain_build_order(
+            video_tree=[video1],
+            build_settings=build_settings,
+            already_added=set(),
+            video_build_order=[],
+        )
+
+        # Assert the build order
+        assert build_order == [video2, video4, video5, video3, video1]
+
     # @pytest.mark.unit
     # @pytest.mark.asyncio
     # @pytest.mark.skip

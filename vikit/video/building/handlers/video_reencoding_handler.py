@@ -23,6 +23,7 @@ class VideoReencodingHandler(Handler):
             raise ValueError(f"Video {video.id} has no media url")
 
         logger.debug(f"Video video.media_url : {video.media_url}")
+        video.metadata.is_reencoded = True
         if video._needs_video_reencoding:
             video._media_url = await reencode_video(
                 video_url=video.media_url,
@@ -30,7 +31,6 @@ class VideoReencodingHandler(Handler):
                     build_settings=video.build_settings
                 ),
             )
-            video.metadata.is_reencoded = True
             logger.trace(f"Video reencoded: {video.id}, {video.media_url}")
         else:
             logger.warning(

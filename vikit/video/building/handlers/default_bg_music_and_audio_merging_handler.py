@@ -26,18 +26,18 @@ class DefaultBGMusicAndAudioMergingHandler(Handler):
         audio_file = await self._fit_standard_background_music(
             expected_music_duration=expected_music_duration, video=video
         )
+        video.metadata.bg_music_applied = True
+        video.metadata.bg_music_applied = True
+
         self.media_url = await merge_audio(
             media_url=video.media_url,
             audio_file_path=audio_file,
-            target_file_name=f"bg_music_{random.getrandbits(5)}_"
-            + video.media_url.split("/")[-1],
+            target_file_name=video.get_file_name_by_state(),
         )
         assert audio_file, "Default Background music was not fit properly to video"
         video.background_music = audio_file
-        video._is_background_music_generated = True
-        video.metadata.bg_music_applied = True
-
         assert video.media_url, "Default Background music was not merged properly"
+
         return video
 
     async def _fit_standard_background_music(
