@@ -243,6 +243,7 @@ class CompositeVideo(Video, is_composite_video):
             return self
         await self.prepare_build(build_settings=build_settings)
         logger.debug(f"Current - Building video {self.id}")
+        built_video = None
         if self._is_root_video_composite:
 
             # The list below is generated in a control and command way,
@@ -263,13 +264,14 @@ class CompositeVideo(Video, is_composite_video):
         for handler in self.get_and_initialize_video_handler_chain(
             build_settings=build_settings
         ):
-            built_video = await handler.execute_async(
+            logger.debug(f"Executing handler {handler} on video {self.id}")
+            _ = await handler.execute_async(
                 video=self,
             )
 
-        built_video.run_post_build_actions()
+        self.run_post_build_actions()
 
-        return built_video
+        return self
 
     async def concatenate(self):
         """
@@ -379,31 +381,41 @@ class CompositeVideo(Video, is_composite_video):
         if self._needs_reencoding:
             handlers.append(VideoReencodingHandler())
 
+        bg_music_text_prompt = None
         # You may use specific background music and prompt audio for the composite video
         # even if not a root composite, in case the composite is a part of a bigger video
         # and if you think it is long enough to add them
         if build_settings.music_building_context.apply_background_music:
             if build_settings.music_building_context.generate_background_music:
                 if build_settings.prompt:  # use the prompt if we have one
-                    bg_music = build_settings.prompt.get_full_text
-                else:
-                    bg_music = self.generate_background_music_prompt()
-                if not bg_music or bg_music == "":
+                    if build_settings.prompt.text:
+                        bg_music_text_prompt = build_settings.prompt.text
+                        logger.debug(
+                            f"Generating background music using prompt: {build_settings.prompt.text}"
+                        )
+                    else:
+                        logger.debug(
+                            "No prompt provided for background music generation, using composite video list  concatenated titles"
+                        )
+                        bg_music_text_prompt = self.generate_background_music_prompt()
+                if not bg_music_text_prompt or bg_music_text_prompt == "":
                     logger.warning(
-                        "No prompt provided for background music generation, skipping background music generation"
+                        "No textt prompt coud be used or infered for background music generation, skipping background music generation"
                     )
                 else:
                     logger.debug(
-                        f"Generating background music using text prompt: {bg_music}"
+                        f"build_settings.music_building_context.expected_music_length : {build_settings.music_building_context.expected_music_length}"
+                    )
+                    logger.debug(f"build_settings.prompt : {build_settings.prompt}")
+                    music_duration = (
+                        build_settings.music_building_context.expected_music_length
+                        if build_settings.music_building_context.expected_music_length
+                        else build_settings.prompt.duration
                     )
                     handlers.append(
                         VideoMusicBuildingHandlerGenerateFomApi(
-                            bg_music_prompt=bg_music,
-                            music_duration=(
-                                build_settings.music_building_context.expected_music_length
-                                if build_settings.music_building_context.expected_music_length
-                                else build_settings.prompt.duration
-                            ),
+                            bg_music_prompt=bg_music_text_prompt,
+                            music_duration=music_duration,
                         )
                     )
             else:

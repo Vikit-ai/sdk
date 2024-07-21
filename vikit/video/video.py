@@ -108,14 +108,25 @@ class Video(ABC):
     @background_music.setter
     def background_music(self, file_name):
         self._background_music_file_name = file_name
+        self.metadata.is_bg_music_generated = True
 
     @property
     def duration(self):
         return self.metadata.duration
 
+    @duration.setter
+    def duration(self, value):
+        self._duration = value
+        self.metadata.duration = value
+
     @property
     def is_video_generated(self):
-        return self.metadata.is_video_generated
+        return self._is_video_generated
+
+    @is_video_generated.setter
+    def is_video_generated(self, value):
+        self._is_video_generated = value
+        self.metadata.is_video_generated = value
 
     @property
     def title(self):

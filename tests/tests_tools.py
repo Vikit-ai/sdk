@@ -72,6 +72,7 @@ def create_fake_prompt_for_local_tests_moss_stones_train_boy():
     prompt.audio_recording = get_test_prompt_recording_stones_trainboy_path()
     prompt.text = " ".join(subs_as_text_tokens)
     prompt._subtitle_as_text_tokens = subs_as_text_tokens
+    prompt.duration = 13
 
     return prompt
 
@@ -89,7 +90,7 @@ def create_fake_prompt_trainboy():
     prompt.audio_recording = get_test_recorded_prompt_path()
     prompt.text = " ".join(subs_as_text_tokens)
     prompt._subtitle_as_text_tokens = subs_as_text_tokens
-    prompt.duration = 10
+    prompt.duration = 11  # completely random value :)
 
     return prompt
 

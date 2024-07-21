@@ -32,11 +32,12 @@ class DefaultBGMusicAndAudioMergingHandler(Handler):
             target_file_name=f"bg_music_{random.getrandbits(5)}_"
             + video.media_url.split("/")[-1],
         )
+        assert audio_file, "Default Background music was not fit properly to video"
         video.background_music = audio_file
-        assert os.path.exists(audio_file), f"File {audio_file} does not exist"
         video._is_background_music_generated = True
         video.metadata.bg_music_applied = True
 
+        assert video.media_url, "Default Background music was not merged properly"
         return video
 
     async def _fit_standard_background_music(

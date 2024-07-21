@@ -20,5 +20,5 @@ class VideoInterpolationHandler(Handler):
         )[0]
         video.media_url = interpolated_video_path
         video.metadata.is_interpolated = True
-
+        assert video.media_url, "Interpolated video was not generated properly"
         return video

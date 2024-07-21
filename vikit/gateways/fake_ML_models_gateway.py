@@ -52,7 +52,7 @@ class FakeMLModelsGateway(MLModelsGateway):
         await asyncio.sleep(sleep_time)
 
         if duration < 0:
-            raise ValueError("Duration must be a positive float")
+            raise ValueError(f"Duration must be a positive float, got {duration}")
 
         return tests_medias.get_sample_gen_background_music()
 

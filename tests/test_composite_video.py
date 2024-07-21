@@ -153,6 +153,7 @@ class TestCompositeVideo:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True
                     ),
+                    prompt=test_prompt,
                 )
             )
             assert (
@@ -374,9 +375,7 @@ class TestCompositeVideo:
             from vikit.video.seine_transition import SeineTransition
 
             transition = SeineTransition(comp_start, comp_end)
-
             vid_cp_final = CompositeVideo()
-
             vid_cp_final.append_video(comp_start).append_video(transition).append_video(
                 comp_end
             )

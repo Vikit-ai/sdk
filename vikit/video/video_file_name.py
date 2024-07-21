@@ -56,7 +56,6 @@ class VideoFileName:
         if video_metadata is None:
             raise ValueError("video_metadata cannot be None")
         self._video_metadata = video_metadata
-        logger.debug(f"video_metadata: {video_metadata}")
         self._title = self._truncate_title(
             video_metadata.title, max_length=self.VIDEO_TITLE_MAX_LENGTH
         )

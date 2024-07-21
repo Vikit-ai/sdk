@@ -1,3 +1,5 @@
+from loguru import logger
+
 from vikit.common.handler import Handler
 from vikit.video.video import Video
 from vikit.wrappers.ffmpeg_wrapper import (
@@ -42,4 +44,7 @@ class VideoMusicBuildingHandlerGenerateFomApi(Handler):
             audio_file_path=video.background_music,
             target_file_name=video.get_file_name_by_state(),
         )
+        assert (
+            video.background_music is not None
+        ), "Background music was not generated properly"
         return video

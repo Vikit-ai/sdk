@@ -32,5 +32,6 @@ class ReadAloudPromptAudioMergingHandler(Handler):
             target_file_name="background_music_" + video.media_url.split("/")[-1],
         )
         video.metadata.is_prompt_read_aloud = True
+        assert video.media_url, "Media URL was not generated properly"
 
         return video
