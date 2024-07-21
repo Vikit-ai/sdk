@@ -267,7 +267,7 @@ class VikitGateway(MLModelsGateway):
         if video is None:
             raise AttributeError("The input video is None")
 
-        logger.debug(f"Video to interpolate {video}")
+        logger.debug(f"Video to interpolate {video.substring(0, 50)}")
 
         returnedVideo = requests.post(
             vikit_backend_url,
