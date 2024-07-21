@@ -100,7 +100,7 @@ class RawTextBasedVideo(Video):
         if self.metadata.is_video_generated:
             return self
 
-        logger.info("Generating video, could take some time ")
+        logger.info("Generating video, could take somne time ")
         enhanced_prompt = None
         ml_gateway = build_settings.get_ml_models_gateway()
 

@@ -3,27 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-========================================
-Vikit.ai
-========================================
-
 Welcome to vikit.ai SDK's documentation!
+========================================
 
-**Vikit** let you develop easily video generators leveraging generative AI and other AI models. You may see this as a langchain to orchestrate AI models and video editing tools.
-
-Contents
-========
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
+   :caption: Contents:
 
    autoapi/index
-   contributing
-   license
 
-Diagrams
-============
-
-`Diagrams <_static/diagrams/index.html>`_
 
 Indices and tables
 ==================

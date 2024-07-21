@@ -1,28 +1,21 @@
-
 GeneralBuildSettings
 ====================
 
 .. py:module:: GeneralBuildSettings
 
 
-Overview
---------
-
-.. list-table:: Classes
-   :header-rows: 0
-   :widths: auto
-   :class: summarytable
-
-   * - :py:obj:`GeneralBuildSettings <GeneralBuildSettings.GeneralBuildSettings>`
-     - General build settings for the video generation
-
-
-
-
 Classes
 -------
 
-.. py:class:: GeneralBuildSettings(delete_interim_files: bool = False, run_async: bool = False, test_mode: bool = False, output_path: str = None)
+.. autoapisummary::
+
+   GeneralBuildSettings.GeneralBuildSettings
+
+
+Module Contents
+---------------
+
+.. py:class:: GeneralBuildSettings(delete_interim_files: bool = False, run_async: bool = False, test_mode: bool = False)
 
    General build settings for the video generation
 
@@ -32,28 +25,10 @@ Classes
    - test_mode: whether to run the video generation in local mode, to run local and fast tests
 
 
-   .. rubric:: Overview
-
-
-   .. list-table:: Methods
-      :header-rows: 0
-      :widths: auto
-      :class: summarytable
-
-      * - :py:obj:`get_ml_models_gateway <GeneralBuildSettings.GeneralBuildSettings.get_ml_models_gateway>`\ ()
-        - Handy function to get the ML models gateway from the buildsettings, as it is used in many places
-
-
-   .. rubric:: Members
-
    .. py:method:: get_ml_models_gateway()
 
       Handy function to get the ML models gateway from the buildsettings, as it is used in many places
       like a context
-
-
-
-
 
 
 

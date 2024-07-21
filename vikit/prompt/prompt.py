@@ -26,16 +26,15 @@ Someone has said it is better to study one man than ten books. I want neither bo
 class Prompt(ABC):
     """
     A class to represent a prompt, a user written prompt, a prompt
-    generated from an audio file, an image prompt, or one sent or received from an LLM.
+    generated from an audio file, or one sent or received from an LLM.
 
     This class is going to be used as a base class for new type of prompts as
-    they are accepted by LLM's, like a video, or an embedding...
+    they are accepted by LLM's, like an image, a video, or an embedding...
     """
 
     @log_function_params
     def __init__(self, ml_gateway: MLModelsGateway = None):
         self._text = None
-        self._image = None
         self._subtitles: list[pysrt.SubRipItem] = None
         self._subtitle_extractor = None
         if ml_gateway is None:
@@ -47,13 +46,6 @@ class Prompt(ABC):
         Returns the text of the prompt.
         """
         return self._text
-
-    @property
-    def image(self) -> str:
-        """
-        Returns the image of the prompt.
-        """
-        return self._image
 
     @property
     def subtitles(self) -> list[pysrt.SubRipItem]:

@@ -115,10 +115,10 @@ Classes
 
                   {% endif %}
 .. autoapisummary::
-   {{ macros.auto_summary(visible_classes, title="Classes") }}
-   ..                {% for klass in visible_classes %}
-   .. {{ klass.id }}
-   ..                {% endfor %}
+
+                  {% for klass in visible_classes %}
+   {{ klass.id }}
+                  {% endfor %}
                {% endif %}
 
 
@@ -149,8 +149,8 @@ Functions
             {% endif %}
             {% set this_page_children = visible_children|rejectattr("type", "in", own_page_types)|list %}
             {% if this_page_children %}
-{{ obj.name }} Contents
-{{ "-" * obj.name|length }}---------
+{{ obj.type|title }} Contents
+{{ "-" * obj.type|length }}---------
 
                {% for obj_item in this_page_children %}
 {{ obj_item.render()|indent(0) }}
