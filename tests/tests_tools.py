@@ -54,6 +54,7 @@ def create_fake_prompt_for_local_tests():
         "A young boy traveling in the train alongside Mediterranean coast,",
         "contemplating the sea and loving it.",
     ]
+    prompt.duration = 13
 
     return prompt
 

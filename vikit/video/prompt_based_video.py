@@ -1,6 +1,5 @@
 import os
 
-from loguru import logger
 import pysrt
 
 from vikit.video.video import VideoBuildSettings
@@ -11,10 +10,6 @@ from vikit.video.seine_transition import SeineTransition
 from vikit.video.video_types import VideoType
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
-from vikit.video.building.handlers.video_reencoding_handler import (
-    VideoReencodingHandler,
-)
-from vikit.common.handler import Handler
 
 
 class PromptBasedVideo(CompositeVideo):
@@ -27,16 +22,12 @@ class PromptBasedVideo(CompositeVideo):
     We do some form of inheritance by composition to prevent circular dependencies and benefit from more modularity
     """
 
-    def __init__(self, prompt=None):
-        if prompt is None:
+    def __init__(self, prompt: Prompt = None):
+        if not prompt:
             raise ValueError("prompt cannot be None")
+        self._prompt = prompt
 
         super().__init__()
-        self._prompt: Prompt = prompt
-        self._title = None
-        self.metadata.title = self._title
-        self._source = type(self).__name__
-        self._needs_reencoding = False
 
     def __str__(self) -> str:
         super_str = super().__str__()
@@ -53,7 +44,7 @@ class PromptBasedVideo(CompositeVideo):
         """
         Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
         """
-        if not self._title:
+        if not self.metadata.title:
             # backup plan: If no title existing yet (should be generated straight from an LLM)
             # then get the first and last words of the prompt
             splitted_prompt = self._prompt.subtitles[0].text.split(" ")
@@ -62,9 +53,21 @@ class PromptBasedVideo(CompositeVideo):
                 summarised_title = clean_title_words[0]
             else:
                 summarised_title = clean_title_words[0] + "-" + clean_title_words[-1]
-            self._title = summarised_title
+            self.metadata.title = summarised_title
 
-        return self._title
+        return self.metadata.title
+
+    async def prepare_build_hook(self, build_settings=VideoBuildSettings()):
+        """
+        Generate the actual inner video
+
+        Params:
+            - build_settings: allow some customization
+
+        Returns:
+            The current instance
+        """
+        return await self.compose(build_settings=build_settings)
 
     async def compose(self, build_settings: VideoBuildSettings):
         """
@@ -95,28 +98,6 @@ class PromptBasedVideo(CompositeVideo):
             self.append_video(vid_cp_sub)  # Adding the comnposite to the overall video
 
         return self
-
-    async def prepare_build(self, build_settings=VideoBuildSettings()):
-        """
-        Generate the actual inner video
-
-        Params:
-            - build_settings: allow some customization
-
-        Returns:
-            The current instance
-        """
-        if not build_settings.prompt:
-            build_settings.prompt = self._prompt
-        if not build_settings.prompt:
-            raise ValueError(
-                "Prompt is not set in the build settings neither gathered from instanciation"
-            )
-        await self.compose(build_settings=build_settings)
-        return await super().prepare_build(build_settings)
-
-    def run_post_build_actions(self):
-        pass
 
     async def _prepare_basic_building_block(
         self, sub: pysrt.SubRipItem, build_stgs: VideoBuildSettings = None
@@ -154,7 +135,7 @@ class PromptBasedVideo(CompositeVideo):
             )
         )
 
-        keyword_based_vid = await RawTextBasedVideo(sub.text).prepare_build(
+        keyword_based_vid = await RawTextBasedVideo(sub.text).prepare_build_hook(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_keywords,
                 test_mode=build_stgs.test_mode,
@@ -171,7 +152,7 @@ class PromptBasedVideo(CompositeVideo):
                 ),
             )
         )
-        prompt_based_vid = await RawTextBasedVideo(sub.text).prepare_build(
+        prompt_based_vid = await RawTextBasedVideo(sub.text).prepare_build_hook(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_prompt_text,
                 test_mode=build_stgs.test_mode,
@@ -186,23 +167,3 @@ class PromptBasedVideo(CompositeVideo):
         )
 
         return keyword_based_vid, prompt_based_vid, transit
-
-    def get_and_initialize_video_handler_chain(
-        self, build_settings: VideoBuildSettings
-    ) -> list[Handler]:
-        """
-        Get the handler chain of the video.
-        Defining the handler chain is the main way to define how the video is built
-        so it is up to the child classes to implement this method
-
-        Returns:
-            list: The list of handlers to use for building the video
-        """
-        handlers = []
-        if (
-            len(list(filter(lambda video: video._needs_reencoding, self.video_list)))
-            >= 1
-        ):
-            handlers.append(VideoReencodingHandler())
-
-        return handlers

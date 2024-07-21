@@ -28,8 +28,8 @@ class TestPromptBasedVideo:
 
     @pytest.mark.unit
     def test_no_prompt_text(self):
-        # with pytest.raises(ValueError):
-        _ = PromptBasedVideo(str(""))
+        with pytest.raises(ValueError):
+            _ = PromptBasedVideo(str(""))
 
     @pytest.mark.unit
     @pytest.mark.asyncio

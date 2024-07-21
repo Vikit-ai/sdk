@@ -3,12 +3,6 @@ from vikit.video.transition import Transition
 from vikit.video.building.handlers.transition_handler import (
     VideoBuildingHandlerTransition,
 )
-from vikit.video.building.handlers.interpolation_handler import (
-    VideoInterpolationHandler,
-)
-from vikit.video.building.handlers.video_reencoding_handler import (
-    VideoReencodingHandler,
-)
 from vikit.common.handler import Handler
 
 
@@ -24,12 +18,10 @@ class SeineTransition(Transition):
         """
         super().__init__(source_video=source_video, target_video=target_video)
 
-    async def prepare_build(self, build_settings=...):
-        return await super().prepare_build(build_settings)
+    async def prepare_build_hook(self, build_settings=...):
+        return await super().prepare_build_hook(build_settings)
 
-    def get_and_initialize_video_handler_chain(
-        self, build_settings: VideoBuildSettings
-    ) -> list[Handler]:
+    def get_core_handlers(self, build_settings: VideoBuildSettings) -> list[Handler]:
         """
         Get the handler chain of the video.
         Defining the handler chain is the main way to define how the video is built
@@ -42,9 +34,5 @@ class SeineTransition(Transition):
         """
         handlers = []
         handlers.append(VideoBuildingHandlerTransition())
-        if build_settings.interpolate:
-            handlers.append(VideoInterpolationHandler())
-        if self._needs_reencoding:
-            handlers.append(VideoReencodingHandler())
 
         return handlers

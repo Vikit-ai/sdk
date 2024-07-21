@@ -1,13 +1,10 @@
-from loguru import logger
-
 from vikit.common.handler import Handler
-from vikit.video.video import Video
 from vikit.wrappers.ffmpeg_wrapper import (
     merge_audio,
 )
 
 
-class VideoMusicBuildingHandlerGenerateFomApi(Handler):
+class GenerateMusicAndMergeHandler(Handler):
     def __init__(
         self,
         music_duration: float,
@@ -16,7 +13,7 @@ class VideoMusicBuildingHandlerGenerateFomApi(Handler):
         self.music_duration = music_duration
         self.bg_music_prompt = bg_music_prompt
 
-    async def execute_async(self, video: Video):
+    async def execute_async(self, video):
         """
         Process the video generation binaries: we actually do ask the video to build itself
         as a video binary (typically an MP4 generated from Gen AI, hosted behind an API),

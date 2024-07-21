@@ -1,12 +1,11 @@
 from urllib.request import urlretrieve
 
 from vikit.common.handler import Handler
-from vikit.video.video import Video
 
 
 class VideoInterpolationHandler(Handler):
 
-    async def execute_async(self, video: Video):
+    async def execute_async(self, video):
 
         interpolated_video = (
             await video.build_settings.get_ml_models_gateway().interpolate_async(

@@ -1,13 +1,7 @@
 import os
-from vikit.video.video import Video, VideoBuildSettings
+
+from vikit.video.video import Video
 from vikit.video.video_types import VideoType
-from vikit.video.building.handlers.video_reencoding_handler import (
-    VideoReencodingHandler,
-)
-from vikit.video.building.handlers.interpolation_handler import (
-    VideoInterpolationHandler,
-)
-from vikit.common.handler import Handler
 
 
 class ImportedVideo(Video):
@@ -34,7 +28,7 @@ class ImportedVideo(Video):
         else:
             raise ValueError("The video file path should be provided")
 
-        self._needs_reencoding = True
+        self._needs_video_reencoding = True
         self.metadata.title = self.get_title()
 
     def get_title(self):
@@ -52,41 +46,3 @@ class ImportedVideo(Video):
         Get the short type name of the video
         """
         return str(VideoType.TRANSITION)
-
-    async def prepare_build(
-        self,
-        build_settings=VideoBuildSettings(),
-    ):
-        """
-        prepare the actual video,
-
-        Params:
-            - build_settings: allow some customization
-
-        Returns:
-            The current instance
-        """
-        await super().prepare_build(build_settings)
-
-        return self
-
-    def get_and_initialize_video_handler_chain(
-        self, build_settings: VideoBuildSettings
-    ) -> list[Handler]:
-        """
-        Get the handler chain of the video. Order matters here.
-
-        At this stage, we should already have the enhanced prompt and title for this video
-        not much to do on an imported video, maybe some resizing and normalization
-        on later versions
-
-        Returns:
-            list: The list of handlers to use for building the video
-        """
-        handlers = []
-        if build_settings.interpolate:
-            handlers.append(VideoInterpolationHandler())
-        if self._needs_reencoding:
-            handlers.append(VideoReencodingHandler())
-
-        return handlers

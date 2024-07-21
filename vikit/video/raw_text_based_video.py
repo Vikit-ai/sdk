@@ -1,19 +1,9 @@
 import os
 
-from loguru import logger
-
-from vikit.common import file_tools as ft
 from vikit.video.video import Video
-from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
 from vikit.video.building.handlers.videogen_handler import (
     VideoGenHandler,
-)
-from vikit.video.building.handlers.interpolation_handler import (
-    VideoInterpolationHandler,
-)
-from vikit.video.building.handlers.video_reencoding_handler import (
-    VideoReencodingHandler,
 )
 from vikit.common.handler import Handler
 
@@ -54,7 +44,7 @@ class RawTextBasedVideo(Video):
         else:
             self._title = self.get_title()
         self.metadata.title = self._title
-        self._needs_reencoding = (
+        self._needs_video_reencoding = (
             False  # We usually don't need reencoding for raw text based videos
         )
 
@@ -85,59 +75,31 @@ class RawTextBasedVideo(Video):
             self._title = summarised_title
             return self._title
 
-    async def prepare_build(
-        self,
-        build_settings=VideoBuildSettings(),
-    ):
+    async def prepare_build_hook(self, build_settings):
         """
-        prepare the video before building
-
-        Params:
-            - build_settings: allow some customization
-
-        Returns:
-            The current instance
-        """
-        if self.build_settings and self.are_build_settings_prepared:
-            logger.debug(f"Video {self.id} build settings already prepared")
-            return self
-
-        await super().prepare_build(build_settings)
-        if not self._title:
-            self._title = ft.get_safe_filename(
-                self.build_settings.prompter_prompt.extended_fields["title"]
-            )
-            logger.trace(f"Video Title: {self._title}")
-
-        return self
-
-    def get_and_initialize_video_handler_chain(
-        self, build_settings: VideoBuildSettings
-    ) -> list[Handler]:
-        """
-        Get the handler chain of the video. Order matters here.
-
-
-        At this stage, we should already have the enhanced prompt and title for this video
-
-        In the raw text based video, we consider the video timing is too short to set
-        any useful background music, maybe that will come later for longer videos.
-        Use Composites if you want background music, same for read aloud prompts
-        though this may change later if needed
-
-        Later version may include room for sound effects too
+        Prepare the video for building
 
         Args:
             build_settings (VideoBuildSettings): The settings for building the video
 
         Returns:
-            list: The list of handlers to use for building the video
+            Video: The current instance
+        """
+        self.build_settings = build_settings
+
+        return self
+
+    def get_core_handlers(self) -> list[Handler]:
+        """
+         Get the handler chain of the video. Order matters here.
+         At this stage, we should already have the enhanced prompt and title for this video
+
+        Args:
+             build_settings (VideoBuildSettings): The settings for building the video
+
+         Returns:
+             list: The list of handlers to use for building the video
         """
         handlers = []
         handlers.append(VideoGenHandler(video_gen_text_prompt=self.text))
-        if build_settings.interpolate:
-            handlers.append(VideoInterpolationHandler())
-        if self._needs_reencoding:
-            handlers.append(VideoReencodingHandler())
-
         return handlers

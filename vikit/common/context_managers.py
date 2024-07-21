@@ -13,7 +13,9 @@ class WorkingFolderContext:
     in the constructor
     """
 
-    def __init__(self, path=None, delete_on_exit=False, mark: str = None):
+    def __init__(
+        self, path=None, delete_on_exit=False, mark: str = None, include_mark=False
+    ):
         """
         Allows for dynamic creation of a working folder, with the option to delete it on exit
 
@@ -35,7 +37,8 @@ class WorkingFolderContext:
                 date_string,
                 "".join(random.choice(string.hexdigits) for i in range(20)),
             )
-            # temp_folder = temp_folder + ("-" + mark) if mark else temp_folder
+            if include_mark:
+                temp_folder = temp_folder + ("-" + mark) if mark else temp_folder
             os.makedirs(temp_folder)
         else:
             if not os.path.exists(path):

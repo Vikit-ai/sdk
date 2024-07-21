@@ -1,15 +1,15 @@
-import os
 import random
 
 from vikit.common.handler import Handler
-from vikit.video.video import Video
+
+# from vikit.video.video import Video
 import vikit.common.config as config
 from vikit.wrappers.ffmpeg_wrapper import merge_audio, extract_audio_slice
 
 
 class DefaultBGMusicAndAudioMergingHandler(Handler):
 
-    async def execute_async(self, video: Video):
+    async def execute_async(self, video):
         """
         Merge background music and video  as a single media file
 

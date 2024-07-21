@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABC
+import os
 import uuid as uid
 
 from loguru import logger
@@ -13,6 +14,8 @@ import vikit.common.file_tools as ft
 from vikit.video.video_metadata import VideoMetadata
 from vikit.common.handler import Handler
 from vikit.video.video_file_name import VideoFileName
+from vikit.common.file_tools import is_valid_path
+from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
 
 
 class Video(ABC):
@@ -42,7 +45,7 @@ class Video(ABC):
         self._background_music_file_name = None
         self._duration = None
         self._is_video_generated = False
-        self._needs_reencoding: bool = None
+        self._needs_video_reencoding: bool = False
         self._id = uid.uuid4()
         self.top_parent_id = (
             self._id
@@ -71,15 +74,12 @@ class Video(ABC):
             []
         )  # Define video dependencies, i.e. the videos that are needed to build the current video
 
+    def __str__(self):
+        return f"ID:  {self.id}, type: {type(self)}, short_type_name: {self.short_type_name} , title: {self.title}, duration: {self.duration}, is_video_generated: {self.is_video_generated}"
+
     @property
     def metadata(self):
         return self._videoMetadata
-
-    @metadata.setter
-    def metadata(self, metadata):
-        if not isinstance(metadata, VideoMetadata):
-            raise ValueError("metadata should be of type VideoMetadata")
-        self._videoMetadata = metadata
 
     @property
     @abstractmethod
@@ -132,12 +132,16 @@ class Video(ABC):
     def title(self):
         return self.get_title()
 
+    @title.setter
+    def title(self, value):
+        self.metadata.title = value
+
     @abstractmethod
     def get_title(self):
         """
         Returns the title of the video.
         """
-        return "notitle"
+        return "no-title-yet" if self.metadata.title is None else self.metadata.title
 
     async def get_first_frame_as_image(self):
         """
@@ -176,6 +180,17 @@ class Video(ABC):
             self._duration = float(get_media_duration(self.media_url))
         return self._duration
 
+    def _set_working_folder_path(self, working_folder_path: str):
+        if working_folder_path:
+            if is_valid_path(working_folder_path):
+                os.chdir(working_folder_path)
+                return True
+            else:
+                logger.warning(
+                    f"Video target file name is None or invalid, using the current video generation path: {os.getcwd()}"
+                )
+                return False
+
     async def build(self, build_settings: VideoBuildSettings = VideoBuildSettings()):
         """
         Build the video in the child classes, unless the video is already built, in  which case
@@ -194,12 +209,53 @@ class Video(ABC):
             logger.info(f"Video {self.id} is already built, returning itself")
             return self
 
-        logger.info(f"Starting the building of Video {self.id} ")
+        current_dir = os.getcwd()
+        logger.warning(
+            f"Starting the pre build hook for Video {self.id}, current_dir {current_dir} "
+        )
+
+        wfolder_changed = self._set_working_folder_path(
+            build_settings.working_folder_path
+        )
+        logger.warning(f"Working folder changed: {wfolder_changed}")
+
+        logger.debug(f"Starting the pre build hook for Video {self.id} ")
+        await self.run_pre_build_actions_hook(build_settings=build_settings)
 
         built_video = None
-        await self.prepare_build(build_settings=build_settings)
+        if not self.are_build_settings_prepared:
+            self.build_settings = build_settings
+            self._source = type(
+                build_settings.get_ml_models_gateway()  # TODO: this is hacky anbd should be refactored
+                # so that we infer source from the different handlers (initial video generator, interpolation, etc)
+            ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
 
-        handler_chain = self.get_and_initialize_video_handler_chain(
+            await self.prepare_build_hook(build_settings=build_settings)
+            self.are_build_settings_prepared = True
+
+        logger.info(f"Starting the building of Video {self.id} ")
+
+        built_video = await self.run_build_core_logic_hook(
+            build_settings=build_settings
+        )  # logic from the child classes if any
+        built_video = await self.gather_and_run_handlers()
+
+        logger.debug(f"Starting the post build hook for Video {self.id} ")
+        await self.run_post_build_actions_hook(build_settings=build_settings)
+        if wfolder_changed:
+            self._set_working_folder_path(current_dir)
+
+        self.is_video_generated = True
+
+        return built_video
+
+    async def gather_and_run_handlers(self):
+        """
+        Gather the handler chain and run it
+        """
+        logger.trace("Gathering the handler chain")
+
+        handler_chain = self._get_and_initialize_video_handler_chain(
             build_settings=self.build_settings
         )
         if not handler_chain:
@@ -209,19 +265,36 @@ class Video(ABC):
         else:
             for handler in handler_chain:
                 built_video = await handler.execute_async(video=self)
+                assert built_video, "The video was not built properly"
+                self.metadata = built_video.metadata
 
-            self.run_post_build_actions()  # self and built_video are the same here
+        self.metadata.title = self.get_title()
+        self.metadata.duration = self.get_duration()
 
         return built_video
 
-    def run_post_build_actions(self):
+    async def run_build_core_logic_hook(self, build_settings: VideoBuildSettings):
         """
-        Ppost build actions hook
-        """
-        pass
+        Run the core logic of the video building
 
-    @abstractmethod
-    async def prepare_build(self, build_settings: VideoBuildSettings):
+        Args:
+            build_settings (VideoBuildSettings): The settings to use for building the video
+        """
+
+    async def run_pre_build_actions_hook(self, build_settings: VideoBuildSettings):
+        """
+        Pre build actions hook
+
+        Args:
+            build_settings (VideoBuildSettings): The settings to use for building the video
+        """
+
+    async def run_post_build_actions_hook(self, build_settings: VideoBuildSettings):
+        """
+        Post build actions hook
+        """
+
+    async def prepare_build_hook(self, build_settings: VideoBuildSettings) -> "Video":
         """
         Prepare the video for building, may be used to inject build settings for individual videos
         that we don't want to share with global buildsettings. For instance to generate a video
@@ -230,15 +303,9 @@ class Video(ABC):
         Args:
             build_settings (VideoBuildSettings): The settings to use for building the video later on
 
-        Returns:
-            Video: The prepared video
+        returns:
+            Video: The current instance, prepared for building
         """
-        self.build_settings = build_settings
-        self._source = type(
-            build_settings.get_ml_models_gateway()  # TODO: this is hacky anbd should be refactored
-            # so that we infer source from the different handlers (initial video generator, interpolation, etc)
-        ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
-        self.are_build_settings_prepared = True
 
     def _get_bk_music_target_filemame(self):
         """
@@ -266,20 +333,40 @@ class Video(ABC):
             )
         )
 
-    @abstractmethod
-    def get_and_initialize_video_handler_chain(
+    def generate_background_music_prompt(self):
+        """
+        Get the background music prompt from the video list.
+
+        returns:
+            str: The background music prompt
+        """
+        return self.get_title()
+
+    def _get_and_initialize_video_handler_chain(
         self, build_settings: VideoBuildSettings
     ) -> list[Handler]:
         """
         Get the handler chain of the video.
         Defining the handler chain is the main way to define how the video is built
-        so it is up to the child classes to implement this method as a complement
-        of this music building logic, or to redefine it.
+        so it is up to the child classes to implement methods called by this template method
 
         Args:
             build_settings (VideoBuildSettings): The settings to use for building the video
 
         Returns:
             list: The list of handlers to use for building the video
+        """
+        handlers = []
+
+        handlers.extend(self.get_core_handlers(build_settings))
+        handlers.extend(
+            VideoBuildingPipeline().get_handlers(self, build_settings=build_settings)
+        )
+
+        return handlers
+
+    def get_core_handlers(self, build_settings=None):
+        """
+        Get the core handlers for the video
         """
         return []

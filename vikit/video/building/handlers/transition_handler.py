@@ -22,8 +22,12 @@ class VideoBuildingHandlerTransition(Handler):
         Returns:
             CompositeVideo: The composite video
         """
-        assert video.source_video.is_video_generated, "source video must be generated"
-        assert video.target_video.is_video_generated, "target video must be generated"
+        assert (
+            video.source_video.media_url
+        ), f"source video must be generated, video: {video.source_video}"
+        assert (
+            video.target_video.media_url
+        ), f"target video must be generated, {video.target_video.media_url}, id: {video.target_video.id}"
         assert url_exists(video.source_video.media_url), "source_video must exist"
         assert url_exists(video.target_video.media_url), "target_video must exist"
 

@@ -1,7 +1,6 @@
 import random
 
 from vikit.common.handler import Handler
-from vikit.video.video import Video
 from vikit.wrappers.ffmpeg_wrapper import (
     merge_audio,
 )
@@ -9,7 +8,7 @@ from vikit.wrappers.ffmpeg_wrapper import (
 
 class UsePromptAudioTrackAndAudioMergingHandler(Handler):
 
-    async def execute_async(self, video: Video):
+    async def execute_async(self, video):
         """
         Merge music and video  as a single media file
 
@@ -19,6 +18,7 @@ class UsePromptAudioTrackAndAudioMergingHandler(Handler):
         Returns:
             The video including generated music
         """
+
         if video.build.prompt._recorded_audio_prompt_path is None:
             raise ValueError("Audio file path is required for the prompt")
 

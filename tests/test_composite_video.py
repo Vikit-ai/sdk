@@ -323,6 +323,7 @@ class TestCompositeVideo:
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True, generate_background_music=True
                 ),
+                interpolate=True,
                 test_mode=True,
                 include_read_aloud_prompt=True,
                 prompt=test_prompt_library["train_boy"],

@@ -89,7 +89,7 @@ class Transition(Video):
         """
         return str(VideoType.TRANSITION)
 
-    async def prepare_build(
+    async def prepare_build_hook(
         self,
         build_settings=VideoBuildSettings(),
     ):
@@ -102,26 +102,13 @@ class Transition(Video):
         Returns:
             The current instance
         """
-        await super().prepare_build(build_settings)
+        await super().prepare_build_hook(build_settings)
 
-    def get_and_initialize_video_handler_chain(
-        self, build_settings: VideoBuildSettings
-    ) -> list[Handler]:
+    def generate_background_music_prompt(self):
         """
-        Get the handler chain of the video.
-        Defining the handler chain is the main way to define how the video is built
-        so it is up to the child classes to implement this method
+        Get the background music prompt from the source and target videos.
 
-        At this stage, we should already have the enhanced prompt and title for this video
-
-        Returns:
-            list: The list of handlers to use for building the video
+        returns:
+            str: The background music prompt
         """
-        handlers = []
-        handlers.append(VideoGenHandler())
-        if build_settings.interpolate:
-            handlers.append(VideoInterpolationHandler())
-        if self._needs_reencoding:
-            handlers.append(VideoReencodingHandler())
-
-        return handlers
+        return self.source_video.get_title() + " " + self.target_video.get_title()

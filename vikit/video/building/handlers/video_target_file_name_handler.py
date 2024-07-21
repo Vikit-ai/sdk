@@ -3,8 +3,8 @@ import os
 
 from loguru import logger
 from vikit.video.video import Video
-from vikit.common.file_tools import get_path_type, is_valid_path
 from vikit.common.handler import Handler
+from vikit.common.file_tools import is_valid_path
 
 
 class VideoBuildingHandlerTargetFileSetter(Handler):

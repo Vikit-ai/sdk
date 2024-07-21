@@ -19,6 +19,9 @@ from vikit.video.composite_video import CompositeVideo
 from vikit.common.context_managers import WorkingFolderContext
 from tests.tests_tools import test_prompt_library
 from vikit.music_building_context import MusicBuildingContext
+from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handler import (
+    ReadAloudPromptAudioMergingHandler,
+)
 
 
 class TestAudioCompositions:
@@ -33,11 +36,22 @@ class TestAudioCompositions:
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_insert_subtitle_audio_no_prompt(self):
-        # This test should work as we fail open: if the prompt is not provided, we should not raise an error
-        vid = CompositeVideo()
-        await vid._insert_subtitles_audio_recording(
-            VideoBuildSettings(include_read_aloud_prompt=True, prompt=None)
-        )
+        with pytest.raises(ValueError):
+            handler = ReadAloudPromptAudioMergingHandler(None)
+            await handler.execute_async(video=None)
+
+    @pytest.mark.unit
+    @pytest.mark.asyncio
+    async def test_insert_subtitle_audio_nominal(self):
+        with WorkingFolderContext():
+            video = ImportedVideo(get_generated_3s_forest_video_1_path())
+            handler = ReadAloudPromptAudioMergingHandler(
+                recorded_prompt=test_prompt_library["train_boy"]
+            )
+            res_vid = await handler.execute_async(video=video)
+
+            assert res_vid is not None, "Video was not generated properly"
+            assert res_vid.media_url is not None, "Media URL was not generated properly"
 
     @pytest.mark.integration
     @pytest.mark.asyncio
