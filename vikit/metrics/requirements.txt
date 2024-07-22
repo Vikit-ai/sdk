@@ -1,0 +1,6 @@
+torch
+opencv-python
+numpy
+Pillow
+tqdm
+clip-by-openai
