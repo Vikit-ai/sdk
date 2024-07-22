@@ -9,7 +9,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         delete_interim_files: bool = False,
         run_async: bool = True,
         test_mode: bool = True,
-        expected_length: float = 1,  # The expected length in seconds of the video, will be used when actually building the video
+        expected_length: float = None,  # The expected length in seconds of the video, will be used when actually building the video
         include_read_aloud_prompt: bool = False,  # Include a synthetic voice that reads the prompts in the final video
         prompt: Prompt = None,  # Include subtitles in the final video and fit videos to match the prompt subtitles timelines
         generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt

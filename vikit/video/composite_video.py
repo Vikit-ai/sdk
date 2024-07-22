@@ -1,4 +1,5 @@
 import os
+import random
 import shutil
 import uuid as uid
 
@@ -230,6 +231,7 @@ class CompositeVideo(Video, is_composite_video):
         video_list_file = "_".join(
             [
                 short_title,
+                str(random.getrandbits(16)),
                 config.get_video_list_file_name(),
             ]
         )

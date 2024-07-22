@@ -121,7 +121,7 @@ class TestPromptBasedVideo:
         with WorkingFolderContext():
 
             prompt = await PromptFactory().create_prompt_from_text(
-                "A group of stones in a forest"
+                "A group of stones in a forest", 
             )
             pbv = PromptBasedVideo(prompt=prompt)
             result = await pbv.build()

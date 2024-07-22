@@ -174,10 +174,9 @@ class Video(ABC):
         Returns:
             float: The duration of the final video
         """
-        if self._duration is None:
-            if self.media_url is None:
-                raise ValueError("The source media URL is not set")
-            self._duration = float(get_media_duration(self.media_url))
+        if self.media_url is None:
+            raise ValueError("The source media URL is not set")
+        self.duration = float(get_media_duration(self.media_url))
         return self._duration
 
     def _set_working_folder_path(self, working_folder_path: str):

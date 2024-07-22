@@ -2,10 +2,11 @@ import os
 
 from urllib.request import urlopen
 from urllib.error import URLError
+from loguru import logger
 
 from vikit.video.video import Video
 from vikit.common.decorators import log_function_params
-from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.video.video_file_name import VideoFileName
 from vikit.video.video_types import VideoType
 
 TIMEOUT = 5  # TODO: set to global config , seconds before stopping the request to check an URL exists
@@ -70,7 +71,10 @@ class Transition(Video):
         self.video_dependencies.extend([source_video, target_video])
 
     def get_title(self):
-        return str(self.source_video.id)[:5] + "-to-" + str(self.target_video.id)[:5]
+        source_id = VideoFileName.from_file_name(self.source_video.media_url).unique_id
+        target_id = VideoFileName.from_file_name(self.target_video.media_url).unique_id
+
+        return str(source_id) + "-to-" + str(target_id)
 
     @property
     def short_type_name(self):
