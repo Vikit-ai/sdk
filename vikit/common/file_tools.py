@@ -6,6 +6,10 @@ import sys
 
 from typing import Union, Optional
 from loguru import logger
+from urllib.request import urlopen
+from urllib.error import URLError
+
+from vikit.common.decorators import log_function_params
 
 
 def get_canonical_name(file_path: str):
@@ -157,3 +161,43 @@ def is_valid_filename(filename: str) -> bool:
         return False
 
     return True
+
+
+TIMEOUT = 5  # TODO: set to global config , seconds before stopping the request to check an URL exists
+
+
+def web_url_exists(url):
+    """
+    Check if a URL exists on the web
+    """
+    try:
+        urlopen(url, timeout=TIMEOUT)
+        return True
+    except URLError:
+        return False
+    except ValueError:
+        return False
+
+
+@log_function_params
+def url_exists(url: str):
+    """
+    Check if a URL exists somewhere on the internet or locally. To be superseded by a more
+    versatile and unified library in the future.
+
+    Args:
+        url (str): The URL to check
+
+    Returns:
+        bool: True if the URL exists, False otherwise
+    """
+    url_exists = False
+    assert url, "url cannot be None"
+
+    if os.path.exists(url):
+        url_exists = True
+
+    if web_url_exists(url):
+        url_exists = True
+
+    return url_exists

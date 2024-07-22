@@ -2,7 +2,7 @@ import shutil
 from urllib.request import urlretrieve
 from loguru import logger
 
-from vikit.video.transition import url_exists
+from vikit.common.file_tools import url_exists
 from vikit.common.handler import Handler
 from vikit.video.video import Video
 from vikit.common.file_tools import get_path_type
