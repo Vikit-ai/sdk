@@ -99,7 +99,9 @@ class CompositeVideo(Video, is_composite_video):
         ):  # Adding a video that needs reencoding will trigger reencoding of the whole tree
             self._needs_video_reencoding = True
 
-        if isinstance(video, CompositeVideo):
+        if type(video) is CompositeVideo:
+            logger.debug(
+                f"Added composite video {video.id} to composite video {self.id}"
             video._is_root_video_composite = False
             video.metadata.top_parent_id = self.top_parent_id
 
