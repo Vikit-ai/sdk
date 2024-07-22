@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
 import os
 import uuid as uid
+import random
 
 from loguru import logger
 
@@ -46,15 +47,14 @@ class Video(ABC):
         self._duration = None
         self._is_video_generated = False
         self._needs_video_reencoding: bool = False
-        self._id = uid.uuid4()
-        self.top_parent_id = (
-            self._id
-        )  # The top parent id is the id of the video that is the top parent of the current video chain, if any
+        self.temp_id = random.getrandbits(
+            16
+        )  # used to get a short ID when mixed within local filesystem filenames
         self._short_type_name = (
             "Video"  # a 5 letters identifier to easily identify the type of video
         )
         self._videoMetadata = VideoMetadata(
-            id=self._id,
+            id=uid.uuid4(),
             title="notitle-yet",
             duration=0,
             width=self._width,
@@ -64,7 +64,6 @@ class Video(ABC):
             is_interpolated=False,
             is_bg_music_applied=False,
             is_bg_music_generated=None,  # if not using gnerated we infer the default bg music is used
-            top_parent_id=self.top_parent_id,
         )
 
         self.media_url = None

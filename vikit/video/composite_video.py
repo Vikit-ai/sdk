@@ -72,6 +72,9 @@ class CompositeVideo(Video, is_composite_video):
         """
         Get the cascaded build settings
         """
+        logger.debug(
+            f"Composite video {self.id} getting cascaded build settings from {self.build_settings}"
+        )
         return VideoBuildSettings(
             interpolate=self.build_settings.interpolate,
             include_read_aloud_prompt=False,
@@ -79,7 +82,7 @@ class CompositeVideo(Video, is_composite_video):
             test_mode=self.build_settings.test_mode,
         )
 
-    def append_video(self, video: Video = None):
+    def append_video(self, video: Video):
         """
         Append a video to the list of videos to be mixed
 
@@ -89,9 +92,8 @@ class CompositeVideo(Video, is_composite_video):
         returns:
             self: The current object
         """
-        if video is None:
+        if not video:
             raise ValueError("video cannot be None")
-        video.top_parent_id = self.top_parent_id  # We cascade the top parent id
         self.video_list.append(video)
 
         if (
@@ -101,10 +103,15 @@ class CompositeVideo(Video, is_composite_video):
 
         if type(video) is CompositeVideo:
             logger.debug(
-                f"Added composite video {video.id} to composite video {self.id}"
+                f"experiment 0 Added composite video {video.id} to composite video {self.id}"
             )
             video._is_root_video_composite = False
-            video.metadata.top_parent_id = self.top_parent_id
+
+        if isinstance(video, CompositeVideo):
+            logger.debug(
+                f"experiment  1 composite video {video.id} to composite video {self.id}"
+            )
+            video._is_root_video_composite = False
 
         return self
 
@@ -222,19 +229,10 @@ class CompositeVideo(Video, is_composite_video):
         """
         Concatenate the videos for this composite
         """
-
-        short_title = self.get_title()
-        # TODO: change this hard truncate!!
-        if len(short_title) > 20:
-            logger.warning(
-                f"Video title is too long: {short_title}, truncating to 20 characters, new title: {short_title[:20]}"
-            )
-            short_title = short_title[:20]
-
         video_list_file = "_".join(
             [
-                short_title,
-                str(random.getrandbits(16)),
+                self.get_title()[:5],
+                str(self.temp_id),
                 config.get_video_list_file_name(),
             ]
         )

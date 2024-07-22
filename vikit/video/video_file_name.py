@@ -8,7 +8,8 @@ from vikit.common.file_tools import get_max_filename_length
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_metadata import VideoMetadata
 
-MANAGED_FEATURES = "dogrpvi"
+MANAGED_FEATURES = "dogrvip"
+split_separator = "__"
 
 
 class VideoFileName:
@@ -114,19 +115,18 @@ class VideoFileName:
         # if not VideoFileName.is_video_file_name(file_name):
         #     raise ValueError("The file name is not a video file name")
 
-        parts = file_name.split("_")
+        parts = file_name.split("__")
+        logger.debug(f"len(parts) found {len(parts)}, parts found : {parts}")
         title = parts[0]
         bld_settings = VideoBuildSettings()
         bld_settings.id = parts[3]
         bld_settings.build_date = datetime.date.fromisoformat(parts[4])
-        # bld_settings.build_time = datetime.time.fromisoformat(parts[5])
-
         video_file_name = VideoFileName(
             build_settings=bld_settings, video_metadata=VideoMetadata(title=title)
         )
         video_file_name._video_type = parts[1]
         video_file_name._video_features = parts[2]
-        # video_file_name._unique_id = parts[7].split(".")[0]
+        video_file_name._unique_id = parts[6].split(".")[0]
 
         return video_file_name
 
@@ -195,7 +195,9 @@ class VideoFileName:
         """
         Get the file name of the video,  as a string
         """
-        return f"{self._title}_{str(self.video_type)}_{self.video_features}_{self.build_id}_{self._build_date}_UID_{self.unique_id}.{self._file_extension}"
+        file_name = f"{self._title}_{str(self.video_type)}_{self.video_features}_{self.build_id}_{self._build_date}_UID_{self.unique_id}.{self._file_extension}"
+        file_name = file_name.replace("_", split_separator)
+        return file_name
 
     def __str__(self):
         return self._fit(target_path=self._build_settings.output_path)

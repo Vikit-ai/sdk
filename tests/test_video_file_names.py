@@ -1,3 +1,4 @@
+import random
 import pytest
 
 import warnings
@@ -75,9 +76,9 @@ class TestVideoFileNames:
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_from_file_name(self):
-        id = str(uuid.uuid4())
+        id = str(random.getrandbits(16))
         file_name = (
-            f"exampletitle_comproot_ooooo_1234567890_2022-01-01_12:00_UID_{id}.mp4"
+            f"exampletitle__comproot__ooooo__1234567890__2022-01-01__UID__{id}.mp4"
         )
         video_file_name = VideoFileName.from_file_name(file_name=file_name)
         assert video_file_name.title == "exampletitle"
@@ -85,8 +86,7 @@ class TestVideoFileNames:
         assert video_file_name.video_features == "ooooo"
         assert video_file_name.build_id == "1234567890"
         assert video_file_name._build_date == datetime.date(2022, 1, 1)
-        # assert video_file_name._build_time == datetime.time(12, 0)
-        # assert video_file_name.unique_id == uuid.UUID(id)
+        assert video_file_name.unique_id == id
 
     @pytest.mark.unit
     @pytest.mark.asyncio
