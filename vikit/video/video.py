@@ -362,13 +362,18 @@ class Video(ABC):
         handlers = []
 
         handlers.extend(self.get_core_handlers(build_settings))
+        from vikit.video.building.handlers.video_reencoding_handler import (
+            VideoReencodingHandler,
+        )
+
+        handlers.append(VideoReencodingHandler())
+
         handlers.extend(
             VideoBuildingPipeline().get_handlers(self, build_settings=build_settings)
         )
         logger.debug(
-            f"Video {self.id} of type {self.short_type_name} / {type(self)} has {len(handlers)} handlers"
+            f"Handlers for video {self.id} of type {type(self)} / {self.short_type_name}: {handlers}"
         )
-        logger.debug(f"Handlers for video {self.id} : {handlers}")
 
         return handlers
 

@@ -46,7 +46,7 @@ class ImportedVideo(Video):
         """
         Get the short type name of the video
         """
-        return str(VideoType.TRANSITION)
+        return str(VideoType.IMPORTED)
 
     async def prepare_build_hook(self, build_settings: VideoBuildSettings):
         """

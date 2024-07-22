@@ -1,5 +1,4 @@
 import os
-import random
 import shutil
 import uuid as uid
 
@@ -233,6 +232,7 @@ class CompositeVideo(Video, is_composite_video):
         ratio = self._get_ratio_to_multiply_animations(
             build_settings=self.build_settings
         )
+        logger.debug("ratio to multiply animations: " + str(ratio))
         with open(video_list_file, "w") as myfile:
             for video in self.video_list:
                 file_name = video.media_url
