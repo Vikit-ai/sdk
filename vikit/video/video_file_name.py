@@ -195,8 +195,8 @@ class VideoFileName:
         """
         Get the file name of the video,  as a string
         """
-        file_name = f"{self._title}_{str(self.video_type)}_{self.video_features}_{self.build_id}_{self._build_date}_UID_{self.unique_id}.{self._file_extension}"
-        file_name = file_name.replace("_", split_separator)
+        file_name = f"{self._title}oOo{str(self.video_type)}oOo{self.video_features}oOo{self.build_id}oOo{self._build_date}oOoUIDoOo{self.unique_id}.{self._file_extension}"
+        file_name = file_name.replace("oOo", split_separator)
         return file_name
 
     def __str__(self):

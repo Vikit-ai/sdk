@@ -3,7 +3,6 @@ import pytest
 
 import warnings
 import datetime
-import uuid
 
 from vikit.common.context_managers import WorkingFolderContext
 
