@@ -172,11 +172,10 @@ class TestCompositeVideo:
             video_start = ImportedVideo(get_cat_video_path())
             video_end = ImportedVideo(get_test_transition_stones_trainboy_path())
             test_video_mixer = CompositeVideo()
-            final_video = (
-                test_video_mixer.append_video(video_start)
-                .append_video(video_end)
-                .append_video(CompositeVideo())  # should be filtered
+            final_video = test_video_mixer.append_video(video_start).append_video(
+                video_end
             )
+
             final_video = await final_video.build(
                 VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
@@ -189,6 +188,25 @@ class TestCompositeVideo:
             )
             assert final_video.media_url is not None
             assert final_video.background_music is not None
+
+    @pytest.mark.unit
+    @pytest.mark.asyncio
+    async def test_build_video_composite_filters_empty_composites(
+        self,
+    ):
+        with WorkingFolderContext():
+            test_video_mixer = CompositeVideo()
+            composite_to_delete = CompositeVideo()
+            composite_to_delete2 = CompositeVideo()
+            final_video = (
+                test_video_mixer.append_video(composite_to_delete)
+                .append_video(composite_to_delete2)
+                .append_video(CompositeVideo())  # should be filtered
+            )
+            final_video = await final_video.prepare_build_hook(VideoBuildSettings())
+
+            assert len(final_video.video_list) == 0, "Video list should be empty"
+            assert not final_video.media_url, "Media URL should be null"
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio

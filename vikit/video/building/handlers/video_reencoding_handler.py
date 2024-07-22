@@ -25,7 +25,7 @@ class VideoReencodingHandler(Handler):
         logger.debug(f"Video video.media_url : {video.media_url}")
         video.metadata.is_reencoded = True
         if video._needs_video_reencoding:
-            video._media_url = await reencode_video(
+            video.media_url = await reencode_video(
                 video_url=video.media_url,
                 target_video_name=video.get_file_name_by_state(
                     build_settings=video.build_settings

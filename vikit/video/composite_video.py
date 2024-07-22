@@ -175,6 +175,9 @@ class CompositeVideo(Video, is_composite_video):
         Returns:
             list: The video build order
         """
+        # Cleanse the video list by removing any empty composites videos
+        self.video_list = self.cleanse_video_list()
+
         self.build_settings = build_settings
         for video in self.video_list:
             if not video.are_build_settings_prepared:
@@ -182,8 +185,6 @@ class CompositeVideo(Video, is_composite_video):
                     build_settings=self.get_cascaded_build_settings()
                 )
 
-        # Cleanse the video list by removing any empty composites videos
-        self.video_list = self.cleanse_video_list()
         self.are_build_settings_prepared = True
 
         return self
@@ -193,8 +194,14 @@ class CompositeVideo(Video, is_composite_video):
         build_settings=VideoBuildSettings(),
     ):
         """
-        Mix all the videos in the list: here we actually build and stitch the videos together, will take some time and resources,
-        as we call external services and run video mixing locally.
+        Mix all the videos in the list: here we actually build and stitch the videos together,
+        will take some time and resources as we call external services and run video mixing locally.
+
+        Warning: order is very importamnt here, and the first pass is supposed to happen from the rootcomposite levels
+
+        Today we do generate the videos so the first ones are the ones that will be used to generate the final video
+        This requires a specific order, and generating videos ahad of time won't work unless you take care
+        of building the videos in the child composite video list first.
 
         params:
             build_settings: The settings to be used for the build
@@ -214,6 +221,8 @@ class CompositeVideo(Video, is_composite_video):
             for video in ordered_video_list:
                 await video.build(build_settings=build_settings)
 
+        # at this stage we should have all the videos generated. Will be improved in the future
+        # in case we are called directly on a child composite without starting by the composite root
         self.media_url = await self.concatenate()
 
         return self
@@ -232,7 +241,7 @@ class CompositeVideo(Video, is_composite_video):
         ratio = self._get_ratio_to_multiply_animations(
             build_settings=self.build_settings
         )
-        logger.debug("ratio to multiply animations: " + str(ratio))
+        logger.debug("ratio to multiply animations about to be applied: " + str(ratio))
 
         with open(video_list_file, "w") as myfile:
             for video in self.video_list:
