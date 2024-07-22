@@ -171,6 +171,7 @@ class CompositeVideo(Video, is_composite_video):
         Returns:
             list: The video build order
         """
+        self.build_settings = build_settings
         for video in self.video_list:
             if not video.are_build_settings_prepared:
                 await video.prepare_build_hook(
@@ -179,6 +180,7 @@ class CompositeVideo(Video, is_composite_video):
 
         # Cleanse the video list by removing any empty composites videos
         self.video_list = self.cleanse_video_list()
+        self.are_build_settings_prepared = True
 
         return self
 
@@ -365,5 +367,8 @@ class CompositeVideo(Video, is_composite_video):
             >= 1
         ):
             handlers.append(VideoReencodingHandler())
+            logger.debug(
+                f"Added video reencoding handler for composite video {self.id}"
+            )
 
         return handlers

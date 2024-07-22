@@ -27,11 +27,16 @@ class VideoBuildingPipeline:
         """
         handlers = []
 
-        handlers.extend(self.get_background_music_handlers(build_settings))
+        handlers.extend(self.get_background_music_handlers(build_settings, video))
+
         handlers.extend(self.get_read_aloud_prompt_handlers(build_settings))
+        logger.debug(
+            f"Handlers after read aloud prompt: {handlers} for video {video.id}"
+        )
+
         return handlers
 
-    def get_background_music_handlers(self, build_settings: VideoBuildSettings):
+    def get_background_music_handlers(self, build_settings: VideoBuildSettings, video):
         """
         Get the background music handlers
         """
@@ -78,6 +83,8 @@ class VideoBuildingPipeline:
                     handlers.append(UsePromptAudioTrackAndAudioMergingHandler())
                 else:
                     handlers.append(DefaultBGMusicAndAudioMergingHandler())
+            if len(handlers) > 0:
+                logger.warning(f"bg music added  for  Video of type {type(video)}")
 
         return handlers
 

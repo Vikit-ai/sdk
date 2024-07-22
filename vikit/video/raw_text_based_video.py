@@ -89,6 +89,7 @@ class RawTextBasedVideo(Video):
             Video: The current instance
         """
         self.build_settings = build_settings
+        self.are_build_settings_prepared = True
 
         return self
 

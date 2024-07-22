@@ -256,6 +256,7 @@ class Video(ABC):
         Gather the handler chain and run it
         """
         logger.trace("Gathering the handler chain")
+        built_video = None
 
         handler_chain = self._get_and_initialize_video_handler_chain(
             build_settings=self.build_settings
@@ -366,6 +367,10 @@ class Video(ABC):
         handlers.extend(
             VideoBuildingPipeline().get_handlers(self, build_settings=build_settings)
         )
+        logger.debug(
+            f"Video {self.id} of type {self.short_type_name} / {type(self)} has {len(handlers)} handlers"
+        )
+        logger.debug(f"Handlers for video {self.id} : {handlers}")
 
         return handlers
 

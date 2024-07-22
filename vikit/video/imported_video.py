@@ -2,6 +2,7 @@ import os
 
 from vikit.video.video import Video
 from vikit.video.video_types import VideoType
+from vikit.video.video_build_settings import VideoBuildSettings
 
 
 class ImportedVideo(Video):
@@ -46,3 +47,17 @@ class ImportedVideo(Video):
         Get the short type name of the video
         """
         return str(VideoType.TRANSITION)
+
+    async def prepare_build_hook(self, build_settings: VideoBuildSettings):
+        """
+        Prepare the video build
+
+        Args:
+            build_settings (VideoBuildSettings): The build settings
+
+        Returns:
+            list: The video build order
+        """
+        self.build_settings = build_settings
+        self.are_build_settings_prepared = True
+        return self

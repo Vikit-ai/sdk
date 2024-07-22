@@ -101,49 +101,6 @@ class VideoFileName:
         self._has_been_interpolated = self._video_features[3] == "i"
 
     @staticmethod
-    def is_video_file_name(file_name: str):
-        """
-        Check if a file name is a video file name
-
-        params:
-            file_name: The file name to check
-
-        returns:
-            bool: True if the file name is a video file name, False otherwise
-        """
-        if not file_name:
-            return False
-
-        parts = file_name.split("_")
-        if len(parts) != 8:
-            return False
-        if len(parts[2]) != 5:  # video features
-            return False
-        else:
-            for i in range(5):
-                if parts[2][i] not in MANAGED_FEATURES:
-                    logger.warning(f"unknown video feature {parts[2][i]}")
-
-        if len(parts[3]) > 10:  # build id
-            return False
-        try:
-            datetime.date.fromisoformat(parts[4])
-        except ValueError:
-            return False
-        try:
-            datetime.time.fromisoformat(parts[5])
-        except ValueError:
-            return False
-
-        try:
-            value = int(parts[7], 16)
-            return 0 <= value <= 0xFFFF
-        except ValueError:
-            return False
-
-        return True
-
-    @staticmethod
     def from_file_name(file_name: str):
         """
         Parse a file name to extract the metadata
@@ -154,8 +111,8 @@ class VideoFileName:
         returns:
             VideoFileName: The video file name object
         """
-        if not VideoFileName.is_video_file_name(file_name):
-            raise ValueError("The file name is not a video file name")
+        # if not VideoFileName.is_video_file_name(file_name):
+        #     raise ValueError("The file name is not a video file name")
 
         parts = file_name.split("_")
         title = parts[0]
@@ -169,7 +126,7 @@ class VideoFileName:
         )
         video_file_name._video_type = parts[1]
         video_file_name._video_features = parts[2]
-        video_file_name._unique_id = parts[7].split(".")[0]
+        # video_file_name._unique_id = parts[7].split(".")[0]
 
         return video_file_name
 

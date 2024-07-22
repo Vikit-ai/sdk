@@ -79,21 +79,6 @@ class Transition(Video):
         """
         return str(VideoType.TRANSITION)
 
-    async def prepare_build_hook(
-        self,
-        build_settings=VideoBuildSettings(),
-    ):
-        """
-        prepare the actual inner video
-
-        Params:
-            - build_settings: allow some customization
-
-        Returns:
-            The current instance
-        """
-        await super().prepare_build_hook(build_settings)
-
     def generate_background_music_prompt(self):
         """
         Get the background music prompt from the source and target videos.
