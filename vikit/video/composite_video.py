@@ -233,6 +233,7 @@ class CompositeVideo(Video, is_composite_video):
             build_settings=self.build_settings
         )
         logger.debug("ratio to multiply animations: " + str(ratio))
+
         with open(video_list_file, "w") as myfile:
             for video in self.video_list:
                 file_name = video.media_url
