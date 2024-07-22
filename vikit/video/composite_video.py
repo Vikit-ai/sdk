@@ -102,6 +102,7 @@ class CompositeVideo(Video, is_composite_video):
         if type(video) is CompositeVideo:
             logger.debug(
                 f"Added composite video {video.id} to composite video {self.id}"
+            )
             video._is_root_video_composite = False
             video.metadata.top_parent_id = self.top_parent_id
 
