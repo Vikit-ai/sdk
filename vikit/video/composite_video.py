@@ -162,32 +162,8 @@ class CompositeVideo(Video, is_composite_video):
             )
         )
 
-    async def prepare_build_hook(self, build_settings: VideoBuildSettings):
-        """
-        Prepare the video before launching the video build process:
-
-        here we ensure child videos won't have buildsettings with music, etc
-        unless they would already have been prepared with sepecific build settings
-
-        Args:
-            build_settings (VideoBuildSettings): The build settings
-
-        Returns:
-            list: The video build order
-        """
-        # Cleanse the video list by removing any empty composites videos
+    async def run_pre_build_actions_hook(self, build_settings: VideoBuildSettings):
         self.video_list = self.cleanse_video_list()
-
-        self.build_settings = build_settings
-        for video in self.video_list:
-            if not video.are_build_settings_prepared:
-                await video.prepare_build_hook(
-                    build_settings=self.get_cascaded_build_settings()
-                )
-
-        self.are_build_settings_prepared = True
-
-        return self
 
     async def run_build_core_logic_hook(
         self,
@@ -219,7 +195,7 @@ class CompositeVideo(Video, is_composite_video):
                 already_added=set(),
             )
             for video in ordered_video_list:
-                await video.build(build_settings=build_settings)
+                await video.build(build_settings=self.get_cascaded_build_settings())
 
         # at this stage we should have all the videos generated. Will be improved in the future
         # in case we are called directly on a child composite without starting by the composite root

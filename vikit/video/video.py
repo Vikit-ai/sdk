@@ -309,6 +309,13 @@ class Video(ABC):
         returns:
             Video: The current instance, prepared for building
         """
+        logger.debug(
+            f"Preparing the build settings with {build_settings} for video {self.id} of type {self.short_type_name} / {type(self)}"
+        )
+        self.build_settings = build_settings
+        self.are_build_settings_prepared = True
+
+        return self
 
     def _get_bk_music_target_filemame(self):
         """

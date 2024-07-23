@@ -78,21 +78,6 @@ class RawTextBasedVideo(Video):
             self._title = summarised_title
             return self._title
 
-    async def prepare_build_hook(self, build_settings):
-        """
-        Prepare the video for building
-
-        Args:
-            build_settings (VideoBuildSettings): The settings for building the video
-
-        Returns:
-            Video: The current instance
-        """
-        self.build_settings = build_settings
-        self.are_build_settings_prepared = True
-
-        return self
-
     def get_core_handlers(self, build_settings) -> list[Handler]:
         """
          Get the handler chain of the video. Order matters here.

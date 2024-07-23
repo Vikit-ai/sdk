@@ -203,7 +203,7 @@ class TestCompositeVideo:
                 .append_video(composite_to_delete2)
                 .append_video(CompositeVideo())  # should be filtered
             )
-            final_video = await final_video.prepare_build_hook(VideoBuildSettings())
+            await final_video.run_pre_build_actions_hook(VideoBuildSettings())
 
             assert len(final_video.video_list) == 0, "Video list should be empty"
             assert not final_video.media_url, "Media URL should be null"

@@ -27,7 +27,11 @@ class VideoBuildingPipeline:
         """
         handlers = []
 
-        handlers.extend(self.get_background_music_handlers(build_settings, video))
+        handlers.extend(
+            self.get_background_music_handlers(
+                build_settings=build_settings, video=video
+            )
+        )
 
         handlers.extend(self.get_read_aloud_prompt_handlers(build_settings))
         logger.debug(

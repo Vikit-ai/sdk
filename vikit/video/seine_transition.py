@@ -21,11 +21,6 @@ class SeineTransition(Transition):
         """
         super().__init__(source_video=source_video, target_video=target_video)
 
-    async def prepare_build_hook(self, build_settings=...):
-        self.build_settings = build_settings
-        self.are_build_settings_prepared = True
-        return self
-
     def get_core_handlers(self, build_settings: VideoBuildSettings) -> list[Handler]:
         """
         Get the handler chain of the video.
