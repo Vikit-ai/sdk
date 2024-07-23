@@ -3,7 +3,6 @@ from vikit.common.file_tools import download_file
 from loguru import logger
 
 from vikit.video.video import Video
-from vikit.common.file_tools import get_path_type
 from vikit.common.handler import Handler
 
 
@@ -25,29 +24,21 @@ class VideoGenHandler(Handler):
         Returns:
             CompositeVideo: The composite video
         """
-        video_link_from_prompt = (
+        generated_video_media = (
             await (  # Should give a link on a web storage
                 video.build_settings.get_ml_models_gateway().generate_video_async(
                     prompt=self.video_gen_prompt_text
                 )
             )
         )
-        file_name = video.get_file_name_by_state(video.build_settings)
-        path_info, error = get_path_type(video_link_from_prompt)
-        if path_info["type"] == "local":
-            video.media_url = video_link_from_prompt
-            logger.debug(
-                f"Video URL already on local file system, nothing to do. Path is: {video.media_url}"
-            )
-        else:
-            logger.debug(f"Retrieving file from remote URL :  {video_link_from_prompt}")
-
-            video.media_url = await download_file(
-                url=video_link_from_prompt,
-                local_path=file_name,
-            )[0]
         video.is_video_generated
         video.metadata.is_video_generated = True
+        file_name = video.get_file_name_by_state(video.build_settings)
+
+        video.media_url = await download_file(
+            url=generated_video_media,
+            local_path=file_name,
+        )
 
         logger.debug(f"Video generated from prompt: {video.media_url}")
         return video

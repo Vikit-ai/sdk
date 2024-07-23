@@ -121,9 +121,14 @@ class FakeMLModelsGateway(MLModelsGateway):
 
     async def generate_video_async(self, prompt: str = None, sleep_time: int = 0):
         await asyncio.sleep(sleep_time)
-        return ft.create_non_colliding_file_name(
-            tests_medias.get_cat_video_path()[:-4], extension="mp4"
+        # test_file = ft.create_non_colliding_file_name(
+        #     tests_medias.get_cat_video_path()[:-4], extension="mp4"
+        # )
+        test_file = tests_medias.get_cat_video_path()
+        logger.debug(
+            f"Generating video from prompt: {prompt}, return a link: {test_file}"
         )
+        return test_file
 
     async def extract_audio_slice_async(
         self, i, end, audiofile_path, target_file_name: str = None, sleep_time: int = 0

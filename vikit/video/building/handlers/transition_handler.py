@@ -1,11 +1,9 @@
-import shutil
-from urllib.request import urlretrieve
 from loguru import logger
 
 from vikit.common.file_tools import url_exists
+from vikit.common.file_tools import download_file
 from vikit.common.handler import Handler
 from vikit.video.video import Video
-from vikit.common.file_tools import get_path_type
 
 
 class VideoBuildingHandlerTransition(Handler):
@@ -50,15 +48,21 @@ class VideoBuildingHandlerTransition(Handler):
         target_file_name = video.get_file_name_by_state(
             build_settings=video.build_settings
         )
-        file_type = get_path_type(link_to_transition_video)["type"]
-        logger.debug(f"file_type: {file_type}")
-        if not file_type == "local":
-            video.media_url = urlretrieve(
-                target_file_name,
-            )[0]
-        else:
-            logger.debug(f"Renaming {link_to_transition_video} to {target_file_name}")
-            shutil.copyfile(link_to_transition_video, target_file_name)
+
+        target_file_name = await download_file(
+            url=link_to_transition_video,
+            local_path=video.get_file_name_by_state(video.build_settings),
+        )
+
+        # file_type, error = get_path_type(link_to_transition_video)["type"]
+        # logger.debug(f"file_type: {file_type}")
+        # if not file_type == "local":
+        #     video.media_url = urlretrieve(
+        #         target_file_name,
+        #     )[0]
+        # else:
+        #     logger.debug(f"Renaming {link_to_transition_video} to {target_file_name}")
+        #     shutil.copyfile(link_to_transition_video, target_file_name)
 
         video._media_url = target_file_name
 

@@ -210,7 +210,6 @@ def url_exists(url: str):
     return url_exists
 
 
-@log_function_params
 async def download_file(url, local_path):
     """
     Download a file from a URL to a local file asynchronously
