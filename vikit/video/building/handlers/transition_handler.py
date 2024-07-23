@@ -20,6 +20,10 @@ class VideoBuildingHandlerTransition(Handler):
         Returns:
             CompositeVideo: The composite video
         """
+        logger.info(
+            f"about to generate transition as video: {video.id}, source:  {video.source_video.media_url}, target: {video.target_video.media_url}"
+        )
+
         assert (
             video.source_video.media_url
         ), f"source video must be generated, video: {video.source_video}"

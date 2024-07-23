@@ -32,11 +32,7 @@ class VideoBuildingPipeline:
                 build_settings=build_settings, video=video
             )
         )
-
         handlers.extend(self.get_read_aloud_prompt_handlers(build_settings))
-        logger.debug(
-            f"Handlers after read aloud prompt: {handlers} for video {video.id}"
-        )
 
         return handlers
 

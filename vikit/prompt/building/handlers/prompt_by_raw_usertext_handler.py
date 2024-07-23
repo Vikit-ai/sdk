@@ -22,6 +22,8 @@ class PromptByRawUserTextHandler(Handler):
         Returns:
             a string containing a list of keywords to be used for video generation
         """
+        logger.info(f"about to enhance a prompt from raw user text: {text_prompt}")
+
         prompt_build_settings: PromptBuildSettings = kwargs.get("prompt_build_settings")
         if not prompt_build_settings:
             raise ValueError("PromptBuildSettings is required to process prompt")

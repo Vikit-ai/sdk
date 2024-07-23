@@ -131,7 +131,7 @@ class TestPromptBasedVideo:
     @pytest.mark.integration
     @pytest.mark.asyncio
     @pytest.mark.skip
-    async def test_sound_of_silence(self):
+    async def test_use_recorded_prompt_infer_lyrics_sof(self):
 
         with WorkingFolderContext():
             bld_settings = VideoBuildSettings(
@@ -147,7 +147,7 @@ class TestPromptBasedVideo:
             test_prompt = await PromptFactory(
                 bld_settings.get_ml_models_gateway()
             ).create_prompt_from_text(
-                test_media.SOUND_OF_SILENCE,
+                test_media.sof,
             )
             bld_settings.prompt = test_prompt
 
