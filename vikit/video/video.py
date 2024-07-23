@@ -260,7 +260,9 @@ class Video(ABC):
             )
             for handler in handler_chain:
                 built_video = await handler.execute_async(video=self)
-                assert built_video, "The video was not built properly"
+                built_video.is_video_generated = True
+
+                assert built_video.media_url, "The video media URL is not set"
 
         self.metadata.title = self.get_title()
         self.metadata.duration = self.get_duration()

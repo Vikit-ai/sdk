@@ -1,3 +1,5 @@
+from loguru import logger
+
 from vikit.common.handler import Handler
 from vikit.wrappers.ffmpeg_wrapper import (
     merge_audio,
@@ -23,6 +25,7 @@ class GenerateMusicAndMergeHandler(Handler):
         Returns:
             CompositeVideo: The composite video
         """
+        logger.info(f"about to generate music for video: {video.id} ")
         self.bg_music_prompt = (
             self.bg_music_prompt
             if self.bg_music_prompt

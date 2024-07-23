@@ -286,7 +286,7 @@ class TestCompositeVideo:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
-    async def test_int_combine_generated_and_preexiting_video_based_video_no_build_settings(
+    async def test_combine_generated_and_preexiting_video_no_build_settings(
         self,
     ):
         with WorkingFolderContext():

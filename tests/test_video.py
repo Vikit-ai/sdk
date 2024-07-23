@@ -47,13 +47,12 @@ class TestVideo:
     @pytest.mark.integration
     @pytest.mark.asyncio
     async def test_get_duration(self):
-        with WorkingFolderContext():
-            with pytest.raises(
-                ValueError
-            ):  # As the video is not generated, we should raise an error
-                PromptBasedVideo(
-                    tools.test_prompt_library["moss_stones-train_boy"]
-                ).get_duration()
+        assert (
+            PromptBasedVideo(
+                tools.test_prompt_library["moss_stones-train_boy"]
+            ).get_duration()
+            == 0
+        ), "Duration is not 0"
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio

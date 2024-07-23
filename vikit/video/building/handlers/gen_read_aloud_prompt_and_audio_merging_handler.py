@@ -1,3 +1,5 @@
+from loguru import logger
+
 from vikit.common.handler import Handler
 from vikit.wrappers.ffmpeg_wrapper import (
     merge_audio,
@@ -24,6 +26,9 @@ class ReadAloudPromptAudioMergingHandler(Handler):
         Returns:
             The video including generated synthetic voice that reads the prompt
         """
+        logger.info(
+            f"about to merge read aloud prompt audio to video: {video.id}, read alout media:  {self.recorded_prompt.audio_recording}"
+        )
         video.metadata.is_prompt_read_aloud = True
 
         video.media_url = await merge_audio(

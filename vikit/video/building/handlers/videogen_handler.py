@@ -1,5 +1,3 @@
-from vikit.common.file_tools import download_file
-
 from loguru import logger
 
 from vikit.video.video import Video
@@ -24,7 +22,8 @@ class VideoGenHandler(Handler):
         Returns:
             CompositeVideo: The composite video
         """
-        generated_video_media = (
+        logger.info(f"About to generate video: {video.id}, title: {video.get_title()}")
+        video.media_url = (
             await (  # Should give a link on a web storage
                 video.build_settings.get_ml_models_gateway().generate_video_async(
                     prompt=self.video_gen_prompt_text
@@ -33,12 +32,11 @@ class VideoGenHandler(Handler):
         )
         video.is_video_generated
         video.metadata.is_video_generated = True
-        file_name = video.get_file_name_by_state(video.build_settings)
-
-        video.media_url = await download_file(
-            url=generated_video_media,
-            local_path=file_name,
-        )
+        # file_name = video.get_file_name_by_state(video.build_settings)
+        # video.media_url = await download_file(
+        #     url=generated_video_media,
+        #     local_path=file_name,
+        # )
 
         logger.debug(f"Video generated from prompt: {video.media_url}")
         return video

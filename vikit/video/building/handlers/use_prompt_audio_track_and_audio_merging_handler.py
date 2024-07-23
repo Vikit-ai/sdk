@@ -1,3 +1,5 @@
+from loguru import logger
+
 from vikit.common.handler import Handler
 from vikit.wrappers.ffmpeg_wrapper import (
     merge_audio,
@@ -16,6 +18,9 @@ class UsePromptAudioTrackAndAudioMergingHandler(Handler):
         Returns:
             The video including generated music
         """
+        logger.info(
+            f"about to use recording audio track for video: {video.id}, video url : {video.media_url}"
+        )
 
         if video.build.prompt._recorded_audio_prompt_path is None:
             raise ValueError("Audio file path is required for the prompt")

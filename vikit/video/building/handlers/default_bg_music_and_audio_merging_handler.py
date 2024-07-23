@@ -1,5 +1,4 @@
-import random
-
+from loguru import logger
 from vikit.common.handler import Handler
 
 # from vikit.video.video import Video
@@ -19,6 +18,10 @@ class DefaultBGMusicAndAudioMergingHandler(Handler):
         Returns:
             The video including bg music
         """
+        logger.info(
+            f"about to merge default background music to video: {video.id}, music media source (before transformation):  {config.get_default_background_music()}"
+        )
+
         assert video.media_url is not None, "Media URL is required for the video"
         expected_music_duration = (
             video.build_settings.music_building_context.expected_music_length

@@ -18,7 +18,7 @@ class VideoReencodingHandler(Handler):
             CompositeVideo: The composite video
 
         """
-        logger.debug(f"Reencoding video: {video.id}, {video.media_url}")
+        logger.info(f"about to reencode video: {video.id}, {video.media_url}")
         if not video.media_url:
             raise ValueError(f"Video {video.id} has no media url")
 
