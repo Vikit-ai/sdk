@@ -5,7 +5,7 @@ from loguru import logger
 
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.prompt.prompt_factory import PromptFactory
-from tests.tests_medias import get_test_prompt_recording
+from tests.testing_medias import get_test_prompt_recording
 from vikit.gateways import replicate_gateway as replicate_gateway
 
 mp3_transcription = "ceci est un test rapide avec nma voix enregistrée pour faire un test"

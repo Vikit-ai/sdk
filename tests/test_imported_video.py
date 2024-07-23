@@ -6,7 +6,7 @@ import warnings
 import pytest
 from loguru import logger
 
-from tests.tests_medias import get_cat_video_path
+from tests.testing_medias import get_cat_video_path
 from vikit.video.video import VideoBuildSettings
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.imported_video import ImportedVideo

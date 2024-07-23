@@ -6,7 +6,7 @@ import shutil
 
 from loguru import logger
 
-import tests.tests_medias as tests_medias
+import tests.testing_medias as tests_medias
 import vikit.common.file_tools as ft
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from urllib.parse import urljoin
@@ -37,13 +37,11 @@ class FakeMLModelsGateway(MLModelsGateway):
     def sleep(self, sleep_time=1):
         sleep(sleep_time)  # Simulate a long process with time.sleep
 
-    async def generate_mp3_from_text_async(
-        self, prompt_text, target_file_name: str = None
-    ):
+    async def generate_mp3_from_text_async(self, prompt_text, target_file: str = None):
         logger.debug(f"Creating aa prompt from text: {prompt_text}")
 
         shutil.copy(
-            src=tests_medias.get_test_prompt_recording_trainboy(), dst=target_file_name
+            src=tests_medias.get_test_prompt_recording_trainboy(), dst=target_file
         )
 
     async def generate_background_music_async(
@@ -123,9 +121,14 @@ class FakeMLModelsGateway(MLModelsGateway):
 
     async def generate_video_async(self, prompt: str = None, sleep_time: int = 0):
         await asyncio.sleep(sleep_time)
-        return ft.create_non_colliding_file_name(
-            tests_medias.get_cat_video_path()[:-4], extension="mp4"
+        # test_file = ft.create_non_colliding_file_name(
+        #     tests_medias.get_cat_video_path()[:-4], extension="mp4"
+        # )
+        test_file = tests_medias.get_cat_video_path()
+        logger.debug(
+            f"Generating video from prompt: {prompt}, return a link: {test_file}"
         )
+        return test_file
 
     async def extract_audio_slice_async(
         self, i, end, audiofile_path, target_file_name: str = None, sleep_time: int = 0

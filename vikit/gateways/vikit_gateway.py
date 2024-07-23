@@ -5,11 +5,10 @@ import base64
 import json
 import subprocess
 
-import requests
-
 from tenacity import retry, before_log, after_log, stop_after_attempt
 from loguru import logger
-from urllib.request import urlretrieve
+from vikit.common.file_tools import download_file
+from vikit.common.decorators import log_function_params
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.common.secrets import get_replicate_api_token, get_vikit_api_token
@@ -36,8 +35,6 @@ class VikitGateway(MLModelsGateway):
     ):
         """
         Generate an mp3 file from a text prompt.
-        TODO: May be isolated into
-        another gatesay later
 
         Args:
             - prompt_text: str - the text to generate the mp3 from
@@ -47,10 +44,11 @@ class VikitGateway(MLModelsGateway):
             - None
         """
         await elevenlabs_gateway.generate_mp3_from_text_async(
-            text=prompt_text, target_file=target_file, target_file_name=target_file_name
+            text=prompt_text, target_file=target_file
         )
         assert os.path.exists(target_file), "The generated audio file does not exists"
 
+    @log_function_params
     async def generate_background_music_async(
         self, duration: int = 3, prompt: str = None
     ) -> str:
@@ -68,10 +66,10 @@ class VikitGateway(MLModelsGateway):
             duration < 300
         ), "The duration of the music should be less than 300 seconds"
 
-        outputLLM = asyncio.run(self.get_music_generation_keywords_async(prompt))
+        outputLLM = await self.get_music_generation_keywords_async(prompt)
         logger.debug(f"outputLLM: {outputLLM}")
 
-        # je veux le dernier mot de la liste de mots générés pour le nom du fichier
+        # get the last word which corresponds to proposed prompt title
         prompt_based_music_file_name = str(outputLLM.split()[-1:][0]) + ".mp3"
         logger.debug(f"prompt_based_music_file_name: {prompt_based_music_file_name}")
         title_length = len(prompt_based_music_file_name)  # remove the .mp3 extension
@@ -84,9 +82,14 @@ class VikitGateway(MLModelsGateway):
         )
 
         logger.debug("Downloading the generated music")
-        gen_music_file_path = urlretrieve(
-            output_music_link, prompt_based_music_file_name
+        gen_music_file_path = await download_file(
+            url=output_music_link, local_path=prompt_based_music_file_name
         )[0]
+
+        # gen_music_file_path = urlretrieve(
+        #     output_music_link, prompt_based_music_file_name
+        # )[0]
+
         lowered_music_filename = f"lowered_{prompt_based_music_file_name}"
 
         logger.debug("Lowering the volume of the music")
@@ -116,6 +119,7 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
+    @log_function_params
     async def generate_seine_transition_async(
         self, source_image_path, target_image_path
     ):
@@ -150,21 +154,23 @@ class VikitGateway(MLModelsGateway):
             open(target_image_path, "rb").read()
         ).decode("ascii")
 
-        response = requests.post(
-            vikit_backend_url,
-            json={
-                "key": vikit_api_key,
-                "model": "leclem/seine-transition:6de45c0cdc731d9fdf73f1d7b9db6373089804b62f6f2c1e3c853f4f04e20566",
-                "input": {
-                    "image": "data:image/jpeg;base64," + source_image_base64,
-                    "image2": "data:image/jpeg;base64," + target_image_base64,
-                    "width": 512,
-                    "height": 320,
+        async with aiohttp.ClientSession() as session:
+            payload = (
+                {
+                    "key": vikit_api_key,
+                    "model": "leclem/seine-transition:6de45c0cdc731d9fdf73f1d7b9db6373089804b62f6f2c1e3c853f4f04e20566",
+                    "input": {
+                        "image": "data:image/jpeg;base64," + source_image_base64,
+                        "image2": "data:image/jpeg;base64," + target_image_base64,
+                        "width": 512,
+                        "height": 320,
+                    },
                 },
-            },
-        )
+            )
+            async with session.post(vikit_backend_url, json=payload) as response:
+                response = await response.text()
 
-        return response.text
+        return response
 
     ##################  Replicate API calls for Music keywords prompt and music gen  ##################
 
@@ -174,6 +180,7 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
+    @log_function_params
     async def compose_music_from_text_async(self, prompt_text: str, duration: int):
         """
         Compose a music for a prompt text
@@ -194,9 +201,9 @@ class VikitGateway(MLModelsGateway):
             raise AttributeError("The input duration is greater than 60")
         if len(prompt_text) < 1:
             raise AttributeError("The input prompt text is empty")
-        result_music_link = requests.post(
-            vikit_backend_url,
-            json={
+
+        async with aiohttp.ClientSession() as session:
+            payload = {
                 "key": vikit_api_key,
                 "model": "meta/musicgen:b05b1dff1d8c6dc63d14b0cdb42135378dcb87f6373b0d3d341ede46e59e2b38",
                 "input": {
@@ -214,8 +221,10 @@ class VikitGateway(MLModelsGateway):
                     "normalization_strategy": "peak",
                     "classifier_free_guidance": 3,
                 },
-            },
-        ).text
+            }
+
+            async with session.post(vikit_backend_url, json=payload) as response:
+                result_music_link = await response.text()
 
         if result_music_link is None:
             raise AttributeError("The result music link is None")
@@ -230,6 +239,7 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
+    @log_function_params
     async def get_music_generation_keywords_async(self, text) -> str:
         """
         Generate keywords from a text using the Replicate API
@@ -270,11 +280,10 @@ class VikitGateway(MLModelsGateway):
                     "frequency_penalty": 0,
                 },
             }
-
             async with session.post(vikit_backend_url, json=payload) as response:
-                llm_keywords = await response.json()
-
-        return cleanse_llm_keywords(llm_keywords.text)
+                llm_keywords = await response.text()
+        logger.debug(f"LLM Keywords: {llm_keywords}")
+        return cleanse_llm_keywords(llm_keywords)
 
     @retry(
         stop=stop_after_attempt(get_nb_retries_http_calls()),
@@ -282,6 +291,7 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("DEBUG").no),
         after=after_log(logger, logger.level("DEBUG").no),
     )
+    @log_function_params
     async def interpolate_async(self, video):
         """
         Run some interpolation magic. This model may fail after timeout, so you
@@ -298,21 +308,28 @@ class VikitGateway(MLModelsGateway):
 
         logger.debug(f"Video to interpolate {video}")
 
-        return requests.post(
-            vikit_backend_url,
-            json={
-                "key": vikit_api_key,
-                "model": "pollinations/amt:6e03c945a24b2defe4576e35235b9c9c0120d81c9df58880c0b3832a5777cdcd",
-                "input": {
-                    "video": video,
-                    "model_type": "amt-l",
-                    "output_video_fps": 16,
-                    "recursive_interpolation_passes": 2,
+        async with aiohttp.ClientSession() as session:
+            payload = (
+                {
+                    "key": vikit_api_key,
+                    "model": "pollinations/amt:6e03c945a24b2defe4576e35235b9c9c0120d81c9df58880c0b3832a5777cdcd",
+                    "input": {
+                        "video": video,
+                        "model_type": "amt-l",
+                        "output_video_fps": 16,
+                        "recursive_interpolation_passes": 2,
+                    },
                 },
-            },
-        ).text
+            )
+
+            async with session.post(vikit_backend_url, json=payload) as response:
+                output = await response.text()
+
+        logger.debug(f"Interpolated video response: {output}")
+        return output
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    @log_function_params
     async def get_keywords_from_prompt_async(
         self, subtitleText, excluded_words: str = None
     ):
@@ -328,45 +345,48 @@ class VikitGateway(MLModelsGateway):
         """
         assert subtitleText is not None
 
-        llm_keywords = requests.post(
-            vikit_backend_url,
-            json={
-                "key": vikit_api_key,
-                "model": "mistralai/mistral-7b-instruct-v0.2",
-                "input": {
-                    "top_k": 50,
-                    "top_p": 0.9,
-                    "prompt": "I want you to act as a english keyword generator for Midjourney's artificial intelligence program."
-                    + "Your job is to provide detailed and creative descriptions that will inspire unique and interesting images from "
-                    + "the AI for a video. Keep in mind that the AI is capable of understanding a wide range of language and can "
-                    + "interpret abstract concepts, so feel free to be as imaginative and descriptive as possible. Don't repeat keywords. The more detailed "
-                    + "and imaginative your keywords, the more interesting the resulting image will be. Here is the sentence from "
-                    + "which to extract keywords: '"
-                    ""
-                    + subtitleText
-                    + "'. Just list the keywords in english language, separated by a coma, do not re-output the prompt. "
-                    + (
-                        f" . Please avoid using these keywords: {excluded_words}"
-                        if excluded_words
-                        else ""
-                    )
-                    + KEYWORDS_FORMAT_PROMPT,
-                    "temperature": 0.6,
-                    "max_new_tokens": 32,
-                    "prompt_template": "<s>[INST] {prompt} [/INST] ",
-                    "presence_penalty": 0,
-                    "frequency_penalty": 0,
+        async with aiohttp.ClientSession() as session:
+            payload = (
+                {
+                    "key": vikit_api_key,
+                    "model": "mistralai/mistral-7b-instruct-v0.2",
+                    "input": {
+                        "top_k": 50,
+                        "top_p": 0.9,
+                        "prompt": "I want you to act as a english keyword generator for Midjourney's artificial intelligence program."
+                        + "Your job is to provide detailed and creative descriptions that will inspire unique and interesting images from "
+                        + "the AI for a video. Keep in mind that the AI is capable of understanding a wide range of language and can "
+                        + "interpret abstract concepts, so feel free to be as imaginative and descriptive as possible. Don't repeat keywords. The more detailed "
+                        + "and imaginative your keywords, the more interesting the resulting image will be. Here is the sentence from "
+                        + "which to extract keywords: '"
+                        ""
+                        + subtitleText
+                        + "'. Just list the keywords in english language, separated by a coma, do not re-output the prompt. "
+                        + (
+                            f" . Please avoid using these keywords: {excluded_words}"
+                            if excluded_words
+                            else ""
+                        )
+                        + KEYWORDS_FORMAT_PROMPT,
+                        "temperature": 0.6,
+                        "max_new_tokens": 32,
+                        "prompt_template": "<s>[INST] {prompt} [/INST] ",
+                        "presence_penalty": 0,
+                        "frequency_penalty": 0,
+                    },
                 },
-            },
-        )
+            )
+            async with session.post(vikit_backend_url, json=payload) as response:
+                llm_keywords = await response.text()
 
-        clean_result = cleanse_llm_keywords(llm_keywords.text)
+        clean_result = cleanse_llm_keywords(llm_keywords)
         title_from_keywords_as_tokens = clean_result.split()[-1:][0]
 
         # Transform the list of keywords into a single string, we do keep the final title within
         return clean_result, title_from_keywords_as_tokens
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    @log_function_params
     async def get_enhanced_prompt_async(self, subtitleText):
         """
         Generates an enhanced prompt from an original one, probably written by a user or
@@ -379,9 +399,8 @@ class VikitGateway(MLModelsGateway):
             A prompt enhanced by an LLM
         """
 
-        outputLLM = requests.post(
-            vikit_backend_url,
-            json={
+        async with aiohttp.ClientSession() as session:
+            payload = {
                 "key": vikit_api_key,
                 "model": "mistralai/mistral-7b-instruct-v0.2",
                 "input": {
@@ -397,16 +416,19 @@ class VikitGateway(MLModelsGateway):
                     "presence_penalty": 0,
                     "frequency_penalty": 0,
                 },
-            },
-        )
+            }
 
-        clean_result = cleanse_llm_keywords(outputLLM.text)
+            async with session.post(vikit_backend_url, json=payload) as response:
+                outputLLM = await response.text()
+
+        clean_result = cleanse_llm_keywords(outputLLM)
         title_from_keywords_as_tokens = clean_result.split()[-1:][0]
 
         # Transform the list of keywords into a single string, we do keep the final title within
         return clean_result, title_from_keywords_as_tokens
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    @log_function_params
     async def get_subtitles_async(self, audiofile_path):
         # Obtain subtitles using Replicate API
         """
@@ -426,31 +448,33 @@ class VikitGateway(MLModelsGateway):
         base64AudioFile = base64.b64encode(open(audiofile_path, "rb").read()).decode(
             "ascii"
         )
-
-        subs = requests.post(
-            vikit_backend_url,
-            json={
-                "key": vikit_api_key,
-                "model": "cjwbw/whisper:b70a8e9dc4aa40bf4309285fbaefe3ed3d3a313f1f32ea61826fc64cdb4917a5",
-                "input": {
-                    "model": "base",
-                    "translate": True,
-                    "temperature": 0,
-                    "transcription": "srt",
-                    "suppress_tokens": "-1",
-                    "logprob_threshold": -1,
-                    "no_speech_threshold": 0.6,
-                    "condition_on_previous_text": True,
-                    "compression_ratio_threshold": 2.4,
-                    "temperature_increment_on_fallback": 0.2,
-                    "audio": "data:audio/mp3;base64," + base64AudioFile,
+        async with aiohttp.ClientSession() as session:
+            payload = (
+                {
+                    "key": vikit_api_key,
+                    "model": "cjwbw/whisper:b70a8e9dc4aa40bf4309285fbaefe3ed3d3a313f1f32ea61826fc64cdb4917a5",
+                    "input": {
+                        "model": "base",
+                        "translate": True,
+                        "temperature": 0,
+                        "transcription": "srt",
+                        "suppress_tokens": "-1",
+                        "logprob_threshold": -1,
+                        "no_speech_threshold": 0.6,
+                        "condition_on_previous_text": True,
+                        "compression_ratio_threshold": 2.4,
+                        "temperature_increment_on_fallback": 0.2,
+                        "audio": "data:audio/mp3;base64," + base64AudioFile,
+                    },
                 },
-            },
-        )
+            )
+            async with session.post(vikit_backend_url, json=payload) as response:
+                subs = await response.text()
 
-        return json.loads(subs.text)
+        return json.loads(subs)
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    @log_function_params
     async def generate_video_async(self, prompt: str):
         """
         Generate a video from the given prompt
@@ -462,9 +486,8 @@ class VikitGateway(MLModelsGateway):
                 The link to the generated video
         """
         logger.debug(f"Generating video from prompt: {prompt}")
-        output = requests.post(
-            vikit_backend_url,
-            json={
+        async with aiohttp.ClientSession() as session:
+            payload = {
                 "key": vikit_api_key,
                 "model": "cjwbw/videocrafter:02edcff3e9d2d11dcc27e530773d988df25462b1ee93ed0257b6f246de4797c8",
                 "input": {
@@ -473,7 +496,8 @@ class VikitGateway(MLModelsGateway):
                     "ddim_steps": 50,
                     "unconditional_guidance_scale": 12,
                 },
-            },
-        )
+            }
+            async with session.post(vikit_backend_url, json=payload) as response:
+                output = await response.text()
 
-        return output.text
+        return output

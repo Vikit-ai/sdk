@@ -1,7 +1,7 @@
 import os
 
 from vikit.prompt.recorded_prompt import RecordedPrompt
-from tests.tests_medias import (
+from tests.testing_medias import (
     get_test_prompt_recording_trainboy,
     get_test_recorded_prompt_path,
     get_test_prompt_recording_stones_trainboy_path,

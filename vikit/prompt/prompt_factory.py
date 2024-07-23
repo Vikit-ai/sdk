@@ -72,7 +72,7 @@ class PromptFactory:
         # calling a model like Whisper from openAI
         await self._ml_gateway.generate_mp3_from_text_async(
             prompt_text=prompt_text,
-            target_file_name=config.get_prompt_mp3_file_name(),
+            target_file=config.get_prompt_mp3_file_name(),
         )
 
         extractor = RecordedPromptSubtitlesExtractor()

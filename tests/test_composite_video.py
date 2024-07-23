@@ -3,18 +3,18 @@ import warnings
 import pytest
 from loguru import logger
 
-import tests.tests_medias as test_media
+import tests.testing_medias as test_media
 from vikit.video.video import Video, VideoBuildSettings
 from vikit.video.composite_video import CompositeVideo
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.video.raw_text_based_video import RawTextBasedVideo
-import tests.tests_tools as tools  # used to get a library of test prompts
+import tests.testing_tools as tools  # used to get a library of test prompts
 import vikit.wrappers.ffmpeg_wrapper as ffmpegwrapper
 from vikit.music_building_context import MusicBuildingContext
-from tests.tests_tools import test_prompt_library
+from tests.testing_tools import test_prompt_library
 from vikit.video.imported_video import ImportedVideo
 
-from tests.tests_medias import (
+from tests.testing_medias import (
     get_cat_video_path,
     get_test_transition_stones_trainboy_path,
 )
@@ -139,7 +139,7 @@ class TestCompositeVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_build_video_composite_2_prompt_vids_music_no_subs_no_transition(
+    async def test_build_video_composite_2_prompt_vids_gen_music_no_subs_no_transition(
         self,
     ):
         with WorkingFolderContext():
@@ -210,7 +210,7 @@ class TestCompositeVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_prompt_recording_synchro_tired(self):
+    async def test_prompt_recording_synchro_trainboy_prompt_but_not_readaloud(self):
         with WorkingFolderContext():
             prompt_with_recording = tools.test_prompt_library["tired"]
             final_composite_video = CompositeVideo()

@@ -6,7 +6,7 @@ from loguru import logger
 
 from vikit.wrappers.ffmpeg_wrapper import concatenate_videos, reencode_video
 from vikit.common.context_managers import WorkingFolderContext
-import tests.tests_medias as tests_medias
+import tests.testing_medias as tests_medias
 
 
 class TestFFMPEGWrapper:
