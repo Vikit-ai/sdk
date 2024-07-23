@@ -149,96 +149,75 @@ class TestVideoFileNames:
     @pytest.mark.asyncio
     async def test_video_file_names_across_building_steps(self):
 
-        with WorkingFolderContext():
-            root_composite_video = CompositeVideo()
-            bld_set = self.get_test_build_settings()
+        root_composite_video = CompositeVideo()
+        bld_set = self.get_test_build_settings()
 
-            fname = str(
-                root_composite_video.get_file_name_by_state(build_settings=bld_set)
-            )
-            vid_fname = VideoFileName.from_file_name(fname)
+        fname = str(
+            root_composite_video.get_file_name_by_state(build_settings=bld_set)
+        )
+        vid_fname = VideoFileName.from_file_name(fname)
 
-            # assert VideoFileName.is_video_file_name(
-            #     fname
-            # ), "The file name of the video instance is not valid. Generated file name: {}".format(
-            #     fname
-            # )
-            assert (
-                vid_fname.video_features == "ooooo"
-            ), "The video features are not correct: features returned: {}".format(
-                vid_fname.video_features
-            )
-            assert (
-                vid_fname.build_id == bld_set.id
-            ), "The build ID is not correct, {}".format(bld_set.id)
+        assert (
+            vid_fname.video_features == "ooooo"
+        ), "The video features are not correct: features returned: {}".format(
+            vid_fname.video_features
+        )
+        assert (
+            vid_fname.build_id == bld_set.id
+        ), "The build ID is not correct, {}".format(bld_set.id)
 
-            assert vid_fname._build_date == bld_set.build_date
-            # assert vid_fname._build_time == bld_set.build_time
-            assert vid_fname.unique_id is not None
+        assert vid_fname._build_date == bld_set.build_date
+        # assert vid_fname._build_time == bld_set.build_time
+        assert vid_fname.unique_id is not None
 
-            # now we stop to the next video building step (build the video, here we decide to
-            # interpolate and reencode), we expect the video features to be updated accordingly
-            root_composite_video.metadata.is_video_generated = True
-            root_composite_video.metadata.is_interpolated = True
-            root_composite_video.metadata.is_reencoded = True
+        # now we stop to the next video building step (build the video, here we decide to
+        # interpolate and reencode), we expect the video features to be updated accordingly
+        root_composite_video.metadata.is_video_generated = True
+        root_composite_video.metadata.is_interpolated = True
+        root_composite_video.metadata.is_reencoded = True
 
-            fname_built = str(
-                root_composite_video.get_file_name_by_state(build_settings=bld_set)
-            )
-            vid_fname = VideoFileName.from_file_name(fname_built)
-            # assert VideoFileName.is_video_file_name(
-            #     fname
-            # ), "The file name of the video instance is not valid. Generated file name: {}".format(
-            #     fname
-            # )
-            assert (
-                vid_fname.video_features == "oorio"
-            ), "The video features are not correct: features returned: {}".format(
-                vid_fname.video_features
-            )
-            assert (  # Check the build id has not changed
-                vid_fname.build_id == bld_set.id
-            ), "The build ID is not correct, {}".format(bld_set.id)
+        fname_built = str(
+            root_composite_video.get_file_name_by_state(build_settings=bld_set)
+        )
+        vid_fname = VideoFileName.from_file_name(fname_built)
+        assert (
+            vid_fname.video_features == "oorio"
+        ), "The video features are not correct: features returned: {}".format(
+            vid_fname.video_features
+        )
+        assert (  # Check the build id has not changed
+            vid_fname.build_id == bld_set.id
+        ), "The build ID is not correct, {}".format(bld_set.id)
 
-            # now we stop to the next video building step, here we add background music, and it needs
-            # to be generated. We expect the video features to be updated accordingly
-            root_composite_video.metadata.is_bg_music_applied = True
-            root_composite_video.metadata.is_bg_music_generated = True
-            fname_built = str(
-                root_composite_video.get_file_name_by_state(build_settings=bld_set)
-            )
-            vid_fname = VideoFileName.from_file_name(fname_built)
-            # assert VideoFileName.is_video_file_name(
-            #     fname
-            # ), "The file name of the video instance is not valid. Generated file name: {}".format(
-            #     fname
-            # )
-            assert (
-                vid_fname.video_features == "gorio"
-            ), "The video features are not correct: features returned: {}".format(
-                vid_fname.video_features
-            )
-            assert (  # Check the build id has not changed
-                vid_fname.build_id == bld_set.id
-            ), "The build ID is not correct, {}".format(bld_set.id)
+        # now we stop to the next video building step, here we add background music, and it needs
+        # to be generated. We expect the video features to be updated accordingly
+        root_composite_video.metadata.is_bg_music_applied = True
+        root_composite_video.metadata.is_bg_music_generated = True
+        fname_built = str(
+            root_composite_video.get_file_name_by_state(build_settings=bld_set)
+        )
+        vid_fname = VideoFileName.from_file_name(fname_built)
+        assert (
+            vid_fname.video_features == "gorio"
+        ), "The video features are not correct: features returned: {}".format(
+            vid_fname.video_features
+        )
+        assert (  # Check the build id has not changed
+            vid_fname.build_id == bld_set.id
+        ), "The build ID is not correct, {}".format(bld_set.id)
 
-            # now we stop to the next video building step, here we add read aloud subtitles.
-            #  We expect the video features to be updated accordingly
-            root_composite_video.metadata.is_prompt_read_aloud = True
-            fname_built = str(
-                root_composite_video.get_file_name_by_state(build_settings=bld_set)
-            )
-            vid_fname = VideoFileName.from_file_name(fname_built)
-            # assert VideoFileName.is_video_file_name(
-            #     fname
-            # ), "The file name of the video instance is not valid. Generated file name: {}".format(
-            #     fname
-            # )
-            assert (
-                vid_fname.video_features == "gvrio"
-            ), "The video features are not correct: features returned: {}".format(
-                vid_fname.video_features
-            )
-            assert (  # Check the build id has not changed
-                vid_fname.build_id == bld_set.id
-            ), "The build ID is not correct, {}".format(bld_set.id)
+        # now we stop to the next video building step, here we add read aloud subtitles.
+        #  We expect the video features to be updated accordingly
+        root_composite_video.metadata.is_prompt_read_aloud = True
+        fname_built = str(
+            root_composite_video.get_file_name_by_state(build_settings=bld_set)
+        )
+        vid_fname = VideoFileName.from_file_name(fname_built)
+        assert (
+            vid_fname.video_features == "gvrio"
+        ), "The video features are not correct: features returned: {}".format(
+            vid_fname.video_features
+        )
+        assert (  # Check the build id has not changed
+            vid_fname.build_id == bld_set.id
+        ), "The build ID is not correct, {}".format(bld_set.id)
