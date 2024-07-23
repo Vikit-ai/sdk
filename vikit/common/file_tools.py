@@ -1,9 +1,12 @@
 import os
 import re
 import uuid as uuid
-import urllib.parse
 import sys
+import shutil
 
+import aiohttp
+import aiofiles
+import urllib.parse
 from typing import Union, Optional
 from loguru import logger
 from urllib.request import urlopen
@@ -49,8 +52,8 @@ def create_non_colliding_file_name(canonical_name: str = None, extension: str = 
     """
     target_name = canonical_name + "_UID_" + str(uuid.uuid4()) + "." + extension
 
-    val_target_name = get_path_type(target_name)
-    if val_target_name["type"] == "error":
+    val_target_name, error = get_path_type(target_name)
+    if error:
         logger.warning(
             f"Error creating non-colliding file name: {val_target_name['path']}"
         )
@@ -95,34 +98,38 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
 
     Returns:
         dict: The path type and the path itself
-        Can be local, http, https, s3, gs, None, undefined, error,
+        Path type can be local, http, https, s3, gs, None, undefined, error,
+        error : message if the path is invalid, None if no error
     """
     logger.debug(f"Checking path: {path}")
+    error = None
+    result = ({"type": "undefined", "path": "undefined"}, "undefined path")
 
-    result = {"type": "undefined", "path": "undefined"}
     if path is None:
-        return {"type": "none", "path": None}
+        return {"type": "none", "path": path}, "The path is None"
 
     if len(path) > get_max_filename_length():
         return {
             "type": "error",
-            "path": "The file name is too long for local filesystem storage",
-        }
+            "path": "",
+        }, "The file name is too long for local filesystem storage"
 
     if os.path.exists(path) or is_valid_filename(filename=os.path.basename(path)):
-        logger.debug(f"Path is a PathLike object: {path}")
-        return {"type": "local", "path": path}
+        if path.startswith("file://"):
+            logger.debug(f"Path is a local url format: {path}")
+            return {"type": "local_url_format", "path": path}, None
+        else:
+            logger.debug(f"Path is a PathLike object: {path}")
+            return {"type": "local", "path": path}, None
     else:
         # Check if the path is a URL
         parsed_uri = urllib.parse.urlparse(str(path))
 
         if parsed_uri.scheme in ["http", "https", "s3", "gs"]:
-            if len(parsed_uri.path) > get_max_remote_path_length():
-                raise ValueError("The file name is too long for remote storage")
-            return {"type": parsed_uri.scheme, "path": path}
+            return {"type": parsed_uri.scheme, "path": path}, None
 
     # by default, consider it as a local path
-    return result
+    return result, error
 
 
 def is_valid_filename(filename: str) -> bool:
@@ -201,3 +208,49 @@ def url_exists(url: str):
         url_exists = True
 
     return url_exists
+
+
+@log_function_params
+async def download_file(url, local_path):
+    """
+    Download a file from a URL to a local file asynchronously
+
+    Args:
+        url (str): The URL to download the file from
+        local_path (str): The filename to save the file to
+
+    Returns:
+        str: The filename of the downloaded file
+    """
+    if not url:
+        raise ValueError("URL must be provided")
+
+    path_desc, error = get_path_type(url)
+
+    if not error:
+        if path_desc["type"] == "http" or path_desc["type"] == "https":
+            async with aiohttp.ClientSession() as session:
+                logger.debug(f"Downloading file from {url} to {local_path}")
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        # Utilisez aiofiles pour écrire le contenu de manière asynchrone
+                        async with aiofiles.open(url, "wb") as f:
+                            while (
+                                True
+                            ):  # Lire le contenu par morceaux pour ne pas surcharger la mémoire
+                                chunk = await response.content.read(1024)
+                                if not chunk:
+                                    break
+                                await f.write(chunk)
+                        return local_path
+        elif path_desc["type"] == "local":
+            logger.debug(f"Copying file from {url} to {local_path}")
+            shutil.copyfile(url, local_path)
+            return local_path
+        elif path_desc["type"] == "local_url_format":
+            url = url.replace("file://", "")
+            logger.debug(f"Copying file from {url} to {local_path}")
+            shutil.copyfile(url, local_path)
+            return local_path
+    else:
+        raise ValueError(f"Unsupported remote path type: {url}")

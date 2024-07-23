@@ -6,7 +6,7 @@ import shutil
 
 from loguru import logger
 
-import tests.tests_medias as tests_medias
+import tests.testing_medias as tests_medias
 import vikit.common.file_tools as ft
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from urllib.parse import urljoin

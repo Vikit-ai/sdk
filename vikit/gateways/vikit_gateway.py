@@ -7,8 +7,7 @@ import subprocess
 
 from tenacity import retry, before_log, after_log, stop_after_attempt
 from loguru import logger
-from vikit.common.download_file import download_file
-from urllib.request import urlretrieve
+from vikit.common.file_tools import download_file
 from vikit.common.decorators import log_function_params
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
@@ -84,7 +83,7 @@ class VikitGateway(MLModelsGateway):
 
         logger.debug("Downloading the generated music")
         gen_music_file_path = await download_file(
-            url=output_music_link, filename=prompt_based_music_file_name
+            url=output_music_link, local_path=prompt_based_music_file_name
         )[0]
 
         # gen_music_file_path = urlretrieve(

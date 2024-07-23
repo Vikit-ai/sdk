@@ -7,7 +7,7 @@ from loguru import logger
 from vikit.video.imported_video import ImportedVideo
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.common.context_managers import WorkingFolderContext
-import tests.tests_tools as tools  # used to get a library of test prompts
+import tests.testing_tools as tools  # used to get a library of test prompts
 
 
 TESTS_MEDIA_FOLDER = "medias/"

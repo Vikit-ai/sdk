@@ -8,7 +8,7 @@ import warnings
 import pytest
 from loguru import logger
 
-from tests.tests_medias import (
+from tests.testing_medias import (
     get_cat_video_path,
     get_generated_3s_forest_video_1_path,
     get_generated_3s_forest_video_2_path,
@@ -17,7 +17,7 @@ from vikit.video.video import VideoBuildSettings
 from vikit.video.imported_video import ImportedVideo
 from vikit.video.composite_video import CompositeVideo
 from vikit.common.context_managers import WorkingFolderContext
-from tests.tests_tools import test_prompt_library
+from tests.testing_tools import test_prompt_library
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handler import (
     ReadAloudPromptAudioMergingHandler,
