@@ -27,7 +27,7 @@ class DefaultBGMusicAndAudioMergingHandler(Handler):
             expected_music_duration=expected_music_duration, video=video
         )
         video.metadata.bg_music_applied = True
-        video.metadata.bg_music_applied = True
+        video.metadata.is_default_bg_music_applied = True
 
         self.media_url = await merge_audio(
             media_url=video.media_url,

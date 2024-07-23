@@ -59,11 +59,6 @@ class Video(ABC):
             duration=0,
             width=self._width,
             height=self._height,
-            is_video_generated=False,
-            is_reencoded=False,
-            is_interpolated=False,
-            is_bg_music_applied=False,
-            is_bg_music_generated=None,  # if not using gnerated we infer the default bg music is used
         )
 
         self.media_url = None
@@ -316,12 +311,6 @@ class Video(ABC):
         self.are_build_settings_prepared = True
 
         return self
-
-    def _get_bk_music_target_filemame(self):
-        """
-        Get the target file name for the background music
-        """
-        return f"{self.media_url[:-4].split('/')[-1]}_background_music.mp3"
 
     def get_file_name_by_state(self, build_settings: VideoBuildSettings = None):
         """

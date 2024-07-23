@@ -60,6 +60,6 @@ class VideoBuildingHandlerTransition(Handler):
             logger.debug(f"Renaming {link_to_transition_video} to {target_file_name}")
             shutil.copyfile(link_to_transition_video, target_file_name)
 
-        video._media_url = target_file_name
+        video.media_url = target_file_name
 
         return video

@@ -31,6 +31,7 @@ class VideoGenHandler(Handler):
                 )
             )
         )
+        video.is_video_generated = True
         file_name = video.get_file_name_by_state(video.build_settings)
         path_info = get_path_type(video_link_from_prompt)
         if path_info["type"] == "local":
@@ -44,8 +45,6 @@ class VideoGenHandler(Handler):
                 video_link_from_prompt,
                 file_name,
             )[0]
-        video.is_video_generated
-        video.metadata.is_video_generated = True
 
         logger.debug(f"Video generated from prompt: {video.media_url}")
         return video

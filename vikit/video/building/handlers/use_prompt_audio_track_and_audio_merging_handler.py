@@ -19,7 +19,8 @@ class UsePromptAudioTrackAndAudioMergingHandler(Handler):
 
         if video.build.prompt._recorded_audio_prompt_path is None:
             raise ValueError("Audio file path is required for the prompt")
-        video.metadata.bg_music_applied = True
+
+        video.metadata.is_bg_music_applied = True
         video.metadata.is_subtitle_audio_applied = True
 
         video.media_url = await merge_audio(

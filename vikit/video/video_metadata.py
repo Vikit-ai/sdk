@@ -28,13 +28,13 @@ class VideoMetadata:
         duration=None,
         width: int = None,
         height: int = None,
-        top_parent_id=None,
         is_video_generated=False,
         is_reencoded=False,
         is_interpolated=False,
         is_bg_music_applied=False,
         is_subtitle_audio_applied=False,
         is_bg_music_generated=None,
+        is_default_bg_music_applied=False,
         is_prompt_read_aloud=False,
         **custom_metadata,
     ):
@@ -49,7 +49,7 @@ class VideoMetadata:
         self.bg_music_applied = is_bg_music_applied
         self.is_subtitle_audio_applied = is_subtitle_audio_applied
         self.is_bg_music_generated = is_bg_music_generated  # if not using gnerated we infer the default bg music is used
-        self.top_parent_id = top_parent_id
+        self.is_default_bg_music_applied = is_default_bg_music_applied
         self.is_prompt_read_aloud = is_prompt_read_aloud
 
         self.custom_metadata = custom_metadata
