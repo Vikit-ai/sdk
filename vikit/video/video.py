@@ -141,9 +141,7 @@ class Video(ABC):
         """
         Get the first frame of the video
         """
-        target_path = ft.create_non_colliding_file_name(
-            canonical_name="fst_frm_" + self.get_title()[0], extension="jpg"
-        )
+        target_path = f"fst_frm_{self.id}.jpg"
 
         return await get_first_frame_as_image_ffmpeg(
             media_url=self.media_url, target_path=target_path
@@ -153,9 +151,7 @@ class Video(ABC):
         """
         Get the last frame of the video
         """
-        target_path = ft.create_non_colliding_file_name(
-            canonical_name="lst_frm_" + self.get_title()[0], extension="jpg"
-        )
+        target_path = f"lst_frm_{self.id}.jpg"
 
         return await get_last_frame_as_image_ffmpeg(
             media_url=self.media_url, target_path=target_path

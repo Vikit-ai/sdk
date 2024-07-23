@@ -22,7 +22,7 @@ class TestReplicateWrapper:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
-    async def test_inte_get_keywords_from_prompt(self):
+    async def test_int_get_keywords_from_prompt(self):
 
         with WorkingFolderContext():
             ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
@@ -32,7 +32,7 @@ class TestReplicateWrapper:
             test_prompt = await PromptFactory(ml_gateway=ml_gw).create_prompt_from_text(
                 SAMPLE_PROMPT_TEXT
             )
-            keywords, title = ml_gw.get_keywords_from_prompt_async(
+            keywords, title = await ml_gw.get_keywords_from_prompt_async(
                 test_prompt.text, "previous_words"
             )
             assert len(keywords) > 0

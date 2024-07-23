@@ -72,66 +72,6 @@ def get_max_remote_path_length():
     """
     return 2048
 
-
-def is_valid_path(path: Optional[Union[str, os.PathLike]]) -> bool:
-    """
-    Check if the path is valid
-
-    Args:
-        path (str, os.PathLike): The path to validate
-
-    Returns:
-        bool: True if the path is valid, False otherwise
-    """
-    path = get_path_type(path)
-    if path["type"] == "error" or path["type"] == "none":
-        return False
-    return True
-
-
-def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
-    """
-    Validate the path and return its type
-
-    Args:
-        path (str, os.PathLike, ): The path to validate
-
-    Returns:
-        dict: The path type and the path itself
-        Path type can be local, http, https, s3, gs, None, undefined, error,
-        error : message if the path is invalid, None if no error
-    """
-    logger.debug(f"Checking path: {path}")
-    error = None
-    result = ({"type": "undefined", "path": "undefined"}, "undefined path")
-
-    if path is None:
-        return {"type": "none", "path": path}, "The path is None"
-
-    if len(path) > get_max_filename_length():
-        return {
-            "type": "error",
-            "path": "",
-        }, "The file name is too long for local filesystem storage"
-
-    if os.path.exists(path) or is_valid_filename(filename=os.path.basename(path)):
-        if path.startswith("file://"):
-            logger.debug(f"Path is a local url format: {path}")
-            return {"type": "local_url_format", "path": path}, None
-        else:
-            logger.debug(f"Path is a PathLike object: {path}")
-            return {"type": "local", "path": path}, None
-    else:
-        # Check if the path is a URL
-        parsed_uri = urllib.parse.urlparse(str(path))
-
-        if parsed_uri.scheme in ["http", "https", "s3", "gs"]:
-            return {"type": parsed_uri.scheme, "path": path}, None
-
-    # by default, consider it as a local path
-    return result, error
-
-
 def is_valid_filename(filename: str) -> bool:
     """
     Check if the provided string is a valid filename for the local file system.
@@ -210,6 +150,66 @@ def url_exists(url: str):
     return url_exists
 
 
+
+
+def is_valid_path(path: Optional[Union[str, os.PathLike]]) -> bool:
+    """
+    Check if the path is valid
+
+    Args:
+        path (str, os.PathLike): The path to validate
+
+    Returns:
+        bool: True if the path is valid, False otherwise
+    """
+    path = get_path_type(path)
+    if path["type"] == "error" or path["type"] == "none":
+        return False
+    return True
+
+
+def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
+    """
+    Validate the path and return its type
+
+    Args:
+        path (str, os.PathLike, ): The path to validate
+
+    Returns:
+        dict: The path type and the path itself
+        Path type can be local, http, https, s3, gs, None, undefined, error,
+        error : message if the path is invalid, None if no error
+    """
+    logger.debug(f"Checking path: {path}")
+    result = {"type": "undefined", "path": "undefined"}, "undefined path"
+
+    if path is None:
+        return {"type": "none", "path": path}, "The path is None"
+
+    if len(path) > get_max_filename_length():
+        return {
+            "type": "error",
+            "path": "",
+        }, "The file name is too long for local filesystem storage"
+
+    # Check if the path is a URL
+    parsed_uri = urllib.parse.urlparse(str(path))
+    if parsed_uri.scheme in ["http", "https", "s3", "gs"]:
+        return {"type": parsed_uri.scheme, "path": path}, None
+
+    if os.path.exists(path) or is_valid_filename(filename=os.path.basename(path)):
+        if path.startswith("file://"):
+            logger.debug(f"Path is a local url format: {path}")
+            return {"type": "local_url_format", "path": path}, None
+        else:
+            if os.path.exists(path):
+                logger.debug(f"Path is a PathLike object: {path}")
+                return {"type": "local", "path": path}, None
+
+    # by default, consider it as a local path
+    return result
+
+
 async def download_file(url, local_path):
     """
     Download a file from a URL to a local file asynchronously
@@ -233,7 +233,7 @@ async def download_file(url, local_path):
                 async with session.get(url) as response:
                     if response.status == 200:
                         # Utilisez aiofiles pour écrire le contenu de manière asynchrone
-                        async with aiofiles.open(url, "wb") as f:
+                        async with aiofiles.open(local_path, "wb") as f:
                             while (
                                 True
                             ):  # Lire le contenu par morceaux pour ne pas surcharger la mémoire

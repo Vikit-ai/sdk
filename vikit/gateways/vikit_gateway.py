@@ -31,7 +31,9 @@ class VikitGateway(MLModelsGateway):
         super().__init__()
 
     async def generate_mp3_from_text_async(
-        prompt_text, target_file, target_file_name: str = None
+        self,
+        prompt_text: str,
+        target_file: str,
     ):
         """
         Generate an mp3 file from a text prompt.
@@ -80,15 +82,12 @@ class VikitGateway(MLModelsGateway):
         output_music_link = await self.compose_music_from_text_async(
             clean_prompt_without_title, duration=duration
         )
+        logger.debug(f"output_music_link: {output_music_link}")
 
         logger.debug("Downloading the generated music")
         gen_music_file_path = await download_file(
             url=output_music_link, local_path=prompt_based_music_file_name
-        )[0]
-
-        # gen_music_file_path = urlretrieve(
-        #     output_music_link, prompt_based_music_file_name
-        # )[0]
+        )
 
         lowered_music_filename = f"lowered_{prompt_based_music_file_name}"
 
@@ -445,31 +444,32 @@ class VikitGateway(MLModelsGateway):
             audiofile_path
         ), f"The prompt recording file does not exist: {audiofile_path}"
 
+        logger.debug(f"Getting subtitles for {audiofile_path}")
         base64AudioFile = base64.b64encode(open(audiofile_path, "rb").read()).decode(
             "ascii"
         )
         async with aiohttp.ClientSession() as session:
-            payload = (
-                {
-                    "key": vikit_api_key,
-                    "model": "cjwbw/whisper:b70a8e9dc4aa40bf4309285fbaefe3ed3d3a313f1f32ea61826fc64cdb4917a5",
-                    "input": {
-                        "model": "base",
-                        "translate": True,
-                        "temperature": 0,
-                        "transcription": "srt",
-                        "suppress_tokens": "-1",
-                        "logprob_threshold": -1,
-                        "no_speech_threshold": 0.6,
-                        "condition_on_previous_text": True,
-                        "compression_ratio_threshold": 2.4,
-                        "temperature_increment_on_fallback": 0.2,
-                        "audio": "data:audio/mp3;base64," + base64AudioFile,
-                    },
+            payload = {
+                "key": vikit_api_key,
+                "model": "cjwbw/whisper:b70a8e9dc4aa40bf4309285fbaefe3ed3d3a313f1f32ea61826fc64cdb4917a5",
+                "input": {
+                    "model": "base",
+                    "translate": True,
+                    "temperature": 0,
+                    "transcription": "srt",
+                    "suppress_tokens": "-1",
+                    "logprob_threshold": -1,
+                    "no_speech_threshold": 0.6,
+                    "condition_on_previous_text": True,
+                    "compression_ratio_threshold": 2.4,
+                    "temperature_increment_on_fallback": 0.2,
+                    "audio": "data:audio/mp3;base64," + base64AudioFile,
                 },
-            )
+            },
+            
             async with session.post(vikit_backend_url, json=payload) as response:
                 subs = await response.text()
+                logger.trace(f"Subtitles: {subs}")
 
         return json.loads(subs)
 

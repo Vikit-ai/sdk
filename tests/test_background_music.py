@@ -5,7 +5,7 @@ from loguru import logger
 
 import warnings
 import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
-from vikit.gateways.replicate_gateway import ReplicateGateway
+from vikit.gateways.vikit_gateway import VikitGateway
 from vikit.common.context_managers import WorkingFolderContext
 
 TEST_PROMPT = "A group of stones in a forest, with symbols"
@@ -32,7 +32,7 @@ class TestBackgroundMusic:
     @pytest.mark.asyncio
     async def test_generate_background_music_from_short_prompt(self):
         with pytest.raises(TypeError):
-            _ = await ReplicateGateway().generate_background_music_async(duration="a")
+            _ = await VikitGateway().generate_background_music_async(duration="a")
 
     @pytest.mark.integration
     @pytest.mark.asyncio

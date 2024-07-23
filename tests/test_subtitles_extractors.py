@@ -8,7 +8,7 @@ from vikit.prompt.recorded_prompt_subtitles_extractor import (
     RecordedPromptSubtitlesExtractor,
 )
 from vikit.prompt.prompt_factory import PromptFactory
-from vikit.gateways import replicate_gateway as replicate_gateway
+from vikit.gateways import vikit_gateway as vikit_gateway
 from vikit.common.context_managers import WorkingFolderContext
 
 
@@ -29,7 +29,7 @@ class TestSubtitlesExtrators:
     @pytest.mark.asyncio
     async def test_reunion_island_prompt(self):
         with WorkingFolderContext():
-            gw = replicate_gateway.ReplicateGateway()
+            gw = vikit_gateway.VikitGateway()
             test_prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(
                 """A travel over Reunion Island, taken fomm birdview at 2000meters above 
                 the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis

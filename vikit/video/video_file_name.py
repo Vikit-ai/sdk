@@ -112,11 +112,7 @@ class VideoFileName:
         returns:
             VideoFileName: The video file name object
         """
-        # if not VideoFileName.is_video_file_name(file_name):
-        #     raise ValueError("The file name is not a video file name")
-
         parts = file_name.split("__")
-        logger.debug(f"len(parts) found {len(parts)}, parts found : {parts}")
         title = parts[0]
         bld_settings = VideoBuildSettings()
         bld_settings.id = parts[3]
