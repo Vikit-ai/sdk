@@ -1,4 +1,6 @@
 from urllib.request import urlretrieve
+from vikit.common.download_file import download_file
+
 from loguru import logger
 
 from vikit.video.video import Video
@@ -40,10 +42,15 @@ class VideoGenHandler(Handler):
             )
         else:
             logger.debug(f"Retrieving file from remote URL :  {video_link_from_prompt}")
-            video.media_url = urlretrieve(
+
+            video.media_url = await download_file(
                 video_link_from_prompt,
                 file_name,
             )[0]
+            # video.media_url = urlretrieve(
+            #     video_link_from_prompt,
+            #     file_name,
+            # )[0]
         video.is_video_generated
         video.metadata.is_video_generated = True
 

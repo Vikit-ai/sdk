@@ -37,13 +37,11 @@ class FakeMLModelsGateway(MLModelsGateway):
     def sleep(self, sleep_time=1):
         sleep(sleep_time)  # Simulate a long process with time.sleep
 
-    async def generate_mp3_from_text_async(
-        self, prompt_text, target_file_name: str = None
-    ):
+    async def generate_mp3_from_text_async(self, prompt_text, target_file: str = None):
         logger.debug(f"Creating aa prompt from text: {prompt_text}")
 
         shutil.copy(
-            src=tests_medias.get_test_prompt_recording_trainboy(), dst=target_file_name
+            src=tests_medias.get_test_prompt_recording_trainboy(), dst=target_file
         )
 
     async def generate_background_music_async(

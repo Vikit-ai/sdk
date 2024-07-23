@@ -1,5 +1,5 @@
-from urllib.request import urlretrieve
-
+# from urllib.request import urlretrieve
+from vikit.common.download_file import download_file
 from vikit.common.handler import Handler
 
 
@@ -13,10 +13,15 @@ class VideoInterpolationHandler(Handler):
             )
         )
         video.metadata.is_interpolated = True
-        interpolated_video_path = urlretrieve(
-            interpolated_video,
-            video.get_file_name_by_state(video.build_settings),
-        )[0]
+
+        interpolated_video_path = await download_file(
+            interpolated_video, video.get_file_name_by_state(video.build_settings)
+        )
+        # interpolated_video_path = urlretrieve(
+        #     interpolated_video,
+        #     video.get_file_name_by_state(video.build_settings),
+        # )[0]
+
         video.media_url = interpolated_video_path
         assert video.media_url, "Interpolated video was not generated properly"
 
