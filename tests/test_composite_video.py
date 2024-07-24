@@ -108,7 +108,6 @@ class TestCompositeVideo:
     @pytest.mark.local_integration
     @pytest.mark.asyncio
     async def test_int_create_video_mix_with_preexiting_video_bin_no_bkg_music(self):
-        logger.add("log_test_composite_video.txt", rotation="10 MB", level="TRACE")
 
         with WorkingFolderContext():
             video = ImportedVideo(test_media.get_cat_video_path())

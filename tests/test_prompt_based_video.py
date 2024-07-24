@@ -175,9 +175,9 @@ class TestPromptBasedVideo:
             assert video.media_url is not None
             assert os.path.exists(video.media_url)
 
+    #@pytest.mark.skip("To be activated on case by case basis")
     @pytest.mark.integration
     @pytest.mark.asyncio
-    @pytest.mark.skip("To be activated on case by case basis")
     async def test_reunion_island_prompt_with_bk_music_subs(self):
         with WorkingFolderContext():
             bld_sett = VideoBuildSettings(

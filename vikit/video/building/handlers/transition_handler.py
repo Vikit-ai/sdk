@@ -45,29 +45,16 @@ class VideoBuildingHandlerTransition(Handler):
 
         if link_to_transition_video is None:
             raise ValueError("No link to transition video generated")
-
+        video.media_url = link_to_transition_video
         video.metadata.is_video_generated = True
         video.metadata.title = video.get_title()
 
-        target_file_name = video.get_file_name_by_state(
-            build_settings=video.build_settings
-        )
-
-        target_file_name = await download_file(
-            url=link_to_transition_video,
-            local_path=video.get_file_name_by_state(video.build_settings),
-        )
-
-        # file_type, error = get_path_type(link_to_transition_video)["type"]
-        # logger.debug(f"file_type: {file_type}")
-        # if not file_type == "local":
-        #     video.media_url = urlretrieve(
-        #         target_file_name,
-        #     )[0]
-        # else:
-        #     logger.debug(f"Renaming {link_to_transition_video} to {target_file_name}")
-        #     shutil.copyfile(link_to_transition_video, target_file_name)
-
-        video.media_url = target_file_name
+        # target_file_name = video.get_file_name_by_state(
+        #     build_settings=video.build_settings
+        # )
+        # target_file_name = await download_file(
+        #     url=link_to_transition_video,
+        #     local_path=video.get_file_name_by_state(video.build_settings),
+        # )
 
         return video
