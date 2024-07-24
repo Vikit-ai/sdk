@@ -449,24 +449,26 @@ class VikitGateway(MLModelsGateway):
             "ascii"
         )
         async with aiohttp.ClientSession() as session:
-            payload = {
-                "key": vikit_api_key,
-                "model": "cjwbw/whisper:b70a8e9dc4aa40bf4309285fbaefe3ed3d3a313f1f32ea61826fc64cdb4917a5",
-                "input": {
-                    "model": "base",
-                    "translate": True,
-                    "temperature": 0,
-                    "transcription": "srt",
-                    "suppress_tokens": "-1",
-                    "logprob_threshold": -1,
-                    "no_speech_threshold": 0.6,
-                    "condition_on_previous_text": True,
-                    "compression_ratio_threshold": 2.4,
-                    "temperature_increment_on_fallback": 0.2,
-                    "audio": "data:audio/mp3;base64," + base64AudioFile,
+            payload = (
+                {
+                    "key": vikit_api_key,
+                    "model": "cjwbw/whisper:b70a8e9dc4aa40bf4309285fbaefe3ed3d3a313f1f32ea61826fc64cdb4917a5",
+                    "input": {
+                        "model": "base",
+                        "translate": True,
+                        "temperature": 0,
+                        "transcription": "srt",
+                        "suppress_tokens": "-1",
+                        "logprob_threshold": -1,
+                        "no_speech_threshold": 0.6,
+                        "condition_on_previous_text": True,
+                        "compression_ratio_threshold": 2.4,
+                        "temperature_increment_on_fallback": 0.2,
+                        "audio": "data:audio/mp3;base64," + base64AudioFile,
+                    },
                 },
-            },
-            
+            )
+
             async with session.post(vikit_backend_url, json=payload) as response:
                 subs = await response.text()
                 logger.trace(f"Subtitles: {subs}")

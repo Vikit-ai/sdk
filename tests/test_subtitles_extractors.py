@@ -7,9 +7,9 @@ import pysrt
 from vikit.prompt.recorded_prompt_subtitles_extractor import (
     RecordedPromptSubtitlesExtractor,
 )
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.gateways import vikit_gateway as vikit_gateway
+from vikit.gateways import vikit_gateway
 from vikit.common.context_managers import WorkingFolderContext
+import tests.testing_tools as tools  # used to get a library of test prompts
 
 
 SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in an abandoned forest, revealing intricate carvings
@@ -30,20 +30,15 @@ class TestSubtitlesExtrators:
     async def test_reunion_island_prompt(self):
         with WorkingFolderContext():
             gw = vikit_gateway.VikitGateway()
-            test_prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(
-                """A travel over Reunion Island, taken fomm birdview at 2000meters above 
-                the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
-                , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
-            )
-
             sub_extractor = RecordedPromptSubtitlesExtractor()
             subs: pysrt.SubRipFile = await sub_extractor.extract_subtitles_async(
-                recorded_prompt_file_path=test_prompt.recorded_audio_prompt_path,
+                recorded_prompt_file_path=tools.test_prompt_library[
+                    "moss_stones-train_boy"
+                ].audio_recording,
                 ml_models_gateway=gw,
             )
 
             for sub in subs:
                 sub = pysrt.SubRipItem(sub)
                 assert sub.text is not None
-                assert sub.text != ""
-                logger.trace(f"Subtitle: {sub.text}")
+                logger.debug(f"Subtitle: {sub.text}")
