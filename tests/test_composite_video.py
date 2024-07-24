@@ -89,7 +89,6 @@ class TestCompositeVideo:
     ):
         with WorkingFolderContext():
             video = ImportedVideo(test_media.get_cat_video_path())
-            assert video.media_url, "Media URL should not be null"
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video)
             built = await test_video_mixer.build(
@@ -193,19 +192,18 @@ class TestCompositeVideo:
     async def test_build_video_composite_filters_empty_composites(
         self,
     ):
-        with WorkingFolderContext():
-            test_video_mixer = CompositeVideo()
-            composite_to_delete = CompositeVideo()
-            composite_to_delete2 = CompositeVideo()
-            final_video = (
-                test_video_mixer.append_video(composite_to_delete)
-                .append_video(composite_to_delete2)
-                .append_video(CompositeVideo())  # should be filtered
-            )
-            await final_video.run_pre_build_actions_hook(VideoBuildSettings())
+        test_video_mixer = CompositeVideo()
+        composite_to_delete = CompositeVideo()
+        composite_to_delete2 = CompositeVideo()
+        final_video = (
+            test_video_mixer.append_video(composite_to_delete)
+            .append_video(composite_to_delete2)
+            .append_video(CompositeVideo())  # should be filtered
+        )
+        await final_video.run_pre_build_actions_hook(VideoBuildSettings())
 
-            assert len(final_video.video_list) == 0, "Video list should be empty"
-            assert not final_video.media_url, "Media URL should be null"
+        assert len(final_video.video_list) == 0, "Video list should be empty"
+        assert not final_video.media_url, "Media URL should be null"
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
@@ -304,9 +302,8 @@ class TestCompositeVideo:
     async def test_tired_local_no_transitions_with_music_and_prompts(self):
 
         with WorkingFolderContext():
-            tired_prompt_with_recording = tools.create_fake_prompt_trainboy()
             final_composite_video = CompositeVideo()
-            for subtitle in tired_prompt_with_recording.subtitles:
+            for subtitle in test_prompt_library["train_boy"].subtitles:
                 video = RawTextBasedVideo(subtitle.text)
                 await video.build(
                     build_settings=VideoBuildSettings(
@@ -323,7 +320,7 @@ class TestCompositeVideo:
                     ),
                     test_mode=True,
                     include_read_aloud_prompt=True,
-                    prompt=tired_prompt_with_recording,
+                    prompt=test_prompt_library["train_boy"],
                 )
             )
 

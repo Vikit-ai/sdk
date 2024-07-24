@@ -1,6 +1,7 @@
 import os
 
 import pysrt
+from loguru import logger
 
 from vikit.video.video import VideoBuildSettings
 from vikit.video.composite_video import CompositeVideo
@@ -80,6 +81,11 @@ class PromptBasedVideo(CompositeVideo):
             The inner composite video
         """
         self._is_root_video_composite = True
+        if not build_settings.prompt:
+            logger.warning(
+                "No prompt found in the build settings, using the default one"
+            )
+            build_settings.prompt = self._prompt
 
         for sub in self._prompt.subtitles:
             vid_cp_sub = CompositeVideo()
@@ -96,6 +102,8 @@ class PromptBasedVideo(CompositeVideo):
             )  # Building a set of 2 videos around the same text + a transition
 
             self.append_video(vid_cp_sub)  # Adding the comnposite to the overall video
+
+        self.are_build_settings_prepared = True
 
         return self
 

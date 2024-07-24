@@ -32,7 +32,7 @@ class DefaultBGMusicAndAudioMergingHandler(Handler):
         video.metadata.bg_music_applied = True
         video.metadata.is_default_bg_music_applied = True
 
-        self.media_url = await merge_audio(
+        video.media_url = await merge_audio(
             media_url=video.media_url,
             audio_file_path=audio_file,
             target_file_name=video.get_file_name_by_state(),
