@@ -154,7 +154,7 @@ class VikitGateway(MLModelsGateway):
             open(target_image_path, "rb").read()
         ).decode("ascii")
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
             payload = (
                 {
                     "key": vikit_api_key,
@@ -200,7 +200,7 @@ class VikitGateway(MLModelsGateway):
         if len(prompt_text) < 1:
             raise AttributeError("The input prompt text is empty")
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
             payload = {
                 "key": vikit_api_key,
                 "model": "meta/musicgen:b05b1dff1d8c6dc63d14b0cdb42135378dcb87f6373b0d3d341ede46e59e2b38",
@@ -255,7 +255,7 @@ class VikitGateway(MLModelsGateway):
         if text is None:
             text = "finaly there is no prompt so just unleash your own imagination"
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
             payload = {
                 "key": vikit_api_key,
                 "model": "mistralai/mistral-7b-instruct-v0.2",
@@ -306,7 +306,7 @@ class VikitGateway(MLModelsGateway):
 
         logger.debug(f"Video to interpolate {video[:50]}")
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
             payload = (
                 {
                     "key": vikit_api_key,
@@ -343,7 +343,7 @@ class VikitGateway(MLModelsGateway):
         """
         assert subtitleText is not None
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
             payload = (
                 {
                     "key": vikit_api_key,
@@ -397,7 +397,7 @@ class VikitGateway(MLModelsGateway):
             A prompt enhanced by an LLM
         """
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
             payload = {
                 "key": vikit_api_key,
                 "model": "mistralai/mistral-7b-instruct-v0.2",
@@ -447,7 +447,7 @@ class VikitGateway(MLModelsGateway):
         base64AudioFile = base64.b64encode(open(audiofile_path, "rb").read()).decode(
             "ascii"
         )
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
             payload = (
                 {
                     "key": vikit_api_key,
@@ -566,7 +566,7 @@ class VikitGateway(MLModelsGateway):
                 The link to the generated video
         """
         logger.debug(f"Generating video from prompt: {prompt}")
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
             payload = {
                 "key": vikit_api_key,
                 "model": "cjwbw/videocrafter:02edcff3e9d2d11dcc27e530773d988df25462b1ee93ed0257b6f246de4797c8",
