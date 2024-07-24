@@ -1,6 +1,7 @@
 import os
 import shutil
 import uuid as uid
+import asyncio
 
 from loguru import logger
 from vikit.video.video import Video
@@ -94,6 +95,7 @@ class CompositeVideo(Video, is_composite_video):
         if not video:
             raise ValueError("video cannot be None")
         self.video_list.append(video)
+        self.video_dependencies.append(video)
 
         if (
             video._needs_video_reencoding
@@ -194,8 +196,32 @@ class CompositeVideo(Video, is_composite_video):
                 build_settings=build_settings,
                 already_added=set(),
             )
-            for video in ordered_video_list:
+            no_dependency_videos = [
+                v for v in ordered_video_list if not v.video_dependencies
+            ]
+            await asyncio.gather(
+                *(
+                    v.build(self.get_cascaded_build_settings())
+                    for v in no_dependency_videos
+                )
+            )
+            with_dependency_videos = [
+                v for v in ordered_video_list if v.video_dependencies
+            ]
+            for video in with_dependency_videos:
+                dependencies_processed = all(
+                    dep._is_video_generated for dep in video.video_dependencies
+                )
+                if not dependencies_processed:
+                    raise Exception(f"{video} dependencies should have been processed.")
                 await video.build(build_settings=self.get_cascaded_build_settings())
+
+            # if isinstance(video, CompositeVideo):
+            #     await asyncio.create_subprocess_exec(
+            #         video.run_pre_build_actions_hook(build_settings=build_settings)
+            #     )
+            # else:
+            #     await video.build(build_settings=self.get_cascaded_build_settings())
 
         # at this stage we should have all the videos generated. Will be improved in the future
         # in case we are called directly on a child composite without starting by the composite root
