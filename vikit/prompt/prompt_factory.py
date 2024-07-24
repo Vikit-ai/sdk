@@ -1,5 +1,9 @@
 from loguru import logger
 
+import os
+import matplotlib.image as mpimg
+
+from vikit.prompt.image_prompt_builder import ImagePromptBuilder
 from vikit.prompt.recorded_prompt_builder import RecordedPromptBuilder
 from vikit.prompt.recorded_prompt_subtitles_extractor import (
     RecordedPromptSubtitlesExtractor,
@@ -16,6 +20,7 @@ from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
     PromptByRawUserTextHandler,
 )
 from vikit.wrappers.ffmpeg_wrapper import get_media_duration
+from vikit.common.decorators import log_function_params
 
 
 class PromptFactory:
@@ -177,3 +182,28 @@ class PromptFactory:
             handlers.append(PromptByRawUserTextHandler())
 
         return handlers
+        return prompt
+
+    @log_function_params
+    def create_prompt_from_image(
+        self,
+        prompt_image: str = None,
+    ):
+        """
+        Create a prompt object from a prompt image
+
+        args:
+            - prompt_image: the image of the prompt
+
+        returns:
+            self
+        """
+        if prompt_image is None:
+            raise ValueError("The prompt image is not provided")
+        if not os.path.exists(prompt_image):
+            raise ValueError("The prompt image file does not exist")
+
+        input_prompt_image = mpimg.imread(prompt_image)
+        prompt = ImagePromptBuilder().set_prompt_image(input_prompt_image).build()
+
+        return prompt

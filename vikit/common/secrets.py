@@ -6,10 +6,10 @@ from loguru import logger
 # Get the absolute path to the directory this file is in.
 dir_path = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))
 env_file = path.join(dir_path, ".env.secrets." + getenv("CONFIG_ENVIRONMENT", "dev"))
-assert path.exists(env_file), f"Secrets file {env_file} does not exist"
-logger.debug(f"Loading secrets from {env_file}")
-
-load_dotenv(dotenv_path=env_file)
+if not path.exists(env_file):
+    logger.warning(f"Secrets file {env_file} does not exist")
+else:
+    load_dotenv(dotenv_path=env_file)
 
 
 def get_sendinblue_api_key():

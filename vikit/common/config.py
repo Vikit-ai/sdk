@@ -10,9 +10,10 @@ dir_path = path.dirname(path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env_file = os.path.join(
     dir_path, ".env.config." + os.getenv("CONFIG_ENVIRONMENT", "dev")
 )
-assert os.path.exists(env_file), f"config file {env_file} does not exist"
-logger.debug(f"Loading config from {env_file}")
-load_dotenv(dotenv_path=env_file)
+if not os.path.exists(env_file):
+    logger.warning(f"config file {env_file} does not exist")
+else:
+    load_dotenv(dotenv_path=env_file)
 
 
 def get_default_background_music() -> str:

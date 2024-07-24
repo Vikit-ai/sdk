@@ -11,7 +11,6 @@ from vikit.wrappers.ffmpeg_wrapper import (
     get_last_frame_as_image_ffmpeg,
 )
 from vikit.video.video_build_settings import VideoBuildSettings
-import vikit.common.file_tools as ft
 from vikit.video.video_metadata import VideoMetadata
 from vikit.common.handler import Handler
 from vikit.video.video_file_name import VideoFileName

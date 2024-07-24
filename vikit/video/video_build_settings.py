@@ -14,6 +14,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         prompt: Prompt = None,  # Include subtitles in the final video and fit videos to match the prompt subtitles timelines
         generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt
         generate_from_llm_prompt: bool = True,
+        generate_from_image_prompt: bool = True,
         interpolate: bool = True,  # Ask to interpolate the video
         music_building_context: MusicBuildingContext = MusicBuildingContext(),
         target_path: str = None,  # The path where the video will be saved, could be local or remote (i.e. a cloud bucket or a streaming service)
@@ -33,5 +34,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.prompt = prompt
         self.generate_from_llm_keyword = generate_from_llm_keyword
         self.generate_from_llm_prompt = generate_from_llm_prompt
+        self.generate_from_image_prompt = generate_from_image_prompt
         self.music_building_context = music_building_context
         self.interpolate = interpolate

@@ -4,6 +4,7 @@ import aiohttp
 import base64
 import json
 import subprocess
+import numpy as np
 
 from tenacity import retry, before_log, after_log, stop_after_attempt
 from loguru import logger
@@ -15,6 +16,9 @@ from vikit.common.secrets import get_replicate_api_token, get_vikit_api_token
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
 from vikit.common.config import get_nb_retries_http_calls
 
+import requests
+import io
+from PIL import Image
 
 os.environ["REPLICATE_API_TOKEN"] = get_replicate_api_token()
 vikit_api_key = get_vikit_api_token()
@@ -64,9 +68,6 @@ class VikitGateway(MLModelsGateway):
         Returns:
             - str: the path to the generated music
         """
-        assert (
-            duration < 300
-        ), "The duration of the music should be less than 300 seconds"
 
         outputLLM = await self.get_music_generation_keywords_async(prompt)
         logger.debug(f"outputLLM: {outputLLM}")
@@ -196,8 +197,6 @@ class VikitGateway(MLModelsGateway):
 
         if duration < 1:
             raise AttributeError("The input duration is less than 1")
-        if duration > 60:
-            raise AttributeError("The input duration is greater than 60")
         if len(prompt_text) < 1:
             raise AttributeError("The input prompt text is empty")
 
@@ -305,7 +304,7 @@ class VikitGateway(MLModelsGateway):
         if video is None:
             raise AttributeError("The input video is None")
 
-        logger.debug(f"Video to interpolate {video}")
+        logger.debug(f"Video to interpolate {video[:50]}")
 
         async with aiohttp.ClientSession() as session:
             payload = (
@@ -449,24 +448,26 @@ class VikitGateway(MLModelsGateway):
             "ascii"
         )
         async with aiohttp.ClientSession() as session:
-            payload = {
-                "key": vikit_api_key,
-                "model": "cjwbw/whisper:b70a8e9dc4aa40bf4309285fbaefe3ed3d3a313f1f32ea61826fc64cdb4917a5",
-                "input": {
-                    "model": "base",
-                    "translate": True,
-                    "temperature": 0,
-                    "transcription": "srt",
-                    "suppress_tokens": "-1",
-                    "logprob_threshold": -1,
-                    "no_speech_threshold": 0.6,
-                    "condition_on_previous_text": True,
-                    "compression_ratio_threshold": 2.4,
-                    "temperature_increment_on_fallback": 0.2,
-                    "audio": "data:audio/mp3;base64," + base64AudioFile,
+            payload = (
+                {
+                    "key": vikit_api_key,
+                    "model": "cjwbw/whisper:b70a8e9dc4aa40bf4309285fbaefe3ed3d3a313f1f32ea61826fc64cdb4917a5",
+                    "input": {
+                        "model": "base",
+                        "translate": True,
+                        "temperature": 0,
+                        "transcription": "srt",
+                        "suppress_tokens": "-1",
+                        "logprob_threshold": -1,
+                        "no_speech_threshold": 0.6,
+                        "condition_on_previous_text": True,
+                        "compression_ratio_threshold": 2.4,
+                        "temperature_increment_on_fallback": 0.2,
+                        "audio": "data:audio/mp3;base64," + base64AudioFile,
+                    },
                 },
-            },
-            
+            )
+
             async with session.post(vikit_backend_url, json=payload) as response:
                 subs = await response.text()
                 logger.trace(f"Subtitles: {subs}")
@@ -476,6 +477,85 @@ class VikitGateway(MLModelsGateway):
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     @log_function_params
     async def generate_video_async(self, prompt: str):
+        """
+        Generate a video from the given prompt
+
+        Args:
+            prompt: The prompt to generate the video from
+
+        returns:
+                The link to the generated video
+        """
+
+        logger.debug(f"Generating image from prompt: {prompt}")
+        output = requests.post(
+            vikit_backend_url,
+            json={
+                "key": vikit_api_key,
+                "model": "stability_text2image_core",
+                "input": {
+                    "prompt": prompt,  # + ", 4k",
+                    "output_format": "png",
+                    "aspect_ratio": "16:9",
+                },
+            },
+        )
+
+        logger.debug("Resizing image for video generator")
+        # Convert result to Base64
+        buffer = io.BytesIO()
+        imgdata = base64.b64decode(output.json()["image"])
+        img = Image.open(io.BytesIO(imgdata))
+        new_img = img.resize((1024, 576))  # x, y
+        new_img.save(buffer, format="PNG")
+        img_b64 = "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode(
+            "utf-8"
+        )
+
+        logger.debug("Generating video from image")
+        # Ask for a video
+        output = requests.post(
+            "https://videho.replit.app/models",
+            json={
+                "key": vikit_api_key,
+                "model": "stability_image2video",
+                "input": {
+                    "image": img_b64,
+                    "seed": 0,
+                    "cfg_scale": 1.8,
+                    "motion_bucket_id": 127,
+                },
+            },
+        )
+
+        return "data:video/mp4;base64," + output.json()["video"]
+
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    def generate_video_haiper(self, prompt: str):
+        """
+        Generate a video from the given prompt
+
+        Args:
+            prompt: The prompt to generate the video from
+
+        returns:
+                The link to the generated video
+        """
+        logger.debug(f"Generating video from prompt: {prompt}")
+        output = requests.post(
+            vikit_backend_url,
+            json={
+                "key": vikit_api_key,
+                "model": "haiper_text2video",
+                "input": {
+                    "prompt": prompt,  # + ", 4k",
+                },
+            },
+        )
+        return output.json()["value"]["url"]
+
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    async def generate_video_VideoCrafter2(self, prompt: str):
         """
         Generate a video from the given prompt
 
@@ -501,3 +581,45 @@ class VikitGateway(MLModelsGateway):
                 output = await response.text()
 
         return output
+
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    def generate_video_from_image_Stability(self, prompt: np.ndarray):
+        """
+        Generate a video from the given image prompt
+
+        Args:
+            prompt: The image prompt to generate the video from
+
+        returns:
+                The link to the generated video
+        """
+
+        # TO DO: include camera motion parameters
+        # Convert image prompt to Base64
+        img = Image.fromarray(prompt)
+        new_img = img.resize((1024, 576))  # x, y
+        # Save the image to a buffer
+        buffer = io.BytesIO()
+        new_img.save(buffer, format="PNG")
+        # Encode the image as base64
+        img_b64 = "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode(
+            "utf-8"
+        )
+
+        logger.debug("Generating video from image prompt")
+        # Ask for a video
+        output = requests.post(
+            "https://videho.replit.app/models",
+            json={
+                "key": vikit_api_key,
+                "model": "stability_image2video",
+                "input": {
+                    "image": img_b64,
+                    "seed": 0,
+                    "cfg_scale": 1.8,
+                    "motion_bucket_id": 127,
+                },
+            },
+        )
+        print(output.json())
+        return "data:video/mp4;base64," + output.json()["video"]
