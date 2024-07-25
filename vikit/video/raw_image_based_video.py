@@ -1,3 +1,18 @@
+# Copyright 2024 VikitAI. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import numpy as np
 
 from urllib.request import urlretrieve
@@ -60,7 +75,6 @@ class RawImageBasedVideo(Video):
     def build(
         self,
         build_settings=VideoBuildSettings(),
-
     ):
         """
         Generate the actual inner video
@@ -79,8 +93,10 @@ class RawImageBasedVideo(Video):
 
         logger.info("Generating video, could take some time ")
         ml_gateway = build_settings.get_ml_models_gateway()
-        
-        video_link_from_prompt = ml_gateway.generate_video_from_image_Stability(self._image)  # Should give a link on the Internet
+
+        video_link_from_prompt = ml_gateway.generate_video_from_image_Stability(
+            self._image
+        )  # Should give a link on the Internet
         self.metadata.is_video_generated = True
 
         if build_settings.interpolate:
