@@ -48,9 +48,6 @@ class ReplicateGateway(MLModelsGateway):
         Returns:
             str: the path to the generated music
         """
-        assert (
-            duration < 300
-        ), "The duration of the music should be less than 300 seconds"
 
         outputLLM = await self.get_music_generation_keywords_async(prompt)
         logger.debug(f"outputLLM: {outputLLM}")

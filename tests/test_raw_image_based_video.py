@@ -59,7 +59,8 @@ class TestImagePromptBasedVideo(unittest.TestCase):
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.local_integration
-    def test_build_single_video_no_bg_music_no_subtitles(self):
+    @pytest.mark.asyncio
+    async def test_build_single_video_no_bg_music_no_subtitles(self):
         with WorkingFolderContext():
             pbvid = RawImageBasedVideo(
                 raw_image_prompt=PromptFactory(
@@ -69,14 +70,15 @@ class TestImagePromptBasedVideo(unittest.TestCase):
                 ._image,
                 title="test_image_prompt",
             )
-            pbvid.build(build_settings=VideoBuildSettings())
+            await pbvid.build(build_settings=VideoBuildSettings())
 
             assert pbvid._background_music_file_name is None
             assert pbvid.media_url, "media URL was not updated"
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.local_integration
-    def test_build_single_video_with_default_bg_music_no_subtitles(self):
+    @pytest.mark.asyncio
+    async def test_build_single_video_with_default_bg_music_no_subtitles(self):
         with WorkingFolderContext():
             pbvid = RawImageBasedVideo(
                 raw_image_prompt=PromptFactory(
@@ -86,7 +88,7 @@ class TestImagePromptBasedVideo(unittest.TestCase):
                 ._image,
                 title="test_image_prompt",
             )
-            pbvid.build(
+            await pbvid.build(
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=False

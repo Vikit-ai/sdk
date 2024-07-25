@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
-from pydantic import BaseModel
+
+# from pydantic import BaseModel
 
 
-class MLModelsGateway(BaseModel, ABC):
+class MLModelsGateway(ABC):
     """
     This class is a gateway to a remote API hosting Machine Learning models as a service.
     It abstracts the main features needed to interact with the API

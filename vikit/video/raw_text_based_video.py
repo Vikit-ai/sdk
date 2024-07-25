@@ -1,12 +1,12 @@
 import os
 
+from loguru import logger
+
+from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video import Video
 from vikit.video.video_types import VideoType
 from vikit.video.building.handlers.videogen_handler import (
     VideoGenHandler,
-)
-from vikit.video.building.handlers.interpolation_handler import (
-    VideoInterpolationHandler,
 )
 from vikit.common.handler import Handler
 
@@ -78,6 +78,10 @@ class RawTextBasedVideo(Video):
             self._title = summarised_title
             return self._title
 
+    def run_build_core_logic_hook(self, build_settings: VideoBuildSettings):
+        return super().run_build_core_logic_hook(build_settings)
+        logger.info(f"Building video from raw text prompt: {self.text}")
+
     def get_core_handlers(self, build_settings) -> list[Handler]:
         """
          Get the handler chain of the video. Order matters here.
@@ -91,6 +95,8 @@ class RawTextBasedVideo(Video):
         """
         handlers = []
         handlers.append(VideoGenHandler(video_gen_text_prompt=self.text))
-        if build_settings.interpolate:
-            handlers.append(VideoInterpolationHandler())
+        # if build_settings.interpolate:
+        #     handlers.append(VideoInterpolationHandler())
+        # Keeping this as commented, as we don't need to interpolate raw text based videos
+        # using the latest models (quality is alreay excellent). This will be done depending on the provider in a next version
         return handlers

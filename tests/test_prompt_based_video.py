@@ -92,6 +92,36 @@ class TestPromptBasedVideo:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
+    async def test_build_tom_cruse_video(self):
+        with WorkingFolderContext():
+
+            bld_settings = VideoBuildSettings(
+                include_read_aloud_prompt=True,
+                music_building_context=MusicBuildingContext(
+                    apply_background_music=True,
+                    generate_background_music=True,
+                ),
+                test_mode=False,
+            )
+
+            prompt = await PromptFactory(
+                ml_gateway=bld_settings.get_ml_models_gateway()
+            ).create_prompt_from_text(
+                """Tom Cruise's face reflects focus, his eyes filled with purpose and drive. He drives a moto very fast on a 
+                skyscrapper rooftop, jumps from the moto to an 
+                helicopter, this last 3 seconds, then Tom Cruse dives into a swimming pool from the helicopter while the helicopter without pilot crashes 
+                  near the beach"""
+            )
+            pbvid = PromptBasedVideo(prompt=prompt)
+
+            pbvid = await pbvid.build(
+                build_settings=bld_settings,
+            )
+            assert pbvid.media_url, "media URL was not updated"
+            assert os.path.exists(pbvid.media_url), "The generated video does not exist"
+
+    @pytest.mark.integration
+    @pytest.mark.asyncio
     async def test_build_single_video_with_generated_bg_music_with_subtitles(self):
         with WorkingFolderContext():
 

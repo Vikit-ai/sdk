@@ -1,4 +1,5 @@
 import warnings
+import os
 
 import pytest
 from loguru import logger
@@ -13,7 +14,7 @@ import vikit.wrappers.ffmpeg_wrapper as ffmpegwrapper
 from vikit.music_building_context import MusicBuildingContext
 from tests.testing_tools import test_prompt_library
 from vikit.video.imported_video import ImportedVideo
-
+from vikit.prompt.prompt_factory import PromptFactory
 from tests.testing_medias import (
     get_cat_video_path,
     get_test_transition_stones_trainboy_path,
@@ -134,6 +135,43 @@ class TestCompositeVideo:
             await test_video_mixer.build(VideoBuildSettings(test_mode=True))
 
             assert test_video_mixer.media_url is not None
+
+    @pytest.mark.integration
+    @pytest.mark.asyncio
+    async def test_chatgpt_scenario(self):
+        with WorkingFolderContext():
+            sections = []
+            current_section = []
+            print("current_section", os.getcwd())
+
+            test_video_gpt = CompositeVideo()
+            with open("../../../tests/medias/chatgpt-scenario.txt", "r") as file:
+                for line in file:
+                    if line.startswith("New_scene"):
+                        if current_section:
+                            sections.append("\n".join(current_section))
+                            current_section = []
+                    else:
+                        current_section.append(line.strip())
+            if current_section:
+                sections.append("\n".join(current_section))
+
+            for i, section in enumerate(sections, 1):
+                logger.debug(f"Section {i}:\n{section}\n")
+                video = RawTextBasedVideo(section)
+                test_video_gpt.append_video(video)
+
+            video_build_settings = VideoBuildSettings(
+                test_mode=False,
+                music_building_context=MusicBuildingContext(
+                    apply_background_music=True, generate_background_music=True
+                ),
+                include_read_aloud_prompt=False,
+            )
+
+            await test_video_gpt.build(video_build_settings)
+
+            # assert test_video_mixer.media_url is not None
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio

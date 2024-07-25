@@ -182,7 +182,6 @@ class PromptFactory:
             handlers.append(PromptByRawUserTextHandler())
 
         return handlers
-        return prompt
 
     @log_function_params
     def create_prompt_from_image(
