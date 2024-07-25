@@ -5,6 +5,7 @@ import base64
 import json
 import subprocess
 import numpy as np
+import uuid as uid
 
 from tenacity import retry, before_log, after_log, stop_after_attempt
 from loguru import logger
@@ -489,66 +490,61 @@ class VikitGateway(MLModelsGateway):
         returns:
                 The path to the generated video
         """
+        output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
 
         output = None
-        try:
+        logger.debug(f"Generating image from prompt: {prompt}")
+        async with aiohttp.ClientSession() as session:
+            payload = (
+                {
+                    "key": vikit_api_key,
+                    "model": "stability_text2image_core",
+                    "input": {
+                        "prompt": prompt,  # + ", 4k",
+                        "output_format": "png",
+                        "aspect_ratio": "16:9",
+                    },
+                },
+            )
 
-            logger.debug(f"Generating image from prompt: {prompt}")
+            async with session.post(vikit_backend_url, json=payload) as response:
+                output = await response.text()
+            logger.debug("Resizing image for video generator")
+            # Convert result to Base64
+            buffer = io.BytesIO()
+            output = json.loads(output)
+            imgdata = base64.b64decode(output["image"])
+            img = Image.open(io.BytesIO(imgdata))
+            new_img = img.resize((1024, 576))  # x, y
+            new_img.save(buffer, format="PNG")
+            img_b64 = "data:image/png;base64," + base64.b64encode(
+                buffer.getvalue()
+            ).decode("utf-8")
+
+            logger.debug("Generating video from image")
+            # Ask for a video
             async with aiohttp.ClientSession() as session:
                 payload = (
                     {
                         "key": vikit_api_key,
-                        "model": "stability_text2image_core",
+                        "model": "stability_image2video",
                         "input": {
-                            "prompt": prompt,  # + ", 4k",
-                            "output_format": "png",
-                            "aspect_ratio": "16:9",
+                            "image": img_b64,
+                            "seed": 0,
+                            "cfg_scale": 1.8,
+                            "motion_bucket_id": 127,
                         },
                     },
                 )
-
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    output = await response.text()
-                logger.debug("Resizing image for video generator")
-                # Convert result to Base64
-                buffer = io.BytesIO()
-                output = json.loads(output)
-                imgdata = base64.b64decode(output["image"])
-                img = Image.open(io.BytesIO(imgdata))
-                new_img = img.resize((1024, 576))  # x, y
-                new_img.save(buffer, format="PNG")
-                img_b64 = "data:image/png;base64," + base64.b64encode(
-                    buffer.getvalue()
-                ).decode("utf-8")
+                    output = await response.json()
 
-                logger.debug("Generating video from image")
-                # Ask for a video
-                async with aiohttp.ClientSession() as session:
-                    payload = (
-                        {
-                            "key": vikit_api_key,
-                            "model": "stability_image2video",
-                            "input": {
-                                "image": img_b64,
-                                "seed": 0,
-                                "cfg_scale": 1.8,
-                                "motion_bucket_id": 127,
-                            },
-                        },
-                    )
-                    async with session.post(
-                        vikit_backend_url, json=payload
-                    ) as response:
-                        output = await response.json()
+                    logger.debug(f"Output: {output.keys()}")
 
-                        logger.debug(f"Output: {output.keys()}")
-                    with open("outputvid.mp4", "wb") as video_file:
-                        video_file.write(base64.b64decode(output["video"]))
-                    return "outputvid.mp4"
-                    # return "data:video/mp4;base64," + output["video"]
-        except GeneratorExit as ex:
-            logger.error(f"Error while generating video: {ex}")
-            return None
+                with open(output_vid_file_name, "wb") as video_file:
+                    video_file.write(base64.b64decode(output["video"]))
+
+                return output_vid_file_name
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     def generate_video_haiper(self, prompt: str):

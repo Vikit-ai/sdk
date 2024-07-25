@@ -145,6 +145,8 @@ class TestCompositeVideo:
             print("current_section", os.getcwd())
 
             test_video_gpt = CompositeVideo()
+            prompt_text = ""
+
             with open("../../../tests/medias/chatgpt-scenario.txt", "r") as file:
                 for line in file:
                     if line.startswith("New_scene"):
@@ -157,8 +159,10 @@ class TestCompositeVideo:
                 sections.append("\n".join(current_section))
 
             for i, section in enumerate(sections, 1):
-                logger.debug(f"Section {i}:\n{section}\n")
                 video = RawTextBasedVideo(section)
+                prompt_text += str(section)[
+                    str(section).index("Description") + len("Description") + 1 :
+                ]
                 test_video_gpt.append_video(video)
 
             video_build_settings = VideoBuildSettings(
@@ -168,10 +172,16 @@ class TestCompositeVideo:
                 ),
                 include_read_aloud_prompt=False,
             )
+            prompt = (
+                await PromptFactory(
+                    ml_gateway=video_build_settings.get_ml_models_gateway()
+                ).create_prompt_from_text(prompt_text),
+            )
+            video_build_settings.prompt = prompt
 
             await test_video_gpt.build(video_build_settings)
 
-            # assert test_video_mixer.media_url is not None
+            assert test_video_mixer.media_url is not None
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
