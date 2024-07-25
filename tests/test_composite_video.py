@@ -166,22 +166,20 @@ class TestCompositeVideo:
                 test_video_gpt.append_video(video)
 
             video_build_settings = VideoBuildSettings(
-                test_mode=False,
+                test_mode=True,
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True, generate_background_music=True
                 ),
                 include_read_aloud_prompt=False,
             )
-            prompt = (
-                await PromptFactory(
-                    ml_gateway=video_build_settings.get_ml_models_gateway()
-                ).create_prompt_from_text(prompt_text),
-            )
+            prompt = await PromptFactory(
+                ml_gateway=video_build_settings.get_ml_models_gateway()
+            ).create_prompt_from_text(prompt_text)
             video_build_settings.prompt = prompt
 
             await test_video_gpt.build(video_build_settings)
 
-            assert test_video_mixer.media_url is not None
+            assert test_video_gpt.media_url is not None
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
