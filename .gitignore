@@ -109,3 +109,8 @@ target/
 
 # Working Folder
 working_folder/
+
+# metrics computation media
+vikit/metrics/videos/
+vikit/metrics/prompts/
+
