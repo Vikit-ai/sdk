@@ -13,7 +13,7 @@ import clip
 def extract_frames(video_path, frame_rate=10):
     """
     Extract frames from a video at the given frame rate.
-    
+
     :param video_path: Path to the video file
     :param frame_rate: Number of frames to extract per second
     :return: List of PIL images of extracted frames
@@ -22,7 +22,7 @@ def extract_frames(video_path, frame_rate=10):
     success, image = vidcap.read()
     frames = []
     count = 0
-    
+
     while success:
         if count % frame_rate == 0:
             # Convert BGR (OpenCV) to RGB (PIL)
@@ -31,13 +31,14 @@ def extract_frames(video_path, frame_rate=10):
             frames.append(pil_image)
         success, image = vidcap.read()
         count += 1
-    
+
     return frames
+
 
 def compute_clip_score(video_path, text_prompt, frame_rate=1):
     """
     Compute the CLIP score for a video/prompt pair.
-    
+
     :param video_path: Path to the video file
     :param text_prompt: The text prompt to compare with video frames
     :param frame_rate: Number of frames to extract per second
@@ -49,32 +50,33 @@ def compute_clip_score(video_path, text_prompt, frame_rate=1):
 
     # Extract frames from the video
     frames = extract_frames(video_path, frame_rate)
-    
+
     # Preprocess the text prompt
     text = clip.tokenize([text_prompt]).to(device)
-    
+
     # Initialize an empty list to store frame scores
     frame_scores = []
-    
+
     with torch.no_grad():
         # Calculate the text features
         text_features = model.encode_text(text)
-        
+
         for frame in frames:
             # Preprocess the frame and move to the same device as the model
             image = preprocess(frame).unsqueeze(0).to(device)
-            
+
             # Calculate the image features
             image_features = model.encode_image(image)
-            
+
             # Calculate the cosine similarity between text and image features
             similarity = torch.cosine_similarity(image_features, text_features)
             frame_scores.append(similarity.item())
-    
+
     # Compute the average score
     avg_score = np.mean(frame_scores)
-    
+
     return avg_score
+
 
 # # Example usage
 # video_path = "./videos/4.mp4"
@@ -148,7 +150,6 @@ if __name__ == "__main__":
     )
     logger.addHandler(stream_handler)
 
-
     # Calculate SD scores for all video-text pairs
     scores = []
 
@@ -164,17 +165,14 @@ if __name__ == "__main__":
             text = read_text_file(prompt_path)
             print(text)
             if metric == "clip_score":
-                score = compute_clip_score(
-                    video_path, text)
+                score = compute_clip_score(video_path, text)
             count += 1
             scores.append(score)
             average_score = sum(scores) / len(scores)
             # count+=1
-            logging.info(
-                f"Vid: {os.path.basename(video_path)},  {metric}: {score}")
+            logging.info(f"Vid: {os.path.basename(video_path)},  {metric}: {score}")
 
     # Calculate the average SD score across all video-text pairs
     logging.info(
         f"Final average {metric}: {average_score}, Total videos: {len(scores)}"
     )
-
