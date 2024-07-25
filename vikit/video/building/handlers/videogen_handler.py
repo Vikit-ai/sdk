@@ -38,5 +38,5 @@ class VideoGenHandler(Handler):
         #     local_path=file_name,
         # )
 
-        logger.debug(f"Video generated from prompt: {video.media_url}")
+        logger.debug(f"Video generated from prompt: {video.media_url[:50]}")
         return video

@@ -9,7 +9,7 @@ class VideoInterpolationHandler(Handler):
     async def execute_async(self, video):
 
         logger.info(
-            f"About to interpolate video: id: {video.id}, media: {video.media_url}"
+            f"About to interpolate video: id: {video.id}, media: {video.media_url[:50]}"
         )
         interpolated_video = (
             await video.build_settings.get_ml_models_gateway().interpolate_async(

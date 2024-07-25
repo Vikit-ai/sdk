@@ -22,7 +22,7 @@ def log_function_params(func):
             ", ".join(repr(arg) for arg in args)
             + ", "
             + ", ".join(f"{key}={value}" for key, value in kwargs.items())
-        )
+        )[:50]
 
         # Get the name of the test from the call stack
         stack = inspect.stack()
