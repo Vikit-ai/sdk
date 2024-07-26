@@ -45,7 +45,7 @@ class WorkingFolderContext:
 
         if path is None:
             now = datetime.now()
-            date_string = now.strftime("%Y-%m-%d-%H:%M")
+            date_string = now.strftime("%Y-%m-%d")
 
             temp_folder = os.path.join(
                 "working_folder",
