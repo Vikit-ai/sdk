@@ -14,6 +14,9 @@ from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handl
 from vikit.video.building.handlers.generate_music_and_merge_handler import (
     GenerateMusicAndMergeHandler,
 )
+from vikit.video.building.handlers.video_reencoding_handler import (
+    VideoReencodingHandler,
+)
 
 
 class VideoBuildingPipeline:
@@ -26,6 +29,16 @@ class VideoBuildingPipeline:
 
         """
         handlers = []
+
+        if video._needs_video_reencoding:
+            logger.debug(
+                f"adding reencoding handlers for video of type {type(video)}, video id {video.id}"
+            )
+            handlers.append(VideoReencodingHandler())
+        else:
+            logger.debug(
+                f"no reencoding needed for video of type {type(video)}, video id {video.id}"
+            )
 
         handlers.extend(
             self.get_background_music_handlers(

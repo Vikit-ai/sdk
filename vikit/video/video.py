@@ -361,12 +361,6 @@ class Video(ABC):
         handlers = []
 
         handlers.extend(self.get_core_handlers(build_settings))
-        from vikit.video.building.handlers.video_reencoding_handler import (
-            VideoReencodingHandler,
-        )
-
-        handlers.append(VideoReencodingHandler())
-
         handlers.extend(
             VideoBuildingPipeline().get_handlers(self, build_settings=build_settings)
         )
