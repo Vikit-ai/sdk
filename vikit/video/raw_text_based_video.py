@@ -110,8 +110,4 @@ class RawTextBasedVideo(Video):
         """
         handlers = []
         handlers.append(VideoGenHandler(video_gen_text_prompt=self.text))
-        # if build_settings.interpolate:
-        #     handlers.append(VideoInterpolationHandler())
-        # Keeping this as commented, as we don't need to interpolate raw text based videos
-        # using the latest models (quality is alreay excellent). This will be done depending on the provider in a next version
         return handlers

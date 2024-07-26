@@ -87,6 +87,7 @@ def get_max_remote_path_length():
     """
     return 2048
 
+
 def is_valid_filename(filename: str) -> bool:
     """
     Check if the provided string is a valid filename for the local file system.
@@ -163,8 +164,6 @@ def url_exists(url: str):
         url_exists = True
 
     return url_exists
-
-
 
 
 def is_valid_path(path: Optional[Union[str, os.PathLike]]) -> bool:

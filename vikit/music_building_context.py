@@ -13,14 +13,26 @@
 # limitations under the License.
 # ==============================================================================
 
+
 class MusicBuildingContext:
     def __init__(
         self,
-        apply_background_music: bool = False,  # will apply background music to the prompt, generate_background_music won't be considered if apply_background_music False
-        generate_background_music: bool = False,  # will generate music taking inspiration from the prompt
+        apply_background_music: bool = False,
+        generate_background_music: bool = False,
         use_recorded_prompt_as_audio: bool = False,
         expected_music_length: float = None,
-    ):  # length in seconds, setting default to 0:
+    ):
+        """
+        A context class for building music.
+
+        params:
+        apply_background_music: bool, whether to apply background music to the prompt, generate_background_music won't be considered if apply_background_music False
+        generate_background_music: bool, whether to generate music taking inspiration from the prompt
+        use_recorded_prompt_as_audio: bool, whether to use recorded prompt as audio
+        expected_music_length: float, expected length of the music in seconds
+
+        """
+        # length in seconds, setting default to 0:
 
         self.use_recorded_prompt_as_audio = use_recorded_prompt_as_audio
         self.apply_background_music = apply_background_music

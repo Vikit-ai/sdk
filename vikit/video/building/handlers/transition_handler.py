@@ -16,7 +16,6 @@
 from loguru import logger
 
 from vikit.common.file_tools import url_exists
-from vikit.common.file_tools import download_file
 from vikit.common.handler import Handler
 from vikit.video.video import Video
 

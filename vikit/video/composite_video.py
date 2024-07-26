@@ -231,13 +231,6 @@ class CompositeVideo(Video, is_composite_video):
                     raise Exception(f"{video} dependencies should have been processed.")
                 await video.build(build_settings=self.get_cascaded_build_settings())
 
-            # if isinstance(video, CompositeVideo):
-            #     await asyncio.create_subprocess_exec(
-            #         video.run_pre_build_actions_hook(build_settings=build_settings)
-            #     )
-            # else:
-            #     await video.build(build_settings=self.get_cascaded_build_settings())
-
         # at this stage we should have all the videos generated. Will be improved in the future
         # in case we are called directly on a child composite without starting by the composite root
         self.media_url = await self.concatenate()

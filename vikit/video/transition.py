@@ -14,7 +14,6 @@
 # ==============================================================================
 
 from vikit.video.video import Video
-from vikit.video.video_file_name import VideoFileName
 from vikit.video.video_types import VideoType
 
 

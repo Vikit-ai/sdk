@@ -28,7 +28,6 @@ class RecordedPromptBuilder:
     Builds a prompt based on a recorded audio file
 
     Most functions are used by a prompt builder, as the way to generate a prompt may vary and get a bit complex
-
     """
 
     def __init__(self):

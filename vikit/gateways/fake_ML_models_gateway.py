@@ -22,7 +22,6 @@ import shutil
 from loguru import logger
 
 import tests.testing_medias as tests_medias
-import vikit.common.file_tools as ft
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from urllib.parse import urljoin
 from urllib.request import pathname2url
@@ -138,9 +137,6 @@ class FakeMLModelsGateway(MLModelsGateway):
         self, prompt: str = None, sleep_time: int = 0, model_provider: str = None
     ):
         await asyncio.sleep(sleep_time)
-        # test_file = ft.create_non_colliding_file_name(
-        #     tests_medias.get_cat_video_path()[:-4], extension="mp4"
-        # )
         test_file = tests_medias.get_cat_video_path()
         logger.debug(
             f"Generating video from prompt: {prompt}, return a link: {test_file}"

@@ -14,13 +14,12 @@
 # ==============================================================================
 
 from vikit.video.video import Video
-from vikit.video.video_metadata import VideoMetadata
-from vikit.video.video_build_settings import VideoBuildSettings
 
 
 class VideoBuildHistory:
     """
-    Video build history
+    Video build history: Not ilmplmented yet, will be used pretty much like Keras model fit history
+    and for instrumentation purposes
     """
 
     def __init__(self, video: Video = None):

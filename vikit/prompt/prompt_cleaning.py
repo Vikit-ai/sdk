@@ -36,7 +36,6 @@ def cleanse_llm_keywords(input):
 
     # initialization of string to ""
     new_keywords = ""
-    # s = input.split("\n")
 
     for x in input:
         if x:

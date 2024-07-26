@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import os
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Any
 
 import vikit.common.secrets as secrets
