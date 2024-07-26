@@ -59,7 +59,7 @@ class Video(ABC):
         self._height = height
         self._background_music_file_name = None
         self._duration = None
-        self._is_video_generated = False
+        self._is_video_built = False
         self._needs_video_reencoding: bool = False
         self.temp_id = random.getrandbits(
             16
@@ -83,7 +83,7 @@ class Video(ABC):
         )  # Define video dependencies, i.e. the videos that are needed to build the current video
 
     def __str__(self):
-        return f"ID:  {self.id}, type: {type(self)}, short_type_name: {self.short_type_name} , title: {self.title}, duration: {self.duration}, is_video_generated: {self.is_video_generated}"
+        return f"ID:  {self.id}, type: {type(self)}, short_type_name: {self.short_type_name} , title: {self.title}, duration: {self.duration}, is_video_built: {self.is_video_built}"
 
     @property
     def metadata(self):
@@ -128,13 +128,13 @@ class Video(ABC):
         self.metadata.duration = value
 
     @property
-    def is_video_generated(self):
-        return self._is_video_generated
+    def is_video_built(self):
+        return self._is_video_built
 
-    @is_video_generated.setter
-    def is_video_generated(self, value):
-        self._is_video_generated = value
-        self.metadata.is_video_generated = value
+    @is_video_built.setter
+    def is_video_built(self, value):
+        self._is_video_built = value
+        self.metadata.is_video_built = value
 
     @property
     def title(self):
@@ -228,7 +228,7 @@ class Video(ABC):
             Video: The built video
 
         """
-        if self._is_video_generated:
+        if self._is_video_built:
             logger.info(f"Video {self.id} is already built, returning itself")
             return self
 
@@ -270,7 +270,7 @@ class Video(ABC):
                 current_dir
             )  # go back to the original working folder
 
-        self.is_video_generated = True
+        self.is_video_built = True
 
         return built_video
 
@@ -294,7 +294,7 @@ class Video(ABC):
             )
             for handler in handler_chain:
                 built_video = await handler.execute_async(video=self)
-                built_video.is_video_generated = True
+                built_video.is_video_built = True
 
                 assert built_video.media_url, "The video media URL is not set"
 

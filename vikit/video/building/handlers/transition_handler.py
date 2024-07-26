@@ -60,7 +60,7 @@ class VideoBuildingHandlerTransition(Handler):
         if link_to_transition_video is None:
             raise ValueError("No link to transition video generated")
         video.media_url = link_to_transition_video
-        video.metadata.is_video_generated = True
+        video.metadata.is_video_built = True
         video.metadata.title = video.get_title()
 
         # target_file_name = video.get_file_name_by_state(

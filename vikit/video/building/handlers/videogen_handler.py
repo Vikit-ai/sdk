@@ -49,8 +49,8 @@ class VideoGenHandler(Handler):
                 )
             )
         )
-        video.is_video_generated
-        video.metadata.is_video_generated = True
+        video.is_video_built
+        video.metadata.is_video_built = True
 
         logger.debug(f"Video generated from prompt: {video.media_url[:50]}")
         return video

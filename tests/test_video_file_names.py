@@ -167,9 +167,7 @@ class TestVideoFileNames:
         root_composite_video = CompositeVideo()
         bld_set = self.get_test_build_settings()
 
-        fname = str(
-            root_composite_video.get_file_name_by_state(build_settings=bld_set)
-        )
+        fname = str(root_composite_video.get_file_name_by_state(build_settings=bld_set))
         vid_fname = VideoFileName.from_file_name(fname)
 
         assert (
@@ -187,7 +185,7 @@ class TestVideoFileNames:
 
         # now we stop to the next video building step (build the video, here we decide to
         # interpolate and reencode), we expect the video features to be updated accordingly
-        root_composite_video.metadata.is_video_generated = True
+        root_composite_video.metadata.is_video_built = True
         root_composite_video.metadata.is_interpolated = True
         root_composite_video.metadata.is_reencoded = True
 

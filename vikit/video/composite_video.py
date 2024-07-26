@@ -226,7 +226,7 @@ class CompositeVideo(Video, is_composite_video):
             ]
             for video in with_dependency_videos:
                 dependencies_processed = all(
-                    dep._is_video_generated for dep in video.video_dependencies
+                    dep._is_video_built for dep in video.video_dependencies
                 )
                 if not dependencies_processed:
                     raise Exception(f"{video} dependencies should have been processed.")

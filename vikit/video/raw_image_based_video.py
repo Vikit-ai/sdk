@@ -86,7 +86,7 @@ class RawImageBasedVideo(Video):
 
         super().build(build_settings)
 
-        if self.metadata.is_video_generated:
+        if self.metadata.is_video_built:
             return self
 
         logger.info("Generating video, could take some time ")
@@ -94,7 +94,7 @@ class RawImageBasedVideo(Video):
         video_link_from_prompt = await ml_gateway.generate_video_async(
             self._image, model_provider=build_settings.target_model_provider
         )  # Should give a link on the Internet
-        self.metadata.is_video_generated = True
+        self.metadata.is_video_built = True
 
         if build_settings.interpolate:
             interpolated_video = await ml_gateway.interpolate_async(

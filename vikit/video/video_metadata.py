@@ -25,7 +25,7 @@ class VideoMetadata:
     duration (int): Duration of the video in seconds.
     height (str): height of the video.
     width (str): width of the video.
-    is_video_generated (bool): Whether the video is generated.
+    is_video_built (bool): Whether the video is generated.
     is_reencoded (bool): Whether the video is reencoded.
     is_interpolated (bool): Whether the video is interpolated.
     is_bg_music_applied (bool): Whether the background music is applied.
@@ -43,7 +43,7 @@ class VideoMetadata:
         duration=None,
         width: int = None,
         height: int = None,
-        is_video_generated=False,
+        is_video_built=False,
         is_reencoded=False,
         is_interpolated=False,
         is_bg_music_applied=False,
@@ -58,7 +58,7 @@ class VideoMetadata:
         self.duration = duration
         self.width = width
         self.height = height
-        self.is_video_generated = is_video_generated
+        self.is_video_built = is_video_built
         self.is_reencoded = is_reencoded
         self.is_interpolated = is_interpolated
         self.bg_music_applied = is_bg_music_applied
@@ -70,7 +70,7 @@ class VideoMetadata:
         self.custom_metadata = custom_metadata
 
     def __str__(self):
-        return f"VideoMetadata(title={self.title}, duration={self.duration}, width={self.width}, height={self.height}, is_video_generated={self.is_video_generated}, is_reencoded={self.is_reencoded}, is_interpolated={self.is_interpolated}, bg_music_applied={self.bg_music_applied}, is_bg_music_generated={self.is_bg_music_generated}, custom_metadata={self.custom_metadata})"
+        return f"VideoMetadata(title={self.title}, duration={self.duration}, width={self.width}, height={self.height}, is_video_built={self.is_video_built}, is_reencoded={self.is_reencoded}, is_interpolated={self.is_interpolated}, bg_music_applied={self.bg_music_applied}, is_bg_music_generated={self.is_bg_music_generated}, custom_metadata={self.custom_metadata})"
 
     def __getitem__(self, key):
         if hasattr(self, key):
