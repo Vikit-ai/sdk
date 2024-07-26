@@ -119,7 +119,9 @@ class FakeMLModelsGateway(MLModelsGateway):
             subs = f.read()
         return {"transcription": subs}
 
-    async def generate_video_async(self, prompt: str = None, sleep_time: int = 0):
+    async def generate_video_async(
+        self, prompt: str = None, sleep_time: int = 0, model_provider: str = None
+    ):
         await asyncio.sleep(sleep_time)
         # test_file = ft.create_non_colliding_file_name(
         #     tests_medias.get_cat_video_path()[:-4], extension="mp4"

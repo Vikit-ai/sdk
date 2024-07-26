@@ -125,15 +125,17 @@ class TestCompositeVideo:
     async def test_combine_generated_and_preexiting_video_based_video(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo("Some text")
-
+            video._needs_video_reencoding = True
             video.build_settings = VideoBuildSettings(
                 prompt=tools.test_prompt_library["moss_stones-train_boy"]
             )
             video_imp = ImportedVideo(test_media.get_cat_video_path())
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video).append_video(video_imp)
+            assert (
+                video._needs_video_reencoding
+            ), f"Video should need reencoding, type: {type(video)}"
             await test_video_mixer.build(VideoBuildSettings(test_mode=True))
-
             assert test_video_mixer.media_url is not None
 
     @pytest.mark.integration
@@ -345,7 +347,7 @@ class TestCompositeVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_tired_local_no_transitions_with_music_and_prompts(self):
+    async def test_train_boy_local_no_transitions_with_music_and_prompts(self):
 
         with WorkingFolderContext():
             final_composite_video = CompositeVideo()

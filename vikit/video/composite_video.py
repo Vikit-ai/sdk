@@ -92,15 +92,19 @@ class CompositeVideo(Video, is_composite_video):
         returns:
             self: The current object
         """
-        if not video:
-            raise ValueError("video cannot be None")
         self.video_list.append(video)
         self.video_dependencies.append(video)
 
         if (
             video._needs_video_reencoding
         ):  # Adding a video that needs reencoding will trigger reencoding of the whole tree
+            # and flag the next ones for reencoding
             self._needs_video_reencoding = True
+            for video_to_reencode in self.video_list:
+                video_to_reencode._needs_video_reencoding = True
+        else:
+            if self._needs_video_reencoding:
+                video._needs_video_reencoding = True
 
         if isinstance(video, CompositeVideo):
             logger.debug(
@@ -264,6 +268,9 @@ class CompositeVideo(Video, is_composite_video):
             if build_settings.prompt is not None:
                 logger.debug(
                     f"parameters video_composite.get_duration() build_settings.prompt : {self.get_duration()}, {build_settings.prompt}"
+                )
+                logger.debug(
+                    f"parameters video_composite.get_duration() build_settings.prompt.duration : {self.get_duration()}, {build_settings.prompt}"
                 )
                 ratioToMultiplyAnimations = (
                     self.get_duration() / build_settings.prompt.duration

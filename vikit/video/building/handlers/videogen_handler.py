@@ -26,17 +26,13 @@ class VideoGenHandler(Handler):
         video.media_url = (
             await (  # Should give a link on a web storage
                 video.build_settings.get_ml_models_gateway().generate_video_async(
-                    prompt=self.video_gen_prompt_text
+                    prompt=self.video_gen_prompt_text,
+                    model_provider=video.build_settings.target_model_provider,
                 )
             )
         )
         video.is_video_generated
         video.metadata.is_video_generated = True
-        # file_name = video.get_file_name_by_state(video.build_settings)
-        # video.media_url = await download_file(
-        #     url=generated_video_media,
-        #     local_path=file_name,
-        # )
 
         logger.debug(f"Video generated from prompt: {video.media_url[:50]}")
         return video

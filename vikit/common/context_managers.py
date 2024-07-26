@@ -14,7 +14,7 @@ class WorkingFolderContext:
     """
 
     def __init__(
-        self, path=None, delete_on_exit=False, mark: str = None, include_mark=True
+        self, path=None, delete_on_exit=False, mark: str = None, include_mark=False
     ):
         """
         Allows for dynamic creation of a working folder, with the option to delete it on exit

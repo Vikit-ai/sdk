@@ -56,5 +56,5 @@ class MLModelsGateway(ABC):
         pass
 
     @abstractmethod
-    def generate_video_async(self, prompt: str):
+    def generate_video_async(self, prompt: str, model_provider: str):
         pass

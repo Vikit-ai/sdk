@@ -14,7 +14,7 @@ from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_metadata import VideoMetadata
 from vikit.common.handler import Handler
 from vikit.video.video_file_name import VideoFileName
-from vikit.common.file_tools import is_valid_path
+from vikit.common.file_tools import is_valid_path, get_path_type, download_file
 from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
 
 
@@ -263,6 +263,12 @@ class Video(ABC):
 
                 assert built_video.media_url, "The video media URL is not set"
 
+        path_type, error = get_path_type(self.media_url)
+        if path_type["type"] != "local":
+            self.media_url = await download_file(
+                self.media_url, self.get_file_name_by_state(self.build_settings)
+            )
+
         self.metadata.title = self.get_title()
         self.metadata.duration = self.get_duration()
 
@@ -355,12 +361,6 @@ class Video(ABC):
         handlers = []
 
         handlers.extend(self.get_core_handlers(build_settings))
-        from vikit.video.building.handlers.video_reencoding_handler import (
-            VideoReencodingHandler,
-        )
-
-        handlers.append(VideoReencodingHandler())
-
         handlers.extend(
             VideoBuildingPipeline().get_handlers(self, build_settings=build_settings)
         )

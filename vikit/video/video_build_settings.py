@@ -9,17 +9,37 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         delete_interim_files: bool = False,
         run_async: bool = True,
         test_mode: bool = True,
-        expected_length: float = None,  # The expected length in seconds of the video, will be used when actually building the video
-        include_read_aloud_prompt: bool = False,  # Include a synthetic voice that reads the prompts in the final video
-        prompt: Prompt = None,  # Include subtitles in the final video and fit videos to match the prompt subtitles timelines
-        generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt
+        target_model_provider: str = None,
+        expected_length: float = None,
+        include_read_aloud_prompt: bool = False,
+        prompt: Prompt = None,
+        generate_from_llm_keyword: bool = False,
         generate_from_llm_prompt: bool = True,
         generate_from_image_prompt: bool = True,
-        interpolate: bool = True,  # Ask to interpolate the video
+        interpolate: bool = True,
         music_building_context: MusicBuildingContext = MusicBuildingContext(),
-        target_path: str = None,  # The path where the video will be saved, could be local or remote (i.e. a cloud bucket or a streaming service)
-        output_video_file_name: str = None,  # The file name of the output video, if needs to be set explicitely
+        target_path: str = None,
+        output_video_file_name: str = None,
     ):
+        """
+        VideoBuildSettings class constructor
+
+        params:
+            delete_interim_files: bool : Whether to delete the interim files generated during the video building process
+            run_async: bool : Whether to run the video building process asynchronously
+            test_mode: bool : Whether to run the video building process in test mode
+
+            target_model_provider: str : The target model provider, in case you don't want to use the one defined by Vikit for each scene of the video
+            Could be vikit, haiper, stability-ai, videocrafter, etc.
+
+            expected_length:  The expected length in seconds of the video, will be used when actually building the video
+            include_read_aloud_prompt:  Include a synthetic voice that reads the prompts in the final video
+            prompt: Prompt : Include subtitles in the final video and fit videos to match the prompt subtitles timelines
+            generate_from_llm_keyword : Ask to generate the video by generating keywords from a LLM Prompt
+            generate_from_llm_prompt : Ask to generate the video by generating prompts from a LLM Prompt
+            generate_from_image_prompt : Ask to generate the video by generating prompts from an image
+            interpolate : Ask to interpolate the video
+        """
 
         super().__init__(
             delete_interim_files=delete_interim_files,
@@ -37,3 +57,4 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.generate_from_image_prompt = generate_from_image_prompt
         self.music_building_context = music_building_context
         self.interpolate = interpolate
+        self.target_model_provider = target_model_provider

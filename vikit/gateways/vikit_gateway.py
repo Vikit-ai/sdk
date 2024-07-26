@@ -156,7 +156,9 @@ class VikitGateway(MLModelsGateway):
             open(target_image_path, "rb").read()
         ).decode("ascii")
 
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=1800)
+        ) as session:
             payload = (
                 {
                     "key": vikit_api_key,
@@ -202,7 +204,9 @@ class VikitGateway(MLModelsGateway):
         if len(prompt_text) < 1:
             raise AttributeError("The input prompt text is empty")
 
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=1800)
+        ) as session:
             payload = {
                 "key": vikit_api_key,
                 "model": "meta/musicgen:b05b1dff1d8c6dc63d14b0cdb42135378dcb87f6373b0d3d341ede46e59e2b38",
@@ -257,7 +261,9 @@ class VikitGateway(MLModelsGateway):
         if text is None:
             text = "finaly there is no prompt so just unleash your own imagination"
 
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=1800)
+        ) as session:
             payload = {
                 "key": vikit_api_key,
                 "model": "mistralai/mistral-7b-instruct-v0.2",
@@ -308,7 +314,9 @@ class VikitGateway(MLModelsGateway):
 
         logger.debug(f"Video to interpolate {video[:50]}")
 
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=1800)
+        ) as session:
             payload = (
                 {
                     "key": vikit_api_key,
@@ -345,7 +353,9 @@ class VikitGateway(MLModelsGateway):
         """
         assert subtitleText is not None
 
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=1800)
+        ) as session:
             payload = (
                 {
                     "key": vikit_api_key,
@@ -399,7 +409,9 @@ class VikitGateway(MLModelsGateway):
             A prompt enhanced by an LLM
         """
 
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=1800)
+        ) as session:
             payload = {
                 "key": vikit_api_key,
                 "model": "mistralai/mistral-7b-instruct-v0.2",
@@ -449,7 +461,9 @@ class VikitGateway(MLModelsGateway):
         base64AudioFile = base64.b64encode(open(audiofile_path, "rb").read()).decode(
             "ascii"
         )
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=1800)
+        ) as session:
             payload = (
                 {
                     "key": vikit_api_key,
@@ -476,11 +490,34 @@ class VikitGateway(MLModelsGateway):
 
         return json.loads(subs)
 
-    CALLS = 1
-    SECONDS = 1
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    async def generate_video_async(self, prompt: str, model_provider: str):
+        """
+        Generate a video from the given prompt
+
+        Args:
+            prompt: The prompt to generate the video from
+            model_provider: The model provider to use
+
+        returns:
+                The path to the generated video
+        """
+        logger.debug(f"Generating video using model provider: {model_provider}")
+        if model_provider == "vikit":
+            return await self.generate_video_stabilityai_async(prompt)
+        elif model_provider == "stabilityai":
+            return await self.generate_video_stabilityai_async(prompt)
+        elif model_provider == "" or model_provider is None:
+            return await self.generate_video_stabilityai_async(prompt)
+        elif model_provider == "haiper":
+            return await self.generate_video_haiper_async(prompt)
+        elif model_provider == "videocrafter":
+            return await self.generate_video_VideoCrafter2_async(prompt)
+        else:
+            raise ValueError(f"Unknown model provider: {model_provider}")
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def generate_video_async(self, prompt: str):
+    async def generate_video_stabilityai_async(self, prompt: str):
         """
         Generate a video from the given prompt
 
@@ -488,11 +525,9 @@ class VikitGateway(MLModelsGateway):
             prompt: The prompt to generate the video from
 
         returns:
-                The path to the generated video
+                The link to the generated video
         """
         output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
-
-        output = None
         logger.debug(f"Generating image from prompt: {prompt}")
         async with aiohttp.ClientSession() as session:
             payload = (
@@ -509,45 +544,49 @@ class VikitGateway(MLModelsGateway):
 
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
-            logger.debug("Resizing image for video generator")
-            # Convert result to Base64
-            buffer = io.BytesIO()
-            output = json.loads(output)
-            imgdata = base64.b64decode(output["image"])
-            img = Image.open(io.BytesIO(imgdata))
-            new_img = img.resize((1024, 576))  # x, y
-            new_img.save(buffer, format="PNG")
-            img_b64 = "data:image/png;base64," + base64.b64encode(
-                buffer.getvalue()
-            ).decode("utf-8")
 
-            logger.debug("Generating video from image")
-            # Ask for a video
-            async with aiohttp.ClientSession() as session:
-                payload = (
-                    {
-                        "key": vikit_api_key,
-                        "model": "stability_image2video",
-                        "input": {
-                            "image": img_b64,
-                            "seed": 0,
-                            "cfg_scale": 1.8,
-                            "motion_bucket_id": 127,
+                logger.debug("Resizing image for video generator")
+                # Convert result to Base64
+                buffer = io.BytesIO()
+                output = json.loads(output)
+                logger.debug(f"Output: {output.keys()}")
+                if "image" not in output:
+                    raise ValueError(
+                        f'Output does not contain image: {output["error"]}'
+                    )
+                imgdata = base64.b64decode(output["image"])
+                img = Image.open(io.BytesIO(imgdata))
+                new_img = img.resize((1024, 576))  # x, y
+                new_img.save(buffer, format="PNG")
+                img_b64 = "data:image/png;base64," + base64.b64encode(
+                    buffer.getvalue()
+                ).decode("utf-8")
+
+                logger.debug("Generating video from image")
+                # Ask for a video
+                async with aiohttp.ClientSession() as session:
+                    payload = (
+                        {
+                            "key": vikit_api_key,
+                            "model": "stability_image2video",
+                            "input": {
+                                "image": img_b64,
+                                "seed": 0,
+                                "cfg_scale": 1.8,
+                                "motion_bucket_id": 127,
+                            },
                         },
-                    },
-                )
-                async with session.post(vikit_backend_url, json=payload) as response:
-                    output = await response.json()
-
-                    logger.debug(f"Output: {output.keys()}")
-
-                with open(output_vid_file_name, "wb") as video_file:
-                    video_file.write(base64.b64decode(output["video"]))
-
-                return output_vid_file_name
+                    )
+                    async with session.post(
+                        vikit_backend_url, json=payload
+                    ) as response:
+                        output = await response.json()
+                        with open(output_vid_file_name, "wb") as video_file:
+                            video_file.write(base64.b64decode(output["video"]))
+                        return output_vid_file_name
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    def generate_video_haiper(self, prompt: str):
+    async def generate_video_haiper_async(self, prompt: str):
         """
         Generate a video from the given prompt
 
@@ -558,20 +597,23 @@ class VikitGateway(MLModelsGateway):
                 The link to the generated video
         """
         logger.debug(f"Generating video from prompt: {prompt}")
-        output = requests.post(
-            vikit_backend_url,
-            json={
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=1800)
+        ) as session:
+            payload = {
                 "key": vikit_api_key,
                 "model": "haiper_text2video",
                 "input": {
                     "prompt": prompt,  # + ", 4k",
                 },
-            },
-        )
-        return output.json()["value"]["url"]
+            }
+            async with session.post(vikit_backend_url, json=payload) as response:
+                output = await response.text()
+                logger.debug(f"Output: {output}")
+                return output.json()["value"]["url"]
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def generate_video_VideoCrafter2(self, prompt: str):
+    async def generate_video_VideoCrafter2_async(self, prompt: str):
         """
         Generate a video from the given prompt
 
@@ -582,7 +624,9 @@ class VikitGateway(MLModelsGateway):
                 The link to the generated video
         """
         logger.debug(f"Generating video from prompt: {prompt}")
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=1800)
+        ) as session:
             payload = {
                 "key": vikit_api_key,
                 "model": "cjwbw/videocrafter:02edcff3e9d2d11dcc27e530773d988df25462b1ee93ed0257b6f246de4797c8",

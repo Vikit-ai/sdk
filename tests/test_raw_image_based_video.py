@@ -1,5 +1,4 @@
 import os
-import unittest
 import pytest
 
 from loguru import logger
@@ -18,7 +17,7 @@ from tests.testing_medias import get_test_prompt_image
 TEST_PROMPT = get_test_prompt_image()
 
 
-class TestImagePromptBasedVideo(unittest.TestCase):
+class TestRawImagePromptBasedVideo:
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
@@ -53,8 +52,11 @@ class TestImagePromptBasedVideo(unittest.TestCase):
                 title="test_image_prompt",
             )
             await pbvid.build()
+            logger.debug(
+                f"Test build_single_video_no_bg_music_without_subs, media URL: {pbvid.media_url}"
+            )
 
-            assert pbvid.media_url, "media URL was not updated"
+            assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
             assert pbvid._background_music_file_name is None
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
@@ -73,7 +75,7 @@ class TestImagePromptBasedVideo(unittest.TestCase):
             await pbvid.build(build_settings=VideoBuildSettings())
 
             assert pbvid._background_music_file_name is None
-            assert pbvid.media_url, "media URL was not updated"
+            assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.local_integration
@@ -96,15 +98,15 @@ class TestImagePromptBasedVideo(unittest.TestCase):
                 )
             )
 
-            assert pbvid.media_url, "media URL was not updated"
+            assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.integration
-    def test_build_single_video_with_generated_bg_music_no_subtitles(self):
+    @pytest.mark.asyncio
+    async def test_build_single_video_with_generated_bg_music_no_subtitles(self):
         with WorkingFolderContext():
 
             bld_settings = VideoBuildSettings(
-                include_audio_read_subtitles=False,
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True,
                     generate_background_music=True,
@@ -120,7 +122,7 @@ class TestImagePromptBasedVideo(unittest.TestCase):
                 ._image,
                 title="test_image_prompt",
             )
-            pbvid.build(
+            assert pbvid.build(
                 build_settings=bld_settings,
             )
             assert pbvid.media_url, "media URL was not updated"
