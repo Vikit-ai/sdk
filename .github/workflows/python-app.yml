@@ -5,9 +5,10 @@ name: Python application
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", async-calls-to-apis ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", async-calls-to-apis ]
+
 
 permissions:
   contents: read
