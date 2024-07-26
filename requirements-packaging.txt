@@ -4,7 +4,7 @@ pysrt==1.1.2
 # sib_api_v3_sdk==7.6.0
 numpy==1.26.4
 loguru==0.7.2
-requests==2.31.0
+requests==2.32.2
 python-dotenv==1.0.1
 tenacity==8.2.3
 pytest==8.1.1
