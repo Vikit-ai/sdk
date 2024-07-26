@@ -38,6 +38,9 @@ class VideoGenHandler(Handler):
             CompositeVideo: The composite video
         """
         logger.info(f"About to generate video: {video.id}, title: {video.get_title()}")
+        logger.debug(
+            f"Target Model provider in the handler: {video.build_settings.target_model_provider}"
+        )
         video.media_url = (
             await (  # Should give a link on a web storage
                 video.build_settings.get_ml_models_gateway().generate_video_async(

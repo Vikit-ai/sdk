@@ -513,6 +513,7 @@ class VikitGateway(MLModelsGateway):
                 The path to the generated video
         """
         logger.debug(f"Generating video using model provider: {model_provider}")
+
         if model_provider == "vikit":
             return await self.generate_video_stabilityai_async(prompt)
         elif model_provider == "stabilityai":
