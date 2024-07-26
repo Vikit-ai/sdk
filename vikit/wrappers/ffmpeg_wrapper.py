@@ -8,7 +8,6 @@ from loguru import logger
 import vikit.common.config as config
 from vikit.common.decorators import log_function_params
 from vikit.common.file_tools import get_canonical_name
-from vikit.common.file_tools import download_file, get_path_type
 
 
 @log_function_params

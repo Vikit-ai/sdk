@@ -597,7 +597,7 @@ class VikitGateway(MLModelsGateway):
                 The link to the generated video
         """
         logger.debug(f"Generating video from prompt: {prompt}")
-        with aiohttp.ClientSession(
+        async with aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(total=1800)
         ) as session:
             payload = {
@@ -609,6 +609,7 @@ class VikitGateway(MLModelsGateway):
             }
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
+                logger.debug(f"Output: {output}")
                 return output.json()["value"]["url"]
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)

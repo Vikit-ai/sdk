@@ -34,7 +34,6 @@ class SeineTransition(Transition):
         """
         handlers = []
         handlers.append(VideoBuildingHandlerTransition())
-        if build_settings.interpolate:
-            handlers.append(VideoInterpolationHandler())
+        handlers.append(VideoInterpolationHandler())
 
         return handlers
