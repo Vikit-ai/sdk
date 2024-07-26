@@ -19,7 +19,7 @@ class TestAsync:
     def test_sinc_on_async_build_single_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a prompt text")
-            built = video.build_non_async()
+            built = video.build()
 
             assert built.media_url is not None
             assert os.path.exists(video.media_url), "The generated video does not exist"
@@ -29,7 +29,7 @@ class TestAsync:
     async def test_build_single_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a prompt text")
-            built = await video.build()
+            built = await video.build_async()
 
             assert built.media_url is not None
             assert os.path.exists(video.media_url), "The generated video does not exist"

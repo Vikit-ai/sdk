@@ -179,9 +179,7 @@ class Video(ABC):
                 )
                 return False
 
-    def build_non_async(
-        self, build_settings: VideoBuildSettings = VideoBuildSettings()
-    ):
+    def build(self, build_settings: VideoBuildSettings = VideoBuildSettings()):
         """
         Build in async but expose a sync interface
         """
@@ -194,12 +192,14 @@ class Video(ABC):
 
         if loop and loop.is_running():
             # If there's already a running loop, create a new task and wait for it
-            return loop.create_task(self.build(build_settings))
+            return loop.create_task(self.build_async(build_settings))
         else:
             # If no loop is running, use asyncio.run
-            return asyncio.run(self.build(build_settings))
+            return asyncio.run(self.build_async(build_settings))
 
-    async def build(self, build_settings: VideoBuildSettings = VideoBuildSettings()):
+    async def build_async(
+        self, build_settings: VideoBuildSettings = VideoBuildSettings()
+    ):
         """
         Build the video in the child classes, unless the video is already built, in  which case
         we just return ourseleves (Video gets immutable once generated)
