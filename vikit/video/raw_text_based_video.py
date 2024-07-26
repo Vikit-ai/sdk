@@ -110,11 +110,16 @@ class RawTextBasedVideo(Video):
                 self._text, excluded_words=excluded_words
             )
             self._keywords = enhanced_prompt
-        else:
+        elif build_settings.generate_from_enhanced_prompt:
             # Get more colorfull prompt from current prompt text
             enhanced_prompt, enhanced_title = ml_gateway.get_enhanced_prompt(self._text)
             if self._title is None:
                 self._title = ft.get_safe_filename(enhanced_title)
+            self._keywords = None
+        else:
+            enhanced_prompt = self._text
+            if self._title is None:
+                self._title = ft.get_safe_filename(self._text)
             self._keywords = None
 
         video_link_from_prompt = ml_gateway.generate_video(
