@@ -5,7 +5,6 @@ numpy==1.26.4
 pillow==10.4.0
 pysrt==1.1.2
 loguru==0.7.2
-requests==2.31.0
 python-dotenv==1.0.1
 pydantic==2.7.4
 tenacity==8.2.3
