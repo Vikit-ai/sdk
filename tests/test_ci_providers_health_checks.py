@@ -31,6 +31,9 @@ class TestProvidersHealthChecks:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
+    @pytest.mark.skip(
+        reason="This test is not working now due to throtling error on Haiper provider"
+    )
     async def test_haiper_provider_and_generate(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a fantastic day today")

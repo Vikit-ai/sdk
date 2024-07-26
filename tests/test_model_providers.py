@@ -69,37 +69,3 @@ class TestModelProviders:
                     prompt=test_prompt_library["train_boy"],
                 )
             )
-
-    @pytest.mark.integration
-    @pytest.mark.asyncio
-    async def test_choose_provider_and_generate(self):
-        with WorkingFolderContext():
-            await self._chose_provider_and_generate(provider="vikit")
-            await self._chose_provider_and_generate(provider="stabilityai")
-            await self._chose_provider_and_generate(provider="haiper")
-            await self._chose_provider_and_generate(provider="videocrafter")
-
-    async def _chose_provider_and_generate(self, provider="videocrafter"):
-        with WorkingFolderContext():
-            final_composite_video = CompositeVideo()
-            # train_boy has 4 subtitles
-            video = RawTextBasedVideo("This is a fantastic day today")
-            video.build_non_async(build_settings=VideoBuildSettings(test_mode=False))
-            assert video.media_url is not None
-            await video.prepare_build_hook(
-                build_settings=VideoBuildSettings(
-                    test_mode=False,
-                    music_building_context=MusicBuildingContext(),
-                    target_model_provider=provider,
-                )
-            )
-            final_composite_video.append_video(video)
-
-            await final_composite_video.build(
-                build_settings=VideoBuildSettings(
-                    music_building_context=MusicBuildingContext(
-                        apply_background_music=True, generate_background_music=True
-                    ),
-                    test_mode=False,
-                )
-            )

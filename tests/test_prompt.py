@@ -39,7 +39,7 @@ class TestPrompt:
     @pytest.mark.asyncio
     async def test_generate_prompt_from_empty_prompt(self):
         with pytest.raises(ValueError):
-            _ = PromptFactory(
+            _ = await PromptFactory(
                 ml_gateway=replicate_gateway.ReplicateGateway()
             ).create_prompt_from_text(prompt_text=None)
 
@@ -85,6 +85,6 @@ class TestPrompt:
             prompt_image = get_test_prompt_image()
             prompt = PromptFactory(
                 ml_gateway=replicate_gateway.ReplicateGateway()
-            ).create_prompt_from_image(prompt_image=prompt_image)
+            ).create_prompt_from_image(image_path=prompt_image)
 
             assert prompt.image is not None
