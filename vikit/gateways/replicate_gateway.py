@@ -24,7 +24,6 @@ import replicate
 
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
-from vikit.common.decorators import log_function_params
 from vikit.common.secrets import get_replicate_api_token
 from vikit.common.config import get_nb_retries_http_calls
 
@@ -67,7 +66,6 @@ class ReplicateGateway(MLModelsGateway):
         outputLLM = await self.get_music_generation_keywords_async(prompt)
         logger.debug(f"outputLLM: {outputLLM}")
 
-        # je veux le dernier mot de la liste de mots générés pour le nom du fichier
         prompt_based_music_file_name = (
             target_file_name
             if target_file_name

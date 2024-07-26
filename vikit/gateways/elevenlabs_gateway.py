@@ -24,7 +24,6 @@ from vikit.common.secrets import get_eleven_labs_api_key
 
 async def generate_mp3_from_text_async(text, target_file):
     CHUNK_SIZE = 1024
-    # TODO: See if we can play with chunk size to optimize performance
 
     headers = {
         "Accept": "audio/mpeg",

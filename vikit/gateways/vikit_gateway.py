@@ -188,8 +188,6 @@ class VikitGateway(MLModelsGateway):
 
         return response
 
-    ##################  Replicate API calls for Music keywords prompt and music gen  ##################
-
     @retry(
         stop=stop_after_attempt(get_nb_retries_http_calls()),
         reraise=True,
