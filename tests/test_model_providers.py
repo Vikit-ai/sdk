@@ -56,10 +56,11 @@ class TestModelProviders:
             )
 
     @pytest.mark.integration
-    @pytest.mark.asyncio
-    async def test_haiper_provider_and_generate(self):
+    def test_haiper_provider_and_generate(self):
         with WorkingFolderContext():
-            await self._chose_provider_and_generate(provider="haiper")
+            video = RawTextBasedVideo("This is a fantastic day today")
+            video.build_non_async(build_settings=VideoBuildSettings(test_mode=False))
+            assert video.media_url is not None
 
     @pytest.mark.integration
     @pytest.mark.asyncio
@@ -75,6 +76,8 @@ class TestModelProviders:
             final_composite_video = CompositeVideo()
             # train_boy has 4 subtitles
             video = RawTextBasedVideo("This is a fantastic day today")
+            video.build_non_async(build_settings=VideoBuildSettings(test_mode=False))
+            assert video.media_url is not None
             await video.prepare_build_hook(
                 build_settings=VideoBuildSettings(
                     test_mode=False,

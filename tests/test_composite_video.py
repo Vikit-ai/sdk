@@ -21,14 +21,12 @@ from tests.testing_medias import (
 )
 
 prompt_mystic = tools.test_prompt_library["moss_stones-train_boy"]
+logger.add("log_test_composite_video.txt", rotation="10 MB")
+warnings.simplefilter("ignore", category=ResourceWarning)
+warnings.simplefilter("ignore", category=UserWarning)
 
 
 class TestCompositeVideo:
-
-    def setUp(self) -> None:
-        logger.add("log_test_composite_video.txt", rotation="10 MB")
-        warnings.simplefilter("ignore", category=ResourceWarning)
-        warnings.simplefilter("ignore", category=UserWarning)
 
     @pytest.mark.unit
     @pytest.mark.asyncio
