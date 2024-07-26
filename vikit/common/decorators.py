@@ -62,19 +62,3 @@ def log_function_params(func):
         return result
 
     return wrapper
-
-
-def delay(seconds):
-    """
-    Decorator to delay the execution of a function
-    """
-
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            if type(seconds) is int and seconds > 0:  # fail open
-                time.sleep(seconds)
-                return func(*args, **kwargs)
-
-        return wrapper
-
-    return decorator

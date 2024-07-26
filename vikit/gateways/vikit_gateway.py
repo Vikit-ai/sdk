@@ -21,7 +21,7 @@ import json
 import subprocess
 import uuid as uid
 
-from tenacity import retry, before_log, after_log, stop_after_attempt
+from tenacity import retry, before_log, after_log, stop_after_attempt, wait_exponential
 from loguru import logger
 from vikit.common.file_tools import download_file
 from vikit.common.decorators import log_function_params
@@ -31,7 +31,6 @@ from vikit.common.secrets import get_replicate_api_token, get_vikit_api_token
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
 from vikit.common.config import get_nb_retries_http_calls
 
-import requests
 import io
 from PIL import Image
 
@@ -600,7 +599,11 @@ class VikitGateway(MLModelsGateway):
                             video_file.write(base64.b64decode(output["video"]))
                         return output_vid_file_name
 
-    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    @retry(
+        stop=stop_after_attempt(get_nb_retries_http_calls()),
+        reraise=True,
+        wait=wait_exponential(min=1, max=5),
+    )
     async def generate_video_haiper_async(self, prompt: str):
         """
         Generate a video from the given prompt
