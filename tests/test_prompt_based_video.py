@@ -162,7 +162,14 @@ class TestPromptBasedVideo:
     @pytest.mark.asyncio
     @pytest.mark.skip
     async def test_use_recorded_prompt_infer_lyrics_sof(self):
+        """
+        Experimental: see how giving a music track would work as a prompt
+            Letting the model infer the lyrics of the song
+            Letting the model imagine a scenario vor the video with movie director's instructions
+            use the audio track as a prompt
 
+            ...please use your own music track for obvious copyright reasons :)
+        """
         with WorkingFolderContext():
             bld_settings = VideoBuildSettings(
                 include_read_aloud_prompt=True,

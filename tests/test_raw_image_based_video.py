@@ -18,7 +18,7 @@ from tests.testing_medias import get_test_prompt_image
 TEST_PROMPT = get_test_prompt_image()
 
 
-class TestImagePromptBasedVideo(unittest.TestCase):
+class TestRawImagePromptBasedVideo(unittest.TestCase):
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
@@ -100,7 +100,8 @@ class TestImagePromptBasedVideo(unittest.TestCase):
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.integration
-    def test_build_single_video_with_generated_bg_music_no_subtitles(self):
+    @pytest.mark.asyncio
+    async def test_build_single_video_with_generated_bg_music_no_subtitles(self):
         with WorkingFolderContext():
 
             bld_settings = VideoBuildSettings(
@@ -120,7 +121,7 @@ class TestImagePromptBasedVideo(unittest.TestCase):
                 ._image,
                 title="test_image_prompt",
             )
-            pbvid.build(
+            assert pbvid.build(
                 build_settings=bld_settings,
             )
             assert pbvid.media_url, "media URL was not updated"

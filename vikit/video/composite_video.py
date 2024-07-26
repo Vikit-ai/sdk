@@ -265,6 +265,9 @@ class CompositeVideo(Video, is_composite_video):
                 logger.debug(
                     f"parameters video_composite.get_duration() build_settings.prompt : {self.get_duration()}, {build_settings.prompt}"
                 )
+                logger.debug(
+                    f"parameters video_composite.get_duration() build_settings.prompt.duration : {self.get_duration()}, {build_settings.prompt}"
+                )
                 ratioToMultiplyAnimations = (
                     self.get_duration() / build_settings.prompt.duration
                 )
