@@ -17,13 +17,13 @@ class RawImageBasedVideo(Video):
     def __init__(
         self,
         title,
-        raw_image_prompt: np.ndarray = None,
+        raw_image_prompt: str = None,
     ):
         """
         Initialize the video
 
         Args:
-            raw_image_prompt (np.ndarray): The raw image prompt to generate the video from
+            raw_image_prompt (base64: The raw image prompt to generate the video from
             title (str): The title of the video
 
         Raises:
@@ -78,9 +78,8 @@ class RawImageBasedVideo(Video):
 
         logger.info("Generating video, could take some time ")
         ml_gateway = build_settings.get_ml_models_gateway()
-
-        video_link_from_prompt = ml_gateway.generate_video_from_image_Stability(
-            self._image
+        video_link_from_prompt = await ml_gateway.generate_video_async(
+            self._image, model_provider=build_settings.target_model_provider
         )  # Should give a link on the Internet
         self.metadata.is_video_generated = True
 
@@ -96,15 +95,14 @@ class RawImageBasedVideo(Video):
             )[
                 0
             ]  # Then we download it
-            self._media_url = interpolated_video_path
+            self.media_url = interpolated_video_path
             self.metadata.is_interpolated = True
         else:
             file_name = self.get_file_name_by_state(build_settings)
-            self._media_url = video_link_from_prompt
+            self.media_url = video_link_from_prompt
+            self.metadata.is_interpolated = False
         self._source = type(
             ml_gateway
         ).__name__  # The source of the video is used later to decide if we need to reencode the video
-
-        self.metadata.is_interpolated = True
 
         return self
