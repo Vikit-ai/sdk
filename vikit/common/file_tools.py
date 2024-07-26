@@ -29,6 +29,8 @@ from urllib.error import URLError
 
 from vikit.common.decorators import log_function_params
 
+TIMEOUT = 10  # seconds before stopping the request to check an URL exists
+
 
 def get_canonical_name(file_path: str):
     """
@@ -126,9 +128,6 @@ def is_valid_filename(filename: str) -> bool:
     return True
 
 
-TIMEOUT = 5  # TODO: set to global config , seconds before stopping the request to check an URL exists
-
-
 def web_url_exists(url):
     """
     Check if a URL exists on the web
@@ -211,7 +210,7 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
     if parsed_uri.scheme in ["http", "https", "s3", "gs"]:
         return {"type": parsed_uri.scheme, "path": path}, None
 
-    if os.path.exists(path) or is_valid_filename(filename=os.path.basename(path)):
+    if os.path.isdir(path) or is_valid_filename(filename=os.path.basename(path)):
         if path.startswith("file://"):
             logger.debug(f"Path is a local url format: {path}")
             return {"type": "local_url_format", "path": path}, None
