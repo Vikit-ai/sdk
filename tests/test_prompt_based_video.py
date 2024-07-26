@@ -17,14 +17,12 @@ import tests.testing_tools as tools  # used to get a library of test prompts
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 TEST_PROMPT = "A group of stones in a forest, with symbols"
+logger.add("log_test_prompt_based_video.txt", rotation="10 MB")
+warnings.simplefilter("ignore", category=ResourceWarning)
+warnings.simplefilter("ignore", category=UserWarning)
 
 
 class TestPromptBasedVideo:
-
-    def setUp(self) -> None:
-        warnings.simplefilter("ignore", category=ResourceWarning)
-        warnings.simplefilter("ignore", category=UserWarning)
-        logger.add("log_test_prompt_based_video.txt", rotation="10 MB")
 
     @pytest.mark.unit
     def test_no_prompt_text(self):

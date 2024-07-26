@@ -333,12 +333,19 @@ class CompositeVideo(Video, is_composite_video):
                     assert os.path.exists(
                         target_dir_path
                     ), f"File {target_dir_path} does not exist"
-
-                shutil.copyfile(
-                    self.media_url,
-                    new_file_path,
-                )
-                self.media_url = new_file_path
+                assert os.path.exists(
+                    self.media_url
+                ), f"File {self.media_url} does not exist"
+                try:
+                    shutil.copyfile(
+                        self.media_url,
+                        new_file_path,
+                    )
+                    self.media_url = new_file_path
+                except Exception as e:
+                    logger.warning(
+                        f"Could not rename the video media file to the target file name: {e}"
+                    )
         else:
             raise ValueError(
                 f"Target dir path is not local: {target_dir_path}. Cannot rename to target file name yet"

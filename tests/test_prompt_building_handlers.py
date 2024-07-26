@@ -11,13 +11,12 @@ from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
     PromptByRawUserTextHandler,
 )
 
+logger.add("log_test_prompt_building_handlers.txt", rotation="10 MB")
+warnings.simplefilter("ignore", category=ResourceWarning)
+warnings.simplefilter("ignore", category=UserWarning)
+
 
 class TestPromptBuildingHandlers:
-
-    def setUp(self) -> None:
-        warnings.simplefilter("ignore", category=ResourceWarning)
-        warnings.simplefilter("ignore", category=UserWarning)
-        logger.add("log_test_prompt_building_handlers.txt", rotation="10 MB")
 
     @pytest.mark.unit
     @pytest.mark.asyncio
