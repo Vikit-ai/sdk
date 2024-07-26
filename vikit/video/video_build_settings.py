@@ -22,7 +22,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
     def __init__(
         self,
         delete_interim_files: bool = False,
-        run_async: bool = True,
         test_mode: bool = True,
         target_model_provider: str = None,
         expected_length: float = None,
@@ -41,7 +40,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
 
         params:
             delete_interim_files: bool : Whether to delete the interim files generated during the video building process
-            run_async: bool : Whether to run the video building process asynchronously
             test_mode: bool : Whether to run the video building process in test mode
 
             target_model_provider: str : The target model provider, in case you don't want to use the one defined by Vikit for each scene of the video
@@ -58,7 +56,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
 
         super().__init__(
             delete_interim_files=delete_interim_files,
-            run_async=run_async,
             test_mode=test_mode,
             output_path=target_path,
             output_file_name=output_video_file_name,

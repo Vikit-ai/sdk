@@ -22,7 +22,6 @@ class PromptBuildSettings(GeneralBuildSettings):
     def __init__(
         self,
         delete_interim_files: bool = False,
-        run_async: bool = True,
         test_mode: bool = True,
         ml_models_gateway: MLModelsGateway = None,
         generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt
@@ -32,7 +31,6 @@ class PromptBuildSettings(GeneralBuildSettings):
 
         super().__init__(
             delete_interim_files=delete_interim_files,
-            run_async=run_async,
             test_mode=test_mode,
         )
 
