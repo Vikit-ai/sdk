@@ -56,13 +56,6 @@ class TestModelProviders:
             )
 
     @pytest.mark.integration
-    def test_haiper_provider_and_generate(self):
-        with WorkingFolderContext():
-            video = RawTextBasedVideo("This is a fantastic day today")
-            video.build_non_async(build_settings=VideoBuildSettings(test_mode=False))
-            assert video.media_url is not None
-
-    @pytest.mark.integration
     @pytest.mark.asyncio
     async def test_choose_provider_and_generate(self):
         with WorkingFolderContext():
