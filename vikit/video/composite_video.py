@@ -95,6 +95,7 @@ class CompositeVideo(Video, is_composite_video):
             include_read_aloud_prompt=False,
             music_building_context=MusicBuildingContext(apply_background_music=False),
             test_mode=self.build_settings.test_mode,
+            target_model_provider=self.build_settings.target_model_provider,
         )
 
     def append_video(self, video: Video):
