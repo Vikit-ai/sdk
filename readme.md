@@ -13,7 +13,7 @@ To see the video in full resolution, click on the GIF.
 <!-- [![](https://img.youtube.com/vi/_ipNgOOcX5U/sddefault.jpg)](https://youtu.be/_ipNgOOcX5U)</div> -->
 <a href='https://youtu.be/_ipNgOOcX5U'><img src='medias/gif1_Plato.gif'></a> <a href='https://youtu.be/_ipNgOOcX5U'><img src='medias/gif3_Plato.gif'></a>
 
-<a href=''><img src='medias/gif2_Paris_h.gif'></a>
+<a href='https://youtu.be/Hd-r3Hy9XFs?si=PRAZqDueaCFEUK9n'><img src='medias/gif2_Paris_h.gif'></a>
 
 
 ## How to use Vikit.ai SDK?
