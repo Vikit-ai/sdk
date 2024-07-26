@@ -132,6 +132,42 @@ class PromptFactory:
             self
 
         """
+        import asyncio
+
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            # If there's already a running loop, create a new task and wait for it
+            return loop.create_task(
+                self.create_prompt_from_audio_file_async(
+                    recorded_audio_prompt_path=recorded_audio_prompt_path
+                )
+            )
+        else:
+            # If no loop is running, use asyncio.run
+            return asyncio.run(
+                self.create_prompt_from_audio_file_async(
+                    recorded_audio_prompt_path=recorded_audio_prompt_path
+                )
+            )
+
+    async def create_prompt_from_audio_file_async(
+        self,
+        recorded_audio_prompt_path: str = None,
+    ):
+        """
+        Create a prompt object from a recorded audio file
+
+        args:
+            - recorded_audio_prompt_path: the path to the recorded audio file
+
+        returns:
+            self
+
+        """
         extractor = RecordedPromptSubtitlesExtractor()
 
         subs = await extractor.extract_subtitles_async(
