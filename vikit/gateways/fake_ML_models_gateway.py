@@ -137,10 +137,5 @@ class FakeMLModelsGateway(MLModelsGateway):
     ):
         await asyncio.sleep(sleep_time)
 
-    def generate_video_from_image_Stability(self, prompt: str = None):
-        return ft.create_non_colliding_file_name(
-            tests_medias.get_cat_video_path()[:-4], extension="mp4"
-        )
-
     def extract_audio_slice(self, i, end, audiofile_path, target_file_name: str = None):
         return tests_medias.get_test_prompt_recording_trainboy()

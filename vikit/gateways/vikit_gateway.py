@@ -4,7 +4,6 @@ import aiohttp
 import base64
 import json
 import subprocess
-import numpy as np
 import uuid as uid
 
 from tenacity import retry, before_log, after_log, stop_after_attempt
@@ -512,6 +511,8 @@ class VikitGateway(MLModelsGateway):
             return await self.generate_video_haiper_async(prompt)
         elif model_provider == "videocrafter":
             return await self.generate_video_VideoCrafter2_async(prompt)
+        elif model_provider == "stabilityai_image":
+            return await self.generate_video_from_image_stabilityai_async(prompt)
         else:
             raise ValueError(f"Unknown model provider: {model_provider}")
 
@@ -642,43 +643,57 @@ class VikitGateway(MLModelsGateway):
         return output
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    def generate_video_from_image_Stability(self, prompt: np.ndarray):
+    async def generate_video_from_image_stabilityai_async(self, prompt: str):
         """
         Generate a video from the given image prompt
 
         Args:
-            prompt: The image prompt to generate the video from
+            prompt: Image prompt to generate the video from in base64 format
 
         returns:
                 The link to the generated video
         """
 
         # TO DO: include camera motion parameters
-        # Convert image prompt to Base64
-        img = Image.fromarray(prompt)
-        new_img = img.resize((1024, 576))  # x, y
-        # Save the image to a buffer
-        buffer = io.BytesIO()
-        new_img.save(buffer, format="PNG")
-        # Encode the image as base64
-        img_b64 = "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode(
-            "utf-8"
-        )
+        output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
+        logger.debug("Generating video from image prompt ")
+        async with aiohttp.ClientSession() as session:
+            logger.debug("Resizing image for video generator")
+            # Convert result to Base64
+            image_data = base64.b64decode(prompt)
+            image = Image.open(io.BytesIO(image_data))
+            target_size = (1024, 576)
 
-        logger.debug("Generating video from image prompt")
-        # Ask for a video
-        output = requests.post(
-            "https://videho.replit.app/models",
-            json={
-                "key": vikit_api_key,
-                "model": "stability_image2video",
-                "input": {
-                    "image": img_b64,
-                    "seed": 0,
-                    "cfg_scale": 1.8,
-                    "motion_bucket_id": 127,
-                },
-            },
-        )
-        print(output.json())
-        return "data:video/mp4;base64," + output.json()["video"]
+            # Check the size and resize if needed
+            if image.size != target_size:
+                image = image.resize(target_size)
+
+            # Save the image to a buffer
+            buffer = io.BytesIO()
+            image.save(buffer, format="PNG")
+
+            # Encode the image as base64
+            img_b64 = "data:image/png;base64," + base64.b64encode(
+                buffer.getvalue()
+            ).decode("utf-8")
+
+            logger.debug("Generating video from image")
+            # Ask for a video
+            async with aiohttp.ClientSession() as session:
+                payload = (
+                    {
+                        "key": vikit_api_key,
+                        "model": "stability_image2video",
+                        "input": {
+                            "image": img_b64,
+                            "seed": 0,
+                            "cfg_scale": 1.8,
+                            "motion_bucket_id": 127,
+                        },
+                    },
+                )
+                async with session.post(vikit_backend_url, json=payload) as response:
+                    output = await response.json()
+                    with open(output_vid_file_name, "wb") as video_file:
+                        video_file.write(base64.b64decode(output["video"]))
+                    return output_vid_file_name

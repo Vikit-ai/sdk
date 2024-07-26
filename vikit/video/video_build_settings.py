@@ -16,7 +16,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         generate_from_llm_keyword: bool = False,
         generate_from_llm_prompt: bool = True,
         generate_from_image_prompt: bool = True,
-        interpolate: bool = True,
+        interpolate: bool = False,
         music_building_context: MusicBuildingContext = MusicBuildingContext(),
         target_path: str = None,
         output_video_file_name: str = None,

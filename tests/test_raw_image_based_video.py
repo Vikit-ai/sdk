@@ -106,24 +106,25 @@ class TestRawImagePromptBasedVideo:
     async def test_build_single_video_with_generated_bg_music_no_subtitles(self):
         with WorkingFolderContext():
 
-            bld_settings = VideoBuildSettings(
+            build_settings = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True,
                     generate_background_music=True,
                 ),
                 test_mode=False,
+                target_model_provider="stabilityai_image",
             )
 
-            pbvid = RawImageBasedVideo(
+            video = RawImageBasedVideo(
                 raw_image_prompt=PromptFactory(
-                    ml_gateway=ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway()
+                    ml_gateway=build_settings.get_ml_models_gateway()
                 )
                 .create_prompt_from_image(TEST_PROMPT)
                 ._image,
                 title="test_image_prompt",
             )
-            assert pbvid.build(
-                build_settings=bld_settings,
-            )
-            assert pbvid.media_url, "media URL was not updated"
-            assert os.path.exists(pbvid.media_url), "The generated video does not exist"
+
+            await video.build(build_settings=build_settings)
+
+            assert video.media_url, "media URL was not updated"
+            assert os.path.exists(video.media_url), "The generated video does not exist"
