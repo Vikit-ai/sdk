@@ -95,7 +95,7 @@ class CompositeVideo(Video, is_composite_video):
         if not video:
             raise ValueError("video cannot be None")
         self.video_list.append(video)
-        # self.video_dependencies.append(video)
+        self.video_dependencies.append(video)
 
         if (
             video._needs_video_reencoding
