@@ -59,7 +59,7 @@ class Video(ABC):
             width=self._width,
             height=self._height,
         )
-
+        self._source = None
         self.media_url = None
         self.build_settings: VideoBuildSettings = VideoBuildSettings()
         self.are_build_settings_prepared = False

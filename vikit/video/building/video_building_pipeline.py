@@ -29,16 +29,9 @@ class VideoBuildingPipeline:
 
         """
         handlers = []
-
-        if video._needs_video_reencoding:
-            logger.debug(
-                f"adding reencoding handlers for video of type {type(video)}, video id {video.id}"
-            )
-            handlers.append(VideoReencodingHandler())
-        else:
-            logger.debug(
-                f"no reencoding needed for video of type {type(video)}, video id {video.id}"
-            )
+        handlers.append(
+            VideoReencodingHandler()
+        )  # THe handler will trigger only if necessary
 
         handlers.extend(
             self.get_background_music_handlers(

@@ -23,6 +23,11 @@ class VideoReencodingHandler(Handler):
             raise ValueError(f"Video {video.id} has no media url")
 
         logger.debug(f"Video video.media_url : {video.media_url}")
+
+        # Special case here: the video used for testing should always be reencoded as coming from hetegenous sources
+        if video.build_settings.test_mode:
+            video._needs_video_reencoding = True
+
         video.metadata.is_reencoded = True
         if video._needs_video_reencoding:
             video.media_url = await reencode_video(

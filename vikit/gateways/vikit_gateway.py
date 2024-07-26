@@ -32,9 +32,8 @@ class VikitGateway(MLModelsGateway):
     A Gateway to interact with the Vikit API
     """
 
-    def __init__(self, target_provider: str = "haiper"):
+    def __init__(self):
         super().__init__()
-        # self.provider = target_provider
 
     async def generate_mp3_from_text_async(
         self,
