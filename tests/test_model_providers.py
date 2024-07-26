@@ -74,21 +74,26 @@ class TestModelProviders:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
-    async def test_bug_none_model_provider(self):
-        with WorkingFolderContext():
-            video_build_settings = VideoBuildSettings(
-                music_building_context=MusicBuildingContext(
-                    apply_background_music=True, generate_background_music=True
-                ),
-                test_mode=True,
-                target_model_provider="haiper",
-            )
+    async def test_model_provider_passing_and_error(self):
+        with pytest.raises(ValueError):
+            with WorkingFolderContext():
+                video_build_settings = VideoBuildSettings(
+                    music_building_context=MusicBuildingContext(
+                        apply_background_music=True, generate_background_music=True
+                    ),
+                    test_mode=True,
+                    target_model_provider="an unexisting model",
+                )
 
-            prompt = "Unlock your radiance with AI Cosmetics."  # @param {type:"string"}
-            gw = video_build_settings.get_ml_models_gateway()
-            prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(prompt)
-            video = PromptBasedVideo(prompt=prompt)
-            logger.debug(
-                f"target_model_provider: {video_build_settings.target_model_provider}"
-            )
-            await video.build(build_settings=video_build_settings)
+                prompt = (
+                    "Unlock your radiance with AI Cosmetics."  # @param {type:"string"}
+                )
+                gw = video_build_settings.get_ml_models_gateway()
+                prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(
+                    prompt
+                )
+                video = PromptBasedVideo(prompt=prompt)
+                logger.debug(
+                    f"target_model_provider: {video_build_settings.target_model_provider}"
+                )
+                await video.build(build_settings=video_build_settings)

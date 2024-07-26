@@ -137,6 +137,22 @@ class FakeMLModelsGateway(MLModelsGateway):
         self, prompt: str = None, sleep_time: int = 0, model_provider: str = None
     ):
         await asyncio.sleep(sleep_time)
+
+        if model_provider == "vikit":
+            pass
+        elif model_provider == "stabilityai":
+            pass
+        elif model_provider == "" or model_provider is None:
+            pass
+        elif model_provider == "haiper":
+            pass
+        elif model_provider == "videocrafter":
+            pass
+        elif model_provider == "stabilityai_image":
+            pass
+        else:
+            raise ValueError(f"Unknown model provider: {model_provider}")
+
         test_file = tests_medias.get_cat_video_path()
         logger.debug(
             f"Generating video from prompt: {prompt}, return a link: {test_file}"
