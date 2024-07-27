@@ -259,7 +259,7 @@ class Video(ABC):
                 # so that we infer source from the different handlers (initial video generator, interpolation, etc)
             ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
 
-            await self.prepare_build_hook(build_settings=build_settings)
+            await self.prepare_build(build_settings=build_settings)
             self.are_build_settings_prepared = True
 
         logger.info(f"Starting the building of Video {self.id} ")
@@ -342,7 +342,7 @@ class Video(ABC):
         Post build actions hook
         """
 
-    async def prepare_build_hook(self, build_settings: VideoBuildSettings) -> "Video":
+    async def prepare_build(self, build_settings: VideoBuildSettings) -> "Video":
         """
         Prepare the video for building, may be used to inject build settings for individual videos
         that we don't want to share with global buildsettings. For instance to generate a video
