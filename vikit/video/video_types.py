@@ -23,6 +23,7 @@ class VideoType(Enum):
     RAWTEXT = 3
     TRANSITION = 4
     PRMPTBASD = 5
+    RAWIMAGE = 6
 
     def __str__(self):
         return self.name.lower()
