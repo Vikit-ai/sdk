@@ -48,7 +48,7 @@ class VikitGateway(MLModelsGateway):
     def __init__(self):
         super().__init__()
 
-    async def generate_mp3_from_text_async(
+    async def generate_mp3_from_text_async_elevenlabs(
         self,
         prompt_text: str,
         target_file: str,
@@ -67,6 +67,32 @@ class VikitGateway(MLModelsGateway):
             text=prompt_text, target_file=target_file
         )
         assert os.path.exists(target_file), "The generated audio file does not exists"
+
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    async def generate_mp3_from_text_async(
+        self,
+        prompt_text: str,
+        target_file: str,
+    ):
+        async with aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=1800)
+        ) as session:
+            payload = (
+                {
+                    "key": vikit_api_key,
+                    "model": "adirik/styletts2:989cb5ea6d2401314eb30685740cb9f6fd1c9001b8940659b406f952837ab5ac",
+                    "input": {
+                        "text": prompt_text,
+                        "embedding_scale": 1.5,
+                    },
+                },
+            )
+            async with session.post(vikit_backend_url, json=payload) as response:
+                response = await response.text()
+                await download_file(
+                    url=response, local_path=target_file
+                )
+        return response
 
     @log_function_params
     async def generate_background_music_async(
@@ -714,3 +740,5 @@ class VikitGateway(MLModelsGateway):
                     with open(output_vid_file_name, "wb") as video_file:
                         video_file.write(base64.b64decode(output["video"]))
                     return output_vid_file_name
+
+
