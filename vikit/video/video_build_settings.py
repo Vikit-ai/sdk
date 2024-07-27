@@ -27,8 +27,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         expected_length: float = None,
         include_read_aloud_prompt: bool = False,
         prompt: Prompt = None,
-        generate_from_llm_keyword: bool = False,
-        generate_from_llm_prompt: bool = True,
         generate_from_image_prompt: bool = True,
         interpolate: bool = False,
         music_building_context: MusicBuildingContext = MusicBuildingContext(),
@@ -48,8 +46,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
             expected_length:  The expected length in seconds of the video, will be used when actually building the video
             include_read_aloud_prompt:  Include a synthetic voice that reads the prompts in the final video
             prompt: Prompt : Include subtitles in the final video and fit videos to match the prompt subtitles timelines
-            generate_from_llm_keyword : Ask to generate the video by generating keywords from a LLM Prompt
-            generate_from_llm_prompt : Ask to generate the video by generating prompts from a LLM Prompt
             generate_from_image_prompt : Ask to generate the video by generating prompts from an image
             interpolate : Ask to interpolate the video
         """
@@ -64,8 +60,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.expected_length = expected_length
         self.include_read_aloud_prompt = include_read_aloud_prompt
         self.prompt = prompt
-        self.generate_from_llm_keyword = generate_from_llm_keyword
-        self.generate_from_llm_prompt = generate_from_llm_prompt
         self.generate_from_image_prompt = generate_from_image_prompt
         self.music_building_context = music_building_context
         self.interpolate = interpolate
