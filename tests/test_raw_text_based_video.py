@@ -72,7 +72,7 @@ class TestRawTextBasedVideo:
             video = RawTextBasedVideo("This is a prompt text")
             target_path = os.makedirs("testdir")
             built = await video.build(
-                build_settings=VideoBuildSettings(target_path="testdir")
+                build_settings=VideoBuildSettings(target_dir_path="testdir")
             )
 
             assert built.media_url is not None
@@ -88,7 +88,8 @@ class TestRawTextBasedVideo:
             target_path = os.makedirs("testdir2")
             built = await video.build(
                 build_settings=VideoBuildSettings(
-                    target_path="testdir2", output_video_file_name="my_othervideo.mp4"
+                    target_dir_path="testdir2",
+                    output_video_file_name="my_othervideo.mp4",
                 )
             )
 

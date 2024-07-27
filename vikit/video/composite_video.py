@@ -295,14 +295,14 @@ class CompositeVideo(Video, is_composite_video):
         return ratioToMultiplyAnimations
 
     async def run_post_build_actions_hook(self, build_settings: VideoBuildSettings):
-        if not build_settings.output_file_name:
+        if not build_settings.target_file_name:
             name, extension = os.path.splitext(os.path.basename(self.media_url))
             new_name = f"{name}_{uid.uuid4()}{extension}"
-            build_settings.output_file_name = os.path.join(
+            build_settings.target_file_name = os.path.join(
                 os.path.dirname(self.media_url), new_name
             )
             logger.warning(
-                f"Output file name not set, using a random name: {build_settings.output_file_name}"
+                f"Output file name not set, using a random name: {build_settings.target_file_name}"
             )
 
     def generate_background_music_prompt(self):

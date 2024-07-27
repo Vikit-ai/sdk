@@ -25,8 +25,8 @@ class GeneralBuildSettings:
         self,
         delete_interim_files: bool = False,  # not implemented yet :)
         test_mode: bool = False,
-        output_path: str = None,
-        output_file_name: str = None,
+        target_dir_path: str = None,
+        target_file_name: str = None,
     ):
         """
         Initialize the build settings
@@ -45,8 +45,8 @@ class GeneralBuildSettings:
         self.id = str(randint(1, 9999999999)).zfill(10)
         self.build_date = datetime.date.today().strftime("%Y-%m-%d")
         self.build_time = datetime.datetime.now().time().strftime("%H:%M")
-        self._output_path = output_path
-        self.output_file_name = output_file_name
+        self.target_dir_path = target_dir_path
+        self.target_file_name = target_file_name
 
     def get_ml_models_gateway(self):
         """
@@ -66,13 +66,13 @@ class GeneralBuildSettings:
         """
         Get the output path where the video will be saved
         """
-        return self._output_path
+        return self.target_dir_path
 
     @output_path.setter
     def output_path(self, output_path: str):
         """
         Set the output path where the video will be saved
         """
-        self._output_path = output_path
+        self.target_dir_path = output_path
 
         return self

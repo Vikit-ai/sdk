@@ -272,9 +272,9 @@ class Video(ABC):
         logger.debug(f"Starting the post build hook for Video {self.id} ")
         await self.run_post_build_actions_hook(build_settings=build_settings)
 
-        if self.build_settings.output_file_name:
+        if self.build_settings.target_file_name:
             self.set_final_video_name(
-                output_file_name=build_settings.output_file_name,
+                output_file_name=build_settings.target_file_name,
             )
 
         if wfolder_changed:
