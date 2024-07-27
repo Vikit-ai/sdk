@@ -67,3 +67,7 @@ def get_discord_api_key():
     if discord_api_key is None:
         raise Exception("DISCORD_API_KEY is not set")
     return discord_api_key
+
+def has_eleven_labs_api_key():
+    eleven_labs_api_key = getenv("ELEVEN_LABS_KEY", "dev")
+    return eleven_labs_api_key is not "dev"

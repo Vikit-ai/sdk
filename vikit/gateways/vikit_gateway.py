@@ -30,6 +30,7 @@ from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.common.secrets import get_replicate_api_token, get_vikit_api_token
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
 from vikit.common.config import get_nb_retries_http_calls
+from vikit.common.secrets import has_eleven_labs_api_key
 
 import io
 from PIL import Image
@@ -74,25 +75,31 @@ class VikitGateway(MLModelsGateway):
         prompt_text: str,
         target_file: str,
     ):
-        async with aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=1800)
-        ) as session:
-            payload = (
-                {
-                    "key": vikit_api_key,
-                    "model": "adirik/styletts2:989cb5ea6d2401314eb30685740cb9f6fd1c9001b8940659b406f952837ab5ac",
-                    "input": {
-                        "text": prompt_text,
-                        "embedding_scale": 1.5,
-                    },
-                },
+        if has_eleven_labs_api_key():
+            await self.generate_mp3_from_text_async_elevenlabs(
+                prompt_text,
+                target_file,
             )
-            async with session.post(vikit_backend_url, json=payload) as response:
-                response = await response.text()
-                await download_file(
-                    url=response, local_path=target_file
+        else:
+            async with aiohttp.ClientSession(
+                timeout=aiohttp.ClientTimeout(total=1800)
+            ) as session:
+                payload = (
+                    {
+                        "key": vikit_api_key,
+                        "model": "adirik/styletts2:989cb5ea6d2401314eb30685740cb9f6fd1c9001b8940659b406f952837ab5ac",
+                        "input": {
+                            "text": prompt_text,
+                            "embedding_scale": 1.5,
+                        },
+                    },
                 )
-        return response
+                async with session.post(vikit_backend_url, json=payload) as response:
+                    response = await response.text()
+                    await download_file(
+                        url=response, local_path=target_file
+                    )
+            return response
 
     @log_function_params
     async def generate_background_music_async(
