@@ -17,9 +17,10 @@ import os
 import warnings
 
 import pytest
-from loguru import logger
 
+from loguru import logger
 from vikit.video.imported_video import ImportedVideo
+from vikit.video.video import Video
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.common.context_managers import WorkingFolderContext
 import tests.testing_tools as tools  # used to get a library of test prompts
@@ -92,3 +93,12 @@ class TestVideo:
             assert image_path is not None
             assert image_path.__len__() > 0
             assert os.path.exists(image_path)
+
+    @pytest.mark.unit
+    async def test_create_single_video_mix_single_video(self):
+        """
+        Create a single video mix
+        No Music
+        """
+        with pytest.raises(TypeError):
+            _ = Video()
