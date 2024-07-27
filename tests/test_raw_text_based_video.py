@@ -85,10 +85,10 @@ class TestRawTextBasedVideo:
     ):
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a prompt text")
-            target_path = os.makedirs("testdir")
+            target_path = os.makedirs("testdir2")
             built = await video.build(
                 build_settings=VideoBuildSettings(
-                    target_path="testdir", output_video_file_name="my_video.mp4"
+                    target_path="testdir", output_video_file_name="my_othervideo.mp4"
                 )
             )
 
