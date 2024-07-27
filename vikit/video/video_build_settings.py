@@ -43,7 +43,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
             test_mode: bool : Whether to run the video building process in test mode
 
             target_model_provider: str : The target model provider, in case you don't want to use the one defined by Vikit for each scene of the video
-            Could be vikit, haiper, stability-ai, videocrafter, etc.
+            Could be vikit, haiper, stabilityai, videocrafter, etc.
 
             expected_length:  The expected length in seconds of the video, will be used when actually building the video
             include_read_aloud_prompt:  Include a synthetic voice that reads the prompts in the final video
