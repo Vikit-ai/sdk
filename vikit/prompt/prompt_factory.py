@@ -238,6 +238,7 @@ class PromptFactory:
     def create_prompt_from_image(
         self,
         image_path: str = None,
+        text: str = None,
     ):
         """
         Create a prompt object from a prompt image path
@@ -251,9 +252,9 @@ class PromptFactory:
         if image_path is None:
             raise ValueError("The prompt image is not provided")
         if not os.path.exists(image_path):
-            raise ValueError("The prompt image file does not exist")
+            raise ValueError(f"The prompt image file {image_path} does not exist")
 
         with open(image_path, "rb") as image_file:
             input_prompt_image = base64.b64encode(image_file.read()).decode("utf-8")
-        prompt = ImagePromptBuilder().set_prompt_image(input_prompt_image).build()
+        prompt = ImagePromptBuilder().set_prompt_image(input_prompt_image, text).build()
         return prompt

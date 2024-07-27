@@ -59,7 +59,7 @@ class RawImageBasedVideo(Video):
         """
         Get the short type name of the video
         """
-        return str(VideoType.RAWTEXT)
+        return str(VideoType.RAWIMAGE)
 
     @log_function_params
     def get_title(self):
@@ -83,8 +83,8 @@ class RawImageBasedVideo(Video):
         Returns:
             The current instance
         """
-
         super().build(build_settings)
+        # super().run_build_core_logic_hook(build_settings)
 
         if self.metadata.is_video_built:
             return self
