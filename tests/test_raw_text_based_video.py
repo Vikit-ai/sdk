@@ -88,9 +88,9 @@ class TestRawTextBasedVideo:
             target_path = os.makedirs("testdir2")
             built = await video.build(
                 build_settings=VideoBuildSettings(
-                    target_path="testdir", output_video_file_name="my_othervideo.mp4"
+                    target_path="testdir2", output_video_file_name="my_othervideo.mp4"
                 )
             )
 
             assert built.media_url is not None
-            assert os.path.isdir("testdir"), f"Directory not found: {target_path}"
+            assert os.path.isdir("testdir2"), f"Directory not found: {target_path}"
