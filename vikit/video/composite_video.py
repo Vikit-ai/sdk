@@ -90,13 +90,18 @@ class CompositeVideo(Video, is_composite_video):
         logger.debug(
             f"Composite video {self.id} getting cascaded build settings from {self.build_settings}"
         )
-        return VideoBuildSettings(
-            interpolate=self.build_settings.interpolate,
-            include_read_aloud_prompt=False,
-            music_building_context=MusicBuildingContext(apply_background_music=False),
-            test_mode=self.build_settings.test_mode,
-            target_model_provider=self.build_settings.target_model_provider,
-        )
+        if self.build_settings.cascade_build_settings:
+            return self.build_settings
+        else:
+            return VideoBuildSettings(
+                interpolate=self.build_settings.interpolate,
+                include_read_aloud_prompt=False,
+                music_building_context=MusicBuildingContext(
+                    apply_background_music=False
+                ),
+                test_mode=self.build_settings.test_mode,
+                target_model_provider=self.build_settings.target_model_provider,
+            )
 
     def append_video(self, video: Video):
         """
