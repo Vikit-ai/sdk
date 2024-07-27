@@ -30,6 +30,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         generate_from_image_prompt: bool = True,
         interpolate: bool = False,
         music_building_context: MusicBuildingContext = MusicBuildingContext(),
+        cascade_build_settings: bool = False,
         target_path: str = None,
         output_video_file_name: str = None,
     ):
@@ -48,6 +49,10 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
             prompt: Prompt : Include subtitles in the final video and fit videos to match the prompt subtitles timelines
             generate_from_image_prompt : Ask to generate the video by generating prompts from an image
             interpolate : Ask to interpolate the video
+            music_building_context: MusicBuildingContext : The music building context to use when building the video
+            cascade_build_settings: bool : Whether to cascade the build settings to the sub videos
+            target_path: str : The target path to save the video
+            output_video_file_name: str : The output video file name (one is generated for you by default)
         """
 
         super().__init__(
@@ -64,3 +69,4 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.music_building_context = music_building_context
         self.interpolate = interpolate
         self.target_model_provider = target_model_provider
+        self.cascade_build_settings = cascade_build_settings
