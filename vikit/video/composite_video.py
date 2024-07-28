@@ -33,7 +33,6 @@ from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
 from vikit.common.handler import Handler
-from vikit.common.file_tools import get_path_type
 
 
 class CompositeVideo(Video, is_composite_video):
@@ -82,9 +81,9 @@ class CompositeVideo(Video, is_composite_video):
 
         return f"{videos_output}"
 
-    def get_cascaded_build_settings(self):
+    def get_children_build_settings(self):
         """
-        Get the cascaded build settings
+        Get the  build settings for children Video
         """
         logger.debug(
             f"Composite video {self.id} getting cascaded build settings from {self.build_settings}"
@@ -221,7 +220,7 @@ class CompositeVideo(Video, is_composite_video):
             ]
             await asyncio.gather(
                 *(
-                    v.build(self.get_cascaded_build_settings())
+                    v.build(self.get_children_build_settings())
                     for v in no_dependency_videos
                 )
             )
@@ -234,7 +233,7 @@ class CompositeVideo(Video, is_composite_video):
                 )
                 if not dependencies_processed:
                     raise Exception(f"{video} dependencies should have been processed.")
-                await video.build(build_settings=self.get_cascaded_build_settings())
+                await video.build(build_settings=self.get_children_build_settings())
 
         # at this stage we should have all the videos generated. Will be improved in the future
         # in case we are called directly on a child composite without starting by the composite root

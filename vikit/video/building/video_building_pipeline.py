@@ -44,9 +44,8 @@ class VideoBuildingPipeline:
 
         """
         handlers = []
-        handlers.append(
-            VideoReencodingHandler()
-        )  # THe handler will trigger only if necessary
+        if video._needs_video_reencoding:
+            handlers.append(VideoReencodingHandler())
 
         handlers.extend(
             self.get_background_music_handlers(

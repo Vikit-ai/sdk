@@ -17,6 +17,7 @@ from loguru import logger
 
 import os
 import base64
+from typing import List, Dict
 
 from vikit.prompt.image_prompt_builder import ImagePromptBuilder
 from vikit.prompt.recorded_prompt_builder import RecordedPromptBuilder
@@ -257,4 +258,36 @@ class PromptFactory:
         with open(image_path, "rb") as image_file:
             input_prompt_image = base64.b64encode(image_file.read()).decode("utf-8")
         prompt = ImagePromptBuilder().set_prompt_image(input_prompt_image, text).build()
+        return prompt
+
+    async def create_prompt_from_scenes_descriptons(
+        self,
+        scenes_descriptions: List[Dict] = None,
+    ):
+        """
+        Create a prompt  object from a list of scenes described by a dictionnary
+
+        args:
+            - scenes_descriptions: the dict of scenes descriptions. Scenes description can
+            be either a single key / value as well as more complex ones. For instance we could
+             have lightning, weather, location, time of the day, etc
+
+        returns:
+            a RecordedPrompt object
+        """
+        if not scenes_descriptions:
+            raise ValueError("The scenes_descriptions are not provided")
+        if len(scenes_descriptions) == 0:
+            raise ValueError("The scenes_descriptions list is empty")
+
+        prompt = (
+            RecordedPromptBuilder()
+            .set_prompt_text(prompt_text)
+            .set_subtitles(merged_subs)
+            .set_audio_recording(config.get_prompt_mp3_file_name())
+            .set_duration(get_media_duration(config.get_prompt_mp3_file_name()))
+            .build()
+        )
+        prompt.recorded_audio_prompt_path = config.get_prompt_mp3_file_name()
+
         return prompt

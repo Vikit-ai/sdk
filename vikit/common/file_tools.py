@@ -167,7 +167,9 @@ def url_exists(url: str):
 
 def is_valid_path(path: Optional[Union[str, os.PathLike]]) -> bool:
     """
-    Check if the path is valid
+    Check if the path is valid: could be a local path or a remote one
+    (http, etc). We don't test the actual access and credentials at this stage,
+    just the path fornat.
 
     Args:
         path (str, os.PathLike): The path to validate
@@ -195,6 +197,10 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
         Path type can be local, http, https, s3, gs, None, undefined, error,
         error : message if the path is invalid, None if no error
     """
+    import traceback
+
+    logger.warning(f"call stack: {traceback.print_stack()}")
+
     logger.debug(f"Checking path: {path}")
     result = {"type": "undefined", "path": "undefined"}, "undefined path"
 

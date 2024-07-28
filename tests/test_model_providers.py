@@ -97,3 +97,27 @@ class TestModelProviders:
                     f"target_model_provider: {video_build_settings.target_model_provider}"
                 )
                 await video.build(build_settings=video_build_settings)
+
+    @pytest.mark.integration
+    @pytest.mark.asyncio
+    async def test_model_provider_video_crafter_clement_raised_issue_double_call_to_get_path_type(
+        self,
+    ):
+        with WorkingFolderContext():
+            video_build_settings = VideoBuildSettings(
+                music_building_context=MusicBuildingContext(
+                    apply_background_music=True, generate_background_music=True
+                ),
+                test_mode=False,
+                target_model_provider="videocrafter",
+                include_read_aloud_prompt=True,
+            )
+
+            prompt = "Unlock your radiance with AI Cosmetics."  # @param {type:"string"}
+            gw = video_build_settings.get_ml_models_gateway()
+            prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(prompt)
+            video = PromptBasedVideo(prompt=prompt)
+            logger.debug(
+                f"target_model_provider: {video_build_settings.target_model_provider}"
+            )
+            await video.build(build_settings=video_build_settings)
