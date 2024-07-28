@@ -197,9 +197,9 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
         Path type can be local, http, https, s3, gs, None, undefined, error,
         error : message if the path is invalid, None if no error
     """
-    import traceback
+    # import traceback
 
-    logger.warning(f"call stack: {traceback.print_stack()}")
+    # logger.warning(f"call stack: {traceback.print_stack()}")
 
     logger.debug(f"Checking path: {path}")
     result = {"type": "undefined", "path": "undefined"}, "undefined path"

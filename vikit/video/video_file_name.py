@@ -38,7 +38,7 @@ class VideoFileName:
     and the bare minimum is here to simplify processing even if the metadata store is not available
     """
 
-    VIDEO_TITLE_MAX_LENGTH = 30
+    VIDEO_TITLE_MAX_LENGTH = 20
 
     def __init__(
         self,
@@ -82,7 +82,6 @@ class VideoFileName:
 
         self._build_id = build_settings.id
         self._build_date = build_settings.build_date
-        # self._build_time = build_settings.build_time
         self._unique_id = random.getrandbits(16)
         self._file_extension = file_extension
 
