@@ -197,10 +197,6 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
         Path type can be local, http, https, s3, gs, None, undefined, error,
         error : message if the path is invalid, None if no error
     """
-    # import traceback
-
-    # logger.warning(f"call stack: {traceback.print_stack()}")
-
     logger.debug(f"Checking path: {path}")
     result = {"type": "undefined", "path": "undefined"}, "undefined path"
 
@@ -228,7 +224,7 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
     return result
 
 
-async def download_file(url, local_path):
+async def download_or_copy_file(url, local_path):
     """
     Download a file from a URL to a local file asynchronously
 

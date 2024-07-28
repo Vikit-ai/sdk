@@ -19,7 +19,7 @@ import os
 
 from loguru import logger
 
-from vikit.common.file_tools import download_file
+from vikit.common.file_tools import download_or_copy_file
 from vikit.common.context_managers import WorkingFolderContext
 import tests.testing_medias as testing_medias
 
@@ -41,7 +41,9 @@ class TestFileTools:
 
         with WorkingFolderContext():
             local_file = testing_medias.get_cat_video_path()
-            downloaded_file = await download_file(local_file, "downloaded_cat.mp4")
+            downloaded_file = await download_or_copy_file(
+                local_file, "downloaded_cat.mp4"
+            )
 
             assert downloaded_file is not None
             assert downloaded_file == "downloaded_cat.mp4"

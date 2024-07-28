@@ -33,7 +33,7 @@ from vikit.video.video_file_name import VideoFileName
 from vikit.common.file_tools import (
     is_valid_path,
     get_path_type,
-    download_file,
+    download_or_copy_file,
     is_valid_filename,
 )
 from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
@@ -310,14 +310,14 @@ class Video(ABC):
 
                 assert built_video.media_url, "The video media URL is not set"
 
-        path_type, error = get_path_type(self.media_url)
-        if path_type["type"] != "local":
-            self.media_url = await download_file(
-                self.media_url, self.get_file_name_by_state(self.build_settings)
-            )
-
         self.metadata.title = self.get_title()
-        self.metadata.duration = self.get_duration()
+        self.media_url = await download_or_copy_file(
+            url=self.media_url,
+            local_path=self.get_file_name_by_state(self.build_settings),
+        )
+        self.metadata.duration = (
+            self.get_duration()
+        )  # This needs to happen once the video has been downloaded
 
         return built_video
 
@@ -410,9 +410,6 @@ class Video(ABC):
         if not build_settings and not self.build_settings:
             raise ValueError("build_settings should be set")
 
-        self.metadata.title = (
-            self.get_title()
-        )  # refresh to be sure to gather latest title in case of composite video
         return str(
             VideoFileName(
                 video_type=self.short_type_name,
