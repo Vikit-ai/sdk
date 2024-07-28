@@ -43,8 +43,8 @@ class VideoReencodingHandler(Handler):
         if video.build_settings.test_mode:
             video._needs_video_reencoding = True
 
-        video.metadata.is_reencoded = True
         if video._needs_video_reencoding:
+            video.metadata.is_reencoded = True
             video.media_url = await reencode_video(
                 video_url=video.media_url,
                 target_video_name=video.get_file_name_by_state(

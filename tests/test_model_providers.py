@@ -100,7 +100,7 @@ class TestModelProviders:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
-    async def test_model_provider_video_crafter_clement_raised_issue_duble_call_to_get_path_type(
+    async def test_model_provider_video_crafter_clement_raised_issue_double_call_to_get_path_type(
         self,
     ):
         with WorkingFolderContext():
@@ -110,6 +110,7 @@ class TestModelProviders:
                 ),
                 test_mode=False,
                 target_model_provider="videocrafter",
+                include_read_aloud_prompt=True,
             )
 
             prompt = "Unlock your radiance with AI Cosmetics."  # @param {type:"string"}
