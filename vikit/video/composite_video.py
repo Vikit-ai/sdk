@@ -33,7 +33,6 @@ from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
 from vikit.common.handler import Handler
-from vikit.common.file_tools import get_path_type
 
 
 class CompositeVideo(Video, is_composite_video):
