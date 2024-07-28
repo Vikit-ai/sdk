@@ -16,6 +16,8 @@
 from urllib.request import urlretrieve
 from loguru import logger
 
+from vikit.common.handler import Handler
+from vikit.video.building.handlers.videogen_handler import VideoGenHandler
 from vikit.video.video import Video
 from vikit.common.decorators import log_function_params
 from vikit.video.video_build_settings import VideoBuildSettings
@@ -29,7 +31,7 @@ class RawImageBasedVideo(Video):
 
     def __init__(
         self,
-        title,
+        title: str,
         raw_image_prompt: str = None,
     ):
         """
@@ -48,8 +50,10 @@ class RawImageBasedVideo(Video):
         super().__init__()
 
         self._image = raw_image_prompt
-        self._title = title
-        self._needs_reencoding = False
+        self._title = str(title)
+        self._needs_video_reencoding = (
+            False  # We usually don't need reencoding for raw text based videos
+        )
 
     # def __str__(self) -> str:
     #     return super().__str__() + os.linesep + f"text: {self._text}"
@@ -64,58 +68,21 @@ class RawImageBasedVideo(Video):
     @log_function_params
     def get_title(self):
         return self._title
-        # else:
-        #     # Add a unique identifier suffix to prevent several videos having the same title in a composite down the road
-        #     self._title = summarised_title
-        #     return self._title
 
-    @log_function_params
-    async def build(
-        self,
-        build_settings=VideoBuildSettings(),
-    ):
+    def run_build_core_logic_hook(self, build_settings: VideoBuildSettings):
+        return super().run_build_core_logic_hook(build_settings)
+
+    def get_core_handlers(self, build_settings) -> list[Handler]:
         """
-        Generate the actual inner video
+         Get the handler chain of the video. Order matters here.
+         At this stage, we should already have the enhanced prompt and title for this video
 
-        Params:
-            - build_settings: allow some customization
+        Args:
+             build_settings (VideoBuildSettings): The settings for building the video
 
-        Returns:
-            The current instance
+         Returns:
+             list: The list of handlers to use for building the video
         """
-        super().build(build_settings)
-        # super().run_build_core_logic_hook(build_settings)
-
-        if self.metadata.is_video_built:
-            return self
-
-        logger.info("Generating video, could take some time ")
-        ml_gateway = build_settings.get_ml_models_gateway()
-        video_link_from_prompt = await ml_gateway.generate_video_async(
-            self._image, model_provider=build_settings.target_model_provider
-        )  # Should give a link on the Internet
-        self.metadata.is_video_built = True
-
-        if build_settings.interpolate:
-            interpolated_video = await ml_gateway.interpolate_async(
-                video_link_from_prompt
-            )
-            self.metadata.is_interpolated = True
-            file_name = self.get_file_name_by_state(build_settings)
-            interpolated_video_path = urlretrieve(
-                interpolated_video,
-                file_name,
-            )[
-                0
-            ]  # Then we download it
-            self.media_url = interpolated_video_path
-            self.metadata.is_interpolated = True
-        else:
-            file_name = self.get_file_name_by_state(build_settings)
-            self.media_url = video_link_from_prompt
-            self.metadata.is_interpolated = False
-        self._source = type(
-            ml_gateway
-        ).__name__  # The source of the video is used later to decide if we need to reencode the video
-
-        return self
+        handlers = []
+        handlers.append(VideoGenHandler(video_gen_text_prompt=self._image))
+        return handlers

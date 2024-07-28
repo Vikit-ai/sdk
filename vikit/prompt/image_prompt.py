@@ -25,7 +25,7 @@ class ImagePrompt(Prompt):
         super().__init__()
         self._image = prompt_image
         self._text = text
-        self.duration = 4.0
+        self._duration = 3.9
 
     @property
     def image(self) -> str:
@@ -40,3 +40,10 @@ class ImagePrompt(Prompt):
         Returns the text of the prompt.
         """
         return self._text
+
+    @property
+    def duration(self) -> str:
+        """
+        Returns the text of the prompt.
+        """
+        return self._duration
