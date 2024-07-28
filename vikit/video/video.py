@@ -410,6 +410,9 @@ class Video(ABC):
         if not build_settings and not self.build_settings:
             raise ValueError("build_settings should be set")
 
+        self.metadata.title = (
+            self.get_title()
+        )  # refresh to be sure to gather latest title in case of composite video
         return str(
             VideoFileName(
                 video_type=self.short_type_name,
