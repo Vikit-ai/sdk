@@ -85,8 +85,8 @@ async def generate_single_image_based_video(
 ):
     build_settings = VideoBuildSettings(
         music_building_context=MusicBuildingContext(
-            apply_background_music=False,
-            generate_background_music=False,
+            apply_background_music=True,
+            generate_background_music=True,
         ),
         test_mode=False,
         target_model_provider="stabilityai_image",
@@ -105,6 +105,40 @@ async def generate_single_image_based_video(
     return video, build_settings
 
 
+async def batch_composed_textonly_prompting(prompt_file: str, output_path: str):
+
+    prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
+    # at least 2 prompts
+    assert len(prompt_df) > 1, "You need at least 2 prompts"
+    vid_cp_sub = CompositeVideo()
+
+    composite_build_settings = VideoBuildSettings(
+        music_building_context=MusicBuildingContext(
+            apply_background_music=True, generate_background_music=True
+        ),
+        cascade_build_settings=True,
+        interpolate=False,
+        test_mode=True,
+        target_model_provider="videocrafter",
+    )
+
+    for i in range(len(prompt_df)):
+        prompt_content = prompt_df.iloc[i]["prompt"]
+        video = RawTextBasedVideo(prompt_content)
+        vid_cp_sub.append_video(video)
+
+    await vid_cp_sub.build(build_settings=composite_build_settings)
+
+    # move video files
+    for video in vid_cp_sub.video_list:
+        path = video.media_url
+        shutil.move(path, os.path.join(output_path, path))
+    shutil.move(
+        vid_cp_sub.media_url,
+        os.path.join(output_path, "Composite_" + vid_cp_sub.media_url),
+    )
+
+
 async def batch_composed_prompting(prompt_file: str, output_path: str):
 
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
@@ -114,11 +148,11 @@ async def batch_composed_prompting(prompt_file: str, output_path: str):
 
     text_based_video_build_settings = VideoBuildSettings(
         music_building_context=MusicBuildingContext(
-            apply_background_music=False, generate_background_music=False
+            apply_background_music=True, generate_background_music=True
         ),
         interpolate=False,
         test_mode=False,
-        target_model_provider="stabilityai",
+        target_model_provider="videocrafter",
     )
 
     for i in range(0, len(prompt_df) - 1, 2):
@@ -162,7 +196,15 @@ async def batch_composed_prompting(prompt_file: str, output_path: str):
 
         vid_cp_sub.append_video(first_video).append_video(second_video)
     await vid_cp_sub.build(build_settings=VideoBuildSettings())
-    shutil.move(vid_cp_sub.media_url, "composite.mp4")
+
+    # move video files
+    for video in vid_cp_sub.video_list:
+        path = video.media_url
+        shutil.move(path, os.path.join(output_path, path))
+    shutil.move(
+        vid_cp_sub.media_url,
+        os.path.join(output_path, "Composite_" + vid_cp_sub.media_url),
+    )
 
 
 if __name__ == "__main__":
@@ -171,39 +213,54 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--prompt_file",
-        default="inputs/Drama/input.csv",
+        default="inputs/TextOnly/input.csv",
         type=str,
         help="The path to the CSV file containing prompts.",
     )
     parser.add_argument(
         "--output_path",
-        default="inputs/Drama/",
+        default="inputs/TextOnly/",
         type=str,
         help="The path to the folder to save videos.",
     )
 
     parser.add_argument(
         "--model_provider",
-        default="stabilityai",
+        default="videocrafter",
         type=str,
         help="chose the model provider: stabilityai, videocrafter, haiper, stabilityai_image",
     )
 
     # Parse the command-line arguments
     args = parser.parse_args()
-    # asyncio.run(
-    #     batch_raw_text_based_prompting(
-    #         args.prompt_file, args.output_path, args.model_provider
-    #     )
-    # )
 
-    # asyncio.run(
-    #     batch_image_based_prompting(
-    #         "inputs/image_based/input.csv", "inputs/image_based/"
+    # # Example1 - Create a composite of different types of videos
+    # with WorkingFolderContext("./examples/"):
+    #     asyncio.run(
+    #         batch_composed_prompting(
+    #             "inputs/Drama_Composite/input.csv", "inputs/Drama_Composite"
+    #         )
     #     )
-    # )
 
-    with WorkingFolderContext("./working_directory/"):
+    with WorkingFolderContext("./examples/"):
         asyncio.run(
-            batch_composed_prompting("inputs/composed/input.csv", "inputs/composed/")
+            batch_composed_textonly_prompting(
+                "inputs/TextOnly/input.csv", "inputs/TextOnly"
+            )
         )
+
+    # # Example 2 - Create batch of videos from text
+    # with WorkingFolderContext("./examples/"):
+    #     asyncio.run(
+    #         batch_raw_text_based_prompting(
+    #             args.prompt_file, args.output_path, args.model_provider
+    #         )
+    #     )
+
+    # # Example 3 - Create a batch of videos from images
+    # with WorkingFolderContext("./examples/"):
+    #     asyncio.run(
+    #         batch_image_based_prompting(
+    #             "inputs/ImageOnly/input.csv", "inputs/ImageOnly/"
+    #         )
+    #     )
