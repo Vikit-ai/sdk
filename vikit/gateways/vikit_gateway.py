@@ -96,9 +96,7 @@ class VikitGateway(MLModelsGateway):
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
                     response = await response.text()
-                    await download_file(
-                        url=response, local_path=target_file
-                    )
+                    await download_file(url=response, local_path=target_file)
             return response
 
     @log_function_params
@@ -559,6 +557,7 @@ class VikitGateway(MLModelsGateway):
             return await self.generate_video_VideoCrafter2_async(prompt)
         elif model_provider == "stabilityai_image":
             return await self.generate_video_from_image_stabilityai_async(prompt)
+
         else:
             raise ValueError(f"Unknown model provider: {model_provider}")
 
@@ -596,6 +595,10 @@ class VikitGateway(MLModelsGateway):
                 buffer = io.BytesIO()
                 output = json.loads(output)
                 logger.debug(f"Output: {output.keys()}")
+                if "error" in output.keys():
+                    err = output["error"]
+                    logger.debug(f"Error: {err}")
+
                 if "image" not in output:
                     raise ValueError(
                         f'Output does not contain image: {output["error"]}'
@@ -710,7 +713,7 @@ class VikitGateway(MLModelsGateway):
 
         # TO DO: include camera motion parameters
         output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
-        logger.debug("Generating video from image prompt ")
+        logger.debug(f"Generating video from image prompt {prompt.title} ")
         async with aiohttp.ClientSession() as session:
             logger.debug("Resizing image for video generator")
             # Convert result to Base64
