@@ -14,7 +14,6 @@
 # ==============================================================================
 
 import os
-import shutil
 import uuid as uid
 import asyncio
 
@@ -296,73 +295,14 @@ class CompositeVideo(Video, is_composite_video):
         return ratioToMultiplyAnimations
 
     async def run_post_build_actions_hook(self, build_settings: VideoBuildSettings):
-        if not build_settings.output_file_name:
+        if not build_settings.target_file_name:
             name, extension = os.path.splitext(os.path.basename(self.media_url))
             new_name = f"{name}_{uid.uuid4()}{extension}"
-            build_settings.output_file_name = os.path.join(
+            build_settings.target_file_name = os.path.join(
                 os.path.dirname(self.media_url), new_name
             )
             logger.warning(
-                f"Output file name not set, using a random name: {build_settings.output_file_name}"
-            )
-
-        if self._is_root_video_composite:
-            self.set_final_video_name(
-                target_dir_path=build_settings.output_path,
-                output_file_name=build_settings.output_file_name,
-            )
-
-    def set_final_video_name(self, target_dir_path: str, output_file_name: str):
-        """
-        Rename the video media file to the target file name if not already set
-        to the target file name.
-        Todday this function only works for local files.
-        We fail open: in case no target file name works, we just keep the video
-        as it is and where it stands. We send a warning to the logger though.
-
-        Args:
-            target_file_path (str): The target file path
-            output_file_name (str): The output file name
-
-        Returns:
-            The video with the target file name
-        """
-        # Rename the video media file to the target file name
-        if not target_dir_path or get_path_type(target_dir_path)["type"] == "local":
-            current_dir_name = os.path.dirname(self.media_url)
-            current_file_name = os.path.basename(self.media_url)
-            if (
-                current_dir_name != target_dir_path
-                or current_file_name != output_file_name
-            ):
-                new_file_path = (
-                    output_file_name
-                    if not target_dir_path
-                    else os.path.join(target_dir_path, output_file_name)
-                )
-                logger.debug(
-                    f"Copying video media file from {self.media_url} to {new_file_path}"
-                )
-                if target_dir_path:
-                    assert os.path.exists(
-                        target_dir_path
-                    ), f"File {target_dir_path} does not exist"
-                assert os.path.exists(
-                    self.media_url
-                ), f"File {self.media_url} does not exist"
-                try:
-                    shutil.copyfile(
-                        self.media_url,
-                        new_file_path,
-                    )
-                    self.media_url = new_file_path
-                except Exception as e:
-                    logger.warning(
-                        f"Could not rename the video media file to the target file name: {e}"
-                    )
-        else:
-            raise ValueError(
-                f"Target dir path is not local: {target_dir_path}. Cannot rename to target file name yet"
+                f"Output file name not set, using a random name: {build_settings.target_file_name}"
             )
 
     def generate_background_music_prompt(self):

@@ -30,7 +30,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         interpolate: bool = False,
         music_building_context: MusicBuildingContext = MusicBuildingContext(),
         cascade_build_settings: bool = False,
-        target_path: str = None,
+        target_dir_path: str = None,
         output_video_file_name: str = None,
     ):
         """
@@ -57,8 +57,8 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         super().__init__(
             delete_interim_files=delete_interim_files,
             test_mode=test_mode,
-            output_path=target_path,
-            output_file_name=output_video_file_name,
+            target_dir_path=target_dir_path,
+            target_file_name=output_video_file_name,
         )
 
         self.expected_length = expected_length

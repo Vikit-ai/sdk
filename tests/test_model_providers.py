@@ -52,7 +52,7 @@ class TestModelProviders:
                     target_model_provider = (None,)
 
                 video = RawTextBasedVideo(subtitle.text)
-                await video.prepare_build_hook(
+                await video.prepare_build(
                     build_settings=VideoBuildSettings(
                         test_mode=False,
                         music_building_context=MusicBuildingContext(),

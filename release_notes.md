@@ -23,7 +23,7 @@ Keep tuned for new integrations to come on the Video genration and music generat
 
 Some other features you might want to expriment: 
 
-- Prepare a video ( prepare_build_hook) with specific build settings, which means chosing your video generation provider, music, prompt, etc...all that can be applied with VideoBuildSettings object
+- Prepare a video ( prepare_build) with specific build settings, which means chosing your video generation provider, music, prompt, etc...all that can be applied with VideoBuildSettings object
 
 - Also, the video generation process is streamlined trough two ways:
 

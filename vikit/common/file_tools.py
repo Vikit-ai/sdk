@@ -39,7 +39,7 @@ def get_canonical_name(file_path: str):
     return os.path.splitext(os.path.basename(file_path))[0]
 
 
-def get_max_filename_length(path="."):
+def get_max_path_length(path="."):
     """
     get the max file name for the current OS
 
@@ -122,7 +122,7 @@ def is_valid_filename(filename: str) -> bool:
         return False
 
     # Check the length of the filename
-    if len(filename) > get_max_filename_length():
+    if len(filename) > get_max_path_length():
         return False
 
     return True
@@ -175,7 +175,9 @@ def is_valid_path(path: Optional[Union[str, os.PathLike]]) -> bool:
     Returns:
         bool: True if the path is valid, False otherwise
     """
-    path = get_path_type(path)
+    path, error = get_path_type(path)
+    if error:
+        return False
     if path["type"] == "error" or path["type"] == "none":
         return False
     return True
@@ -199,7 +201,7 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
     if path is None:
         return {"type": "none", "path": path}, "The path is None"
 
-    if len(path) > get_max_filename_length():
+    if len(path) > get_max_path_length():
         return {
             "type": "error",
             "path": "",
@@ -210,14 +212,11 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
     if parsed_uri.scheme in ["http", "https", "s3", "gs"]:
         return {"type": parsed_uri.scheme, "path": path}, None
 
-    if os.path.isdir(path) or is_valid_filename(filename=os.path.basename(path)):
-        if path.startswith("file://"):
-            logger.debug(f"Path is a local url format: {path}")
-            return {"type": "local_url_format", "path": path}, None
-        else:
-            if os.path.exists(path):
-                logger.debug(f"Path is a PathLike object: {path}")
-                return {"type": "local", "path": path}, None
+    if path.startswith("file://"):
+        logger.debug(f"Path is a local url format: {path}")
+        return {"type": "local_url_format", "path": path}, None
+    if os.path.isdir(path) or os.path.isfile(path):
+        return {"type": "local", "path": path}, None
 
     # by default, consider it as a local path
     return result

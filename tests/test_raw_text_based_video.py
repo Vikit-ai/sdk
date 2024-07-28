@@ -13,6 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
+import os
 import warnings
 
 import pytest
@@ -45,3 +46,52 @@ class TestRawTextBasedVideo:
             built = await video.build(build_settings=VideoBuildSettings())
 
             assert built.media_url is not None
+
+    @pytest.mark.local_integration
+    @pytest.mark.asyncio
+    async def test_output_video_file_name(
+        self,
+    ):
+        with WorkingFolderContext():
+            video = RawTextBasedVideo("This is a prompt text")
+            built = await video.build(
+                build_settings=VideoBuildSettings(output_video_file_name="my_video.mp4")
+            )
+
+            assert built.media_url is not None
+            assert os.path.exists(
+                "my_video.mp4"
+            ), f"File not found: my_video.mp4, {os.listdir()}"
+
+    @pytest.mark.local_integration
+    @pytest.mark.asyncio
+    async def test_target_path(
+        self,
+    ):
+        with WorkingFolderContext():
+            video = RawTextBasedVideo("This is a prompt text")
+            target_path = os.makedirs("testdir")
+            built = await video.build(
+                build_settings=VideoBuildSettings(target_dir_path="testdir")
+            )
+
+            assert built.media_url is not None
+            assert os.path.isdir("testdir"), f"Directory not found: {target_path}"
+
+    @pytest.mark.local_integration
+    @pytest.mark.asyncio
+    async def test_target_path_and_output_file_name(
+        self,
+    ):
+        with WorkingFolderContext():
+            video = RawTextBasedVideo("This is a prompt text")
+            target_path = os.makedirs("testdir2")
+            built = await video.build(
+                build_settings=VideoBuildSettings(
+                    target_dir_path="testdir2",
+                    output_video_file_name="my_othervideo.mp4",
+                )
+            )
+
+            assert built.media_url is not None
+            assert os.path.isdir("testdir2"), f"Directory not found: {target_path}"

@@ -15,6 +15,7 @@
 
 from abc import abstractmethod, ABC
 import os
+import shutil
 import uuid as uid
 import random
 
@@ -29,7 +30,12 @@ from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_metadata import VideoMetadata
 from vikit.common.handler import Handler
 from vikit.video.video_file_name import VideoFileName
-from vikit.common.file_tools import is_valid_path, get_path_type, download_file
+from vikit.common.file_tools import (
+    is_valid_path,
+    get_path_type,
+    download_file,
+    is_valid_filename,
+)
 from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
 
 
@@ -183,14 +189,14 @@ class Video(ABC):
         self.duration = float(get_media_duration(self.media_url))
         return self._duration
 
-    def _set_working_folder_path(self, working_folder_path: str):
+    def _set_working_folder_dir(self, working_folder_path: str):
         if working_folder_path:
             if is_valid_path(working_folder_path):
                 os.chdir(working_folder_path)
                 return True
             else:
                 logger.warning(
-                    f"Video target file name is None or invalid, using the current video generation path: {os.getcwd()}"
+                    f"Video target dir path name is None or invalid, using the current video generation path: {os.getcwd()}"
                 )
                 return False
 
@@ -237,8 +243,8 @@ class Video(ABC):
             f"Starting the pre build hook for Video {self.id}, current_dir {current_dir} "
         )
 
-        wfolder_changed = self._set_working_folder_path(build_settings.output_path)
-        logger.trace(f"Working folder changed: {wfolder_changed}")
+        wfolder_changed = self._set_working_folder_dir(build_settings.output_path)
+        logger.trace(f"Working folder has changed? : {wfolder_changed}")
 
         logger.trace(
             f"Starting the pre build hook for Video {self.id} of type {self.short_type_name} / {type(self)}"
@@ -253,7 +259,7 @@ class Video(ABC):
                 # so that we infer source from the different handlers (initial video generator, interpolation, etc)
             ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
 
-            await self.prepare_build_hook(build_settings=build_settings)
+            await self.prepare_build(build_settings=build_settings)
             self.are_build_settings_prepared = True
 
         logger.info(f"Starting the building of Video {self.id} ")
@@ -265,8 +271,14 @@ class Video(ABC):
 
         logger.debug(f"Starting the post build hook for Video {self.id} ")
         await self.run_post_build_actions_hook(build_settings=build_settings)
+
+        if self.build_settings.target_file_name:
+            self.set_final_video_name(
+                output_file_name=build_settings.target_file_name,
+            )
+
         if wfolder_changed:
-            self._set_working_folder_path(
+            self._set_working_folder_dir(
                 current_dir
             )  # go back to the original working folder
 
@@ -330,7 +342,7 @@ class Video(ABC):
         Post build actions hook
         """
 
-    async def prepare_build_hook(self, build_settings: VideoBuildSettings) -> "Video":
+    async def prepare_build(self, build_settings: VideoBuildSettings) -> "Video":
         """
         Prepare the video for building, may be used to inject build settings for individual videos
         that we don't want to share with global buildsettings. For instance to generate a video
@@ -349,6 +361,44 @@ class Video(ABC):
         self.are_build_settings_prepared = True
 
         return self
+
+    def set_final_video_name(self, output_file_name: str):
+        """
+        Rename the video media file to the output_file_name if not already set
+        as the current media file.
+
+        Todday this function only works for local files.
+
+        We fail open: in case no target file name works, we just keep the video
+        as it is and where it stands. We send a warning to the logger though.
+
+        Args:
+            output_file_name (str): The output file name
+
+        Returns:
+            The video with the target file name
+        """
+        current_file_name = os.path.basename(self.media_url)
+        # We should already be positionned in the right target folder
+        if current_file_name != output_file_name:
+            new_file_path = output_file_name
+            logger.debug(
+                f"Copying video media file from {self.media_url} to {new_file_path}"
+            )
+            if not is_valid_filename(output_file_name):
+                raise ValueError(
+                    f"Invalid output file name: {output_file_name}, cannot rename the video media file"
+                )
+            try:
+                shutil.copyfile(
+                    self.media_url,
+                    new_file_path,
+                )
+                self.media_url = new_file_path
+            except Exception as e:
+                logger.warning(
+                    f"Could not copy the video media file to the target file name: {e}"
+                )
 
     def get_file_name_by_state(self, build_settings: VideoBuildSettings = None):
         """

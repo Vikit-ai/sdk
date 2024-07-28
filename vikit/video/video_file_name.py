@@ -19,7 +19,7 @@ import os
 
 from loguru import logger
 
-from vikit.common.file_tools import get_max_filename_length
+from vikit.common.file_tools import get_max_path_length
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_metadata import VideoMetadata
 
@@ -272,7 +272,7 @@ class VideoFileName:
         if target_path is None:
             target_path = os.getcwd()
 
-        if self.length + len(target_path) >= get_max_filename_length():
+        if self.length + len(target_path) >= get_max_path_length():
             logger.warning(
                 f"The file name is too long, it will be truncated to fit the file system's limits. Target path {target_path}",
             )
@@ -283,7 +283,7 @@ class VideoFileName:
             )
             logger.debug(f"target path: {target_path}, file name: {self.file_name}")
 
-            gap = get_max_filename_length() - len(self.file_name) - len(target_path)
+            gap = get_max_path_length() - len(self.file_name) - len(target_path)
             if (
                 abs(gap) > 25 + 10 + 10 + 6
             ):  # 25 is the length of the title we can lose,

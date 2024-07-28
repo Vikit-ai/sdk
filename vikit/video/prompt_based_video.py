@@ -73,7 +73,7 @@ class PromptBasedVideo(CompositeVideo):
 
         return self.metadata.title
 
-    async def prepare_build_hook(self, build_settings=VideoBuildSettings()):
+    async def prepare_build(self, build_settings=VideoBuildSettings()):
         """
         Generate the actual inner video
 
@@ -83,6 +83,7 @@ class PromptBasedVideo(CompositeVideo):
         Returns:
             The current instance
         """
+        super().prepare_build(build_settings=build_settings)
         return await self.compose(build_settings=build_settings)
 
     async def compose(self, build_settings: VideoBuildSettings):
@@ -117,8 +118,6 @@ class PromptBasedVideo(CompositeVideo):
             )  # Building a set of 2 videos around the same text + a transition
 
             self.append_video(vid_cp_sub)  # Adding the comnposite to the overall video
-
-        self.are_build_settings_prepared = True
 
         return self
 
@@ -158,7 +157,7 @@ class PromptBasedVideo(CompositeVideo):
             )
         )
 
-        keyword_based_vid = await RawTextBasedVideo(sub.text).prepare_build_hook(
+        keyword_based_vid = await RawTextBasedVideo(sub.text).prepare_build(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_keywords,
                 test_mode=build_stgs.test_mode,
@@ -176,7 +175,7 @@ class PromptBasedVideo(CompositeVideo):
                 ),
             )
         )
-        prompt_based_vid = await RawTextBasedVideo(sub.text).prepare_build_hook(
+        prompt_based_vid = await RawTextBasedVideo(sub.text).prepare_build(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_prompt_text,
                 test_mode=build_stgs.test_mode,
