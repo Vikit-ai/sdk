@@ -70,4 +70,4 @@ def get_discord_api_key():
 
 def has_eleven_labs_api_key():
     eleven_labs_api_key = getenv("ELEVEN_LABS_KEY", "dev")
-    return eleven_labs_api_key is not "dev"
+    return eleven_labs_api_key != "dev"
