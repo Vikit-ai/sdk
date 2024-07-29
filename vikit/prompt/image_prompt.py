@@ -42,7 +42,7 @@ class ImagePrompt(Prompt):
         return self._text
 
     @property
-    def duration(self) -> str:
+    def duration(self) -> float:
         """
         Returns the text of the prompt.
         """
