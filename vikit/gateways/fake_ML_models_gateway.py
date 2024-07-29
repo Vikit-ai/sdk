@@ -155,7 +155,7 @@ class FakeMLModelsGateway(MLModelsGateway):
 
         test_file = tests_medias.get_cat_video_path()
         logger.debug(
-            f"Generating video from prompt: {prompt}, return a link: {test_file}"
+            f"Generating video from prompt: {prompt[:5]}, return a link: {test_file}"
         )
         return test_file
 

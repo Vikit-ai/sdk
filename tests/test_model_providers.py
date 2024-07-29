@@ -100,6 +100,9 @@ class TestModelProviders:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
+    # @pytest.mark.skip(
+    #     reason="This test zas used to fix a regression and has been successfully resolved"
+    # )
     async def test_model_provider_video_crafter_clement_raised_issue_double_call_to_get_path_type(
         self,
     ):
