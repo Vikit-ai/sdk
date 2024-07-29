@@ -85,7 +85,7 @@ class VideoBuildingPipeline:
                         bg_music_text_prompt = self.generate_background_music_prompt()
                 if not bg_music_text_prompt or bg_music_text_prompt == "":
                     logger.warning(
-                        "No textt prompt coud be used or infered for background music generation, skipping background music generation"
+                        "No text prompt could be used or infered for background music generation, skipping background music generation"
                     )
                 else:
                     logger.debug(
