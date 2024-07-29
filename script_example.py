@@ -199,10 +199,10 @@ async def composite_imageonly_prompting(prompt_file: str):
         prompt_content = prompt_df.iloc[i]["prompt"]
         video, _ = await generate_single_image_based_video(
             prompt_content=prompt_content,
-            text="A cool music for picnic",
             build_settings=single_video_buildsettings,
         )
         vid_cp_sub.append_video(video)
+
     total_duration = get_estimated_duration(vid_cp_sub)
     composite_build_settings = VideoBuildSettings(
         music_building_context=MusicBuildingContext(
@@ -212,7 +212,6 @@ async def composite_imageonly_prompting(prompt_file: str):
         ),
         test_mode=TEST_MODE,
         target_model_provider="stabilityai_image",
-        cascade_build_settings=True,
         output_video_file_name="Composit.mp4",
         expected_length=total_duration,
     )
