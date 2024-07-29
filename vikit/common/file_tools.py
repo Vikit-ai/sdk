@@ -26,6 +26,10 @@ from typing import Union, Optional
 from loguru import logger
 from urllib.request import urlopen
 from urllib.error import URLError
+from tenacity import retry, before_log, after_log, stop_after_attempt, wait_exponential
+
+from vikit.common.config import get_nb_retries_http_calls
+
 
 from vikit.common.decorators import log_function_params
 
@@ -223,7 +227,7 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
     # by default, consider it as a local path
     return result
 
-
+@retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
 async def download_or_copy_file(url, local_path):
     """
     Download a file from a URL to a local file asynchronously
@@ -256,6 +260,8 @@ async def download_or_copy_file(url, local_path):
                                     break
                                 await f.write(chunk)
                         return local_path
+                    else:
+                        raise FileNotFoundError(f"The URL did not work with response: {response}")
         elif path_desc["type"] == "local":
             logger.debug(f"Copying file from {url} to {local_path}")
             shutil.copyfile(url, local_path)
