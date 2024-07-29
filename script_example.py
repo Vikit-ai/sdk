@@ -14,6 +14,7 @@
 # ==============================================================================
 
 import os
+from vikit.common.decorators import log_function_params
 from vikit.video.transition import Transition
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.seine_transition import SeineTransition
@@ -56,6 +57,7 @@ async def batch_raw_text_based_prompting(
         await video.build(build_settings=video_build_settings)
 
 
+@log_function_params
 def get_estimated_duration(composite: CompositeVideo):
     """Get an estimation of a composite video's duration, based on the type of the sub-videos"""
     duration_dict = {
@@ -63,16 +65,22 @@ def get_estimated_duration(composite: CompositeVideo):
         "vikit": 3.9,
         "stabilityai": 3.9,
         "stabilityai_image": 3.9,
-        "seine": 4.0,
         "videocrafter": 2.0,
         "haiper": 3.9,
     }
     duration = 0
     for video in composite.video_list:
-        if isinstance(video, Transition):
-            duration += 2.0
+        if video.build_settings.interpolate:
+            interpolation_factor = 2.0
         else:
-            duration += duration_dict[video.build_settings.target_model_provider]
+            interpolation_factor = 1.0
+        if isinstance(video, Transition):
+            duration += 2.0 * interpolation_factor
+        else:
+            duration += (
+                duration_dict[video.build_settings.target_model_provider]
+                * interpolation_factor
+            )
     return duration
 
 
@@ -214,7 +222,7 @@ async def composite_imageonly_prompting(prompt_file: str):
         music_building_context=MusicBuildingContext(
             apply_background_music=True,
             generate_background_music=True,
-            expected_music_length=total_duration,
+            expected_music_length=total_duration + 1,
         ),
         test_mode=TEST_MODE,
         target_model_provider="stabilityai_image",
