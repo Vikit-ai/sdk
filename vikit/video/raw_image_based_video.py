@@ -31,7 +31,7 @@ class RawImageBasedVideo(Video):
 
     def __init__(
         self,
-        title: str,
+        title: str = "Image Prompt",
         raw_image_prompt: str = None,
     ):
         """
@@ -50,13 +50,9 @@ class RawImageBasedVideo(Video):
         super().__init__()
 
         self._image = raw_image_prompt
-        self._title = str(title)
-        self._needs_video_reencoding = (
-            False  # We usually don't need reencoding for raw text based videos
-        )
-
-    # def __str__(self) -> str:
-    #     return super().__str__() + os.linesep + f"text: {self._text}"
+        self._needs_reencoding = False
+        self._title = title
+        self.duration = 4.0
 
     @property
     def short_type_name(self):
@@ -68,6 +64,9 @@ class RawImageBasedVideo(Video):
     @log_function_params
     def get_title(self):
         return self._title
+
+    def get_duration(self):
+        return self.duration
 
     def run_build_core_logic_hook(self, build_settings: VideoBuildSettings):
         return super().run_build_core_logic_hook(build_settings)

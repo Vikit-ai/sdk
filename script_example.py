@@ -127,7 +127,7 @@ async def generate_single_image_based_video(
     output_filename: str = None,
     text: str = None,
 ):
-    """text would be basically used for music generation, if applicable"""
+    """text: would be basically used for music generation, if applicable"""
     if build_settings is None:
         build_settings = VideoBuildSettings(
             test_mode=test_mode,
@@ -180,6 +180,48 @@ async def batch_image_based_prompting(prompt_file: str):
         print(f"video saved on {output_file}")
 
 
+async def composite_imageonly_prompting(prompt_file: str):
+
+    TEST_MODE = False
+    prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
+    # at least 2 prompts
+    assert len(prompt_df) > 1, "You need at least 2 prompts"
+
+    single_video_buildsettings = VideoBuildSettings(
+        interpolate=False,
+        test_mode=TEST_MODE,
+        target_model_provider="stabilityai_image",
+    )
+
+    vid_cp_sub = CompositeVideo()
+
+    for i in range(len(prompt_df)):
+        prompt_content = prompt_df.iloc[i]["prompt"]
+        video, _ = await generate_single_image_based_video(
+            prompt_content=prompt_content,
+            text="A cool music for picnic",
+            build_settings=single_video_buildsettings,
+        )
+        vid_cp_sub.append_video(video)
+    total_duration = get_estimated_duration(vid_cp_sub)
+    composite_build_settings = VideoBuildSettings(
+        music_building_context=MusicBuildingContext(
+            apply_background_music=True,
+            generate_background_music=True,
+            expected_music_length=total_duration,
+        ),
+        test_mode=TEST_MODE,
+        target_model_provider="stabilityai_image",
+        cascade_build_settings=True,
+        output_video_file_name="Composit.mp4",
+        expected_length=total_duration,
+    )
+    composite_build_settings.prompt = await PromptFactory().create_prompt_from_text(
+        "A happy picnic music!"
+    )
+    await vid_cp_sub.build(build_settings=composite_build_settings)
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -217,11 +259,20 @@ if __name__ == "__main__":
     #     logger.add("log.txt")
     #     asyncio.run(batch_raw_text_based_prompting("./input.csv"))
 
-    # Example 3 - Create a batch of videos from images
+    # # Example 3 - Create a batch of videos from images
+    # with WorkingFolderContext("./examples/inputs/ImageOnly/"):
+    #     logger.add("log.txt")
+    #     asyncio.run(
+    #         batch_image_based_prompting(
+    #             "input.csv",
+    #         )
+    #     )
+
+    # Example 4 - Create a batch of videos from images
     with WorkingFolderContext("./examples/inputs/ImageOnly/"):
         logger.add("log.txt")
         asyncio.run(
-            batch_image_based_prompting(
+            composite_imageonly_prompting(
                 "input.csv",
             )
         )
