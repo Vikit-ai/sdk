@@ -63,7 +63,7 @@ def get_estimated_duration(composite: CompositeVideo):
         "vikit": 3.9,
         "stabilityai": 3.9,
         "stabilityai_image": 3.9,
-        "seine": 2.0,
+        "seine": 4.0,
         "videocrafter": 2.0,
         "haiper": 3.9,
     }
@@ -201,6 +201,12 @@ async def composite_imageonly_prompting(prompt_file: str):
             prompt_content=prompt_content,
             build_settings=single_video_buildsettings,
         )
+        if i >= 1:
+            transition_video = SeineTransition(
+                source_video=vid_cp_sub.video_list[i - 1],
+                target_video=video,
+            )
+            vid_cp_sub.append_video(transition_video)
         vid_cp_sub.append_video(video)
 
     total_duration = get_estimated_duration(vid_cp_sub)
