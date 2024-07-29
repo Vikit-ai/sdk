@@ -31,6 +31,7 @@ from vikit.common.secrets import get_replicate_api_token, get_vikit_api_token
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
 from vikit.common.config import get_nb_retries_http_calls
 from vikit.common.secrets import has_eleven_labs_api_key
+from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
 
 import io
 from PIL import Image
@@ -87,16 +88,19 @@ class VikitGateway(MLModelsGateway):
                 payload = (
                     {
                         "key": vikit_api_key,
-                        "model": "adirik/styletts2:989cb5ea6d2401314eb30685740cb9f6fd1c9001b8940659b406f952837ab5ac",
+                        "model": "lucataco/xtts-v2:684bc3855b37866c0c65add2ff39c78f3dea3f4ff103a436465326e0f438d55e",
                         "input": {
                             "text": prompt_text,
-                            "embedding_scale": 1.5,
+                            "speaker": "https://replicate.delivery/pbxt/Jt79w0xsT64R1JsiJ0LQRL8UcWspg5J4RFrU6YwEKpOT1ukS/male.wav",
+                            "language": "en",
+                            "cleanup_voice": False
                         },
                     },
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
                     response = await response.text()
-                    await download_or_copy_file(url=response, local_path=target_file)
+                    await download_or_copy_file(url=response, local_path="temp.wav")
+            await convert_as_mp3_file("temp.wav", target_file)
             return response
 
     @log_function_params
