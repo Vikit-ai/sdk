@@ -25,7 +25,6 @@ from loguru import logger  # type: ignore
 from base64 import b64decode
 import pandas as pd  # type: ignore
 import argparse
-import shutil
 import asyncio
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.raw_image_based_video import RawImageBasedVideo
@@ -37,8 +36,7 @@ from vikit.music_building_context import MusicBuildingContext
 async def batch_raw_text_based_prompting(
     prompt_file: str, model_provider: str = "videocrafter"
 ):
-    to_interpolate = False
-    # True if model_provider == "videocrafter" else False
+    to_interpolate = True if model_provider == "videocrafter" else False
 
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
     for _, row in prompt_df.iterrows():
@@ -102,21 +100,84 @@ async def composite_textonly_prompting(prompt_file: str):
             vid_cp_sub.append_video(transition_video)
         vid_cp_sub.append_video(video)
 
+    total_duration = get_estimated_duration(vid_cp_sub)
     composite_build_settings = VideoBuildSettings(
         music_building_context=MusicBuildingContext(
-            apply_background_music=True, generate_background_music=True
+            apply_background_music=True,
+            generate_background_music=True,
+            expected_music_length=total_duration,
         ),
         interpolate=False,
         test_mode=False,
         target_model_provider="videocrafter",
         output_video_file_name="Composit.mp4",
-        expected_length=get_estimated_duration(vid_cp_sub),
+        expected_length=total_duration,
     )
     # set up music prompt
     composite_build_settings.prompt = await PromptFactory().create_prompt_from_text(
         " A cool music"
     )
     await vid_cp_sub.build(build_settings=composite_build_settings)
+
+
+async def generate_single_image_based_video(
+    prompt_content,
+    build_settings=None,
+    test_mode=True,
+    output_filename: str = None,
+    text: str = None,
+):
+    """text would be basically used for music generation, if applicable"""
+    if build_settings is None:
+        build_settings = VideoBuildSettings(
+            test_mode=test_mode,
+            target_model_provider="stabilityai_image",
+            output_video_file_name=output_filename,
+        )
+    image_prompt = PromptFactory(
+        ml_gateway=build_settings.get_ml_models_gateway()
+    ).create_prompt_from_image(image_path=prompt_content, text=text)
+
+    video = RawImageBasedVideo(
+        raw_image_prompt=image_prompt._image,
+    )
+    video.build_settings = build_settings
+    build_settings.prompt = image_prompt
+    return video, build_settings
+
+
+async def batch_image_based_prompting(prompt_file: str):
+
+    prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
+    for _, row in prompt_df.iterrows():
+        prompt_path = row.iloc[1]
+        output_file = f"{row.iloc[0]}.mp4"
+
+        build_settings = VideoBuildSettings(
+            music_building_context=MusicBuildingContext(
+                apply_background_music=True,
+                generate_background_music=True,
+                expected_music_length=4,
+            ),
+            test_mode=False,
+            interpolate=False,
+            target_model_provider="stabilityai_image",
+            output_video_file_name=output_file,
+            expected_length=4,
+        )
+
+        video, _ = await generate_single_image_based_video(
+            prompt_content=prompt_path,
+            text="A cool music for picnic",
+            build_settings=build_settings,
+        )
+        await video.build(build_settings=build_settings)
+
+        assert video.media_url, "media URL was not updated"
+        assert os.path.exists(
+            video.media_url
+        ), f"The generated video {video.media_url} does not exist"
+        print(f"video saved on {output_file}")
 
 
 if __name__ == "__main__":
@@ -146,12 +207,21 @@ if __name__ == "__main__":
     # Parse the command-line arguments
     args = parser.parse_args()
 
-    # Example 1- Create a composite of text-based videos:
-    with WorkingFolderContext("./examples/inputs/TextOnly"):
-        logger.add("log.txt")
-        asyncio.run(composite_textonly_prompting("./input.csv"))
+    # # Example 1- Create a composite of text-based videos:
+    # with WorkingFolderContext("./examples/inputs/TextOnly"):
+    #     logger.add("log.txt")
+    #     asyncio.run(composite_textonly_prompting("./input.csv"))
 
     # # Example 2- Create a batch of text-based videos:
     # with WorkingFolderContext("./examples/inputs/TextOnly"):
     #     logger.add("log.txt")
     #     asyncio.run(batch_raw_text_based_prompting("./input.csv"))
+
+    # Example 3 - Create a batch of videos from images
+    with WorkingFolderContext("./examples/inputs/ImageOnly/"):
+        logger.add("log.txt")
+        asyncio.run(
+            batch_image_based_prompting(
+                "input.csv",
+            )
+        )
