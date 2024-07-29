@@ -31,6 +31,7 @@ from vikit.common.secrets import get_replicate_api_token, get_vikit_api_token
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
 from vikit.common.config import get_nb_retries_http_calls
 from vikit.common.secrets import has_eleven_labs_api_key
+from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
 
 import io
 from PIL import Image
@@ -98,7 +99,8 @@ class VikitGateway(MLModelsGateway):
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
                     response = await response.text()
-                    await download_or_copy_file(url=response, local_path=target_file)
+                    await download_or_copy_file(url=response, local_path="temp.wav")
+            await convert_as_mp3_file("temp.wav", target_file)
             return response
 
     @log_function_params
