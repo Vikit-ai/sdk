@@ -95,7 +95,7 @@ class VikitGateway(MLModelsGateway):
                             "text": prompt_text,
                             "speaker": "https://replicate.delivery/pbxt/Jt79w0xsT64R1JsiJ0LQRL8UcWspg5J4RFrU6YwEKpOT1ukS/male.wav",
                             "language": "en",
-                            "cleanup_voice": False
+                            "cleanup_voice": False,
                         },
                     },
                 )
@@ -121,12 +121,12 @@ class VikitGateway(MLModelsGateway):
         Returns:
             - str: the path to the generated music
         """
-
+        logger.debug(f"Calling get_music_generation_keywords_async by {prompt}")
         outputLLM = await self.get_music_generation_keywords_async(prompt)
         logger.debug(f"outputLLM: {outputLLM}")
 
         # get the last word which corresponds to proposed prompt title
-        prompt_based_music_file_name = str(outputLLM.split()[-1:][0]) + ".mp3"
+        prompt_based_music_file_name = str(outputLLM.split()[-1:][0])[:25] + ".mp3"
         logger.debug(f"prompt_based_music_file_name: {prompt_based_music_file_name}")
         title_length = len(prompt_based_music_file_name)  # remove the .mp3 extension
 
@@ -573,6 +573,7 @@ class VikitGateway(MLModelsGateway):
             return await self.generate_video_VideoCrafter2_async(prompt)
         elif model_provider == "stabilityai_image":
             return await self.generate_video_from_image_stabilityai_async(prompt)
+
         else:
             raise ValueError(f"Unknown model provider: {model_provider}")
 
@@ -588,7 +589,7 @@ class VikitGateway(MLModelsGateway):
                 The link to the generated video
         """
         output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
-        logger.debug(f"Generating image from prompt: {prompt}")
+        logger.debug(f"Generating image from prompt: {prompt[:50]}")
         async with aiohttp.ClientSession() as session:
             payload = (
                 {
@@ -609,6 +610,11 @@ class VikitGateway(MLModelsGateway):
                 # Convert result to Base64
                 buffer = io.BytesIO()
                 output = json.loads(output)
+                logger.debug(f"Output: {output.keys()}")
+                if "error" in output.keys():
+                    err = output["error"]
+                    logger.debug(f"Error: {err}")
+
                 if "image" not in output:
                     raise ValueError(
                         f'Output does not contain image: {output["error"]}'
@@ -725,7 +731,7 @@ class VikitGateway(MLModelsGateway):
 
         # TO DO: include camera motion parameters
         output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
-        logger.debug("Generating video from image prompt ")
+        logger.debug(f"Generating video from image prompt {prompt.title} ")
         async with aiohttp.ClientSession() as session:
             logger.debug("Resizing image for video generator")
             # Convert result to Base64

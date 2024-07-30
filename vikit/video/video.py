@@ -232,7 +232,7 @@ class Video(ABC):
     ):
         """
         Build the video in the child classes, unless the video is already built, in  which case
-        we just return ourseleves (Video gets immutable once generated)
+        we just return ourselves (Video gets immutable once generated)
 
         This is a template method, the child classes should implement the get_handler_chain method
 

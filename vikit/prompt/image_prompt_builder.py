@@ -13,8 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-import numpy as np
-
 from vikit.common.decorators import log_function_params
 from vikit.prompt.image_prompt import ImagePrompt
 
@@ -31,10 +29,12 @@ class ImagePromptBuilder:
         self.prompt = ImagePrompt()
 
     @log_function_params
-    def set_prompt_image(self, image: np.ndarray):
+    def set_prompt_image(self, image: str, text: str):
         if image is None:
             raise ValueError("The image prompt is not provided")
         self.prompt._image = image
+        self.prompt._text = text
+
         return self
 
     def build(self):

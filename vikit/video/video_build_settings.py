@@ -27,7 +27,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         expected_length: float = None,
         include_read_aloud_prompt: bool = False,
         prompt: Prompt = None,
-        generate_from_image_prompt: bool = True,
         interpolate: bool = False,
         music_building_context: MusicBuildingContext = MusicBuildingContext(),
         cascade_build_settings: bool = False,
@@ -65,7 +64,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.expected_length = expected_length
         self.include_read_aloud_prompt = include_read_aloud_prompt
         self.prompt = prompt
-        self.generate_from_image_prompt = generate_from_image_prompt
         self.music_building_context = music_building_context
         self.interpolate = interpolate
         self.target_model_provider = target_model_provider

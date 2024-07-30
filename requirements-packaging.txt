@@ -1,9 +1,0 @@
-replicate==0.24.0
-pysrt==1.1.2
-loguru==0.7.2
-python-dotenv==1.0.1
-tenacity==8.2.3
-pytest==8.1.1
-pytest-xdist==3.6.1
-Sphinx==7.3.7
-sphinx-autoapi==3.1.2

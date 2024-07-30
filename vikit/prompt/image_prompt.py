@@ -13,7 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-import numpy as np
 from vikit.prompt.prompt import Prompt
 
 
@@ -22,11 +21,11 @@ class ImagePrompt(Prompt):
     A class to represent an image prompt
     """
 
-    def __init__(self, prompt_image: np.ndarray = None):
+    def __init__(self, prompt_image: str = None, text: str = None):
         super().__init__()
-        # for the moment, it stays pure image prompt,
-        # To Do: image + text prompting
         self._image = prompt_image
+        self._text = text
+        self._duration = 3.9
 
     @property
     def image(self) -> str:
@@ -34,3 +33,17 @@ class ImagePrompt(Prompt):
         Returns the image of the prompt.
         """
         return self._image
+
+    @property
+    def text(self) -> str:
+        """
+        Returns the text of the prompt.
+        """
+        return self._text
+
+    @property
+    def duration(self) -> float:
+        """
+        Returns the text of the prompt.
+        """
+        return self._duration
