@@ -85,6 +85,7 @@ class VideoFileName:
         self.unique_id = random.getrandbits(16)
         self._video_temp_id = str(video_metadata.temp_id)
         self._file_extension = file_extension
+        self._file_name = None
 
         self._video_features = None
         if not video_features:
@@ -198,11 +199,15 @@ class VideoFileName:
         """
         Get the file name of the video,  as a string
         """
+        if self._file_name:
+            return self._file_name
+
         # file_name = f"{self.title}oOo{str(self.video_type)}oOo{self.video_features}oOo{self.build_id}oOo{self._build_date}oOoUIDoOo{self._video_temp_id}.{self._file_extension}"
         file_name = f"{self.title}oOo{str(self.video_type)}oOo{self.video_features}oOo{self.build_id}oOo{self._build_date}oOoUIDoOo{self.unique_id}.{self._file_extension}"
         file_name = file_name.replace("oOo", split_separator)
         logger.debug(f"file name by state to be returned: {file_name} ")
-        return file_name
+        self._file_name = file_name
+        return self._file_name
 
     def __str__(self):
         return self._fit(target_path=self._build_settings.output_path)

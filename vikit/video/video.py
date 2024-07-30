@@ -428,9 +428,6 @@ class Video(ABC):
                 ),
             )
         )
-        logger.debug(
-            f"Video file name inferred: {infered_name}, current media URL: {self.media_url}"
-        )
         return infered_name
 
     def generate_background_music_prompt(self):

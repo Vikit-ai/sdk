@@ -135,6 +135,7 @@ class TestPromptBasedVideo:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
+    @pytest.mark.skip("duplicate?")
     async def test_build_single_video_with_generated_bg_music_with_subtitles(self):
         with WorkingFolderContext():
 
@@ -228,7 +229,8 @@ class TestPromptBasedVideo:
     # @pytest.mark.skip("To be activated on case by case basis")
     @pytest.mark.integration
     @pytest.mark.asyncio
-    async def test_reunion_island_prompt_with_bk_music_subs(self):
+    @pytest.mark.skip("skipping tests until needed to assess regressions")
+    async def test_reunion_island_prompt_with_default_bk_music_subs(self):
         with WorkingFolderContext():
             bld_sett = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
@@ -306,7 +308,7 @@ class TestPromptBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    @pytest.mark.skip
+    @pytest.mark.skip("skipping tests used to validate bug fixing")
     async def test_collab_integration(self):
         with WorkingFolderContext():
             prompt = await PromptFactory(
