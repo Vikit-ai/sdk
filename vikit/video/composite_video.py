@@ -298,7 +298,8 @@ class CompositeVideo(Video, is_composite_video):
         if not build_settings.target_file_name:
             if self.is_root_video_composite:
                 name, extension = os.path.splitext(os.path.basename(self.media_url))
-                new_name = f"{name.replace(DEFAULT_VIDEO_TITLE, "YourVideo")}_{uid.uuid4()}{extension}"
+                _name = name.replace(DEFAULT_VIDEO_TITLE, "YourVideo")
+                new_name = f"{_name}_{uid.uuid4()}{extension}"
                 build_settings.target_file_name = os.path.join(
                     os.path.dirname(self.media_url), new_name
                 )
