@@ -32,11 +32,12 @@ from vikit.common.handler import Handler
 from vikit.video.video_file_name import VideoFileName
 from vikit.common.file_tools import (
     is_valid_path,
-    get_path_type,
     download_or_copy_file,
     is_valid_filename,
 )
 from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
+
+DEFAULT_VIDEO_TITLE = "no-title-yet"
 
 
 class Video(ABC):
@@ -75,7 +76,7 @@ class Video(ABC):
         )
         self._videoMetadata = VideoMetadata(
             id=uid.uuid4(),
-            title="notitle-yet",
+            title=DEFAULT_VIDEO_TITLE,
             duration=0,
             width=self._width,
             height=self._height,
@@ -410,7 +411,7 @@ class Video(ABC):
         if not build_settings and not self.build_settings:
             raise ValueError("build_settings should be set")
 
-        return str(
+        infered_name = str(
             VideoFileName(
                 video_type=self.short_type_name,
                 video_metadata=self.metadata,
@@ -419,6 +420,10 @@ class Video(ABC):
                 ),
             )
         )
+        logger.debug(
+            f"Video file name inferred: {infered_name}, current media URL: {self.media_url}"
+        )
+        return infered_name
 
     def generate_background_music_prompt(self):
         """

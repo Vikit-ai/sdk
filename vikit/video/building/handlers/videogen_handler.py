@@ -27,15 +27,14 @@ class VideoGenHandler(Handler):
 
     async def execute_async(self, video: Video):
         """
-        Process the video generation binaries: we actually do ask the video to build itself
-        as a video binary (typically an MP4 generated from Gen AI, hosted behind an API),
-        or to compose from its inner videos in case of a child composite video
+        Process the video generation binaries: the video binary is generated from Gen AI, hosted behind an API
+        which could be distant as well as local. The video binary is then stored in a web storage or locally.
 
         Args:
-            args: The arguments: video, build_settings, video.media_url, target_file_name
+            video (Video): The video to process
 
         Returns:
-            CompositeVideo: The composite video
+            The video with the media URL set to the generated video
         """
         logger.info(f"About to generate video: {video.id}, title: {video.get_title()}")
         logger.debug(
@@ -49,8 +48,6 @@ class VideoGenHandler(Handler):
                 )
             )
         )
-        video.is_video_built
-        video.metadata.is_video_built = True
 
-        logger.debug(f"Video generated from prompt: {video.media_url[:50]}")
+        logger.debug(f"Video generated from prompt: {video.media_url}")
         return video
