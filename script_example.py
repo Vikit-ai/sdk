@@ -34,29 +34,6 @@ from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
 
 
-async def batch_raw_text_based_prompting(
-    prompt_file: str, model_provider: str = "videocrafter"
-):
-    to_interpolate = True if model_provider == "videocrafter" else False
-
-    prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
-    for _, row in prompt_df.iterrows():
-        output_file = f"{row.iloc[0]}.mp4"
-        prompt = await PromptFactory().create_prompt_from_text(row.iloc[1])
-        video_build_settings = VideoBuildSettings(
-            music_building_context=MusicBuildingContext(
-                apply_background_music=True, generate_background_music=True
-            ),
-            test_mode=False,
-            interpolate=to_interpolate,
-            target_model_provider=model_provider,
-            output_video_file_name=output_file,
-        )
-        video_build_settings.prompt = prompt
-        video = RawTextBasedVideo(prompt.text)
-        await video.build(build_settings=video_build_settings)
-
-
 @log_function_params
 def get_estimated_duration(composite: CompositeVideo):
     """Get an estimation of a composite video's duration, based on the type of the sub-videos"""
@@ -84,28 +61,54 @@ def get_estimated_duration(composite: CompositeVideo):
     return duration
 
 
-async def composite_textonly_prompting(prompt_file: str):
+async def batch_raw_text_based_prompting(
+    prompt_file: str, model_provider: str = "videocrafter"
+):
+    to_interpolate = True if model_provider == "videocrafter" else False
 
+    prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
+    for _, row in prompt_df.iterrows():
+        output_file = f"{row.iloc[0]}.mp4"
+        prompt = await PromptFactory().create_prompt_from_text(row.iloc[1])
+        video_build_settings = VideoBuildSettings(
+            music_building_context=MusicBuildingContext(
+                apply_background_music=True, generate_background_music=True
+            ),
+            test_mode=False,
+            interpolate=to_interpolate,
+            target_model_provider=model_provider,
+            output_video_file_name=output_file,
+        )
+        video_build_settings.prompt = prompt
+        video = RawTextBasedVideo(prompt.text)
+        await video.build(build_settings=video_build_settings)
+
+
+async def composite_textonly_prompting(prompt_file: str):
+    TEST_MODE = False
+    model_provider = "videocrafter"
+    to_interpolate = True if model_provider == "videocrafter" else False
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
     # At least 2 prompts
     assert len(prompt_df) > 1, "You need at least 2 prompts"
     vid_cp_sub = CompositeVideo()
     single_video_buildsettings = VideoBuildSettings(
-        interpolate=False,
-        test_mode=False,
-        target_model_provider="videocrafter",
+        interpolate=to_interpolate,
+        test_mode=TEST_MODE,
+        target_model_provider=model_provider,
     )
-
     for i in range(len(prompt_df)):
         prompt_content = prompt_df.iloc[i]["prompt"]
         video = RawTextBasedVideo(prompt_content)
         video.build_settings = single_video_buildsettings
         if i >= 1:
+            n_videos = len(vid_cp_sub.video_list)
             transition_video = SeineTransition(
-                source_video=vid_cp_sub.video_list[i - 1],
+                source_video=vid_cp_sub.video_list[n_videos - 1],
                 target_video=video,
             )
             vid_cp_sub.append_video(transition_video)
+        await video.prepare_build(build_settings=video.build_settings)
         vid_cp_sub.append_video(video)
 
     total_duration = get_estimated_duration(vid_cp_sub)
@@ -113,17 +116,16 @@ async def composite_textonly_prompting(prompt_file: str):
         music_building_context=MusicBuildingContext(
             apply_background_music=True,
             generate_background_music=True,
-            expected_music_length=total_duration,
+            expected_music_length=total_duration + 1,
         ),
-        interpolate=False,
-        test_mode=False,
-        target_model_provider="videocrafter",
+        test_mode=TEST_MODE,
+        target_model_provider=model_provider,
         output_video_file_name="Composit.mp4",
         expected_length=total_duration,
     )
     # set up music prompt
     composite_build_settings.prompt = await PromptFactory().create_prompt_from_text(
-        " A cool music"
+        " Classic French music!"
     )
     await vid_cp_sub.build(build_settings=composite_build_settings)
 
@@ -196,7 +198,6 @@ async def composite_imageonly_prompting(prompt_file: str):
     assert len(prompt_df) > 1, "You need at least 2 prompts"
 
     single_video_buildsettings = VideoBuildSettings(
-        interpolate=False,
         test_mode=TEST_MODE,
         target_model_provider="stabilityai_image",
     )
@@ -210,11 +211,13 @@ async def composite_imageonly_prompting(prompt_file: str):
             build_settings=single_video_buildsettings,
         )
         if i >= 1:
+            n_videos = len(vid_cp_sub.video_list)
             transition_video = SeineTransition(
-                source_video=vid_cp_sub.video_list[i - 1],
+                source_video=vid_cp_sub.video_list[n_videos - 1],
                 target_video=video,
             )
             vid_cp_sub.append_video(transition_video)
+        await video.prepare_build(build_settings=video.build_settings)
         vid_cp_sub.append_video(video)
 
     total_duration = get_estimated_duration(vid_cp_sub)
@@ -231,6 +234,71 @@ async def composite_imageonly_prompting(prompt_file: str):
     )
     composite_build_settings.prompt = await PromptFactory().create_prompt_from_text(
         "A happy picnic music!"
+    )
+    await vid_cp_sub.build(build_settings=composite_build_settings)
+
+
+async def composite_mixed_prompting(prompt_file: str):
+
+    TEST_MODE = False
+    prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
+    # at least 2 prompts
+    assert len(prompt_df) > 1, "You need at least 2 prompts"
+
+    text_based_video_buildsettings = VideoBuildSettings(
+        test_mode=TEST_MODE,
+        target_model_provider="stabilityai",
+    )
+
+    vid_cp_sub = CompositeVideo()
+
+    for i in range(len(prompt_df)):
+        prompt_content = prompt_df.iloc[i]["prompt"]
+        prompt_type = prompt_df.iloc[i]["type"]
+        if prompt_type == "image":
+            image_based_video_buildsettings = VideoBuildSettings(
+                test_mode=TEST_MODE,
+                target_model_provider="stabilityai_image",
+            )
+            video, image_based_video_buildsettings = (
+                await generate_single_image_based_video(
+                    prompt_content=prompt_content,
+                    build_settings=image_based_video_buildsettings,
+                )
+            )
+
+        elif prompt_type == "text":
+            video = RawTextBasedVideo(prompt_content)
+            video.build_settings = text_based_video_buildsettings
+        else:
+            logger.debug(f"Error! prompt type {prompt_type} not recognized!")
+            continue
+
+        await video.prepare_build(build_settings=video.build_settings)
+
+        if i >= 1:
+            n_videos = len(vid_cp_sub.video_list)
+            transition_video = SeineTransition(
+                source_video=vid_cp_sub.video_list[n_videos - 1],
+                target_video=video,
+            )
+            vid_cp_sub.append_video(transition_video)
+        vid_cp_sub.append_video(video)
+
+    total_duration = get_estimated_duration(vid_cp_sub)
+    composite_build_settings = VideoBuildSettings(
+        music_building_context=MusicBuildingContext(
+            apply_background_music=True,
+            generate_background_music=True,
+            expected_music_length=total_duration + 1,
+        ),
+        test_mode=TEST_MODE,
+        output_video_file_name="Composit.mp4",
+        expected_length=total_duration,
+    )
+
+    composite_build_settings.prompt = await PromptFactory().create_prompt_from_text(
+        "A happy Guitar music!"
     )
     await vid_cp_sub.build(build_settings=composite_build_settings)
 
@@ -270,7 +338,7 @@ if __name__ == "__main__":
     # # Example 2- Create a batch of text-based videos:
     # with WorkingFolderContext("./examples/inputs/TextOnly"):
     #     logger.add("log.txt")
-    #     asyncio.run(batch_raw_text_based_prompting("./input.csv"))
+    #     asyncio.run(batch_raw_text_based_prompting("./small_input.csv"))
 
     # # Example 3 - Create a batch of videos from images
     # with WorkingFolderContext("./examples/inputs/ImageOnly/"):
@@ -281,11 +349,20 @@ if __name__ == "__main__":
     #         )
     #     )
 
-    # Example 4 - Create a batch of videos from images
-    with WorkingFolderContext("./examples/inputs/ImageOnly/"):
+    # # Example 4 - Create a composite of image-based videos:
+    # with WorkingFolderContext("./examples/inputs/ImageOnly/"):
+    #     logger.add("log.txt")
+    #     asyncio.run(
+    #         composite_imageonly_prompting(
+    #             "input.csv",
+    #         )
+    #     )
+
+    # Example 5 - Create a composite of text and image-based videos:
+    with WorkingFolderContext("./examples/inputs/Mixed/"):
         logger.add("log.txt")
         asyncio.run(
-            composite_imageonly_prompting(
+            composite_mixed_prompting(
                 "input.csv",
             )
         )
