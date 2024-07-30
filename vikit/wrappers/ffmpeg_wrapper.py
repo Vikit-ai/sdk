@@ -57,7 +57,6 @@ def has_audio_track(video_path):
     return any(stream["codec_type"] == "audio" for stream in streams)
 
 
-@log_function_params
 def get_media_duration(input_video_path):
     """
     Get the duration of a media file.

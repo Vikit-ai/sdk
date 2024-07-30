@@ -29,9 +29,6 @@ from vikit.video.building.build_order import (
 )
 from vikit.music_building_context import MusicBuildingContext
 from vikit.wrappers.ffmpeg_wrapper import concatenate_videos
-from vikit.video.building.handlers.video_reencoding_handler import (
-    VideoReencodingHandler,
-)
 from vikit.common.handler import Handler
 from vikit.video.video import DEFAULT_VIDEO_TITLE
 
@@ -317,30 +314,3 @@ class CompositeVideo(Video, is_composite_video):
         return " ".join(
             [video.get_title() for video in self.video_list if video.get_title()]
         )
-
-    def get_core_handlers(self, build_settings) -> list[Handler]:
-        """
-         Get the handler chain of the video. Order matters here.
-
-        Args:
-             build_settings (VideoBuildSettings): The settings for building the video
-
-         Returns:
-             list: The list of handlers to use for building the video
-        """
-        handlers = []
-
-        # if (
-        #     len(
-        #         list(
-        #             filter(lambda video: video._needs_video_reencoding, self.video_list)
-        #         )
-        #     )
-        #     >= 1
-        # ):
-        #     handlers.append(VideoReencodingHandler())
-        #     logger.debug(
-        #         f"Added video reencoding handler for composite video {self.id}"
-        #     )
-
-        return handlers

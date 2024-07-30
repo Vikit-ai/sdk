@@ -358,17 +358,20 @@ class TestCompositeVideo:
 
             assert test_video_mixer.media_url is not None
 
-    @pytest.mark.local_integration
+    @pytest.mark.integration
     @pytest.mark.asyncio
     async def test_train_boy_local_no_transitions_with_music_and_prompts(self):
 
         with WorkingFolderContext():
+
+            test_mode = False
+
             final_composite_video = CompositeVideo()
             for subtitle in test_prompt_library["train_boy"].subtitles:
                 video = RawTextBasedVideo(subtitle.text)
                 await video.build(
                     build_settings=VideoBuildSettings(
-                        test_mode=True,
+                        test_mode=test_mode,
                         music_building_context=MusicBuildingContext(),
                     )
                 )
@@ -379,7 +382,7 @@ class TestCompositeVideo:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True
                     ),
-                    test_mode=True,
+                    test_mode=test_mode,
                     include_read_aloud_prompt=True,
                     prompt=test_prompt_library["train_boy"],
                 )
