@@ -119,12 +119,12 @@ class VikitGateway(MLModelsGateway):
         Returns:
             - str: the path to the generated music
         """
-
+        logger.debug(f"Calling get_music_generation_keywords_async by {prompt}")
         outputLLM = await self.get_music_generation_keywords_async(prompt)
         logger.debug(f"outputLLM: {outputLLM}")
 
         # get the last word which corresponds to proposed prompt title
-        prompt_based_music_file_name = str(outputLLM.split()[-1:][0]) + ".mp3"
+        prompt_based_music_file_name = str(outputLLM.split()[-1:][0])[:25] + ".mp3"
         logger.debug(f"prompt_based_music_file_name: {prompt_based_music_file_name}")
         title_length = len(prompt_based_music_file_name)  # remove the .mp3 extension
 
@@ -582,7 +582,7 @@ class VikitGateway(MLModelsGateway):
                 The link to the generated video
         """
         output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
-        logger.debug(f"Generating image from prompt: {prompt}")
+        logger.debug(f"Generating image from prompt: {prompt[:50]}")
         async with aiohttp.ClientSession() as session:
             payload = (
                 {
