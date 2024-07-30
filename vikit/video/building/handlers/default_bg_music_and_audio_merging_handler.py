@@ -24,6 +24,12 @@ from vikit.wrappers.ffmpeg_wrapper import merge_audio, extract_audio_slice
 
 class DefaultBGMusicAndAudioMergingHandler(Handler):
 
+    def __init__(self, music_duration: float = None):
+        """
+        Initialize the handler with the duration of the background music
+        """
+        self.duration = music_duration
+
     async def execute_async(self, video):
         """
         Merge background music and video  as a single media file
@@ -39,9 +45,7 @@ class DefaultBGMusicAndAudioMergingHandler(Handler):
         )
 
         assert video.media_url is not None, "Media URL is required for the video"
-        expected_music_duration = (
-            video.build_settings.music_building_context.expected_music_length
-        )
+        expected_music_duration = self.duration
         audio_file = await self._fit_standard_background_music(
             expected_music_duration=expected_music_duration, video=video
         )
