@@ -55,7 +55,7 @@ class RawImageBasedVideo(Video):
             self._title = title
         else:
             self._title = "notitle"
-        self.duration = 4.0
+        self.duration = 4.0  # currently generated video are 4s long, this will be variabilized per models later
 
     @property
     def short_type_name(self):

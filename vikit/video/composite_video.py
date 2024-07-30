@@ -318,3 +318,32 @@ class CompositeVideo(Video, is_composite_video):
             [video.get_title() for video in self.video_list if video.get_title()]
         )
 
+<<<<<<< Updated upstream
+=======
+    def get_core_handlers(self, build_settings) -> list[Handler]:
+        """
+         Get the handler chain of the video. Order matters here.
+
+        Args:
+             build_settings (VideoBuildSettings): The settings for building the video
+
+         Returns:
+             list: The list of handlers to use for building the video
+        """
+        handlers = []
+
+        # if (
+        #     len(
+        #         list(
+        #             filter(lambda video: video._needs_video_reencoding, self.video_list)
+        #         )
+        #     )
+        #     >= 1
+        # ):
+        #     handlers.append(VideoReencodingHandler())
+        #     logger.debug(
+        #         f"Added video reencoding handler for composite video {self.id}"
+        #     )
+
+        return handlers
+>>>>>>> Stashed changes

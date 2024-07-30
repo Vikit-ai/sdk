@@ -55,7 +55,7 @@ class TestAudioCompositions:
             handler = ReadAloudPromptAudioMergingHandler(None)
             await handler.execute_async(video=None)
 
-    @pytest.mark.unit
+    @pytest.mark.local_integration
     @pytest.mark.asyncio
     async def test_insert_subtitle_audio_nominal(self):
         with WorkingFolderContext():
@@ -108,6 +108,15 @@ class TestAudioCompositions:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True
                     ),
-                    test_mode=False,
+                    test_mode=True,
                 )
             )
+
+            assert video_comp.background_music is not None, f"No background music set"
+            assert video_comp.media_url is not None, f"No media URL"
+            assert (
+                video_comp.media_url != vid1.media_url
+            ), f"Media URL is the same as the first video, {video_comp.media_url}"
+            assert (
+                video_comp.media_url != vid2.media_url
+            ), f"Media URL is the same as the second video, {video_comp.media_url}"

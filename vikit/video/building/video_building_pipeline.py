@@ -67,42 +67,52 @@ class VideoBuildingPipeline:
         """
         handlers = []
         bg_music_text_prompt = None
+        music_duration = 0
         # You may use specific background music and prompt audio for the composite video
         # even if not a root composite, in case the composite is a part of a bigger video
         # and if you think it is long enough to add them
         if build_settings.music_building_context.apply_background_music:
             if build_settings.music_building_context.generate_background_music:
-                if build_settings.prompt:  # use the prompt if we have one
-                    if build_settings.prompt.text:
-                        bg_music_text_prompt = build_settings.prompt.text
-                        logger.debug(
-                            f"Generating background music using prompt: {build_settings.prompt.text}"
-                        )
-                    else:
-                        logger.debug(
-                            "No prompt provided for background music generation, using composite video list  concatenated titles"
-                        )
-                        bg_music_text_prompt = self.generate_background_music_prompt()
-                if not bg_music_text_prompt or bg_music_text_prompt == "":
-                    logger.warning(
-                        "No text prompt could be used or infered for background music generation, skipping background music generation"
+                if (
+                    build_settings.prompt and build_settings.prompt.text
+                ):  # use the prompt if we have one
+                    bg_music_text_prompt = build_settings.prompt.text
+                    logger.debug(
+                        f"Generating background music using prompt: {build_settings.prompt.text}"
                     )
                 else:
                     logger.debug(
-                        f"build_settings.music_building_context.expected_music_length : {build_settings.music_building_context.expected_music_length}"
+                        "No prompt or prompt text provided for background music generation, using composite video list  concatenated titles"
                     )
-                    logger.debug(f"build_settings.prompt : {build_settings.prompt}")
-                    music_duration = (
-                        build_settings.music_building_context.expected_music_length
-                        if build_settings.music_building_context.expected_music_length
-                        else build_settings.prompt.duration
+                    bg_music_text_prompt = video.generate_background_music_prompt()
+
+                if not bg_music_text_prompt or bg_music_text_prompt == "":
+                    logger.warning(
+                        "No text prompt could be used or infered for background music generation, using arbitrary text prompt for background music generation"
                     )
-                    handlers.append(
-                        GenerateMusicAndMergeHandler(
-                            bg_music_prompt=bg_music_text_prompt,
-                            music_duration=music_duration,
-                        )
+                    bg_music_text_prompt = (
+                        "generate a nice chill electro background music"
                     )
+
+                logger.debug(
+                    f"prompt text used to generate background music : {bg_music_text_prompt}"
+                )
+                music_duration = (
+                    build_settings.music_building_context.expected_music_length
+                    if build_settings.music_building_context.expected_music_length
+                    else (
+                        build_settings.prompt.duration
+                        if build_settings.prompt
+                        else video.get_duration()
+                    )
+                )
+
+                handlers.append(
+                    GenerateMusicAndMergeHandler(
+                        bg_music_prompt=bg_music_text_prompt,
+                        music_duration=music_duration,
+                    )
+                )
             else:
                 if build_settings.music_building_context.use_recorded_prompt_as_audio:
                     handlers.append(UsePromptAudioTrackAndAudioMergingHandler())
