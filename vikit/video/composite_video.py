@@ -33,6 +33,7 @@ from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
 from vikit.common.handler import Handler
+from vikit.video.video import DEFAULT_VIDEO_TITLE
 
 
 class CompositeVideo(Video, is_composite_video):
@@ -52,7 +53,7 @@ class CompositeVideo(Video, is_composite_video):
         """
         super().__init__()
 
-        self._is_root_video_composite = True  # true until we have a composite video that will add this composite as a child using append
+        self.is_root_video_composite = True  # true until we have a composite video that will add this composite as a child using append
         self.video_list = []
 
     def is_composite_video(self):
@@ -63,7 +64,7 @@ class CompositeVideo(Video, is_composite_video):
         """
         Get the short type name of the video
         """
-        if self._is_root_video_composite:
+        if self.is_root_video_composite:
             return str(VideoType.COMPROOT)
         else:
             return str(VideoType.COMPCHILD)
@@ -125,7 +126,7 @@ class CompositeVideo(Video, is_composite_video):
             logger.debug(
                 f"experiment  1 composite video {video.id} to composite video {self.id}"
             )
-            video._is_root_video_composite = False
+            video.is_root_video_composite = False
 
         return self
 
@@ -207,7 +208,7 @@ class CompositeVideo(Video, is_composite_video):
             self: The current object
         """
         if (
-            self._is_root_video_composite
+            self.is_root_video_composite
         ):  # This check is important: we generate an ordered video list
             # for the whole video tree at once
             ordered_video_list = get_lazy_dependency_chain_build_order(
@@ -295,14 +296,15 @@ class CompositeVideo(Video, is_composite_video):
 
     async def run_post_build_actions_hook(self, build_settings: VideoBuildSettings):
         if not build_settings.target_file_name:
-            name, extension = os.path.splitext(os.path.basename(self.media_url))
-            new_name = f"{name}_{uid.uuid4()}{extension}"
-            build_settings.target_file_name = os.path.join(
-                os.path.dirname(self.media_url), new_name
-            )
-            logger.warning(
-                f"Output file name not set, using a random name: {build_settings.target_file_name}"
-            )
+            if self.is_root_video_composite:
+                name, extension = os.path.splitext(os.path.basename(self.media_url))
+                new_name = f"{name.replace(DEFAULT_VIDEO_TITLE, "YourVideo")}_{uid.uuid4()}{extension}"
+                build_settings.target_file_name = os.path.join(
+                    os.path.dirname(self.media_url), new_name
+                )
+                logger.info(
+                    f"Your final video name is : {build_settings.target_file_name}"
+                )
 
     def generate_background_music_prompt(self):
         """

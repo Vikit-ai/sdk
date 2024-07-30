@@ -36,6 +36,8 @@ from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
 import io
 from PIL import Image
 
+import time
+
 os.environ["REPLICATE_API_TOKEN"] = get_replicate_api_token()
 vikit_api_key = get_vikit_api_token()
 vikit_backend_url = "https://videho.replit.app/models"
@@ -220,8 +222,11 @@ class VikitGateway(MLModelsGateway):
             )
             async with session.post(vikit_backend_url, json=payload) as response:
                 response = await response.text()
-
-        return response
+        time.sleep(3)
+        if not response or response is None or response == "":
+            raise Exception("ffmpeg command failed")
+        else:
+            return response
 
     @retry(
         stop=stop_after_attempt(get_nb_retries_http_calls()),

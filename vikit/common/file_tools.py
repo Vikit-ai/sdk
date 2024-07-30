@@ -26,6 +26,10 @@ from typing import Union, Optional
 from loguru import logger
 from urllib.request import urlopen
 from urllib.error import URLError
+from tenacity import retry, before_log, after_log, stop_after_attempt, wait_exponential
+
+from vikit.common.config import get_nb_retries_http_calls
+
 
 from vikit.common.decorators import log_function_params
 
@@ -54,29 +58,6 @@ def get_max_path_length(path="."):
         # PC_NAME_MAX may not be available or may fail for certain paths on some OSes
         # Returns a common default value (255) in this case
         return 255
-
-
-def create_non_colliding_file_name(canonical_name: str = None, extension: str = "xyz"):
-    """
-    Transforms the filename to prevent collisions zith other files,
-    by adding a UUID as suffix
-
-    params:
-        canonical_name: a name used as the target file name prefix
-        extension: the extension of the file
-
-    return: the non-colliding name
-    """
-    target_name = canonical_name + "_UID_" + str(uuid.uuid4()) + "." + extension
-
-    val_target_name, error = get_path_type(target_name)
-    if error:
-        logger.warning(
-            f"Error creating non-colliding file name: {val_target_name['path']}"
-        )
-
-    logger.debug(f"val_target_name['path']: {val_target_name['path']}")
-    return val_target_name["path"]
 
 
 def get_safe_filename(filename):
@@ -224,6 +205,7 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
     return result
 
 
+@retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
 async def download_or_copy_file(url, local_path):
     """
     Download a file from a URL to a local file asynchronously
@@ -256,6 +238,10 @@ async def download_or_copy_file(url, local_path):
                                     break
                                 await f.write(chunk)
                         return local_path
+                    else:
+                        raise FileNotFoundError(
+                            f"The URL did not work with response: {response}"
+                        )
         elif path_desc["type"] == "local":
             logger.debug(f"Copying file from {url} to {local_path}")
             shutil.copyfile(url, local_path)

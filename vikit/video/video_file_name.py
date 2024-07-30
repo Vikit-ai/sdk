@@ -72,7 +72,7 @@ class VideoFileName:
         if video_metadata is None:
             raise ValueError("video_metadata cannot be None")
         self._video_metadata = video_metadata
-        self._title = self._truncate_title(
+        self.title = self._truncate_title(
             video_metadata.title, max_length=self.VIDEO_TITLE_MAX_LENGTH
         )
         self._video_type = video_type if video_type is not None else "undefined"
@@ -82,7 +82,7 @@ class VideoFileName:
 
         self._build_id = build_settings.id
         self._build_date = build_settings.build_date
-        self._unique_id = random.getrandbits(16)
+        self.unique_id = random.getrandbits(16)
         self._file_extension = file_extension
 
         self._video_features = None
@@ -136,7 +136,7 @@ class VideoFileName:
         )
         video_file_name._video_type = parts[1]
         video_file_name._video_features = parts[2]
-        video_file_name._unique_id = parts[6].split(".")[0]
+        video_file_name.unique_id = parts[6].split(".")[0]
 
         return video_file_name
 
@@ -172,14 +172,6 @@ class VideoFileName:
         return features_as_string
 
     @property
-    def title(self):
-        return self._title
-
-    @property
-    def unique_id(self):
-        return self._unique_id
-
-    @property
     def video_type(self):
         """
         Get the type of the video, codified as a string
@@ -205,7 +197,7 @@ class VideoFileName:
         """
         Get the file name of the video,  as a string
         """
-        file_name = f"{self._title}oOo{str(self.video_type)}oOo{self.video_features}oOo{self.build_id}oOo{self._build_date}oOoUIDoOo{self.unique_id}.{self._file_extension}"
+        file_name = f"{self.title}oOo{str(self.video_type)}oOo{self.video_features}oOo{self.build_id}oOo{self._build_date}oOoUIDoOo{self.unique_id}.{self._file_extension}"
         file_name = file_name.replace("oOo", split_separator)
         return file_name
 
@@ -213,7 +205,7 @@ class VideoFileName:
         return self._fit(target_path=self._build_settings.output_path)
 
     def __repr__(self):
-        return f"Title: {self._title}, Video Type: {self._video_type}, Video Features: {self._video_features} , Build ID: {self._build_id}, Build Date: {self._build_date}, Unique ID: {self._unique_id},"
+        return f"Title: {self.title}, Video Type: {self._video_type}, Video Features: {self._video_features} , Build ID: {self._build_id}, Build Date: {self._build_date}, Unique ID: {self.unique_id},"
 
     @property
     def video_features(self):
@@ -253,7 +245,7 @@ class VideoFileName:
         return (
             self.file_name[: len(self.file_name) - gap - 36 - 4]
             + "_UID_"
-            + str(self._unique_id)
+            + str(self.unique_id)
             + "."
             + self._file_extension
         )
