@@ -144,7 +144,9 @@ class TestVideoFileNames:
         extracted_features = video_file_name.extract_features_as_string()
         # Check if the extracted features are correct
         expected_features = "ooooo"
-        assert extracted_features == expected_features
+        assert (
+            extracted_features == expected_features
+        ), f"Expected: {expected_features}, got: {extracted_features}"
 
     def get_test_build_settings(self):
         bld_set = VideoBuildSettings()
@@ -172,9 +174,7 @@ class TestVideoFileNames:
 
         assert (
             vid_fname.video_features == "ooooo"
-        ), "The video features are not correct: features returned: {}".format(
-            vid_fname.video_features
-        )
+        ), f"The video features are not correct: features returned: {vid_fname.video_features}, expected ooooo"
         assert (
             vid_fname.build_id == bld_set.id
         ), "The build ID is not correct, {}".format(bld_set.id)

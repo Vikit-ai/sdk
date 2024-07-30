@@ -244,7 +244,11 @@ async def download_or_copy_file(url, local_path):
                         )
         elif path_desc["type"] == "local":
             logger.debug(f"Copying file from {url} to {local_path}")
-            shutil.copyfile(url, local_path)
+            if url == local_path:
+                logger.debug(f"File already exists at {local_path}, skipping copy")
+                return local_path
+            else:
+                shutil.copyfile(url, local_path)
             return local_path
         elif path_desc["type"] == "local_url_format":
             url = url.replace("file://", "")

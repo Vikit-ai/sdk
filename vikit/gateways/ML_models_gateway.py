@@ -30,40 +30,44 @@ class MLModelsGateway(ABC):
     def __init__(self):
         pass
 
-    def generate_mp3_from_text_async(self, prompt_text, target_file):
+    async def generate_mp3_from_text_async(self, prompt_text, target_file):
         pass
 
     @abstractmethod
-    def generate_background_music_async(
+    async def generate_background_music_async(
         self, duration: int = 3, prompt: str = None, target_file_name: str = None
     ) -> str:
         pass
 
     @abstractmethod
-    def generate_seine_transition_async(self, source_image_path, target_image_path):
+    async def generate_seine_transition_async(
+        self, source_image_path, target_image_path
+    ):
         pass
 
     def cleanse_llm_keywords_async(input):
         pass
 
     @abstractmethod
-    def compose_music_from_text_async(self, prompt_text: str, duration: int):
+    async def compose_music_from_text_async(self, prompt_text: str, duration: int):
         pass
 
     @abstractmethod
-    def get_music_generation_keywords_async(self, text) -> str:
+    async def get_music_generation_keywords_async(self, text) -> str:
         pass
 
     @abstractmethod
-    def interpolate_async(self, video):
+    async def interpolate_async(self, video):
         pass
 
     @abstractmethod
-    def get_keywords_from_prompt_async(self, subtitleText, excluded_words: str = None):
+    async def get_keywords_from_prompt_async(
+        self, subtitleText, excluded_words: str = None
+    ):
         pass
 
     @abstractmethod
-    def get_enhanced_prompt_async(self, subtitleText):
+    async def get_enhanced_prompt_async(self, subtitleText):
         pass
 
     @abstractmethod

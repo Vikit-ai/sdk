@@ -37,21 +37,24 @@ class VideoReencodingHandler(Handler):
         if not video.media_url:
             raise ValueError(f"Video {video.id} has no media url")
 
-        logger.debug(f"Video video.media_url : {video.media_url}")
-
-        # Special case here: the video used for testing should always be reencoded as coming from hetegenous sources
-        if video.build_settings.test_mode:
-            video._needs_video_reencoding = True
-
         if video._needs_video_reencoding:
             video.metadata.is_reencoded = True
-            video.media_url = await reencode_video(
-                video_url=video.media_url,
-                target_video_name=video.get_file_name_by_state(
-                    build_settings=video.build_settings
-                ),
+            target_file_name = video.get_file_name_by_state(
+                build_settings=video.build_settings
             )
-            logger.trace(f"Video reencoded: {video.id}, {video.media_url}")
+            logger.debug(
+                f"Reencoding video target_file_name: {target_file_name}, currrent media_url: {video.media_url}"
+            )
+            if target_file_name == video.media_url:
+                logger.warning(
+                    f"Video {video.id} needs reencoding but target file name is the same as the current media url, so skipping reencoding"
+                )
+            else:
+                video.media_url = await reencode_video(
+                    video_url=video.media_url,
+                    target_video_name=target_file_name,
+                )
+                logger.trace(f"Video reencoded: {video.id}, {video.media_url}")
         else:
             logger.warning(
                 f"Video {video.id} does not need reencoding, handler should not have been called"

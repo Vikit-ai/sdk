@@ -21,6 +21,8 @@ class VideoMetadata:
     Hybrid DTO class for storing video metadata.
 
     Attributes:
+    id (uuid): Unique identifier of the video.
+    temp_id (str): Temporary identifier of the video, used when it was being built
     title (str): Title of the video.
     duration (int): Duration of the video in seconds.
     height (str): height of the video.
@@ -39,6 +41,7 @@ class VideoMetadata:
     def __init__(
         self,
         id: uuid = None,
+        temp_id=None,
         title=None,
         duration=None,
         width: int = None,
@@ -51,9 +54,11 @@ class VideoMetadata:
         is_bg_music_generated=None,
         is_default_bg_music_applied=False,
         is_prompt_read_aloud=False,
+        media_url=None,
         **custom_metadata,
     ):
         self.id = id
+        self.temp_id = temp_id
         self.title = title
         self.duration = duration
         self.width = width
@@ -66,6 +71,7 @@ class VideoMetadata:
         self.is_bg_music_generated = is_bg_music_generated  # if not using gnerated we infer the default bg music is used
         self.is_default_bg_music_applied = is_default_bg_music_applied
         self.is_prompt_read_aloud = is_prompt_read_aloud
+        self.media_url = media_url
 
         self.custom_metadata = custom_metadata
 

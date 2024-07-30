@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+import os
 
 from loguru import logger
 from vikit.common.handler import Handler
@@ -69,9 +70,11 @@ class DefaultBGMusicAndAudioMergingHandler(Handler):
             In case the audio is shorter, we will just stop playing music when it ends, no music looping for now
 
         """
+        file_name = os.path.basename(video.media_url)
+        file_name_without_ext, _ = os.path.splitext(file_name)
         return await extract_audio_slice(
             start=0,
             end=expected_music_duration,
             audiofile_path=config.get_default_background_music(),
-            target_file_name=f"{video.media_url[:-4].split('/')[-1]}_background_music.mp3",
+            target_file_name=f"{file_name_without_ext}_background_music.mp3",
         )

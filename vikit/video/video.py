@@ -76,13 +76,13 @@ class Video(ABC):
         )
         self._videoMetadata = VideoMetadata(
             id=uid.uuid4(),
+            temp_id=self.temp_id,
             title=DEFAULT_VIDEO_TITLE,
             duration=0,
             width=self._width,
             height=self._height,
         )
         self._source = None
-        self.media_url = None
         self.build_settings: VideoBuildSettings = VideoBuildSettings()
         self.are_build_settings_prepared = False
         self.video_dependencies = (
@@ -91,6 +91,14 @@ class Video(ABC):
 
     def __str__(self):
         return f"ID:  {self.id}, type: {type(self)}, short_type_name: {self.short_type_name} , title: {self.title}, duration: {self.duration}, is_video_built: {self.is_video_built}"
+
+    @property
+    def media_url(self):
+        return self.metadata.media_url
+
+    @media_url.setter
+    def media_url(self, value):
+        self.metadata.media_url = value
 
     @property
     def metadata(self):
