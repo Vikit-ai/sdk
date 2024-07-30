@@ -101,6 +101,8 @@ class VikitGateway(MLModelsGateway):
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
                     response = await response.text()
+                    if not response.startswith("http"):
+                        raise AttributeError("The result audio link is not a link")
                     await download_or_copy_file(url=response, local_path="temp.wav")
             await convert_as_mp3_file("temp.wav", target_file)
             return response
@@ -222,9 +224,9 @@ class VikitGateway(MLModelsGateway):
             )
             async with session.post(vikit_backend_url, json=payload) as response:
                 response = await response.text()
-        time.sleep(3)
-        if not response or response is None or response == "":
-            raise Exception("ffmpeg command failed")
+        time.sleep(2)
+        if not response.startswith("http"):
+            raise AttributeError("The result SEINE transition link is not a link")
         else:
             return response
 
@@ -284,6 +286,8 @@ class VikitGateway(MLModelsGateway):
             raise AttributeError("The result music link is None")
         if len(result_music_link) < 1:
             raise AttributeError("The result music link is empty")
+        if not result_music_link.startswith("http"):
+            raise AttributeError("The result music link is not a link")
 
         return result_music_link
 
@@ -382,7 +386,10 @@ class VikitGateway(MLModelsGateway):
 
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
-
+        
+        if not output.startswith("http"):
+            raise AttributeError("The result interpolated link is not a link")
+        
         logger.debug(f"Interpolated video link: {output}")
         return output
 
@@ -672,6 +679,8 @@ class VikitGateway(MLModelsGateway):
                 }
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
+                    if not output.json()["value"]["url"].startswith("http"):
+                        raise AttributeError("The result Haiper video link is not a link")
                     return output.json()["value"]["url"]
         except Exception as e:
             logger.error(f"Error generating video from prompt: {e}")
@@ -704,7 +713,8 @@ class VikitGateway(MLModelsGateway):
             }
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
-
+        if not output.startswith("http"):
+            raise AttributeError("The result Videocrafter video link is not a link")
         return output
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
