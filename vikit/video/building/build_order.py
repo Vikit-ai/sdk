@@ -60,7 +60,7 @@ def get_lazy_dependency_chain_build_order(
         )
 
     for video in video_tree:
-        logger.debug(f"type(video) is {type(video)}")
+        logger.trace(f"type(video) is {type(video)}")
         if isinstance(video, is_composite_video) and len(video.video_list) > 0:
             logger.trace(f"Going down the dependency chain for {video.id}")
             get_lazy_dependency_chain_build_order(
@@ -71,7 +71,7 @@ def get_lazy_dependency_chain_build_order(
             )
         else:  # on a leaf, we need to check if the video has dependencies
             if len(video.video_dependencies) > 0:
-                logger.debug(f"On a leaf, going up the dependency chain for {video.id}")
+                logger.trace(f"On a leaf, going up the dependency chain for {video.id}")
                 get_lazy_dependency_chain_build_order(
                     video_build_order=video_build_order,
                     video_tree=video.video_dependencies,

@@ -318,8 +318,6 @@ class CompositeVideo(Video, is_composite_video):
             [video.get_title() for video in self.video_list if video.get_title()]
         )
 
-<<<<<<< Updated upstream
-=======
     def get_core_handlers(self, build_settings) -> list[Handler]:
         """
          Get the handler chain of the video. Order matters here.
@@ -346,4 +344,3 @@ class CompositeVideo(Video, is_composite_video):
         #     )
 
         return handlers
->>>>>>> Stashed changes
