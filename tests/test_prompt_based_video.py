@@ -75,7 +75,7 @@ class TestPromptBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_build_single_video_no_bg_music_with_subtitles(self):
+    async def test_build_single_video_no_bg_music_read_aloud_prompt(self):
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(tools.test_prompt_library["moss_stones-train_boy"])
             await pbvid.build(
@@ -88,7 +88,7 @@ class TestPromptBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_build_single_video_with_default_bg_music_with_subtitles(self):
+    async def test_build_single_video_with_default_bg_music_read_aloud_prompt(self):
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(tools.test_prompt_library["moss_stones-train_boy"])
             await pbvid.build(
@@ -136,7 +136,7 @@ class TestPromptBasedVideo:
     @pytest.mark.integration
     @pytest.mark.asyncio
     @pytest.mark.skip("duplicate?")
-    async def test_build_single_video_with_generated_bg_music_with_subtitles(self):
+    async def test_build_single_video_with_generated_bg_music_read_aloud_prompt(self):
         with WorkingFolderContext():
 
             bld_settings = VideoBuildSettings(
