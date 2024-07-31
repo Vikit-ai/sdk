@@ -23,15 +23,11 @@ from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.raw_image_based_video import RawImageBasedVideo
 from vikit.music_building_context import MusicBuildingContext
 from loguru import logger  # type: ignore
-from base64 import b64decode
 import pandas as pd  # type: ignore
 import argparse
 import asyncio
 from vikit.prompt.prompt_factory import PromptFactory
-from vikit.video.raw_image_based_video import RawImageBasedVideo
-from vikit.video.video import VideoBuildSettings
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.music_building_context import MusicBuildingContext
 
 
 @log_function_params
@@ -69,7 +65,6 @@ async def batch_raw_text_based_prompting(
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
     for _, row in prompt_df.iterrows():
         output_file = f"{row.iloc[0]}.mp4"
-        prompt = await PromptFactory().create_prompt_from_text(row.iloc[1])
         video_build_settings = VideoBuildSettings(
             music_building_context=MusicBuildingContext(
                 apply_background_music=True, generate_background_music=True
@@ -79,6 +74,9 @@ async def batch_raw_text_based_prompting(
             target_model_provider=model_provider,
             output_video_file_name=output_file,
         )
+        prompt = await PromptFactory(
+            ml_gateway=video_build_settings.get_ml_models_gateway()
+        ).create_prompt_from_text(row.iloc[1])
         video_build_settings.prompt = prompt
         video = RawTextBasedVideo(prompt.text)
         await video.build(build_settings=video_build_settings)
@@ -108,9 +106,11 @@ async def composite_textonly_prompting(prompt_file: str):
                 target_video=video,
             )
             vid_cp_sub.append_video(transition_video)
+        # Here we prepare the video before asking to build and using a tailored made build-settings
         await video.prepare_build(build_settings=video.build_settings)
         vid_cp_sub.append_video(video)
 
+    # Here we decide to set music only for the global video
     total_duration = get_estimated_duration(vid_cp_sub)
     composite_build_settings = VideoBuildSettings(
         music_building_context=MusicBuildingContext(
@@ -324,7 +324,7 @@ if __name__ == "__main__":
         "--model_provider",
         default="videocrafter",
         type=str,
-        help="chose the model provider: stabilityai, videocrafter, haiper, stabilityai_image",
+        help="chose the model provider that will be generate all the scenes (but not the transitions if any): stabilityai, videocrafter, haiper, stabilityai_image",
     )
 
     # Parse the command-line arguments
