@@ -200,6 +200,16 @@ class VikitGateway(MLModelsGateway):
                 f"The target image path does not exist: {target_image_path}"
             )
 
+        # Resize the image
+        src_img = Image.open(source_image_path)
+        trg_img = Image.open(target_image_path)
+        if src_img.size != trg_img.size:
+            target_size = (512, 320)
+            for img_path in [source_image_path, target_image_path]:
+                with Image.open(img_path) as img:
+                    resized_img = img.resize(target_size)
+                    resized_img.save(img_path)
+
         source_image_base64 = base64.b64encode(
             open(source_image_path, "rb").read()
         ).decode("ascii")
@@ -386,10 +396,10 @@ class VikitGateway(MLModelsGateway):
 
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
-        
+
         if not output.startswith("http"):
             raise AttributeError("The result interpolated link is not a link")
-        
+
         logger.debug(f"Interpolated video link: {output}")
         return output
 
@@ -680,7 +690,9 @@ class VikitGateway(MLModelsGateway):
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
                     if not output.json()["value"]["url"].startswith("http"):
-                        raise AttributeError("The result Haiper video link is not a link")
+                        raise AttributeError(
+                            "The result Haiper video link is not a link"
+                        )
                     return output.json()["value"]["url"]
         except Exception as e:
             logger.error(f"Error generating video from prompt: {e}")
