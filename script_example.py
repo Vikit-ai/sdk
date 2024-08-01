@@ -69,9 +69,9 @@ async def batch_raw_text_based_prompting(
         prompt_content = row.iloc[1]
         video_build_settings = VideoBuildSettings(
             music_building_context=MusicBuildingContext(
-                apply_background_music=True,
-                generate_background_music=True,
-                expected_music_length=4,
+                apply_background_music=False,
+                generate_background_music=False,
+                expected_music_length=5,
             ),
             interpolate=to_interpolate,
             target_model_provider=model_provider,
@@ -88,7 +88,7 @@ async def batch_raw_text_based_prompting(
 
 async def composite_textonly_prompting(prompt_file: str):
     TEST_MODE = False
-    model_provider = "videocrafter"
+    model_provider = "haiper"
     to_interpolate = True if model_provider == "videocrafter" else False
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
     # At least 2 prompts
@@ -169,8 +169,8 @@ async def batch_image_based_prompting(prompt_file: str):
 
         build_settings = VideoBuildSettings(
             music_building_context=MusicBuildingContext(
-                apply_background_music=True,
-                generate_background_music=True,
+                apply_background_music=False,
+                generate_background_music=False,
                 expected_music_length=4,
             ),
             test_mode=False,
@@ -227,8 +227,8 @@ async def composite_imageonly_prompting(prompt_file: str):
     total_duration = get_estimated_duration(vid_cp_sub)
     composite_build_settings = VideoBuildSettings(
         music_building_context=MusicBuildingContext(
-            apply_background_music=True,
-            generate_background_music=True,
+            apply_background_music=False,
+            generate_background_music=False,
             expected_music_length=total_duration + 1,
         ),
         test_mode=TEST_MODE,
@@ -244,14 +244,15 @@ async def composite_imageonly_prompting(prompt_file: str):
 
 async def composite_mixed_prompting(prompt_file: str):
 
-    TEST_MODE = False
+    TEST_MODE = True
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
     # at least 2 prompts
     assert len(prompt_df) > 1, "You need at least 2 prompts"
 
     text_based_video_buildsettings = VideoBuildSettings(
         test_mode=TEST_MODE,
-        target_model_provider="videocrafter",
+        target_model_provider="stabilityai",
+        include_read_aloud_prompt=True,
     )
 
     vid_cp_sub = CompositeVideo()
@@ -316,7 +317,7 @@ async def prompte_based_composite(prompt: str):
         ),
         test_mode=False,
         include_read_aloud_prompt=True,
-        target_model_provider="videocrafter",
+        target_model_provider="haiper",
         output_video_file_name="Composite.mp4",
     )
 
@@ -365,9 +366,9 @@ if __name__ == "__main__":
         pass
     elif run_an_example == 1:
         # Example 1- Create a composite of text-based videos:
-        with WorkingFolderContext("./examples/inputs/CompositeTextOnly"):
+        with WorkingFolderContext("./examples/inputs/CompositeTextOnly_haiper_music"):
             logger.add("log.txt")
-            asyncio.run(composite_textonly_prompting("./input.csv"))
+            asyncio.run(composite_textonly_prompting("./small_input.csv"))
 
     elif run_an_example == 2:
         # Example 2- Create a batch of text-based videos:
@@ -396,7 +397,7 @@ if __name__ == "__main__":
 
     elif run_an_example == 5:
         # Example 5 - Create a composite of text and image-based videos:
-        with WorkingFolderContext("./examples/inputs/Mixed4/"):
+        with WorkingFolderContext("./examples/inputs/Mixed_t/"):
             logger.add("log.txt")
             asyncio.run(
                 composite_mixed_prompting(
@@ -405,7 +406,7 @@ if __name__ == "__main__":
             )
     elif run_an_example == 6:
         # Example 6 - Create a prompt-based videos
-        with WorkingFolderContext("./examples/inputs/PromptBased_Tokyo/"):
+        with WorkingFolderContext("./examples/inputs/PromptBased_Argantina/"):
             logger.add("log.txt")
 
             # prompt = """London, a city where history and modernity entwine, stretches along the winding path of the River Thames, its skyline a blend of ancient spires
@@ -418,5 +419,9 @@ if __name__ == "__main__":
 
             # prompt = """New York City, often referred to as the "City That Never Sleeps," is a vibrant metropolis that pulses with energy and diversity. Its iconic skyline, dominated by towering skyscrapers like the Empire State Building and One World Trade Center, is a testament to its architectural grandeur. The city is a cultural melting pot, where the bustling streets of Times Square meet the serene beauty of Central Park, and where the neon lights of Broadway theaters illuminate the night. From the trendy neighborhoods of Brooklyn to the historic charm of the Statue of Liberty, New York City offers a rich tapestry of experiences that captivate visitors and residents alike."""
             # prompt = """"China, the world's most populous country, is a captivating blend of ancient history and modern innovation. Its vast landscape includes the Himalayas, the Gobi Desert, and the Yangtze River. Iconic landmarks like the Great Wall and the Forbidden City reflect its rich cultural heritage. From bustling cities like Shanghai and Beijing to serene rural villages, China offers diverse experiences. Its renowned cuisine and traditional arts, such as calligraphy and martial arts, showcase the depth of its cultural legacy."""
-            prompt = """Tokyo, the bustling capital of Japan, is a mesmerizing fusion of ancient tradition and futuristic innovation. Its skyline is a breathtaking blend of towering skyscrapers and historic temples, with the iconic Tokyo Tower and Mount Fuji serving as striking backdrops. The city's vibrant districts, such as the neon-lit streets of Shibuya and the trendy boutiques of Harajuku, offer a sensory overload of color and energy. Tokyo is renowned for its exceptional cuisine, from sushi and ramen to high-end dining, earning it the title of the world's most Michelin-starred city. Despite its modernity, Tokyo preserves its cultural heritage through serene gardens, traditional tea ceremonies, and historic sites like the Meiji Shrine, making it a city that seamlessly balances the old and the new."""
+            # prompt = """Tokyo, the bustling capital of Japan, is a mesmerizing fusion of ancient tradition and futuristic innovation. Its skyline is a breathtaking blend of towering skyscrapers and historic temples, with the iconic Tokyo Tower and Mount Fuji serving as striking backdrops. The city's vibrant districts, such as the neon-lit streets of Shibuya and the trendy boutiques of Harajuku, offer a sensory overload of color and energy. Tokyo is renowned for its exceptional cuisine, from sushi and ramen to high-end dining, earning it the title of the world's most Michelin-starred city. Despite its modernity, Tokyo preserves its cultural heritage through serene gardens, traditional tea ceremonies, and historic sites like the Meiji Shrine, making it a city that seamlessly balances the old and the new."""
+            # prompt = """Amsterdam, known as the "Venice of the North," is a charming city crisscrossed by historic canals and lined with iconic architecture from the Dutch Golden Age. It boasts world-class museums like the Rijksmuseum and Van Gogh Museum, and is famous for its bicycle culture and vibrant nightlife. The city's laid-back atmosphere, picturesque canal houses, and rich cultural heritage make it a captivating destination that blends history and modernity seamlessly."""
+            # prompt = """Barcelona, the cosmopolitan capital of Spain's Catalonia region, is renowned for its unique architecture, vibrant culture, and Mediterranean charm. The city is synonymous with the whimsical designs of Antoni Gaudí, including the iconic Sagrada Família and the colorful Park Güell. Barcelona's lively streets are filled with tapas bars, bustling markets like La Boqueria, and the energetic promenade of La Rambla. With its sunny beaches, rich history, and passionate embrace of art and cuisine, Barcelona offers an unforgettable blend of tradition and modernity."""
+            # prompt = """"Egypt, a land of ancient wonders and timeless beauty, is home to some of the world's most iconic historical sites. The majestic Pyramids of Giza and the enigmatic Sphinx stand as testaments to the country's rich pharaonic heritage. The Nile River, the lifeblood of Egypt, flows through bustling cities like Cairo and Luxor, offering breathtaking views of ancient temples and tombs. From the vibrant markets of Khan El Khalili to the serene beaches of the Red Sea, Egypt is a captivating blend of history, culture, and natural splendor."""
+            prompt = """Argentina, a vast and diverse country in South America, is renowned for its stunning landscapes and vibrant culture. From the bustling streets of Buenos Aires, where tango dancers captivate audiences, to the breathtaking glaciers of Patagonia, Argentina offers a wealth of natural wonders. The country is also famous for its rich gaucho tradition, world-class wine regions like Mendoza, and the awe-inspiring Iguazú Falls. With its passionate embrace of soccer, mouthwatering cuisine, and warm hospitality, Argentina is a destination that truly engages the senses."""
             asyncio.run(prompte_based_composite(prompt=prompt))
