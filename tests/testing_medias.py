@@ -22,6 +22,7 @@ SAMPLE_RECORDED_PROMPT_MEANINGLESS_LIFE = "upload.mp3"
 SMALL_CAT_VIDEO_FILE_NAME = "chat_video_super8.mp4"
 SMALL_VIDEOCRAFTER_VIDEO_FILE_NAME = "videocrafter.mp4"
 SMALL_STABILITY_VIDEO_FILE_NAME = "stability.mp4"
+SMALL_HAIPER_VIDEO_FILE_NAME = "haiper.mp4"
 INTERPOLATE_VIDEO_FILE_NAME = "interpolate.mp4"
 GENERATED_3S_FOREST_VIDEO_SAMPLE_1 = "forest.mp4"
 GENERATED_3S_FOREST_VIDEO_SAMPLE__2 = "treasures.mp4"
@@ -58,6 +59,10 @@ def get_stabilityai_video_path():
 
 def get_stabilityai_image_video_path():
     return os.path.join(_media_dir, SMALL_STABILITY_VIDEO_FILE_NAME)
+
+
+def get_haiper_video_path():
+    return os.path.join(_media_dir, SMALL_HAIPER_VIDEO_FILE_NAME)
 
 
 def get_videocrafter_video_path():

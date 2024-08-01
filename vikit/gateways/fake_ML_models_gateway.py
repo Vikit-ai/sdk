@@ -145,7 +145,7 @@ class FakeMLModelsGateway(MLModelsGateway):
         elif model_provider == "" or model_provider is None:
             test_file = tests_medias.get_cat_video_path()
         elif model_provider == "haiper":
-            test_file = tests_medias.get_cat_video_path()
+            test_file = tests_medias.get_haiper_video_path()
         elif model_provider == "videocrafter":
             test_file = tests_medias.get_videocrafter_video_path()
         elif model_provider == "stabilityai_image":
