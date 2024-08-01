@@ -59,27 +59,30 @@ def get_estimated_duration(composite: CompositeVideo):
 
 
 async def batch_raw_text_based_prompting(
-    prompt_file: str, model_provider: str = "videocrafter"
+    prompt_file: str, model_provider: str = "haiper"
 ):
     to_interpolate = True if model_provider == "videocrafter" else False
 
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
     for _, row in prompt_df.iterrows():
         output_file = f"{row.iloc[0]}.mp4"
+        prompt_content = row.iloc[1]
         video_build_settings = VideoBuildSettings(
             music_building_context=MusicBuildingContext(
-                apply_background_music=True, generate_background_music=True
+                apply_background_music=True,
+                generate_background_music=True,
+                expected_music_length=4,
             ),
-            test_mode=False,
             interpolate=to_interpolate,
             target_model_provider=model_provider,
             output_video_file_name=output_file,
+            test_mode=False,
         )
-        prompt = await PromptFactory(
+        video_build_settings.prompt = await PromptFactory(
             ml_gateway=video_build_settings.get_ml_models_gateway()
-        ).create_prompt_from_text(row.iloc[1])
-        video_build_settings.prompt = prompt
-        video = RawTextBasedVideo(prompt.text)
+        ).create_prompt_from_text(prompt_content)
+
+        video = RawTextBasedVideo(prompt_content)
         await video.build(build_settings=video_build_settings)
 
 
