@@ -17,8 +17,12 @@ import os
 
 TESTS_MEDIA_FOLDER = "medias"
 TRANSITION_BOY_IN_TRAIN = "transition_[seine]_from_Travel_to_travel.mp4"
+TRANSITION_SEINE = "transition_[seine]_from_scene1_to_scene2.mp4"
 SAMPLE_RECORDED_PROMPT_MEANINGLESS_LIFE = "upload.mp3"
 SMALL_CAT_VIDEO_FILE_NAME = "chat_video_super8.mp4"
+SMALL_VIDEOCRAFTER_VIDEO_FILE_NAME = "videocrafter.mp4"
+SMALL_STABILITY_VIDEO_FILE_NAME = "stability.mp4"
+INTERPOLATE_VIDEO_FILE_NAME = "interpolate.mp4"
 GENERATED_3S_FOREST_VIDEO_SAMPLE_1 = "forest.mp4"
 GENERATED_3S_FOREST_VIDEO_SAMPLE__2 = "treasures.mp4"
 GENERATED_TRANSITION_FOREST_TREASURE_VIDEO_SAMPLE = (
@@ -36,12 +40,28 @@ _media_dir = os.path.join(
 )
 
 
+def get_interpolate_video():
+    return os.path.join(_media_dir, INTERPOLATE_VIDEO_FILE_NAME)
+
+
 def get_sample_gen_background_music():
     return os.path.join(_media_dir, SAMPLE_GENERATED_BG_MUSIC)
 
 
 def get_cat_video_path():
     return os.path.join(_media_dir, SMALL_CAT_VIDEO_FILE_NAME)
+
+
+def get_stabilityai_video_path():
+    return os.path.join(_media_dir, SMALL_STABILITY_VIDEO_FILE_NAME)
+
+
+def get_stabilityai_image_video_path():
+    return os.path.join(_media_dir, SMALL_STABILITY_VIDEO_FILE_NAME)
+
+
+def get_videocrafter_video_path():
+    return os.path.join(_media_dir, SMALL_VIDEOCRAFTER_VIDEO_FILE_NAME)
 
 
 def get_sample_generated_music_path():
@@ -92,6 +112,10 @@ def get_test_prompt_recording_stones_trainboy_path():
 
 def get_test_transition_stones_trainboy_path():
     return os.path.join(_media_dir, TRANSITION_BOY_IN_TRAIN)
+
+
+def get_test_sein_transition_video_path():
+    return os.path.join(_media_dir, TRANSITION_SEINE)
 
 
 def get_test_recorded_prompt_path():
