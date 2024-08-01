@@ -85,6 +85,38 @@ def get_media_duration(input_video_path):
     result.check_returncode()
     return float(float(result.stdout))
 
+def get_media_fps(input_video_path):
+    """
+    Get the frames per second of a media file.
+
+    Args:
+        input_video_path (str): The path to the input video file.
+
+    Returns:
+        float: The FPS of the media file in frames per seconds.
+    """
+    assert os.path.exists(input_video_path), f"File {input_video_path} does not exist"
+
+    result = subprocess.run(
+        [
+            "ffprobe",
+            "-v",
+            "0",
+            "-of",
+            "csv=p=0",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=r_frame_rate",
+            input_video_path,
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    result.check_returncode()
+
+    return float(str(result.stdout).split("/")[0].replace("b'", "")) / float(str(result.stdout).split("/")[1].replace("\\n'", ""))
+
 
 @log_function_params
 async def extract_audio_slice(
@@ -211,7 +243,7 @@ async def convert_as_mp3_file(fileName, target_file_name: str):
 
 
 async def concatenate_videos(
-    input_file: str, target_file_name=None, ratioToMultiplyAnimations=1, bias=0.33
+    input_file: str, target_file_name=None, ratioToMultiplyAnimations=1, bias=0.33, fps=16, max_fps=16
 ):
     """
     Concatenate all the videos in the list using a concatenation file
@@ -245,7 +277,7 @@ async def concatenate_videos(
         "-i",
         input_file,
         "-vf",
-        f"setpts={1 / ratioToMultiplyAnimations} * PTS",
+        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB,fps={fps * ratioToMultiplyAnimations}", #
         "-c:v",
         "libx264",
         "-crf",
