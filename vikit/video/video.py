@@ -67,7 +67,7 @@ class Video(ABC):
         self._background_music_file_name = None
         self._duration = None
         self._is_video_built = False
-        self._needs_video_reencoding: bool = False
+        self._needs_video_reencoding: bool = True
         self.temp_id = random.getrandbits(
             16
         )  # used to get a short ID when mixed within local filesystem filenames

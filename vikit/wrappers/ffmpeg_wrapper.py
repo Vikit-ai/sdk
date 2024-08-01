@@ -266,6 +266,26 @@ async def concatenate_videos(
             f"Ratio to multiply animations should be greater than 0. Got {ratioToMultiplyAnimations}"
         )
 
+    logger.debug("Merge with ffmpeg command: ffmpeg" + " " + 
+        "-y" + " " + 
+        "-f" + " " + 
+        "concat" + " " + 
+        "-safe" + " " + 
+        "0" + " " + 
+        "-i" + " " + 
+        input_file + " " + 
+        "-vf" + " " + 
+        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB+ STARTPTS,fps={fps}"  + " " + 
+        "-c:v"  + " " + 
+        "libx264" + " " + 
+        "-crf" + " " + 
+        "23" + " " + 
+        "-c:a" + " " + 
+        "aac" + " " + 
+        "-b:a" + " " + 
+        "192k" + " " + 
+        target_file_name)
+
     # Build the ffmpeg command
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
@@ -277,7 +297,7 @@ async def concatenate_videos(
         "-i",
         input_file,
         "-vf",
-        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB,fps={fps * ratioToMultiplyAnimations}", #
+        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB + STARTPTS,fps={fps}", #
         "-c:v",
         "libx264",
         "-crf",
@@ -521,6 +541,8 @@ async def reencode_video(video_url, target_video_name=None):
         "-y",
         "-i",
         video_url,
+        "-filter:v",
+        "fps=24",
         "-c:v",
         "libx264",
         "-profile:v",
