@@ -225,13 +225,25 @@ class CompositeVideo(Video, is_composite_video):
             with_dependency_videos = [
                 v for v in ordered_video_list if v.video_dependencies
             ]
-            for video in with_dependency_videos:
-                dependencies_processed = all(
-                    dep._is_video_built for dep in video.video_dependencies
-                )
-                if not dependencies_processed:
-                    raise Exception(f"{video} dependencies should have been processed.")
-                await video.build(build_settings=self.get_children_build_settings())
+            # Répéter le processus jusqu'à ce que toutes les vidéos soient traitées
+            while with_dependency_videos:
+                tasks = []
+                for video in with_dependency_videos[:]:
+                    dependencies_processed = all(
+                        dep._is_video_built for dep in video.video_dependencies
+                    )
+                    if dependencies_processed:
+                        tasks.append(
+                            video.build(
+                                build_settings=self.get_children_build_settings()
+                            )
+                        )
+                        with_dependency_videos.remove(video)
+
+                if tasks:
+                    await asyncio.gather(*tasks)
+                else:
+                    raise Exception("Certaines dépendances n'ont pas pu être traitées.")
 
         # at this stage we should have all the videos generated. Will be improved in the future
         # in case we are called directly on a child composite without starting by the composite root
