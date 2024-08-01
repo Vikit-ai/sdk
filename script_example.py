@@ -15,6 +15,7 @@
 
 import os
 from vikit.common.decorators import log_function_params
+from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.transition import Transition
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.seine_transition import SeineTransition
@@ -247,7 +248,7 @@ async def composite_mixed_prompting(prompt_file: str):
 
     text_based_video_buildsettings = VideoBuildSettings(
         test_mode=TEST_MODE,
-        target_model_provider="stabilityai",
+        target_model_provider="videocrafter",
     )
 
     vid_cp_sub = CompositeVideo()
@@ -276,7 +277,7 @@ async def composite_mixed_prompting(prompt_file: str):
 
         await video.prepare_build(build_settings=video.build_settings)
 
-        if i >= 1:
+        if i >= 1 and i % 2 == 0:
             n_videos = len(vid_cp_sub.video_list)
             transition_video = SeineTransition(
                 source_video=vid_cp_sub.video_list[n_videos - 1],
@@ -301,6 +302,25 @@ async def composite_mixed_prompting(prompt_file: str):
         "A happy Guitar music!"
     )
     await vid_cp_sub.build(build_settings=composite_build_settings)
+
+
+async def prompte_based_composite(prompt: str):
+
+    video_build_settings = VideoBuildSettings(
+        music_building_context=MusicBuildingContext(
+            apply_background_music=True,
+            generate_background_music=True,
+        ),
+        test_mode=False,
+        include_read_aloud_prompt=True,
+        target_model_provider="videocrafter",
+        output_video_file_name="Composite.mp4",
+    )
+
+    gw = video_build_settings.get_ml_models_gateway()
+    prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(prompt)
+    video = PromptBasedVideo(prompt=prompt)
+    await video.build(build_settings=video_build_settings)
 
 
 if __name__ == "__main__":
@@ -358,11 +378,26 @@ if __name__ == "__main__":
     #         )
     #     )
 
-    # Example 5 - Create a composite of text and image-based videos:
-    with WorkingFolderContext("./examples/inputs/Mixed/"):
+    # # Example 5 - Create a composite of text and image-based videos:
+    # with WorkingFolderContext("./examples/inputs/Mixed2/"):
+    #     logger.add("log.txt")
+    #     asyncio.run(
+    #         composite_mixed_prompting(
+    #             "input.csv",
+    #         )
+    #     )
+
+    # Example 6 - Create a prompt-based videos
+    with WorkingFolderContext("./examples/inputs/PromptBased_NY/"):
         logger.add("log.txt")
-        asyncio.run(
-            composite_mixed_prompting(
-                "input.csv",
-            )
-        )
+
+        # prompt = """London, a city where history and modernity entwine, stretches along the winding path of the River Thames, its skyline a blend of ancient spires
+        #             and glistening skyscrapers. The iconic Big Ben and the towering London Eye stand sentinel over the bustling streets, where red double-decker buses
+        #               and black cabs weave among the crowds. The city's architectural tapestry unfolds in every direction, from the grandeur of Buckingham Palace to
+        #               the contemporary elegance of The Shard. Along the riverbanks, the vibrant markets of Borough and Camden offer a symphony of flavors and cultures,
+        #               while the tranquil greenery of Hyde Park and St. James's Park provides a serene escape. As the sun sets, the city transforms into a dazzling spectacle
+        #               of lights, with the West End's theaters and the neon signs of Piccadilly Circus illuminating the night, embodying the spirit of a city that never
+        #               truly sleeps."""
+
+        prompt = """New York City, often referred to as the "City That Never Sleeps," is a vibrant metropolis that pulses with energy and diversity. Its iconic skyline, dominated by towering skyscrapers like the Empire State Building and One World Trade Center, is a testament to its architectural grandeur. The city is a cultural melting pot, where the bustling streets of Times Square meet the serene beauty of Central Park, and where the neon lights of Broadway theaters illuminate the night. From the trendy neighborhoods of Brooklyn to the historic charm of the Statue of Liberty, New York City offers a rich tapestry of experiences that captivate visitors and residents alike."""
+        asyncio.run(prompte_based_composite(prompt=prompt))
