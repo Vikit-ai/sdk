@@ -121,7 +121,7 @@ async def composite_textonly_prompting(prompt_file: str):
         ),
         test_mode=TEST_MODE,
         target_model_provider=model_provider,
-        output_video_file_name="Composit.mp4",
+        output_video_file_name="Composite.mp4",
         expected_length=total_duration,
     )
     # set up music prompt
@@ -230,7 +230,7 @@ async def composite_imageonly_prompting(prompt_file: str):
         ),
         test_mode=TEST_MODE,
         target_model_provider="stabilityai_image",
-        output_video_file_name="Composit.mp4",
+        output_video_file_name="Composite.mp4",
         expected_length=total_duration,
     )
     composite_build_settings.prompt = await PromptFactory().create_prompt_from_text(
@@ -294,7 +294,7 @@ async def composite_mixed_prompting(prompt_file: str):
             expected_music_length=total_duration + 1,
         ),
         test_mode=TEST_MODE,
-        output_video_file_name="Composit.mp4",
+        output_video_file_name="Composite.mp4",
         expected_length=total_duration,
     )
 
@@ -347,57 +347,73 @@ if __name__ == "__main__":
         help="chose the model provider that will be generate all the scenes (but not the transitions if any): stabilityai, videocrafter, haiper, stabilityai_image",
     )
 
+    parser.add_argument(
+        "--example",
+        default=None,
+        type=int,
+        help="choose one of the predefined examples to run",
+    )
+
     # Parse the command-line arguments
     args = parser.parse_args()
 
-    # # Example 1- Create a composite of text-based videos:
-    # with WorkingFolderContext("./examples/inputs/TextOnly"):
-    #     logger.add("log.txt")
-    #     asyncio.run(composite_textonly_prompting("./input.csv"))
+    run_an_example = args.example
+    if run_an_example is None:
+        pass
+    elif run_an_example == 1:
+        # Example 1- Create a composite of text-based videos:
+        with WorkingFolderContext("./examples/inputs/CompositeTextOnly"):
+            logger.add("log.txt")
+            asyncio.run(composite_textonly_prompting("./input.csv"))
 
-    # # Example 2- Create a batch of text-based videos:
-    # with WorkingFolderContext("./examples/inputs/TextOnly"):
-    #     logger.add("log.txt")
-    #     asyncio.run(batch_raw_text_based_prompting("./small_input.csv"))
+    elif run_an_example == 2:
+        # Example 2- Create a batch of text-based videos:
+        with WorkingFolderContext("./examples/inputs/TextOnly"):
+            logger.add("log.txt")
+            asyncio.run(batch_raw_text_based_prompting("./small_input.csv"))
 
-    # # Example 3 - Create a batch of videos from images
-    # with WorkingFolderContext("./examples/inputs/ImageOnly/"):
-    #     logger.add("log.txt")
-    #     asyncio.run(
-    #         batch_image_based_prompting(
-    #             "input.csv",
-    #         )
-    #     )
+    elif run_an_example == 3:
+        # Example 3 - Create a batch of videos from images
+        with WorkingFolderContext("./examples/inputs/ImageOnly/"):
+            logger.add("log.txt")
+            asyncio.run(
+                batch_image_based_prompting(
+                    "input.csv",
+                )
+            )
+    elif run_an_example == 4:
+        # Example 4 - Create a composite of image-based videos:
+        with WorkingFolderContext("./examples/inputs/ImageOnly/"):
+            logger.add("log.txt")
+            asyncio.run(
+                composite_imageonly_prompting(
+                    "input.csv",
+                )
+            )
 
-    # # Example 4 - Create a composite of image-based videos:
-    # with WorkingFolderContext("./examples/inputs/ImageOnly/"):
-    #     logger.add("log.txt")
-    #     asyncio.run(
-    #         composite_imageonly_prompting(
-    #             "input.csv",
-    #         )
-    #     )
+    elif run_an_example == 5:
+        # Example 5 - Create a composite of text and image-based videos:
+        with WorkingFolderContext("./examples/inputs/Mixed4/"):
+            logger.add("log.txt")
+            asyncio.run(
+                composite_mixed_prompting(
+                    "input.csv",
+                )
+            )
+    elif run_an_example == 6:
+        # Example 6 - Create a prompt-based videos
+        with WorkingFolderContext("./examples/inputs/PromptBased_Tokyo/"):
+            logger.add("log.txt")
 
-    # # Example 5 - Create a composite of text and image-based videos:
-    # with WorkingFolderContext("./examples/inputs/Mixed2/"):
-    #     logger.add("log.txt")
-    #     asyncio.run(
-    #         composite_mixed_prompting(
-    #             "input.csv",
-    #         )
-    #     )
+            # prompt = """London, a city where history and modernity entwine, stretches along the winding path of the River Thames, its skyline a blend of ancient spires
+            #             and glistening skyscrapers. The iconic Big Ben and the towering London Eye stand sentinel over the bustling streets, where red double-decker buses
+            #               and black cabs weave among the crowds. The city's architectural tapestry unfolds in every direction, from the grandeur of Buckingham Palace to
+            #               the contemporary elegance of The Shard. Along the riverbanks, the vibrant markets of Borough and Camden offer a symphony of flavors and cultures,
+            #               while the tranquil greenery of Hyde Park and St. James's Park provides a serene escape. As the sun sets, the city transforms into a dazzling spectacle
+            #               of lights, with the West End's theaters and the neon signs of Piccadilly Circus illuminating the night, embodying the spirit of a city that never
+            #               truly sleeps."""
 
-    # Example 6 - Create a prompt-based videos
-    with WorkingFolderContext("./examples/inputs/PromptBased_NY/"):
-        logger.add("log.txt")
-
-        # prompt = """London, a city where history and modernity entwine, stretches along the winding path of the River Thames, its skyline a blend of ancient spires
-        #             and glistening skyscrapers. The iconic Big Ben and the towering London Eye stand sentinel over the bustling streets, where red double-decker buses
-        #               and black cabs weave among the crowds. The city's architectural tapestry unfolds in every direction, from the grandeur of Buckingham Palace to
-        #               the contemporary elegance of The Shard. Along the riverbanks, the vibrant markets of Borough and Camden offer a symphony of flavors and cultures,
-        #               while the tranquil greenery of Hyde Park and St. James's Park provides a serene escape. As the sun sets, the city transforms into a dazzling spectacle
-        #               of lights, with the West End's theaters and the neon signs of Piccadilly Circus illuminating the night, embodying the spirit of a city that never
-        #               truly sleeps."""
-
-        prompt = """New York City, often referred to as the "City That Never Sleeps," is a vibrant metropolis that pulses with energy and diversity. Its iconic skyline, dominated by towering skyscrapers like the Empire State Building and One World Trade Center, is a testament to its architectural grandeur. The city is a cultural melting pot, where the bustling streets of Times Square meet the serene beauty of Central Park, and where the neon lights of Broadway theaters illuminate the night. From the trendy neighborhoods of Brooklyn to the historic charm of the Statue of Liberty, New York City offers a rich tapestry of experiences that captivate visitors and residents alike."""
-        asyncio.run(prompte_based_composite(prompt=prompt))
+            # prompt = """New York City, often referred to as the "City That Never Sleeps," is a vibrant metropolis that pulses with energy and diversity. Its iconic skyline, dominated by towering skyscrapers like the Empire State Building and One World Trade Center, is a testament to its architectural grandeur. The city is a cultural melting pot, where the bustling streets of Times Square meet the serene beauty of Central Park, and where the neon lights of Broadway theaters illuminate the night. From the trendy neighborhoods of Brooklyn to the historic charm of the Statue of Liberty, New York City offers a rich tapestry of experiences that captivate visitors and residents alike."""
+            # prompt = """"China, the world's most populous country, is a captivating blend of ancient history and modern innovation. Its vast landscape includes the Himalayas, the Gobi Desert, and the Yangtze River. Iconic landmarks like the Great Wall and the Forbidden City reflect its rich cultural heritage. From bustling cities like Shanghai and Beijing to serene rural villages, China offers diverse experiences. Its renowned cuisine and traditional arts, such as calligraphy and martial arts, showcase the depth of its cultural legacy."""
+            prompt = """Tokyo, the bustling capital of Japan, is a mesmerizing fusion of ancient tradition and futuristic innovation. Its skyline is a breathtaking blend of towering skyscrapers and historic temples, with the iconic Tokyo Tower and Mount Fuji serving as striking backdrops. The city's vibrant districts, such as the neon-lit streets of Shibuya and the trendy boutiques of Harajuku, offer a sensory overload of color and energy. Tokyo is renowned for its exceptional cuisine, from sushi and ramen to high-end dining, earning it the title of the world's most Michelin-starred city. Despite its modernity, Tokyo preserves its cultural heritage through serene gardens, traditional tea ceremonies, and historic sites like the Meiji Shrine, making it a city that seamlessly balances the old and the new."""
+            asyncio.run(prompte_based_composite(prompt=prompt))
