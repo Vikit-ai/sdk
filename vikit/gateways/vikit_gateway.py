@@ -703,11 +703,13 @@ class VikitGateway(MLModelsGateway):
                 }
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
-                    if not output.json()["value"]["url"].startswith("http"):
+                    logger.debug(f"{output}")
+                    output = json.loads(output)
+                    if not output["value"]["url"].startswith("http"):
                         raise AttributeError(
                             "The result Haiper video link is not a link"
                         )
-                    return output.json()["value"]["url"]
+                    return output["value"]["url"]
         except Exception as e:
             logger.error(f"Error generating video from prompt: {e}")
             raise
