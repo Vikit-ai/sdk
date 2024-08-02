@@ -251,7 +251,7 @@ class VikitGateway(MLModelsGateway):
                         )
                     else:
                         return response
-        except e:
+        except Exception as e:
             raise Exception("Retry failed {e}")
 
     @retry(
@@ -570,7 +570,7 @@ class VikitGateway(MLModelsGateway):
 
                     logger.trace(f"Subtitles: {subs}")
                     return json.loads(subs)
-        except e:
+        except Exception as e:
             raise Exception("Retry failed {e}")
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
