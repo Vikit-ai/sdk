@@ -184,12 +184,6 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
     if path is None:
         return {"type": "none", "path": path}, "The path is None"
 
-    if len(path) > get_max_path_length():
-        return {
-            "type": "error",
-            "path": "",
-        }, "The file name is too long for local filesystem storage"
-
     # Check if the path is a URL
     parsed_uri = urllib.parse.urlparse(str(path))
     if parsed_uri.scheme in ["http", "https", "s3", "gs"]:
@@ -197,8 +191,20 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
 
     if path.startswith("file://"):
         logger.debug(f"Path is a local url format: {path}")
+        if len(path) > get_max_path_length():
+            return {
+                "type": "error",
+                "path": "",
+            }, "The file name is too long for local filesystem storage"
+
         return {"type": "local_url_format", "path": path}, None
     if os.path.isdir(path) or os.path.isfile(path):
+        if len(path) > get_max_path_length():
+            return {
+                "type": "error",
+                "path": "",
+            }, "The file name is too long for local filesystem storage"
+
         return {"type": "local", "path": path}, None
 
     # by default, consider it as a local path
@@ -221,7 +227,8 @@ async def download_or_copy_file(url, local_path):
         raise ValueError("URL must be provided")
 
     path_desc, error = get_path_type(url)
-
+    if len(local_path) > 255:
+        local_path = local_path[-255:]
     if not error:
         if path_desc["type"] == "http" or path_desc["type"] == "https":
             async with aiohttp.ClientSession() as session:
@@ -256,4 +263,4 @@ async def download_or_copy_file(url, local_path):
             shutil.copyfile(url, local_path)
             return local_path
     else:
-        raise ValueError(f"Unsupported remote path type: {url}")
+        raise ValueError(f"Unsupported remote path type: {url} with error: {error}")

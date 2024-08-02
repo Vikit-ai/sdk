@@ -16,7 +16,6 @@
 import subprocess
 import os
 import json
-import signal
 import asyncio
 
 from loguru import logger
@@ -69,7 +68,6 @@ def get_media_duration(input_video_path):
         float: The duration of the media file in seconds.
     """
     assert os.path.exists(input_video_path), f"File {input_video_path} does not exist"
-
     result = subprocess.run(
         [
             "ffprobe",
@@ -140,7 +138,7 @@ async def extract_audio_slice(
         str: The path to the extracted audio slice
     """
 
-    logger.info(
+    logger.debug(
         f"Extracting audio slice from file  {audiofile_path} from {start} to {end}"
     )
 
@@ -166,41 +164,24 @@ async def extract_audio_slice(
     if media_length < end:
         raise ValueError("The expected audio length is longer than audio file provided")
 
-    try:
-        # Create sub part of subtitles
-        process = await asyncio.create_subprocess_exec(
-            "ffmpeg",
-            "-y",
-            "-ss",
-            str(start),
-            "-t",
-            str(end),
-            "-i",
-            audiofile_path,
-            "-acodec",
-            "copy",
-            target_file_name,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-    except KeyboardInterrupt:
-        logger.warning("Process creation interrupted by user (Ctrl-C)")
-        process.send_signal(signal.SIGINT)
-        raise
-    except Exception as e:
-        logger.warning(f"Failed to create process: {e}")
-        return
+    # Create sub part of subtitles
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-y",
+        "-ss",
+        str(start),
+        "-t",
+        str(end),
+        "-i",
+        audiofile_path,
+        "-acodec",
+        "copy",
+        target_file_name,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
 
-    try:
-        stdout, stderr = await process.communicate()
-    except KeyboardInterrupt:
-        logger.warning(
-            "Extract audio slice process execution interrupted by user (Ctrl-C)"
-        )
-        process.terminate()
-        await process.wait()
-        logger.warning("Process terminated")
-
+    stdout, stderr = await process.communicate()
     if process.returncode != 0:
         error_messages = []
         if stdout:
@@ -233,33 +214,17 @@ async def convert_as_mp3_file(fileName, target_file_name: str):
     Returns:
         str: The path to the converted audio file
     """
-    logger.info("Starting the conversion of the audio file to MP3 with ffmpeg")
-    try:
-        process = await asyncio.create_subprocess_exec(
-            "ffmpeg",
-            "-y",
-            "-i",
-            fileName,
-            target_file_name,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-    except KeyboardInterrupt:
-        logger.warning("Process creation interrupted by user (Ctrl-C)")
-        process.send_signal(signal.SIGINT)
-        raise
-    except Exception as e:
-        logger.warning(f"Failed to create process: {e}")
-        return
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-y",
+        "-i",
+        fileName,
+        target_file_name,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
 
-    try:
-        stdout, stderr = await process.communicate()
-    except KeyboardInterrupt:
-        logger.warning("Convert to MP3 Process execution interrupted by user (Ctrl-C)")
-        process.terminate()
-        await process.wait()
-        logger.warning("Process terminated")
-
+    stdout, stderr = await process.communicate()
     if process.returncode != 0:
         error_messages = []
         if stdout:
@@ -309,53 +274,71 @@ async def concatenate_videos(
             f"Ratio to multiply animations should be greater than 0. Got {ratioToMultiplyAnimations}"
         )
 
-    # Build the ffmpeg command
-    logger.info(
-        f"Starting Video concatenation process, using ffmpeg, concat txt: {input_file}"
+    logger.debug(
+        "Merge with ffmpeg command: ffmpeg"
+        + " "
+        + "-y"
+        + " "
+        + "-f"
+        + " "
+        + "concat"
+        + " "
+        + "-safe"
+        + " "
+        + "0"
+        + " "
+        + "-i"
+        + " "
+        + input_file
+        + " "
+        + "-vf"
+        + " "
+        + f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB+ STARTPTS,fps={fps}"
+        + " "
+        + "-c:v"
+        + " "
+        + "libx264"
+        + " "
+        + "-crf"
+        + " "
+        + "23"
+        + " "
+        + "-c:a"
+        + " "
+        + "aac"
+        + " "
+        + "-b:a"
+        + " "
+        + "192k"
+        + " "
+        + target_file_name
     )
 
-    try:
-
-        process = await asyncio.create_subprocess_exec(
-            "ffmpeg",
-            "-y",
-            "-f",
-            "concat",
-            "-safe",
-            "0",
-            "-i",
-            input_file,
-            "-vf",
-            f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB,fps={fps * ratioToMultiplyAnimations}",  #
-            "-c:v",
-            "libx264",
-            "-crf",
-            "23",
-            "-c:a",
-            "aac",
-            "-b:a",
-            "192k",
-            target_file_name,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-    except KeyboardInterrupt:
-        logger.warning("Process creation interrupted by user (Ctrl-C)")
-        process.send_signal(signal.SIGINT)
-        raise
-    except Exception as e:
-        logger.warning(f"Failed to create process: {e}")
-        return
-
-    try:
-        stdout, stderr = await process.communicate()
-    except KeyboardInterrupt:
-        logger.warning(
-            "Video concatenation process execution interrupted by user (Ctrl-C)"
-        )
-        process.terminate()
-        await process.wait()
-        logger.warning("Process terminated")
+    # Build the ffmpeg command
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-y",
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        input_file,
+        "-vf",
+        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB + STARTPTS,fps={fps}",  #
+        "-c:v",
+        "libx264",
+        "-crf",
+        "23",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "192k",
+        target_file_name,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
 
     if process.returncode != 0:
         error_messages = []
@@ -365,9 +348,8 @@ async def concatenate_videos(
             error_messages.append(f"stderr: {stderr.decode()}")
 
         if error_messages:
-            error_message = (
-                "ffmpeg command to concatenate videos failed with: "
-                + " and ".join(error_messages)
+            error_message = "ffmpeg command failed with: " + " and ".join(
+                error_messages
             )
         else:
             error_message = "ffmpeg command failed without error output"
@@ -437,58 +419,39 @@ async def _merge_audio_and_video_with_existing_audio(
         str: The merged audio file
 
     """
-    logger.info("Starting Video/Audio merge , audio already existing")
 
-    try:
-        process = await asyncio.create_subprocess_exec(
-            "ffmpeg",
-            "-y",
-            "-i",
-            audio_file_path,
-            "-i",
-            media_url,
-            "-filter_complex",
-            f"[0:a]apad,loudnorm,volume={audio_file_relative_volume}[A];[1:a][A]amerge[out]",
-            "-map",
-            "1:v",
-            "-c:v",
-            "libx264",
-            "-profile:v",
-            "baseline",
-            "-level",
-            "3.0",  # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
-            "-pix_fmt",
-            "yuv420p",  # This tells FFmpeg to use the yuv420p pixel format.
-            "-map",
-            "[out]",
-            "-acodec",
-            "aac",
-            "-ar",
-            "44100",  # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
-            "-ac",
-            "2",  # This tells FFmpeg to use 2 audio channels.
-            target_file_name,
-            stdout=asyncio.subprocess.PIPE,  # Capture la sortie standard
-            stderr=asyncio.subprocess.PIPE,  # Capture la sortie d'erreur
-        )
-    except KeyboardInterrupt:
-        logger.warning("Process creation interrupted by user (Ctrl-C)")
-        process.send_signal(signal.SIGINT)
-        raise
-    except Exception as e:
-        logger.warning(f"Failed to create process: {e}")
-        return
-
-    try:
-        stdout, stderr = await process.communicate()
-    except KeyboardInterrupt:
-        logger.warning(
-            "Video / audio merging process execution interrupted by user (Ctrl-C)"
-        )
-        process.terminate()
-        await process.wait()
-        logger.warning("Process terminated")
-
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-y",
+        "-i",
+        audio_file_path,
+        "-i",
+        media_url,
+        "-filter_complex",
+        f"[0:a]apad,loudnorm,volume={audio_file_relative_volume},aformat=sample_fmts=u8|s16:channel_layouts=stereo[A];[1:a][A]amerge[out]",
+        "-map",
+        "1:v",
+        "-c:v",
+        "libx264",
+        "-profile:v",
+        "baseline",
+        "-level",
+        "3.0",  # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
+        "-pix_fmt",
+        "yuv420p",  # This tells FFmpeg to use the yuv420p pixel format.
+        "-map",
+        "[out]",
+        "-acodec",
+        "aac",
+        "-ar",
+        "44100",  # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
+        "-ac",
+        "2",  # This tells FFmpeg to use 2 audio channels.
+        target_file_name,
+        stdout=asyncio.subprocess.PIPE,  # Capture la sortie standard
+        stderr=asyncio.subprocess.PIPE,  # Capture la sortie d'erreur
+    )
+    stdout, stderr = await process.communicate()
     if process.returncode != 0:
         error_messages = []
         if stdout:
@@ -497,9 +460,8 @@ async def _merge_audio_and_video_with_existing_audio(
             error_messages.append(f"stderr: {stderr.decode()}")
 
         if error_messages:
-            error_message = (
-                "video / audio merging : ffmpeg command failed with: "
-                + " and ".join(error_messages)
+            error_message = "ffmpeg command failed with: " + " and ".join(
+                error_messages
             )
         else:
             error_message = "ffmpeg command failed without error output"
@@ -529,61 +491,41 @@ async def _merge_audio_and_video_without_audio_track(
         str: The merged audio file
 
     """
-    logger.info(
-        "Starting the video/audio merging, no existing auio track on the source video"
+    logger.debug(f"parameters: {media_url}, {audio_file_path}, {target_file_name}")
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-y",
+        "-i",
+        audio_file_path,
+        "-i",
+        media_url,
+        "-filter_complex",
+        f"[0:a]apad,loudnorm,volume={audio_file_relative_volume}[A]",
+        "-shortest",
+        "-map",
+        "1:v",
+        "-c:v",
+        "libx264",
+        "-profile:v",
+        "baseline",
+        "-level",
+        "3.0",
+        "-pix_fmt",
+        "yuv420p",
+        "-map",
+        "[A]",
+        "-acodec",
+        "aac",
+        "-ar",
+        "44100",
+        "-ac",
+        "2",
+        target_file_name,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
     )
 
-    try:
-        process = await asyncio.create_subprocess_exec(
-            "ffmpeg",
-            "-y",
-            "-i",
-            audio_file_path,
-            "-i",
-            media_url,
-            "-filter_complex",
-            f"[0:a]apad,loudnorm,volume={audio_file_relative_volume}[A]",
-            "-shortest",
-            "-map",
-            "1:v",
-            "-c:v",
-            "libx264",
-            "-profile:v",
-            "baseline",
-            "-level",
-            "3.0",
-            "-pix_fmt",
-            "yuv420p",
-            "-map",
-            "[A]",
-            "-acodec",
-            "aac",
-            "-ar",
-            "44100",
-            "-ac",
-            "2",
-            target_file_name,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-    except KeyboardInterrupt:
-        logger.warning("Process creation interrupted by user (Ctrl-C)")
-        process.send_signal(signal.SIGINT)
-        raise
-    except Exception as e:
-        logger.warning(f"Failed to create process: {e}")
-        return
-
-    try:
-        stdout, stderr = await process.communicate()
-    except KeyboardInterrupt:
-        logger.warning(
-            "Video / audio merge process execution interrupted by user (Ctrl-C)"
-        )
-        process.terminate()
-        await process.wait()
-        logger.warning("Process terminated")
-
+    stdout, stderr = await process.communicate()
     if process.returncode != 0:
         error_messages = []
         if stdout:
@@ -592,9 +534,8 @@ async def _merge_audio_and_video_without_audio_track(
             error_messages.append(f"stderr: {stderr.decode()}")
 
         if error_messages:
-            error_message = (
-                "Audio / Video merging ffmpeg command failed with: "
-                + " and ".join(error_messages)
+            error_message = "ffmpeg command failed with: " + " and ".join(
+                error_messages
             )
         else:
             error_message = "ffmpeg command failed without error output"
@@ -623,49 +564,33 @@ async def reencode_video(video_url, target_video_name=None):
     if not target_video_name:
         target_video_name = "reencoded_" + get_canonical_name(video_url) + ".mp4"
 
-    logger.info(
-        f"Starting the ffmpeg reencoding of video {video_url} to {target_video_name}"
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-y",
+        "-i",
+        video_url,
+        "-filter:v",
+        "fps=24",
+        "-c:v",
+        "libx264",
+        "-profile:v",
+        "baseline",
+        "-level",
+        "3.0",  # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
+        "-pix_fmt",
+        "yuv420p",  # This tells FFmpeg to use the yuv420p pixel format.
+        "-acodec",
+        "aac",
+        "-ar",
+        "44100",  # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
+        "-ac",
+        "2",  # This tells FFmpeg to use 2 audio channels.
+        target_video_name,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
     )
-    try:
-        process = await asyncio.create_subprocess_exec(
-            "ffmpeg",
-            "-y",
-            "-i",
-            video_url,
-            "-c:v",
-            "libx264",
-            "-profile:v",
-            "baseline",
-            "-level",
-            "3.0",  # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
-            "-pix_fmt",
-            "yuv420p",  # This tells FFmpeg to use the yuv420p pixel format.
-            "-acodec",
-            "aac",
-            "-ar",
-            "44100",  # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
-            "-ac",
-            "2",  # This tells FFmpeg to use 2 audio channels.
-            target_video_name,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-    except KeyboardInterrupt:
-        logger.warning("Process creation interrupted by user (Ctrl-C)")
-        process.send_signal(signal.SIGINT)
-        raise
-    except Exception as e:
-        logger.warning(f"Failed to create process: {e}")
-        return
 
-    try:
-        stdout, stderr = await process.communicate()
-    except KeyboardInterrupt:
-        logger.warning("Reencoding process execution interrupted by user (Ctrl-C)")
-        process.terminate()
-        await process.wait()
-        logger.warning("Process terminated")
-
+    stdout, stderr = await process.communicate()
     if process.returncode != 0:
         error_messages = []
         if stdout:
@@ -692,39 +617,21 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
     """
     assert media_url, "no media URL provided"
 
-    logger.trace("About to run Get First Frame as image with FFMPEG")
-    try:
-        process = await asyncio.create_subprocess_exec(
-            "ffmpeg",
-            "-i",
-            media_url,
-            "-vf",
-            "select=eq(n\\,0)",  # c'est un filtre vidéo qui sélectionne les frames à extraire. eq(n\,0)
-            # signifie qu'il sélectionne la frame où n (le numéro de la frame) est égal à 0, c'est-à-dire la première frame
-            "-vframes",  # spécifie le nombre de frames vidéo à sortir
-            "1",  # on veut une seule frame
-            target_path,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-    except KeyboardInterrupt:
-        logger.warning("Process creation interrupted by user (Ctrl-C)")
-        process.send_signal(signal.SIGINT)
-        raise
-    except Exception as e:
-        logger.warning(f"Failed to create process: {e}")
-        return
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-i",
+        media_url,
+        "-vf",
+        "select=eq(n\\,0)",  # c'est un filtre vidéo qui sélectionne les frames à extraire. eq(n\,0)
+        # signifie qu'il sélectionne la frame où n (le numéro de la frame) est égal à 0, c'est-à-dire la première frame
+        "-vframes",  # spécifie le nombre de frames vidéo à sortir
+        "1",  # on veut une seule frame
+        target_path,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
 
-    try:
-        stdout, stderr = await process.communicate()
-    except KeyboardInterrupt:
-        logger.warning(
-            "Get First Frame as image  process execution interrupted by user (Ctrl-C)"
-        )
-        process.terminate()
-        await process.wait()
-        logger.warning("Process terminated")
-
+    stdout, stderr = await process.communicate()
     if process.returncode != 0:
         error_messages = []
         if stdout:
@@ -751,41 +658,22 @@ async def get_last_frame_as_image_ffmpeg(media_url, target_path=None):
     """
     assert media_url, "no media URL provided"
 
-    logger.trace("About to run get last frame as image with FFMPEG")
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-sseof",  # spécifie qu'il doit commencer à x secondes de la fin du fichier.
+        "-3",  # on veut les 3 dernières secondes
+        "-i",
+        media_url,
+        "-update",  # signifie qu'il doit mettre à jour l'image de sortie si x nouvelle frame est disponible.
+        "1",  # on veut une seule frame
+        "-q:v",  # -q:v 1 spécifie la qualité de l'image de sortie (1 étant la meilleure qualité).
+        "1",
+        target_path,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
 
-    try:
-        process = await asyncio.create_subprocess_exec(
-            "ffmpeg",
-            "-sseof",  # spécifie qu'il doit commencer à x secondes de la fin du fichier.
-            "-3",  # on veut les 3 dernières secondes
-            "-i",
-            media_url,
-            "-update",  # signifie qu'il doit mettre à jour l'image de sortie si x nouvelle frame est disponible.
-            "1",  # on veut une seule frame
-            "-q:v",  # -q:v 1 spécifie la qualité de l'image de sortie (1 étant la meilleure qualité).
-            "1",
-            target_path,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-    except KeyboardInterrupt:
-        logger.warning("Process creation interrupted by user (Ctrl-C)")
-        process.send_signal(signal.SIGINT)
-        raise
-    except Exception as e:
-        logger.warning(f"Failed to create process: {e}")
-        return
-
-    try:
-        stdout, stderr = await process.communicate()
-    except KeyboardInterrupt:
-        logger.warning(
-            "Get Last Frame as image process execution interrupted by user (Ctrl-C)"
-        )
-        process.terminate()
-        await process.wait()
-        logger.warning("Process terminated")
-
+    stdout, stderr = await process.communicate()
     if process.returncode != 0:
         error_messages = []
         if stdout:
