@@ -35,21 +35,19 @@ from vikit.common.context_managers import WorkingFolderContext
 def get_estimated_duration(composite: CompositeVideo):
     """Get an estimation of a composite video's duration, based on the type of the sub-videos"""
     duration_dict = {
-        "": 3.9,
-        "vikit": 3.9,
-        "stabilityai": 3.9,
-        "stabilityai_image": 3.9,
+        "": 4.04,
+        "vikit": 4.04,
+        "stabilityai": 4.04,
+        "stabilityai_image": 4.04,
         "videocrafter": 2.0,
-        "haiper": 3.9,
+        "haiper": 4.0,
+        "transition": 2.0,
     }
     duration = 0
     for video in composite.video_list:
-        if video.build_settings.interpolate:
-            interpolation_factor = 2.0
-        else:
-            interpolation_factor = 1.0
+        interpolation_factor = 1.9 if video.build_settings.interpolate else 1.0
         if isinstance(video, Transition):
-            duration += 2.0 * interpolation_factor
+            duration += duration_dict["transition"] * interpolation_factor
         else:
             duration += (
                 duration_dict[video.build_settings.target_model_provider]
@@ -61,6 +59,8 @@ def get_estimated_duration(composite: CompositeVideo):
 async def batch_raw_text_based_prompting(
     prompt_file: str, model_provider: str = "haiper"
 ):
+
+    # It is strongly recommended to activate interpolate for videocrafter model
     to_interpolate = True if model_provider == "videocrafter" else False
 
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
@@ -87,22 +87,28 @@ async def batch_raw_text_based_prompting(
 
 
 async def composite_textonly_prompting(prompt_file: str):
-    TEST_MODE = False
-    model_provider = "haiper"
+    TEST_MODE = True
+    # It is strongly recommended to activate interpolate for videocrafter model
+    model_provider = "videocrafter"
     to_interpolate = True if model_provider == "videocrafter" else False
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
     # At least 2 prompts
     assert len(prompt_df) > 1, "You need at least 2 prompts"
     vid_cp_sub = CompositeVideo()
-    single_video_buildsettings = VideoBuildSettings(
-        interpolate=to_interpolate,
-        test_mode=TEST_MODE,
-        target_model_provider=model_provider,
-    )
+
     for i in range(len(prompt_df)):
         prompt_content = prompt_df.iloc[i]["prompt"]
         video = RawTextBasedVideo(prompt_content)
-        video.build_settings = single_video_buildsettings
+        video.build_settings = VideoBuildSettings(
+            interpolate=to_interpolate,
+            test_mode=TEST_MODE,
+            target_model_provider=model_provider,
+            include_read_aloud_prompt=True,
+        )
+        prompt = await PromptFactory(
+            ml_gateway=video.build_settings.get_ml_models_gateway()
+        ).create_prompt_from_text(prompt_content)
+        video.build_settings.prompt = prompt
         if i >= 1:
             n_videos = len(vid_cp_sub.video_list)
             transition_video = SeineTransition(
@@ -119,13 +125,14 @@ async def composite_textonly_prompting(prompt_file: str):
     composite_build_settings = VideoBuildSettings(
         music_building_context=MusicBuildingContext(
             apply_background_music=True,
-            generate_background_music=True,
-            expected_music_length=total_duration + 1,
+            generate_background_music=False,
+            expected_music_length=total_duration * 1.5,
         ),
         test_mode=TEST_MODE,
         target_model_provider=model_provider,
         output_video_file_name="Composite.mp4",
         expected_length=total_duration,
+        include_read_aloud_prompt=True,
     )
     # set up music prompt
     composite_build_settings.prompt = await PromptFactory().create_prompt_from_text(
@@ -171,7 +178,7 @@ async def batch_image_based_prompting(prompt_file: str):
             music_building_context=MusicBuildingContext(
                 apply_background_music=False,
                 generate_background_music=False,
-                expected_music_length=4,
+                expected_music_length=5,
             ),
             test_mode=False,
             interpolate=False,
@@ -229,7 +236,7 @@ async def composite_imageonly_prompting(prompt_file: str):
         music_building_context=MusicBuildingContext(
             apply_background_music=False,
             generate_background_music=False,
-            expected_music_length=total_duration + 1,
+            expected_music_length=total_duration * 1.5,
         ),
         test_mode=TEST_MODE,
         target_model_provider="stabilityai_image",
@@ -244,14 +251,18 @@ async def composite_imageonly_prompting(prompt_file: str):
 
 async def composite_mixed_prompting(prompt_file: str):
 
-    TEST_MODE = True
+    TEST_MODE = False
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
     # at least 2 prompts
     assert len(prompt_df) > 1, "You need at least 2 prompts"
+    text_to_video_model_provider = "stabilityai"
+    # It is strongly recommended to activate interpolate for videocrafter model
+    to_interpolate = True if text_to_video_model_provider == "videocrafter" else False
 
     text_based_video_buildsettings = VideoBuildSettings(
         test_mode=TEST_MODE,
-        target_model_provider="stabilityai",
+        target_model_provider=text_to_video_model_provider,
+        interpolate=to_interpolate,
         include_read_aloud_prompt=True,
     )
 
@@ -294,8 +305,8 @@ async def composite_mixed_prompting(prompt_file: str):
     composite_build_settings = VideoBuildSettings(
         music_building_context=MusicBuildingContext(
             apply_background_music=True,
-            generate_background_music=True,
-            expected_music_length=total_duration + 1,
+            generate_background_music=False,
+            expected_music_length=total_duration * 1.2,
         ),
         test_mode=TEST_MODE,
         output_video_file_name="Composite.mp4",
@@ -310,6 +321,10 @@ async def composite_mixed_prompting(prompt_file: str):
 
 async def prompte_based_composite(prompt: str):
 
+    # It is strongly recommended to activate interpolate for videocrafter model
+    model_provider = "videocrafter"
+    to_interpolate = True if model_provider == "videocrafter" else False
+
     video_build_settings = VideoBuildSettings(
         music_building_context=MusicBuildingContext(
             apply_background_music=True,
@@ -317,8 +332,9 @@ async def prompte_based_composite(prompt: str):
         ),
         test_mode=False,
         include_read_aloud_prompt=True,
-        target_model_provider="haiper",
+        target_model_provider=model_provider,
         output_video_file_name="Composite.mp4",
+        interpolate=to_interpolate,
     )
 
     gw = video_build_settings.get_ml_models_gateway()
@@ -366,9 +382,9 @@ if __name__ == "__main__":
         pass
     elif run_an_example == 1:
         # Example 1- Create a composite of text-based videos:
-        with WorkingFolderContext("./examples/inputs/CompositeTextOnly_haiper_music"):
+        with WorkingFolderContext("./examples/inputs/TextOnly_Obama"):
             logger.add("log.txt")
-            asyncio.run(composite_textonly_prompting("./small_input.csv"))
+            asyncio.run(composite_textonly_prompting("./input.csv"))
 
     elif run_an_example == 2:
         # Example 2- Create a batch of text-based videos:
@@ -397,7 +413,7 @@ if __name__ == "__main__":
 
     elif run_an_example == 5:
         # Example 5 - Create a composite of text and image-based videos:
-        with WorkingFolderContext("./examples/inputs/Mixed_t/"):
+        with WorkingFolderContext("./examples/inputs/Mixed_Obama/"):
             logger.add("log.txt")
             asyncio.run(
                 composite_mixed_prompting(
@@ -406,7 +422,7 @@ if __name__ == "__main__":
             )
     elif run_an_example == 6:
         # Example 6 - Create a prompt-based videos
-        with WorkingFolderContext("./examples/inputs/PromptBased_Argantina/"):
+        with WorkingFolderContext("./examples/inputs/PromptBased_Mallorca/"):
             logger.add("log.txt")
 
             # prompt = """London, a city where history and modernity entwine, stretches along the winding path of the River Thames, its skyline a blend of ancient spires
@@ -423,5 +439,8 @@ if __name__ == "__main__":
             # prompt = """Amsterdam, known as the "Venice of the North," is a charming city crisscrossed by historic canals and lined with iconic architecture from the Dutch Golden Age. It boasts world-class museums like the Rijksmuseum and Van Gogh Museum, and is famous for its bicycle culture and vibrant nightlife. The city's laid-back atmosphere, picturesque canal houses, and rich cultural heritage make it a captivating destination that blends history and modernity seamlessly."""
             # prompt = """Barcelona, the cosmopolitan capital of Spain's Catalonia region, is renowned for its unique architecture, vibrant culture, and Mediterranean charm. The city is synonymous with the whimsical designs of Antoni Gaudí, including the iconic Sagrada Família and the colorful Park Güell. Barcelona's lively streets are filled with tapas bars, bustling markets like La Boqueria, and the energetic promenade of La Rambla. With its sunny beaches, rich history, and passionate embrace of art and cuisine, Barcelona offers an unforgettable blend of tradition and modernity."""
             # prompt = """"Egypt, a land of ancient wonders and timeless beauty, is home to some of the world's most iconic historical sites. The majestic Pyramids of Giza and the enigmatic Sphinx stand as testaments to the country's rich pharaonic heritage. The Nile River, the lifeblood of Egypt, flows through bustling cities like Cairo and Luxor, offering breathtaking views of ancient temples and tombs. From the vibrant markets of Khan El Khalili to the serene beaches of the Red Sea, Egypt is a captivating blend of history, culture, and natural splendor."""
-            prompt = """Argentina, a vast and diverse country in South America, is renowned for its stunning landscapes and vibrant culture. From the bustling streets of Buenos Aires, where tango dancers captivate audiences, to the breathtaking glaciers of Patagonia, Argentina offers a wealth of natural wonders. The country is also famous for its rich gaucho tradition, world-class wine regions like Mendoza, and the awe-inspiring Iguazú Falls. With its passionate embrace of soccer, mouthwatering cuisine, and warm hospitality, Argentina is a destination that truly engages the senses."""
+            # prompt = """Argentina, a vast and diverse country in South America, is renowned for its stunning landscapes and vibrant culture. From the bustling streets of Buenos Aires, where tango dancers captivate audiences, to the breathtaking glaciers of Patagonia, Argentina offers a wealth of natural wonders. The country is also famous for its rich gaucho tradition, world-class wine regions like Mendoza, and the awe-inspiring Iguazú Falls. With its passionate embrace of soccer, mouthwatering cuisine, and warm hospitality, Argentina is a destination that truly engages the senses."""
+            # prompt = """Greece, the cradle of Western civilization, is a captivating blend of ancient history and stunning natural beauty. Renowned for its iconic landmarks like the Acropolis in Athens and the ancient ruins of Delphi, Greece offers a rich tapestry of archaeological sites that tell the story of its illustrious past. The country is also famous for its picturesque islands, such as Santorini and Mykonos, with their whitewashed villages, crystal-clear waters, and vibrant Mediterranean culture. From its delicious cuisine to its warm hospitality, Greece is a destination that enchants visitors with its timeless charm and cultural heritage."""
+            # prompt = """Brazil, the largest country in South America, is a vibrant and diverse land known for its lush rainforests, stunning beaches, and rich cultural heritage. The iconic city of Rio de Janeiro, with its Christ the Redeemer statue and lively Carnival celebrations, embodies the country's energetic spirit. From the vast Amazon rainforest to the bustling metropolis of São Paulo, Brazil offers a captivating blend of natural wonders, colonial architecture, and a passionate love for soccer and samba. Its warm climate, delicious cuisine, and welcoming people make it a destination that truly comes alive with color and rhythm."""
+            prompt = """Mallorca, the largest of Spain's Balearic Islands, is a Mediterranean paradise known for its stunning coastline, crystal-clear waters, and picturesque landscapes. The island's capital, Palma, is a vibrant city with a historic cathedral and charming old town. Beyond its beaches, Mallorca offers a rich cultural heritage, with quaint hilltop villages, ancient ruins, and the scenic Serra de Tramuntana mountain range, making it a captivating destination that combines natural beauty with a touch of elegance and tradition."""
             asyncio.run(prompte_based_composite(prompt=prompt))
