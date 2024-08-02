@@ -74,7 +74,7 @@ class FakeMLModelsGateway(MLModelsGateway):
         self, source_image_path, target_image_path, sleep_time: int = 0
     ):
         await asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
-        return tests_medias.get_test_transition_stones_trainboy_path()  # Important:
+        return tests_medias.get_test_seine_transition_video_path()  # Important:
 
     # the returned name should contains "transition" in the file name so we send the same video at the interpolate call
     # later on
@@ -96,7 +96,7 @@ class FakeMLModelsGateway(MLModelsGateway):
 
     async def interpolate_async(self, link_to_video: str, sleep_time: int = 0):
         await asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
-        local_file_path = Path(os.path.join(_sample_media_dir, STUDENT_ARM_WRITING))
+        local_file_path = Path(tests_medias.get_interpolate_video())
         local_file_url = urljoin("file:", pathname2url(str(local_file_path)))
         return local_file_url
 
@@ -139,21 +139,20 @@ class FakeMLModelsGateway(MLModelsGateway):
         await asyncio.sleep(sleep_time)
 
         if model_provider == "vikit":
-            pass
+            test_file = tests_medias.get_cat_video_path()
         elif model_provider == "stabilityai":
-            pass
+            test_file = tests_medias.get_stabilityai_image_video_path()
         elif model_provider == "" or model_provider is None:
-            pass
+            test_file = tests_medias.get_cat_video_path()
         elif model_provider == "haiper":
-            pass
+            test_file = tests_medias.get_haiper_video_path()
         elif model_provider == "videocrafter":
-            pass
+            test_file = tests_medias.get_videocrafter_video_path()
         elif model_provider == "stabilityai_image":
-            pass
+            test_file = tests_medias.get_stabilityai_image_video_path()
         else:
             raise ValueError(f"Unknown model provider: {model_provider}")
 
-        test_file = tests_medias.get_cat_video_path()
         logger.debug(
             f"Generating video from prompt: {prompt[:5]}, return a link: {test_file}"
         )
