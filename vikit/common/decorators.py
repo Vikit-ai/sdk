@@ -1,3 +1,18 @@
+# Copyright 2024 Vikit.ai. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import time
 import inspect
 import os
@@ -22,7 +37,7 @@ def log_function_params(func):
             ", ".join(repr(arg) for arg in args)
             + ", "
             + ", ".join(f"{key}={value}" for key, value in kwargs.items())
-        )
+        )[:50]
 
         # Get the name of the test from the call stack
         stack = inspect.stack()
@@ -47,19 +62,3 @@ def log_function_params(func):
         return result
 
     return wrapper
-
-
-def delay(seconds):
-    """
-    Decorator to delay the execution of a function
-    """
-
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            if type(seconds) is int and seconds > 0:  # fail open
-                time.sleep(seconds)
-                return func(*args, **kwargs)
-
-        return wrapper
-
-    return decorator

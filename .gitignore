@@ -76,7 +76,8 @@ target/
 .idea
 
 # VS Code
-.vscode/
+# .vscode/
+settings.json
 
 # Spyder
 .spyproject/
@@ -109,3 +110,11 @@ target/
 
 # Working Folder
 working_folder/
+working_directory/
+
+# Example videos
+examples/inputs/*/*.mp4
+examples/inputs/*/*.mp3
+examples/inputs/*/*.srt
+examples/inputs/*/*.txt
+examples/inputs/*/*.jpg

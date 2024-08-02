@@ -1,10 +1,24 @@
+# Copyright 2024 Vikit.ai. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import os
 import subprocess
 
 from loguru import logger
 import pysrt
 
-from vikit.common.decorators import log_function_params
 from vikit.wrappers.ffmpeg_wrapper import extract_audio_slice, get_media_duration
 import vikit.common.config as config
 from vikit.prompt.subtitle_extractor import SubtitleExtractor
@@ -25,8 +39,7 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
     Yes this is kind of hacky, but it works for now.
     """
 
-    @log_function_params
-    def extract_subtitles(
+    async def extract_subtitles_async(
         self, recorded_prompt_file_path, ml_models_gateway: MLModelsGateway = None
     ):
         """
@@ -52,12 +65,16 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
                 else i + video_length_per_subtitle
             )
             # Generate the audio slice from the audio file
-            generated_slice = extract_audio_slice(
+            generated_slice = await extract_audio_slice(
                 start=i, end=end, audiofile_path=recorded_prompt_file_path
             )
             logger.debug(f"Generated slice {generated_slice}")
             # Obtain  sub part of subtitles using elevenlabs API
-            subs = ml_models_gateway.get_subtitles(audiofile_path=generated_slice)
+            subs = await ml_models_gateway.get_subtitles_async(
+                audiofile_path=generated_slice
+            )
+            logger.debug(f"Subtitles in subtitle extractor: {subs}")
+
             subtitle_file_path = "_".join(["subSubtitle", str(i), str(end)]) + ".srt"
             # Write subtitles to a temporary SRT file
             with open(subtitle_file_path, "a") as f:

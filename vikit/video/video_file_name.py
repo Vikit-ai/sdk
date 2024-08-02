@@ -1,14 +1,30 @@
-import uuid as uuid
+# Copyright 2024 Vikit.ai. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
+import random
 import datetime
 import os
 
 from loguru import logger
 
-from vikit.common.file_tools import get_max_filename_length
+from vikit.common.file_tools import get_max_path_length
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_metadata import VideoMetadata
 
-MANAGED_FEATURES = "dogrpvi"
+MANAGED_FEATURES = "dogrvip"
+split_separator = "__"
 
 
 class VideoFileName:
@@ -22,7 +38,7 @@ class VideoFileName:
     and the bare minimum is here to simplify processing even if the metadata store is not available
     """
 
-    VIDEO_TITLE_MAX_LENGTH = 30
+    VIDEO_TITLE_MAX_LENGTH = 20
 
     def __init__(
         self,
@@ -56,7 +72,7 @@ class VideoFileName:
         if video_metadata is None:
             raise ValueError("video_metadata cannot be None")
         self._video_metadata = video_metadata
-        self._title = self._truncate_title(
+        self.title = self._truncate_title(
             video_metadata.title, max_length=self.VIDEO_TITLE_MAX_LENGTH
         )
         self._video_type = video_type if video_type is not None else "undefined"
@@ -66,9 +82,10 @@ class VideoFileName:
 
         self._build_id = build_settings.id
         self._build_date = build_settings.build_date
-        self._build_time = build_settings.build_time
-        self._unique_id = uuid.uuid4()
+        self.unique_id = random.getrandbits(16)
+        self._video_temp_id = str(video_metadata.temp_id)
         self._file_extension = file_extension
+        self._file_name = None
 
         self._video_features = None
         if not video_features:
@@ -101,48 +118,6 @@ class VideoFileName:
         self._has_been_interpolated = self._video_features[3] == "i"
 
     @staticmethod
-    def is_video_file_name(file_name: str):
-        """
-        Check if a file name is a video file name
-
-        params:
-            file_name: The file name to check
-
-        returns:
-            bool: True if the file name is a video file name, False otherwise
-        """
-        if not file_name:
-            return False
-
-        parts = file_name.split("_")
-        if len(parts) != 8:
-            return False
-        if len(parts[2]) != 5:  # video features
-            return False
-        else:
-            for i in range(5):
-                if parts[2][i] not in MANAGED_FEATURES:
-                    logger.warning(f"unknown video feature {parts[2][i]}")
-
-        if len(parts[3]) > 10:  # build id
-            return False
-        try:
-            datetime.date.fromisoformat(parts[4])
-        except ValueError:
-            return False
-        try:
-            datetime.time.fromisoformat(parts[5])
-        except ValueError:
-            return False
-
-        try:
-            uuid.UUID(parts[7].split(".")[0])  # 6 is the string UID
-        except ValueError:
-            return False
-
-        return True
-
-    @staticmethod
     def from_file_name(file_name: str):
         """
         Parse a file name to extract the metadata
@@ -153,22 +128,17 @@ class VideoFileName:
         returns:
             VideoFileName: The video file name object
         """
-        if not VideoFileName.is_video_file_name(file_name):
-            raise ValueError("The file name is not a video file name")
-
-        parts = file_name.split("_")
+        parts = file_name.split("__")
         title = parts[0]
         bld_settings = VideoBuildSettings()
-        bld_settings._id = parts[3]
-        bld_settings._build_date = datetime.date.fromisoformat(parts[4])
-        bld_settings._build_time = datetime.time.fromisoformat(parts[5])
-
+        bld_settings.id = parts[3]
+        bld_settings.build_date = datetime.date.fromisoformat(parts[4])
         video_file_name = VideoFileName(
             build_settings=bld_settings, video_metadata=VideoMetadata(title=title)
         )
         video_file_name._video_type = parts[1]
         video_file_name._video_features = parts[2]
-        video_file_name._unique_id = uuid.UUID(parts[7].split(".")[0])
+        video_file_name.unique_id = parts[6].split(".")[0]
 
         return video_file_name
 
@@ -204,14 +174,6 @@ class VideoFileName:
         return features_as_string
 
     @property
-    def title(self):
-        return self._title
-
-    @property
-    def unique_id(self):
-        return self._unique_id
-
-    @property
     def video_type(self):
         """
         Get the type of the video, codified as a string
@@ -237,13 +199,21 @@ class VideoFileName:
         """
         Get the file name of the video,  as a string
         """
-        return f"{self._title}_{str(self.video_type)}_{self.video_features}_{self.build_id}_{self._build_date}_{self._build_time}_UID_{self.unique_id}.{self._file_extension}"
+        if self._file_name:
+            return self._file_name
+
+        # file_name = f"{self.title}oOo{str(self.video_type)}oOo{self.video_features}oOo{self.build_id}oOo{self._build_date}oOoUIDoOo{self._video_temp_id}.{self._file_extension}"
+        file_name = f"{self.title}oOo{str(self.video_type)}oOo{self.video_features}oOo{self.build_id}oOo{self._build_date}oOoUIDoOo{self.unique_id}.{self._file_extension}"
+        file_name = file_name.replace("oOo", split_separator)
+        logger.debug(f"file name by state to be returned: {file_name} ")
+        self._file_name = file_name
+        return self._file_name
 
     def __str__(self):
         return self._fit(target_path=self._build_settings.output_path)
 
     def __repr__(self):
-        return f"Title: {self._title}, Video Type: {self._video_type}, Video Features: {self._video_features} , Build ID: {self._build_id}, Build Date: {self._build_date},  Build Time: {self._build_time}, Unique ID: {self._unique_id},"
+        return f"Title: {self.title}, Video Type: {self._video_type}, Video Features: {self._video_features} , Build ID: {self._build_id}, Build Date: {self._build_date}, Unique ID: {self.unique_id},"
 
     @property
     def video_features(self):
@@ -283,7 +253,7 @@ class VideoFileName:
         return (
             self.file_name[: len(self.file_name) - gap - 36 - 4]
             + "_UID_"
-            + str(self._unique_id)
+            + str(self.unique_id)
             + "."
             + self._file_extension
         )
@@ -301,18 +271,25 @@ class VideoFileName:
         if target_path is None:
             target_path = os.getcwd()
 
-        if self.length + len(target_path) >= get_max_filename_length():
+        if self.length + len(target_path) >= get_max_path_length():
             logger.warning(
                 f"The file name is too long, it will be truncated to fit the file system's limits. Target path {target_path}",
             )
             # So we may truncate the file name as long as we keep a UUID, we may also afford to lose
             # the build id, the date and the time
-            gap = get_max_filename_length() - len(self.file_name) - len(target_path)
+            logger.debug(
+                f"target path length: {len(target_path)}, len(self.file_name): {len(self.file_name)}"
+            )
+            logger.debug(f"target path: {target_path}, file name: {self.file_name}")
+
+            gap = get_max_path_length() - len(self.file_name) - len(target_path)
             if (
-                abs(gap) > 25 + 10 + 10 + 8
+                abs(gap) > 25 + 10 + 10 + 6
             ):  # 25 is the length of the title we can lose,
                 # 10 is the length of the build id, 10 is the length of the date, 6 is the length of the time
-                raise ValueError("The file name is too long, it cannot be truncated")
+                raise ValueError(
+                    f"The file name is too long, it cannot be truncated, gap: {gap}"
+                )
             else:
                 fitted_name = self.truncate(gap)
                 logger.warning(

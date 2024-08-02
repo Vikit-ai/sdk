@@ -1,6 +1,20 @@
+# Copyright 2024 Vikit.ai. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 from loguru import logger
 
-from vikit.common.decorators import log_function_params
 import vikit.common.config as config
 
 
@@ -10,7 +24,6 @@ class SubtitleExtractor:
     merge short subtitles into longer ones, or extract them as text tokens
     """
 
-    @log_function_params
     def merge_short_subtitles(self, subtitles, min_duration=7):
         """
         Merge subtitles which total duration is less than 7 seconds
@@ -41,10 +54,9 @@ class SubtitleExtractor:
             else:
                 index = index + 1
 
-        logger.debug(f"Subs after merge {len(subs)}")
+        logger.trace(f"Subs after merge {len(subs)}")
         return subs
 
-    @log_function_params
     def build_subtitles_as_text_tokens(self, subtitles) -> list[str]:
         """
         Create blocks of subtitles

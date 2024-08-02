@@ -1,6 +1,22 @@
+# Copyright 2024 Vikit.ai. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import os
 from os import path
 from dotenv import load_dotenv
+from concurrent.futures import ProcessPoolExecutor
 
 from loguru import logger
 
@@ -163,3 +179,24 @@ def get_cloud_bucket_url():
     if cloud_bucket_url is None:
         raise Exception("CLOUD_BUCKET_URL is not set")
     return cloud_bucket_url
+
+
+class singletons:
+    """
+    A class to hold singletons
+    """
+
+    def __init__(self):
+        pass
+
+    _process_pool_executor = None
+
+    @staticmethod
+    def get_process_executor():
+        """
+        The process executor to use for parallel processing
+        """
+        if not singletons._process_pool_executor:
+            singletons._process_pool_executor = ProcessPoolExecutor()
+
+        return singletons._process_pool_executor

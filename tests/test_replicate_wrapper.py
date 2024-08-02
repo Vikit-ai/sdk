@@ -1,4 +1,18 @@
-import unittest
+# Copyright 2024 Vikit.ai. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import warnings
 import pytest
 from loguru import logger
@@ -13,7 +27,7 @@ SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in 
 and symbols. This is additional text to make sure we generate serveral subtitles. """
 
 
-class TestReplicateWrapper(unittest.TestCase):
+class TestReplicateWrapper:
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
@@ -22,17 +36,18 @@ class TestReplicateWrapper(unittest.TestCase):
         logger.add("log_test_replicate_wrapper.txt", rotation="10 MB")
 
     @pytest.mark.integration
-    def test_inte_get_keywords_from_prompt(self):
+    @pytest.mark.asyncio
+    async def test_int_get_keywords_from_prompt(self):
 
         with WorkingFolderContext():
             ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
                 test_mode=False
             )
 
-            test_prompt = PromptFactory(ml_gateway=ml_gw).create_prompt_from_text(
+            test_prompt = await PromptFactory(ml_gateway=ml_gw).create_prompt_from_text(
                 SAMPLE_PROMPT_TEXT
             )
-            keywords, title = ml_gw.get_keywords_from_prompt(
+            keywords, title = await ml_gw.get_keywords_from_prompt_async(
                 test_prompt.text, "previous_words"
             )
             assert len(keywords) > 0

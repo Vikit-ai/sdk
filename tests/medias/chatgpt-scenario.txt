@@ -1,0 +1,71 @@
+New_scene 1
+Duration: 4 seconds
+Wide Shot: The camera captures a desolate downtown Los Angeles. Landmarks crumble under the weight of abandonment. The streets, once bustling with life, are now littered with metallic debris. Flickering neons hint at the ghost of a once-vibrant city. The sky looms overhead in an ominous, murky gray, adding a gloomy palette to the scenery.
+Description: Los Angeles is in ruins. The camera pans over destroyed buildings and debris-strewn streets. Neon lights flicker in the eerie silence. This once lively city now resembles a post-apocalyptic wasteland.
+
+New_scene 2
+Duration: 4 seconds
+Music and Sound: A haunting orchestral score begins softly, reminiscent of "The Terminator" franchise. The sound of mechanical whirring and distant crashes adds to the chilling atmosphere.
+Description: Eerie music sets the mood, with mechanical sounds echoing through the empty streets. It's a world taken over by machines, and the score underscores the tension and desolation.
+
+New_scene 3
+Duration: 4 seconds
+Mid Shot: A squad of robotic sentinels, sleek and menacing, patrols the streets with military precision. Their eyes glow with an unsettling red hue, scanning the environment meticulously. These robots reflect Cameron's style, angular and purposeful, as they navigate the ruined cityscape.
+Description: Robotic sentinels march through the streets, their red eyes glowing ominously. They move with precision, scanning for any signs of human life. These machines are built for one purpose: to hunt.
+
+New_scene 4
+Duration: 4 seconds
+Close-Up: The camera zooms in on the wear and tear of the sentinels, showing battle scars that tell stories of numerous encounters. One robot, slightly larger and more advanced, emits a static-filled communication signal. Its voice is cold and emotionless, encapsulating the dystopian world.
+Description: A close-up reveals the battle scars on the robots, highlighting their relentless pursuit of survivors. One advanced sentinel communicates in a cold, metallic voice, symbolizing the dehumanized state of this new world.
+
+New_scene 5
+Duration: 4 seconds
+Protagonist Introduction: Through the shattered windows of a high-rise building, the camera zooms into a darkened room where shadowy figures move with urgency.
+Description: The scene shifts to the inside of a crumbling skyscraper. Shadows move in the darkness—human survivors planning their next move. This is the heart of the resistance.
+
+New_scene 6
+Duration: 4 seconds
+Visual Detail: Alex, a seasoned resistance leader with rugged features, crafts a makeshift explosive device. Dressed in patched-up combat gear, each piece weathered by time and conflict, Alex's resolve is palpable.
+Description: Meet Alex, the tough and resilient leader of the resistance. He's focused and determined, crafting explosives with the skill of a seasoned warrior. Every scar on his gear tells a story of survival.
+
+New_scene 7
+Duration: 4 seconds
+Dialogue and Sound:
+Alex (Crisp, determined voice): "We're running out of time. Those machines won't stop until they've wiped us out."
+Description: Alex speaks with urgency. His voice is calm but determined. He knows the stakes are high, and time is not on their side.
+
+New_scene 8
+Duration: 4 seconds
+Supporting Character: Grace, a tech specialist, works at a dimly-lit terminal, decrypting the sentinel's communication codes.
+Description: Grace, the brains behind the operation, types furiously at her computer. Her eyes dart across multiple screens, each displaying vital information about their robotic adversaries.
+
+New_scene 9
+Duration: 4 seconds
+Visual Detail: Her eyes dart across multiple screens, hands moving with the dexterity of someone who's spent years in the field. Sweat beads on her forehead, indicative of the tension and high stakes.
+Description: Grace is in her element, decrypting codes with speed and precision. The tension is palpable as she works against the clock, every second crucial in their fight for survival.
+
+New_scene 10
+Duration: 4 seconds
+Dialogue:
+Grace (With urgency): "Alex, we've got a window. If we can't shut them down now, we're finished."
+Description: Grace calls out to Alex, her voice full of urgency. She has found a vulnerability in the machines' network—a small window of opportunity that could turn the tide in their favor.
+
+New_scene 11
+Duration: 4 seconds
+Wide Shot: A convoy of resistance fighters moves stealthily through the ruined streets, avoiding detection.
+Description: The resistance fighters move quietly through the city ruins, alert and ready for any threat. They are a small but determined force, the last hope for humanity.
+
+New_scene 12
+Duration: 4 seconds
+Music and Sound: The score crescendos with heart-pounding intensity. Synchronized metallic footsteps grow louder, signaling the enemy's approach.
+Description: Tension builds as the music intensifies. The sound of approaching machines echoes in the air, a reminder of the ever-present danger lurking around every corner.
+
+New_scene 13
+Duration: 4 seconds
+Close-Up: Alex signals a halt, eyes scanning the horizon. The camera shifts to his perspective, showing a group of sentinels marching in perfect unison.
+Description: Alex raises his hand, signaling his team to stop. He surveys the area, his eyes catching the sight of marching sentinels. The threat is real, and the enemy is near.
+
+New_scene 14
+Duration: 4 seconds
+Climax (Slow Motion Effect): The moment they’re spotted, an explosive sequence unfolds.
+Description: As the sentinels lock onto the resistance fighters, chaos erupts. Explosions light up the scene, capturing the intensity and desperation of this pivotal moment.

@@ -1,13 +1,29 @@
+# Copyright 2024 Vikit.ai. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 import os
 import subprocess
+import asyncio
 
 from tenacity import retry, before_log, after_log, stop_after_attempt
 from loguru import logger
 from urllib.request import urlretrieve
 import replicate
+
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
-from vikit.common.decorators import log_function_params
 from vikit.common.secrets import get_replicate_api_token
 from vikit.common.config import get_nb_retries_http_calls
 
@@ -32,34 +48,36 @@ class ReplicateGateway(MLModelsGateway):
     def __init__(self):
         super().__init__()
 
-    @log_function_params
-    def generate_background_music(self, duration: int = 3, prompt: str = None) -> str:
+    async def generate_background_music_async(
+        self, duration: int = 3, prompt: str = None, target_file_name: str = None
+    ) -> str:
         """
         Here we generate the music to add as background music
 
         Args:
             duration: int - the duration of the music in seconds
             prompt: str - the prompt to generate the music from
+            target_file_name: str - the name of the file to save the music to
 
         Returns:
             str: the path to the generated music
         """
-        assert (
-            duration < 300
-        ), "The duration of the music should be less than 300 seconds"
 
-        outputLLM = self.get_music_generation_keywords(prompt)
+        outputLLM = await self.get_music_generation_keywords_async(prompt)
         logger.debug(f"outputLLM: {outputLLM}")
 
-        # je veux le dernier mot de la liste de mots générés pour le nom du fichier
-        prompt_based_music_file_name = str(outputLLM.split()[-1:][0]) + ".mp3"
+        prompt_based_music_file_name = (
+            target_file_name
+            if target_file_name
+            else str(outputLLM.split()[-1:][0]) + ".mp3"
+        )
         logger.debug(f"prompt_based_music_file_name: {prompt_based_music_file_name}")
         title_length = len(prompt_based_music_file_name)  # remove the .mp3 extension
 
         # Then we generate the music
         clean_prompt_without_title = outputLLM[:-title_length]
         logger.debug(f"Clean GPT Prompt : {clean_prompt_without_title}")
-        output_music_link = self.compose_music_from_text(
+        output_music_link = await self.compose_music_from_text_async(
             clean_prompt_without_title, duration=duration
         )
 
@@ -70,20 +88,22 @@ class ReplicateGateway(MLModelsGateway):
         lowered_music_filename = f"lowered_{prompt_based_music_file_name}"
 
         logger.debug("Lowering the volume of the music")
-        result = subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-i",
-                gen_music_file_path,
-                "-filter_complex",
-                "[a]loudnorm,volume=0.2",
-                lowered_music_filename,
-            ],
+        process = await asyncio.create_subprocess_exec(
+            "ffmpeg",
+            "-y",
+            "-i",
+            gen_music_file_path,
+            "-filter_complex",
+            "[a]loudnorm,volume=0.2",
+            lowered_music_filename,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        result.check_returncode()
+
+        stdout, stderr = await process.communicate()
+        if process.returncode != 0:
+            logger.error(f"ffmpeg command failed with: {stderr.decode()}")
+            raise Exception("ffmpeg command failed")
 
         return lowered_music_filename
 
@@ -93,8 +113,9 @@ class ReplicateGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
-    @log_function_params
-    def generate_seine_transition(self, source_image_path, target_image_path):
+    async def generate_seine_transition_async(
+        self, source_image_path, target_image_path
+    ):
         """
         Generate a transition between two videos
 
@@ -119,7 +140,7 @@ class ReplicateGateway(MLModelsGateway):
                 f"The target image path does not exist: {target_image_path}"
             )
 
-        return replicate.run(
+        return await replicate.async_run(
             "leclem/seine-transition:6de45c0cdc731d9fdf73f1d7b9db6373089804b62f6f2c1e3c853f4f04e20566",
             input={
                 "image": open(source_image_path, "rb"),
@@ -135,7 +156,7 @@ class ReplicateGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
-    def compose_music_from_text(self, prompt_text: str, duration: int):
+    async def compose_music_from_text_async(self, prompt_text: str, duration: int):
         """
         Compose a music for a prompt text
 
@@ -156,7 +177,7 @@ class ReplicateGateway(MLModelsGateway):
         if len(prompt_text) < 1:
             raise AttributeError("The input prompt text is empty")
 
-        result_music_link = replicate.run(
+        result_music_link = await replicate.async_run(
             "meta/musicgen:b05b1dff1d8c6dc63d14b0cdb42135378dcb87f6373b0d3d341ede46e59e2b38",
             input={
                 "top_k": 250,
@@ -188,7 +209,7 @@ class ReplicateGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
-    def get_music_generation_keywords(self, text) -> str:
+    async def get_music_generation_keywords_async(self, text) -> str:
         """
         Generate keywords from a text using the Replicate API
 
@@ -205,7 +226,7 @@ class ReplicateGateway(MLModelsGateway):
         if text is None:
             text = "finaly there is no prompt so just unleash your own imagination"
 
-        llm_keywords = replicate.run(
+        llm_keywords = await replicate.async_run(
             "mistralai/mixtral-8x7b-instruct-v0.1",
             input={
                 "top_k": 50,
@@ -234,7 +255,7 @@ class ReplicateGateway(MLModelsGateway):
         before=before_log(logger, logger.level("DEBUG").no),
         after=after_log(logger, logger.level("DEBUG").no),
     )
-    def interpolate(self, video):
+    async def interpolate_async(self, video):
         """
         Run some interpolation magic. This model may fail after timeout, so you
         should call it with retry logic
@@ -248,7 +269,7 @@ class ReplicateGateway(MLModelsGateway):
         if video is None:
             raise AttributeError("The input video is None")
 
-        return replicate.run(
+        return await replicate.async_run(
             "pollinations/amt:6e03c945a24b2defe4576e35235b9c9c0120d81c9df58880c0b3832a5777cdcd",
             input={
                 "video": video,
@@ -259,8 +280,9 @@ class ReplicateGateway(MLModelsGateway):
         )
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    @log_function_params
-    def get_keywords_from_prompt(self, subtitleText, excluded_words: str = None):
+    async def get_keywords_from_prompt_async(
+        self, subtitleText, excluded_words: str = None
+    ):
         """
         Generates keywords from a subtitle text using the Replicate API.
 
@@ -271,7 +293,7 @@ class ReplicateGateway(MLModelsGateway):
         """
         assert subtitleText is not None
 
-        llm_keywords = replicate.run(  # mistralai/mixtral-8x7b-instruct-v0.1:0.1"
+        llm_keywords = await replicate.async_run(  # mistralai/mixtral-8x7b-instruct-v0.1:0.1"
             "mistralai/mistral-7b-instruct-v0.2",
             input={
                 "top_k": 50,
@@ -305,8 +327,7 @@ class ReplicateGateway(MLModelsGateway):
         return clean_result, title_from_keywords_as_tokens
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    @log_function_params
-    def get_enhanced_prompt(self, subtitleText):
+    async def get_enhanced_prompt_async(self, subtitleText):
         """
         Generates an enhanced prompt from an original one, probably written by a user or
         translated from an audio
@@ -318,7 +339,7 @@ class ReplicateGateway(MLModelsGateway):
             A white space separated string of keywords composing the enhanced prompt
 
         """
-        outputLLM = replicate.run(
+        outputLLM = await replicate.async_run(
             "mistralai/mixtral-8x7b-instruct-v0.1",
             input={
                 "top_k": 50,
@@ -341,8 +362,7 @@ class ReplicateGateway(MLModelsGateway):
         return clean_result, title_from_keywords_as_tokens
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    @log_function_params
-    def get_subtitles(self, audiofile_path):
+    async def get_subtitles_async(self, audiofile_path):
         # Obtain subtitles using Replicate API
         """
         Extract subtitles from an audio file using the Replicate API
@@ -357,7 +377,7 @@ class ReplicateGateway(MLModelsGateway):
         assert os.path.exists(
             audiofile_path
         ), f"The prompt recording file does not exist: {audiofile_path}"
-        subs = replicate.run(
+        subs = await replicate.async_run(
             "cjwbw/whisper:b70a8e9dc4aa40bf4309285fbaefe3ed3d3a313f1f32ea61826fc64cdb4917a5",
             input={
                 "model": "base",
@@ -376,7 +396,7 @@ class ReplicateGateway(MLModelsGateway):
         return subs
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    def generate_video(self, prompt: str):
+    async def generate_video_async(self, prompt: str):
         """
         Generate a video from the given prompt
 
@@ -387,7 +407,7 @@ class ReplicateGateway(MLModelsGateway):
             the video
         """
         logger.debug(f"Generating video from prompt: {prompt}")
-        output = replicate.run(
+        output = await replicate.async_run(
             "cjwbw/videocrafter:02edcff3e9d2d11dcc27e530773d988df25462b1ee93ed0257b6f246de4797c8",
             input={
                 "prompt": prompt,  # + ", 4k",

@@ -1,22 +1,43 @@
-import subprocess
-import os
+# Copyright 2024 Vikit.ai. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 from abc import abstractmethod, ABC
+import os
+import shutil
 import uuid as uid
+import random
+
 from loguru import logger
 
-from vikit.common.decorators import log_function_params
-import vikit.common.config as config
 from vikit.wrappers.ffmpeg_wrapper import (
-    merge_audio,
     get_media_duration,
-    extract_audio_slice,
+    get_first_frame_as_image_ffmpeg,
+    get_last_frame_as_image_ffmpeg,
 )
-from vikit.prompt.recorded_prompt import RecordedPrompt
 from vikit.video.video_build_settings import VideoBuildSettings
-import vikit.common.file_tools as ft
-import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
-from vikit.video.video_file_name import VideoFileName
 from vikit.video.video_metadata import VideoMetadata
+from vikit.common.handler import Handler
+from vikit.video.video_file_name import VideoFileName
+from vikit.common.file_tools import (
+    is_valid_path,
+    download_or_copy_file,
+    is_valid_filename,
+)
+from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
+
+DEFAULT_VIDEO_TITLE = "no-title-yet"
 
 
 class Video(ABC):
@@ -45,40 +66,43 @@ class Video(ABC):
         self._height = height
         self._background_music_file_name = None
         self._duration = None
-        self._is_video_generated = False
-        self._needs_reencoding: bool = None
-        self._id = uid.uuid4()
-        self.top_parent_id = (
-            self._id
-        )  # The top parent id is the id of the video that is the top parent of the current video chain, if any
+        self._is_video_built = False
+        self._needs_video_reencoding: bool = True
+        self.temp_id = random.getrandbits(
+            16
+        )  # used to get a short ID when mixed within local filesystem filenames
         self._short_type_name = (
             "Video"  # a 5 letters identifier to easily identify the type of video
         )
         self._videoMetadata = VideoMetadata(
-            id=self._id,
-            title="notitle-yet",
+            id=uid.uuid4(),
+            temp_id=self.temp_id,
+            title=DEFAULT_VIDEO_TITLE,
             duration=0,
             width=self._width,
             height=self._height,
-            is_video_generated=False,
-            is_reencoded=False,
-            is_interpolated=False,
-            is_bg_music_applied=False,
-            is_bg_music_generated=None,  # if not using gnerated we infer the default bg music is used
-            top_parent_id=self.top_parent_id,
         )
+        self._source = None
+        self.build_settings: VideoBuildSettings = VideoBuildSettings()
+        self.are_build_settings_prepared = False
+        self.video_dependencies = (
+            []
+        )  # Define video dependencies, i.e. the videos that are needed to build the current video
 
-        self._media_url = None
+    def __str__(self):
+        return f"ID:  {self.id}, type: {type(self)}, short_type_name: {self.short_type_name} , title: {self.title}, duration: {self.duration}, is_video_built: {self.is_video_built}"
+
+    @property
+    def media_url(self):
+        return self.metadata.media_url
+
+    @media_url.setter
+    def media_url(self, value):
+        self.metadata.media_url = value
 
     @property
     def metadata(self):
         return self._videoMetadata
-
-    @metadata.setter
-    def metadata(self, metadata):
-        if not isinstance(metadata, VideoMetadata):
-            raise ValueError("metadata should be of type VideoMetadata")
-        self._videoMetadata = metadata
 
     @property
     @abstractmethod
@@ -104,121 +128,64 @@ class Video(ABC):
     def background_music(self):
         return self._background_music_file_name
 
+    @background_music.setter
+    def background_music(self, file_name):
+        self._background_music_file_name = file_name
+        self.metadata.is_bg_music_generated = True
+
     @property
     def duration(self):
         return self.metadata.duration
 
+    @duration.setter
+    def duration(self, value):
+        self._duration = value
+        self.metadata.duration = value
+
     @property
-    def is_video_generated(self):
-        return self.metadata.is_video_generated
+    def is_video_built(self):
+        return self._is_video_built
+
+    @is_video_built.setter
+    def is_video_built(self, value):
+        self._is_video_built = value
+        self.metadata.is_video_built = value
 
     @property
     def title(self):
         return self.get_title()
 
-    def get_file_name_by_state(
-        self,
-        build_settings: VideoBuildSettings,
-        metadata: VideoMetadata = None,
-        video_type: str = None,
-    ):
-        """
-        Get the file name of the video depending on the current metadata / vide state
-
-        params:
-            build_settings (VideoBuildSettings): used to gather build contextual information
-            metadata (VideoMetadata): The metadata to use for generating the file name
-            video_type (str): The type of the video
-
-        Returns:
-            str: The file name of the video
-        """
-        if not metadata:
-            metadata = self.metadata
-
-        vid_type = video_type if video_type else self.short_type_name
-
-        video_fname = VideoFileName(
-            video_type=vid_type,
-            video_metadata=metadata,
-            build_settings=build_settings,
-        )
-        return str(video_fname)
+    @title.setter
+    def title(self, value):
+        self.metadata.title = value
 
     @abstractmethod
     def get_title(self):
         """
         Returns the title of the video.
         """
-        return "no title"
+        return "no-title-yet" if self.metadata.title is None else self.metadata.title
 
-    @property
-    def media_url(self):
-        """
-        Get the media URL of the video.
-        """
-        return self._media_url
-
-    @log_function_params
-    def get_first_frame_as_image(self):
+    async def get_first_frame_as_image(self):
         """
         Get the first frame of the video
         """
-        assert self._media_url, "no media URL provided"
-        assert os.path.exists(self.media_url), "The video file does not exist yet"
+        target_path = f"fst_frm_{self.id}.jpg"
 
-        result_path = ft.create_non_colliding_file_name(
-            canonical_name="fst_frm_" + self.get_title()[0], extension=".jpg"
+        return await get_first_frame_as_image_ffmpeg(
+            media_url=self.media_url, target_path=target_path
         )
-        result = subprocess.run(
-            [
-                "ffmpeg",
-                "-i",
-                self._media_url,
-                "-vf",
-                "select=eq(n\\,0)",  # c'est un filtre vidéo qui sélectionne les frames à extraire. eq(n\,0)
-                # signifie qu'il sélectionne la frame où n (le numéro de la frame) est égal à 0, c'est-à-dire la première frame
-                "-vframes",  # spécifie le nombre de frames vidéo à sortir
-                "1",  # on veut une seule frame
-                result_path,
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        result.check_returncode()
-        return result_path
 
-    @log_function_params
-    def get_last_frame_as_image(self):
+    async def get_last_frame_as_image(self):
         """
         Get the last frame of the video
         """
-        assert self._media_url, "no media URL provided"
-        assert os.path.exists(self._media_url), "The video file does not exist"
+        target_path = f"lst_frm_{self.id}.jpg"
 
-        result_path = ft.create_non_colliding_file_name(
-            canonical_name="last_frm_" + self.get_title()[0], extension=".jpg"
+        return await get_last_frame_as_image_ffmpeg(
+            media_url=self.media_url, target_path=target_path
         )
-        result = subprocess.run(
-            [
-                "ffmpeg",
-                "-sseof",  # spécifie qu'il doit commencer à x secondes de la fin du fichier.
-                "-3",  # on veut les 3 dernières secondes
-                "-i",
-                self._media_url,
-                "-update",  # signifie qu'il doit mettre à jour l'image de sortie si x nouvelle frame est disponible.
-                "1",  # on veut une seule frame
-                "-q:v",  # -q:v 1 spécifie la qualité de l'image de sortie (1 étant la meilleure qualité).
-                "1",
-                result_path,
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        result.check_returncode()
-        return result_path
 
-    @log_function_params
     def get_duration(self):
         """
         Get the duration of the final video
@@ -226,57 +193,48 @@ class Video(ABC):
         Returns:
             float: The duration of the final video
         """
-        if self._media_url is None:
+        if self.media_url is None:
             raise ValueError("The source media URL is not set")
-        self._duration = float(get_media_duration(self._media_url))
+        self.duration = float(get_media_duration(self.media_url))
         return self._duration
 
-    @log_function_params
-    def _apply_background_music(self, background_music_file: str = None):
-        """
-        Set the background music for the current video
-
-        Currently we just add a single music background of the length of the final video
-
-        Args:
-            background_music (str): The path to the background music file
-        Returns:
-            The current instance of the video
-        """
-        if background_music_file:
-            self._background_music_file_name = background_music_file  # Note that here we might overwrite the existing background music file
-            assert os.path.exists(
-                self._background_music_file_name
-            ), f"File {self._background_music_file_name} does not exist"
-
-        self._media_url = merge_audio(
-            media_url=self.media_url,
-            audio_file_path=self._background_music_file_name,
-            target_file_name="background_music_" + self.media_url.split("/")[-1],
-        )
-        self.metadata.bg_music_applied = True
-        return self
-
-    def _apply_subtitle_as_read_aloud(self, build_settings: VideoBuildSettings):
-        """
-        Merge the subtitle audio to the video to read aloud the prompt
-
-        Args:
-            build_settings (VideoBuildSettings): The settings to use for building the video
-        """
-        if build_settings.prompt is RecordedPrompt:
-            if build_settings.prompt.audio_recording:
-                merge_audio(
-                    media_url=self._media_url,
-                    prompt=build_settings.prompt.audio_recording,
+    def _set_working_folder_dir(self, working_folder_path: str):
+        if working_folder_path:
+            if is_valid_path(working_folder_path):
+                os.chdir(working_folder_path)
+                return True
+            else:
+                logger.warning(
+                    f"Video target dir path name is None or invalid, using the current video generation path: {os.getcwd()}"
                 )
-                self.metadata.is_prompt_read_aloud = True
+                return False
 
-    @abstractmethod
-    def build(self, build_settings: VideoBuildSettings = None):
+    def build(self, build_settings: VideoBuildSettings = VideoBuildSettings()):
+        """
+        Build in async but expose a sync interface
+        """
+        import asyncio
+
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            # If there's already a running loop, create a new task and wait for it
+            return loop.create_task(self.build_async(build_settings))
+        else:
+            # If no loop is running, use asyncio.run
+            return asyncio.run(self.build_async(build_settings))
+
+    async def build_async(
+        self, build_settings: VideoBuildSettings = VideoBuildSettings()
+    ):
         """
         Build the video in the child classes, unless the video is already built, in  which case
-        we just return ourseleves (Video gets immutable once generated)
+        we just return ourselves (Video gets immutable once generated)
+
+        This is a template method, the child classes should implement the get_handler_chain method
 
         Args:
             build_settings (VideoBuildSettings): The settings to use for building the video
@@ -285,107 +243,230 @@ class Video(ABC):
             Video: The built video
 
         """
-        if self._is_video_generated:
+        if self._is_video_built:
+            logger.info(f"Video {self.id} is already built, returning itself")
             return self
 
-    @log_function_params
-    def _fit_standard_background_music(self, expected_music_duration: float = None):
-        """
-        Prepare a standard background music for the video
-
-        Args:
-            expected_music_duration (float): The expected duration of the music
-            In case the audio is shorter, we will just stop playing music when it ends, no music looping for now
-
-        """
-        return extract_audio_slice(
-            start=0,
-            end=expected_music_duration,
-            audiofile_path=config.get_default_background_music(),
-            target_file_name=self._get_bk_music_target_filemame(),
+        current_dir = os.getcwd()
+        logger.trace(
+            f"Starting the pre build hook for Video {self.id}, current_dir {current_dir} "
         )
 
-    @log_function_params
-    def _get_bk_music_target_filemame(self):
-        """
-        Get the target file name for the background music
-        """
-        return f"{self.media_url[:-4].split('/')[-1]}_background_music.mp3"
+        wfolder_changed = self._set_working_folder_dir(build_settings.output_path)
+        logger.trace(f"Working folder has changed? : {wfolder_changed}")
 
-    def _build_background_music(
-        self, build_settings: VideoBuildSettings, prompt_text: str = ""
-    ):
-        """
-        Prepare background music for the video either by
-        - using a slice of standard background music,
-        - using a slice of the existing video background music file
-        - generating it using an LLM (not implemented yet)
+        logger.trace(
+            f"Starting the pre build hook for Video {self.id} of type {self.short_type_name} / {type(self)}"
+        )
+        await self.run_pre_build_actions_hook(build_settings=build_settings)
 
-        Args:
-            build_settings (VideoBuildSettings): The settings to use for building
-            prompt_text (str): The prompt text to use for generating the music
+        built_video = None
+        if not self.are_build_settings_prepared:
+            self.build_settings = build_settings
+            self._source = type(
+                build_settings.get_ml_models_gateway()  # TODO: this is hacky anbd should be refactored
+                # so that we infer source from the different handlers (initial video generator, interpolation, etc)
+            ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
 
-        Returns:
-            str: The path to the generated background music
-        """
-        logger.debug(f"self.background_music:: {self.background_music:}")
+            await self.prepare_build(build_settings=build_settings)
+            self.are_build_settings_prepared = True
 
-        if build_settings.music_building_context.generate_background_music:
-            self._background_music_file_name = self._generate_music(
-                expected_music_length=self.get_duration(),
-                test_mode=build_settings.test_mode,
-                prompt_text=prompt_text,
+        logger.info(f"Starting the building of Video {self.id} ")
+
+        built_video = await self.run_build_core_logic_hook(
+            build_settings=build_settings
+        )  # logic from the child classes if any
+        built_video = await self.gather_and_run_handlers()
+
+        logger.debug(f"Starting the post build hook for Video {self.id} ")
+        await self.run_post_build_actions_hook(build_settings=build_settings)
+
+        if self.build_settings.target_file_name:
+            self.set_final_video_name(
+                output_file_name=build_settings.target_file_name,
             )
-            self.metadata.is_bg_music_generated = True
+
+        if wfolder_changed:
+            self._set_working_folder_dir(
+                current_dir
+            )  # go back to the original working folder
+
+        self.is_video_built = True
+
+        return built_video
+
+    async def gather_and_run_handlers(self):
+        """
+        Gather the handler chain and run it
+        """
+        logger.trace("Gathering the handler chain")
+        built_video = None
+
+        handler_chain = self._get_and_initialize_video_handler_chain(
+            build_settings=self.build_settings
+        )
+        if not handler_chain:
+            logger.warning(
+                f"No handler chain defined for the video of type {self.short_type_name}"
+            )
         else:
-            if self.background_music:
-                if not os.path.exists(self.background_music):
-                    raise ValueError("background_music does not exists")
-                # Now we check the length , we may loop the background music in a future version
-                if get_media_duration(self.background_music) < self.get_duration():
-                    raise ValueError(
-                        "The given background music is too short for the video"
-                    )
+            logger.debug(
+                f"about to run {len(handler_chain)} handlers for video {self.id} of type {self.short_type_name} / {type(self)}"
+            )
+            for handler in handler_chain:
+                built_video = await handler.execute_async(video=self)
+                built_video.is_video_built = True
 
-                extract_audio_slice(
-                    start=0,
-                    end=self.get_duration(),
-                    audiofile_path=self.background_music,
-                    target_file_name=self.self._background_music_file_name,
-                )
-            else:  # use the standard bg music
-                self._background_music_file_name = self._fit_standard_background_music(
-                    expected_music_duration=build_settings.music_building_context.expected_music_length
-                )
+                assert built_video.media_url, "The video media URL is not set"
 
-        self._is_background_music_generated = True
+        self.metadata.title = self.get_title()
+        self.media_url = await download_or_copy_file(
+            url=self.media_url,
+            local_path=self.get_file_name_by_state(self.build_settings),
+        )
+        self.metadata.duration = (
+            self.get_duration()
+        )  # This needs to happen once the video has been downloaded
 
-        return self._background_music_file_name
+        return built_video
 
-    def _generate_music(
-        self,
-        expected_music_length,
-        prompt_text: str = None,
-        test_mode: bool = True,
-    ):
+    async def run_build_core_logic_hook(self, build_settings: VideoBuildSettings):
         """
-        Generate the background music for the video
+        Run the core logic of the video building
 
         Args:
-            expected_music_length (float): The expected length of the music
-            prompt_text (str): The prompt text to use for generating the music
-            test_mode (bool): The test mode
-
-        Returns:
-            str: The path to the generated background music
+            build_settings (VideoBuildSettings): The settings to use for building the video
         """
 
-        ml_models_gateway = (
-            ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
-                test_mode=test_mode
+    async def run_pre_build_actions_hook(self, build_settings: VideoBuildSettings):
+        """
+        Pre build actions hook
+
+        Args:
+            build_settings (VideoBuildSettings): The settings to use for building the video
+        """
+
+    async def run_post_build_actions_hook(self, build_settings: VideoBuildSettings):
+        """
+        Post build actions hook
+        """
+
+    async def prepare_build(self, build_settings: VideoBuildSettings) -> "Video":
+        """
+        Prepare the video for building, may be used to inject build settings for individual videos
+        that we don't want to share with global buildsettings. For instance to generate a video
+        a given way, and another video another way, all in the same composite video
+
+        Args:
+            build_settings (VideoBuildSettings): The settings to use for building the video later on
+
+        returns:
+            Video: The current instance, prepared for building
+        """
+        logger.debug(
+            f"Preparing the build settings with {build_settings} for video {self.id} of type {self.short_type_name} / {type(self)}"
+        )
+        self.build_settings = build_settings
+        self.are_build_settings_prepared = True
+
+        return self
+
+    def set_final_video_name(self, output_file_name: str):
+        """
+        Rename the video media file to the output_file_name if not already set
+        as the current media file.
+
+        Todday this function only works for local files.
+
+        We fail open: in case no target file name works, we just keep the video
+        as it is and where it stands. We send a warning to the logger though.
+
+        Args:
+            output_file_name (str): The output file name
+
+        Returns:
+            The video with the target file name
+        """
+        current_file_name = os.path.basename(self.media_url)
+        # We should already be positionned in the right target folder
+        if current_file_name != output_file_name:
+            new_file_path = output_file_name
+            logger.debug(
+                f"Copying video media file from {self.media_url} to {new_file_path}"
+            )
+            if not is_valid_filename(output_file_name):
+                raise ValueError(
+                    f"Invalid output file name: {output_file_name}, cannot rename the video media file"
+                )
+            try:
+                shutil.copyfile(
+                    self.media_url,
+                    new_file_path,
+                )
+                self.media_url = new_file_path
+            except Exception as e:
+                logger.warning(
+                    f"Could not copy the video media file to the target file name: {e}"
+                )
+
+    def get_file_name_by_state(self, build_settings: VideoBuildSettings = None):
+        """
+        Get the file name of the video by its state
+
+        Shortcut method not to have to call the VideoFileName class directly
+        """
+        assert self.metadata, "metadata should be set"
+        if not build_settings and not self.build_settings:
+            raise ValueError("build_settings should be set")
+
+        infered_name = str(
+            VideoFileName(
+                video_type=self.short_type_name,
+                video_metadata=self.metadata,
+                build_settings=(
+                    self.build_settings if not build_settings else build_settings
+                ),
             )
         )
+        return infered_name
 
-        return ml_models_gateway.generate_background_music(
-            duration=expected_music_length, prompt=prompt_text
+    def generate_background_music_prompt(self):
+        """
+        Get the background music prompt from the video list.
+
+        returns:
+            str: The background music prompt
+        """
+        return self.get_title()
+
+    def _get_and_initialize_video_handler_chain(
+        self, build_settings: VideoBuildSettings
+    ) -> list[Handler]:
+        """
+        Get the handler chain of the video.
+        Defining the handler chain is the main way to define how the video is built
+        so it is up to the child classes to implement methods called by this template method
+
+        Args:
+            build_settings (VideoBuildSettings): The settings to use for building the video
+
+        Returns:
+            list: The list of handlers to use for building the video
+        """
+        handlers = []
+
+        handlers.extend(self.get_core_handlers(build_settings))
+        handlers.extend(
+            VideoBuildingPipeline().get_handlers(self, build_settings=build_settings)
         )
+        logger.debug(
+            f"Handlers for video {self.id} of type {type(self)} / {self.short_type_name}: {handlers}"
+        )
+
+        return handlers
+
+    def get_core_handlers(self, build_settings=None):
+        """
+        Get the core handlers for the video
+        """
+        return []
