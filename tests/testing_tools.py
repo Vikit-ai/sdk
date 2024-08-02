@@ -14,7 +14,8 @@
 # ==============================================================================
 
 import os
-
+from pathlib import Path
+from vikit.video.video import Video
 from vikit.prompt.recorded_prompt import RecordedPrompt
 from tests.testing_medias import (
     get_test_prompt_recording_trainboy,
@@ -118,34 +119,37 @@ test_prompt_library = {
 }
 
 
-def check_output_bom(folder: str):
+def check_output_bom(video: Video, output_dir: Path):
     """
     Check if the output files in the folder contain the BOM character
+
+    params:
+    - video: Video object
+    - output_dir: Path to the output folder
+
+    returns
+    - None
     """
-    raise NotImplementedError("Not implemented yet")
+    # so we expect to see the following:
+    # - the generated (or fake) video files
+    # - the subtitle files if recorded prompt is generated
+    # - the background music file
+    # - the prompt audio file
+    # - the transition files
+    # - the first and last frame images for transitions
+    # - the composite video files: one global with expected name and one for each subtitle
+    # List files in the directory and check for .srt extension
+    srt_files = [file for file in output_dir.iterdir() if file.suffix == ".srt"]
+    if video.build_settings.prompt:
+        assert len(srt_files) > 0, "No .srt files found in the output directory"
 
-    for file in os.listdir(folder):
-        # so we expect to see the following:
-        # - the generated (or fake) video files
-        # - the subtitle files
-        # - the background music file
-        # - the prompt audio file
-        # - the transition files
-        # - the first and last frame images for transitions
-        # - the composite video files: one global with expected name and one for each subtitle
-
-        self.assert_exists_generated_video(
-            files, len(test_prompt.subtitles) * 2
-        )  # 2 generated videos per subtitle
-        self.assert_exists_transitions(
-            files, len(test_prompt.subtitles)
-        )  # one transition per subtitle
-        self.assert_exists_composite_videos(
-            files, len(test_prompt.subtitles) + 1
-        )  # one composite per subtitle +1 for the global video
-        self.assert_exists_subtitle(files, 0)
-        self.assert_exists_generated_audio_prompt(files, 0)
-        self.assert_exists_generated_bg_music(files, 0)
-        self.assert_exists_default_bg_music(files, 0)
-
-        print(file)
+    # self.assert_exists_transitions(
+    #     files, len(test_prompt.subtitles)
+    # )  # one transition per subtitle
+    # self.assert_exists_composite_videos(
+    #     files, len(test_prompt.subtitles) + 1
+    # )  # one composite per subtitle +1 for the global video
+    # self.assert_exists_subtitle(files, 0)
+    # self.assert_exists_generated_audio_prompt(files, 0)
+    # self.assert_exists_generated_bg_music(files, 0)
+    # self.assert_exists_default_bg_music(files, 0)
