@@ -184,7 +184,7 @@ async def batch_image_based_prompting(prompt_file: str):
         build_settings = VideoBuildSettings(
             music_building_context=MusicBuildingContext(
                 apply_background_music=True,
-                generate_background_music=False,
+                generate_background_music=True,
                 expected_music_length=5,
             ),
             target_model_provider="stabilityai_image",
