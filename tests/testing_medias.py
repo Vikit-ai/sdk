@@ -119,7 +119,7 @@ def get_test_transition_stones_trainboy_path():
     return os.path.join(_media_dir, TRANSITION_BOY_IN_TRAIN)
 
 
-def get_test_sein_transition_video_path():
+def get_test_seine_transition_video_path():
     return os.path.join(_media_dir, TRANSITION_SEINE)
 
 
