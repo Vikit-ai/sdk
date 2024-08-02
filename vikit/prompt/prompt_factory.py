@@ -142,7 +142,7 @@ class PromptFactory:
 
         if loop and loop.is_running():
             # If there's already a running loop, create a new task and wait for it
-            return loop.create_task(
+            return await loop.create_task(
                 self.create_prompt_from_audio_file_async(
                     recorded_audio_prompt_path=recorded_audio_prompt_path
                 )

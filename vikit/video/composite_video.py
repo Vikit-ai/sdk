@@ -275,7 +275,7 @@ class CompositeVideo(Video, is_composite_video):
             for video in self.video_list:
                 file_name = video.media_url
                 video_fps = get_media_fps(video.media_url)
-                logger.debug(f"Video fps (composite_video): {video_fps}")
+                logger.trace(f"Video fps (composite_video): {video_fps}")
                 sum_files_fps = sum_files_fps + video_fps
                 if max_fps < video_fps:
                     max_fps = video_fps

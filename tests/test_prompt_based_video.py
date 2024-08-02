@@ -44,7 +44,7 @@ class TestPromptBasedVideo:
         with pytest.raises(ValueError):
             _ = PromptBasedVideo(str(""))
 
-    @pytest.mark.unit
+    @pytest.mark.local_integration
     @pytest.mark.asyncio
     async def test_get_title(self):
         with WorkingFolderContext():

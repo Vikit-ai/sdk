@@ -41,31 +41,30 @@ class TestVideoBuildingStrategies:
         Test that the video tree is correctly generated, with right order,
         using a simple video tree
         """
-        with WorkingFolderContext():
-            build_settings = VideoBuildSettings(test_mode=True)
-            composite = CompositeVideo()
-            rtbv = RawTextBasedVideo("test")
-            composite.append_video(rtbv)
+        build_settings = VideoBuildSettings(test_mode=True)
+        composite = CompositeVideo()
+        rtbv = RawTextBasedVideo("test")
+        composite.append_video(rtbv)
 
-            # Here we are testing the ordered list of video to be build
-            # conforms to the expected order
-            video_build_order = get_lazy_dependency_chain_build_order(
-                video_build_order=[],
-                video_tree=[composite],
-                build_settings=build_settings,
-                already_added=set(),
-            )
+        # Here we are testing the ordered list of video to be build
+        # conforms to the expected order
+        video_build_order = get_lazy_dependency_chain_build_order(
+            video_build_order=[],
+            video_tree=[composite],
+            build_settings=build_settings,
+            already_added=set(),
+        )
 
-            assert video_build_order is not None
-            # here we check the leaf has been generated first, then the root composite
-            assert (
-                len(video_build_order) == 2
-            ), f"Should have 2 videos, instead we had {len(video_build_order)}"
+        assert video_build_order is not None
+        # here we check the leaf has been generated first, then the root composite
+        assert (
+            len(video_build_order) == 2
+        ), f"Should have 2 videos, instead we had {len(video_build_order)}"
 
-            assert video_build_order[0].id == rtbv.id
-            assert video_build_order[1].id == composite.id
-            assert isinstance(video_build_order[0], RawTextBasedVideo)
-            assert isinstance(video_build_order[1], CompositeVideo)
+        assert video_build_order[0].id == rtbv.id
+        assert video_build_order[1].id == composite.id
+        assert isinstance(video_build_order[0], RawTextBasedVideo)
+        assert isinstance(video_build_order[1], CompositeVideo)
 
     @pytest.mark.unit
     @pytest.mark.asyncio

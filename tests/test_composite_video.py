@@ -67,34 +67,33 @@ class TestCompositeVideo:
     ):
         # Check the  ratioToMultiplyAnimations = (self.get_duration() / build_settings.prompt.duration
         # is applied properly
-        with WorkingFolderContext():
-            imp_video = ImportedVideo(test_media.get_cat_video_path())
-            assert imp_video.media_url, "Media URL should not be null"
-            cp_video = CompositeVideo()
-            cp_video.append_video(imp_video)
-            cp_vid_durartion = cp_video.get_duration()
-            assert (
-                cp_vid_durartion == imp_video.get_duration()
-            ), f"Duration should be the same, {cp_video.get_duration()} != {imp_video.get_duration()}"
+        imp_video = ImportedVideo(test_media.get_cat_video_path())
+        assert imp_video.media_url, "Media URL should not be null"
+        cp_video = CompositeVideo()
+        cp_video.append_video(imp_video)
+        cp_vid_durartion = cp_video.get_duration()
+        assert (
+            cp_vid_durartion == imp_video.get_duration()
+        ), f"Duration should be the same, {cp_video.get_duration()} != {imp_video.get_duration()}"
 
-            prompt = tools.test_prompt_library["tired"]
-            build_settings = VideoBuildSettings(
-                expected_length=None,
-                test_mode=True,
-                prompt=prompt,
-            )
+        prompt = tools.test_prompt_library["tired"]
+        build_settings = VideoBuildSettings(
+            expected_length=None,
+            test_mode=True,
+            prompt=prompt,
+        )
 
-            ratio = cp_video._get_ratio_to_multiply_animations(
-                build_settings=build_settings,
-            )
+        ratio = cp_video._get_ratio_to_multiply_animations(
+            build_settings=build_settings,
+        )
 
-            assert ratio is not None, "Ratio should not be None"
-            assert ratio > 0, "Ratio should be greater than 0"
-            # Here the ratio should be low as we have a 6s video and a very long prompt which last much longer.
-            # so the ratio will make it so a 6s video is slowed down to match the prompt duration
-            assert (
-                ratio == cp_vid_durartion / prompt.duration
-            ), f"Ratio should be {cp_vid_durartion / prompt.duration} but is {ratio}"
+        assert ratio is not None, "Ratio should not be None"
+        assert ratio > 0, "Ratio should be greater than 0"
+        # Here the ratio should be low as we have a 6s video and a very long prompt which last much longer.
+        # so the ratio will make it so a 6s video is slowed down to match the prompt duration
+        assert (
+            ratio == cp_vid_durartion / prompt.duration
+        ), f"Ratio should be {cp_vid_durartion / prompt.duration} but is {ratio}"
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
