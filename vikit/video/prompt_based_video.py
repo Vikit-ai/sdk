@@ -162,6 +162,7 @@ class PromptBasedVideo(CompositeVideo):
                 prompt=enhanced_prompt_from_keywords,
                 test_mode=build_stgs.test_mode,
                 target_model_provider=build_stgs.target_model_provider,
+                interpolate=build_stgs.interpolate,
             )
         )
 
@@ -180,6 +181,7 @@ class PromptBasedVideo(CompositeVideo):
                 prompt=enhanced_prompt_from_prompt_text,
                 test_mode=build_stgs.test_mode,
                 target_model_provider=build_stgs.target_model_provider,
+                interpolate=build_stgs.interpolate,
             )
         )
         assert keyword_based_vid is not None, "keyword_based_vid cannot be None"
