@@ -142,7 +142,7 @@ class TestCompositeVideo:
             video.build_settings = VideoBuildSettings(
                 prompt=tools.test_prompt_library["moss_stones-train_boy"]
             )
-            video_imp = ImportedVideo(test_media.get_cat_video_path())
+            video_imp = ImportedVideo(test_media.get_generated_3s_forest_video_1_path())
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video).append_video(video_imp)
             assert (
