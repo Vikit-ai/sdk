@@ -85,6 +85,7 @@ def get_media_duration(input_video_path):
     result.check_returncode()
     return float(float(result.stdout))
 
+
 def get_media_fps(input_video_path):
     """
     Get the frames per second of a media file.
@@ -115,7 +116,9 @@ def get_media_fps(input_video_path):
     )
     result.check_returncode()
 
-    return float(str(result.stdout).split("/")[0].replace("b'", "")) / float(str(result.stdout).split("/")[1].replace("\\n'", ""))
+    return float(str(result.stdout).split("/")[0].replace("b'", "")) / float(
+        str(result.stdout).split("/")[1].replace("\\n'", "")
+    )
 
 
 @log_function_params
@@ -243,7 +246,12 @@ async def convert_as_mp3_file(fileName, target_file_name: str):
 
 
 async def concatenate_videos(
-    input_file: str, target_file_name=None, ratioToMultiplyAnimations=1, bias=0.33, fps=16, max_fps=16
+    input_file: str,
+    target_file_name=None,
+    ratioToMultiplyAnimations=1,
+    bias=0.33,
+    fps=16,
+    max_fps=16,
 ):
     """
     Concatenate all the videos in the list using a concatenation file
@@ -266,25 +274,45 @@ async def concatenate_videos(
             f"Ratio to multiply animations should be greater than 0. Got {ratioToMultiplyAnimations}"
         )
 
-    logger.debug("Merge with ffmpeg command: ffmpeg" + " " + 
-        "-y" + " " + 
-        "-f" + " " + 
-        "concat" + " " + 
-        "-safe" + " " + 
-        "0" + " " + 
-        "-i" + " " + 
-        input_file + " " + 
-        "-vf" + " " + 
-        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB+ STARTPTS,fps={fps}"  + " " + 
-        "-c:v"  + " " + 
-        "libx264" + " " + 
-        "-crf" + " " + 
-        "23" + " " + 
-        "-c:a" + " " + 
-        "aac" + " " + 
-        "-b:a" + " " + 
-        "192k" + " " + 
-        target_file_name)
+    logger.debug(
+        "Merge with ffmpeg command: ffmpeg"
+        + " "
+        + "-y"
+        + " "
+        + "-f"
+        + " "
+        + "concat"
+        + " "
+        + "-safe"
+        + " "
+        + "0"
+        + " "
+        + "-i"
+        + " "
+        + input_file
+        + " "
+        + "-vf"
+        + " "
+        + f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB+ STARTPTS,fps={fps}"
+        + " "
+        + "-c:v"
+        + " "
+        + "libx264"
+        + " "
+        + "-crf"
+        + " "
+        + "23"
+        + " "
+        + "-c:a"
+        + " "
+        + "aac"
+        + " "
+        + "-b:a"
+        + " "
+        + "192k"
+        + " "
+        + target_file_name
+    )
 
     # Build the ffmpeg command
     process = await asyncio.create_subprocess_exec(
@@ -297,7 +325,7 @@ async def concatenate_videos(
         "-i",
         input_file,
         "-vf",
-        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB + STARTPTS,fps={fps}", #
+        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB + STARTPTS,fps={fps}",  #
         "-c:v",
         "libx264",
         "-crf",
@@ -400,7 +428,7 @@ async def _merge_audio_and_video_with_existing_audio(
         "-i",
         media_url,
         "-filter_complex",
-        f"[0:a]apad,loudnorm,volume={audio_file_relative_volume}[A];[1:a][A]amerge[out]",
+        f"[0:a]apad,loudnorm,volume={audio_file_relative_volume},aformat=sample_fmts=u8|s16:channel_layouts=stereo[A];[1:a][A]amerge[out]",
         "-map",
         "1:v",
         "-c:v",
