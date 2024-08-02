@@ -267,20 +267,21 @@ class CompositeVideo(Video, is_composite_video):
         )
         logger.debug("ratio to multiply animations about to be applied: " + str(ratio))
 
-        sum_files_fps=0
-        number_files=0
-        max_fps=-1
+        sum_files_fps = 0
+        number_files = 0
+        max_fps = -1
 
         with open(video_list_file, "w") as myfile:
             for video in self.video_list:
                 file_name = video.media_url
                 video_fps = get_media_fps(video.media_url)
+                logger.debug(f"Video fps (composite_video): {video_fps}")
                 sum_files_fps = sum_files_fps + video_fps
-                if max_fps < video_fps: 
+                if max_fps < video_fps:
                     max_fps = video_fps
                 number_files = number_files + 1
                 myfile.write("file " + file_name + os.linesep)
-        
+
         logger.debug(
             f"Setting average fps to the composite video: {str(sum_files_fps/number_files)}"
         )
@@ -291,8 +292,8 @@ class CompositeVideo(Video, is_composite_video):
                 build_settings=video.build_settings,
             ),
             ratioToMultiplyAnimations=ratio,
-            fps=sum_files_fps/number_files,
-            max_fps=max_fps
+            fps=sum_files_fps / number_files,
+            max_fps=max_fps,
         )  # keeping one consistent file name
 
     def _get_ratio_to_multiply_animations(self, build_settings: VideoBuildSettings):
