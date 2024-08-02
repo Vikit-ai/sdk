@@ -74,7 +74,7 @@ class FakeMLModelsGateway(MLModelsGateway):
         self, source_image_path, target_image_path, sleep_time: int = 0
     ):
         await asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
-        return tests_medias.get_test_sein_transition_video_path()  # Important:
+        return tests_medias.get_test_seine_transition_video_path()  # Important:
 
     # the returned name should contains "transition" in the file name so we send the same video at the interpolate call
     # later on
