@@ -149,7 +149,7 @@ async def composite_textonly_prompting(
 async def create_single_image_based_video(
     prompt_content,
     build_settings=None,
-    test_mode: bool = True,
+    test_mode: bool = False,
     output_filename: str = None,
     text: str = None,
 ):
@@ -190,6 +190,7 @@ async def batch_image_based_prompting(prompt_file: str):
             target_model_provider="stabilityai_image",
             output_video_file_name=output_file,
             expected_length=4,
+            test_mode=False,
         )
 
         video, _ = await create_single_image_based_video(
@@ -342,6 +343,7 @@ async def prompte_based_composite(prompt: str, model_provider="stabilityai"):
         target_model_provider=model_provider,
         output_video_file_name="Composite.mp4",
         interpolate=to_interpolate,
+        test_mode=False,
     )
 
     gw = video_build_settings.get_ml_models_gateway()
