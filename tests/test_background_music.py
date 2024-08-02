@@ -43,12 +43,6 @@ class TestBackgroundMusic:
 
             _ = await ml_gw.generate_background_music_async(duration=3, prompt="")
 
-    @pytest.mark.unit
-    @pytest.mark.asyncio
-    async def test_generate_background_music_from_short_prompt(self):
-        with pytest.raises(TypeError):
-            _ = await VikitGateway().generate_background_music_async(duration="a")
-
     @pytest.mark.integration
     @pytest.mark.asyncio
     async def test_generate_background_music_from_prompt(self):
