@@ -31,6 +31,34 @@ else:
     load_dotenv(dotenv_path=env_file)
 
 
+def use_app_analytics() -> bool:
+    use_app_analytics = os.getenv("USE_APP_ANALYTICS", False)
+    if use_app_analytics is None:
+        raise Exception("USE_APP_ANALYTICS is not set")
+    return bool(use_app_analytics)
+
+
+def get_app_analytics_endpoint() -> str:
+    app_analytics_endpoint = os.getenv("VIKIT_APP_ANALYTICS_ENDPOINT", None)
+    if app_analytics_endpoint is None:
+        raise Exception("VIKIT_APP_ANALYTICS_ENDPOINT is not set")
+    return app_analytics_endpoint
+
+
+def use_telemetry() -> bool:
+    use_telemetry = os.getenv("USE_TELEMETRY", False)
+    if use_telemetry is None:
+        raise Exception("USE_TELEMETRY is not set")
+    return bool(use_telemetry)
+
+
+def get_telemetry_endpoint() -> str:
+    telemetry_endpoint = os.getenv("VIKIT_TELEMETRY_ENDPOINT", None)
+    if telemetry_endpoint is None:
+        raise Exception("VIKIT_TELEMETRY_ENDPOINT is not set")
+    return telemetry_endpoint
+
+
 def get_default_background_music() -> str:
     default_background_music = os.getenv("DEFAULT_BACKGROUND_MUSIC", None)
     if default_background_music is None:
