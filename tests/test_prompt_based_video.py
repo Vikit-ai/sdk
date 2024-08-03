@@ -168,7 +168,7 @@ class TestPromptBasedVideo:
                 "A group of stones in a forest",
             )
             pbv = PromptBasedVideo(prompt=prompt)
-            result = await pbv.build()
+            result = await pbv.build(build_settings=VideoBuildSettings(prompt=prompt))
             assert result is not None
             assert os.path.exists(result.media_url)
 
