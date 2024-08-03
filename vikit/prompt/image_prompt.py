@@ -23,27 +23,16 @@ class ImagePrompt(Prompt):
 
     def __init__(self, prompt_image: str = None, text: str = None):
         super().__init__()
-        self._image = prompt_image
-        self._text = text
-        self._duration = 4.04
-
-    @property
-    def image(self) -> str:
-        """
-        Returns the image of the prompt.
-        """
-        return self._image
-
-    @property
-    def text(self) -> str:
-        """
-        Returns the text of the prompt.
-        """
-        return self._text
+        if prompt_image is None:
+            raise ValueError("The image prompt is not provided")
+        self.image = prompt_image
+        self.text = text
 
     @property
     def duration(self) -> float:
         """
-        Returns the text of the prompt.
+        Returns the duration of the prompt.
+        Today we just hardcode the unique image to video provider output video length
+        This is clearly going to change in the next version
         """
-        return self._duration
+        return 4.04

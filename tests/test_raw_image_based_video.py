@@ -47,7 +47,7 @@ class TestRawImagePromptBasedVideo:
                     ml_gateway=ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway()
                 )
                 .create_prompt_from_image(TEST_PROMPT)
-                ._image,
+                .image,
                 title="test_image_prompt",
             ).get_title()
             logger.debug(f"Test get_title, video title: {video_title}")
@@ -63,7 +63,7 @@ class TestRawImagePromptBasedVideo:
                     ml_gateway=ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway()
                 )
                 .create_prompt_from_image(TEST_PROMPT)
-                ._image,
+                .image,
                 title="test_image_prompt",
             )
             await pbvid.build()
@@ -84,7 +84,7 @@ class TestRawImagePromptBasedVideo:
                     ml_gateway=ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway()
                 )
                 .create_prompt_from_image(TEST_PROMPT)
-                ._image,
+                .image,
                 title="test_image_prompt",
             )
             await pbvid.build(build_settings=VideoBuildSettings())
@@ -102,7 +102,7 @@ class TestRawImagePromptBasedVideo:
                     ml_gateway=ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway()
                 )
                 .create_prompt_from_image(TEST_PROMPT)
-                ._image,
+                .image,
                 title="test_image_prompt",
             )
             await pbvid.build(

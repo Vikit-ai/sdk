@@ -17,10 +17,9 @@ from loguru import logger
 
 import os
 import base64
-from typing import List, Dict
 
-from vikit.prompt.image_prompt_builder import ImagePromptBuilder
-from vikit.prompt.recorded_prompt_builder import RecordedPromptBuilder
+from vikit.prompt.image_prompt import ImagePrompt
+from vikit.prompt.recorded_prompt import RecordedPrompt
 from vikit.prompt.recorded_prompt_subtitles_extractor import (
     RecordedPromptSubtitlesExtractor,
 )
@@ -107,16 +106,12 @@ class PromptFactory:
             )
         )
 
-        prompt = (
-            RecordedPromptBuilder()
-            .set_prompt_text(prompt_text)
-            .set_subtitles(merged_subs)
-            .set_audio_recording(config.get_prompt_mp3_file_name())
-            .set_duration(get_media_duration(config.get_prompt_mp3_file_name()))
-            .build()
+        prompt = RecordedPrompt(
+            text=prompt_text,
+            subtitles=merged_subs,
+            audio_recording=config.get_prompt_mp3_file_name(),
+            duration=get_media_duration(config.get_prompt_mp3_file_name()),
         )
-        prompt.recorded_audio_prompt_path = config.get_prompt_mp3_file_name()
-
         return prompt
 
     async def create_prompt_from_audio_file(
@@ -170,7 +165,6 @@ class PromptFactory:
 
         """
         extractor = RecordedPromptSubtitlesExtractor()
-
         subs = await extractor.extract_subtitles_async(
             recorded_audio_prompt_path, ml_models_gateway=self._ml_gateway
         )
@@ -178,14 +172,10 @@ class PromptFactory:
             subs, min_duration=config.get_subtitles_min_duration()
         )
         text = extractor.build_subtitles_as_text_tokens(merged_subs)
-        prompt = (
-            RecordedPromptBuilder().set_subtitles(merged_subs).set_prompt_text(text)
-        )
-        prompt = await prompt.convert_recorded_audio_prompt_path_to_mp3(
-            recorded_audio_prompt_path
-        )
+        prompt = RecordedPrompt(subtitles=merged_subs, text=text)
+        prompt.convert_recorded_audio_prompt_path_to_mp3(recorded_audio_prompt_path)
 
-        return prompt.build()
+        return prompt
 
     async def get_reengineered_prompt_text_from_raw_text(
         self,
@@ -257,5 +247,5 @@ class PromptFactory:
 
         with open(image_path, "rb") as image_file:
             input_prompt_image = base64.b64encode(image_file.read()).decode("utf-8")
-        prompt = ImagePromptBuilder().set_prompt_image(input_prompt_image, text).build()
-        return prompt
+        img_prompt = ImagePrompt(prompt_image=input_prompt_image, text=text)
+        return img_prompt

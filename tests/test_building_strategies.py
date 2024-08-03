@@ -78,7 +78,7 @@ class TestVideoBuildingStrategies:
         build_settings = VideoBuildSettings(test_mode=True)
         build_settings._ml_models_gateway = build_settings.get_ml_models_gateway()
         pbv = PromptBasedVideo(
-            tools.test_prompt_library["train_boy"]
+            tools.test_prompt_library["moss_stones-train_boy"]
         )  # 4 subtitles -> 4 composite videos of 3 vids each
         await pbv.compose(build_settings=build_settings)
 
