@@ -315,6 +315,12 @@ class TestCompositeVideo:
                 )
             )
 
+            assert video_comp.media_url is not None
+            assert video_comp.background_music is not None
+            # assert (
+            #     video_comp.get_duration() == tools.test_prompt_library["tired"].duration
+            # ), f"Duration should be {tools.test_prompt_library['tired'].duration} but is {video_comp.get_duration()}"
+
     @pytest.mark.local_integration
     @pytest.mark.skip
     @pytest.mark.asyncio
@@ -348,7 +354,7 @@ class TestCompositeVideo:
     ):
         with WorkingFolderContext():
             build_stgs = VideoBuildSettings(test_mode=False)
-            test_prompt = tools.test_prompt_library["train_boy"]
+            test_prompt = tools.test_prompt_library["moss_stones-train_boy"]
             video = RawTextBasedVideo(test_prompt.text)
             video2 = ImportedVideo(test_media.get_cat_video_path())
             test_video_mixer = CompositeVideo()
@@ -366,7 +372,7 @@ class TestCompositeVideo:
             test_mode = False
 
             final_composite_video = CompositeVideo()
-            for subtitle in test_prompt_library["train_boy"].subtitles:
+            for subtitle in test_prompt_library["moss_stones-train_boy"].subtitles:
                 video = RawTextBasedVideo(subtitle.text)
                 await video.build(
                     build_settings=VideoBuildSettings(
@@ -383,7 +389,7 @@ class TestCompositeVideo:
                     ),
                     test_mode=test_mode,
                     include_read_aloud_prompt=True,
-                    prompt=test_prompt_library["train_boy"],
+                    prompt=test_prompt_library["moss_stones-train_boy"],
                 )
             )
 
@@ -403,7 +409,7 @@ class TestCompositeVideo:
                 interpolate=True,
                 test_mode=True,
                 include_read_aloud_prompt=True,
-                prompt=test_prompt_library["train_boy"],
+                prompt=test_prompt_library["moss_stones-train_boy"],
             )
             comp_start = CompositeVideo().append_video(
                 ImportedVideo(test_media.get_cat_video_path())

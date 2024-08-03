@@ -41,7 +41,9 @@ class TestModelProviders:
         with WorkingFolderContext():
             final_composite_video = CompositeVideo()
             # train_boy has 4 subtitles
-            for i, subtitle in enumerate(test_prompt_library["train_boy"].subtitles):
+            for i, subtitle in enumerate(
+                test_prompt_library["moss_stones-train_boy"].subtitles
+            ):
                 if i % 3 == 0:
                     target_model_provider = "vikit"
                 elif i % 3 == 1:
@@ -68,7 +70,7 @@ class TestModelProviders:
                     ),
                     test_mode=False,
                     include_read_aloud_prompt=True,
-                    prompt=test_prompt_library["train_boy"],
+                    prompt=test_prompt_library["moss_stones-train_boy"],
                 )
             )
 

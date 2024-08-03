@@ -61,7 +61,7 @@ class TestAudioCompositions:
         with WorkingFolderContext():
             video = ImportedVideo(get_generated_3s_forest_video_1_path())
             handler = ReadAloudPromptAudioMergingHandler(
-                recorded_prompt=test_prompt_library["train_boy"]
+                recorded_prompt=test_prompt_library["moss_stones-train_boy"]
             )
             res_vid = await handler.execute_async(video=video)
 
