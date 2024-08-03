@@ -244,7 +244,8 @@ class Video(ABC):
             Video: The built video
 
         """
-        capture_event(id=self.id, event="build_video")
+        if not build_settings.test_mode:
+            capture_event(id=self.id, event="build_video")
 
         if self._is_video_built:
             logger.info(f"Video {self.id} is already built, returning itself")

@@ -17,7 +17,6 @@ from loguru import logger
 
 from vikit.common.handler import Handler
 from vikit.video.video import Video
-from vikit.common.telemetry import tracer
 
 
 class VideoGenHandler(Handler):
