@@ -17,7 +17,7 @@ Overview
    * - :py:obj:`concatenate_videos <ffmpeg_wrapper.concatenate_videos>`\ (input_file, target_file_name, ratioToMultiplyAnimations, bias, fps, max_fps)
      - Concatenate all the videos in the list using a concatenation file
    * - :py:obj:`convert_as_mp3_file <ffmpeg_wrapper.convert_as_mp3_file>`\ (fileName, target_file_name)
-     - Save the incoming audio file to a regular mp3 file with a standardised filename
+     - Save the incoming audio file to a regular mp3 file with a standardized filename
    * - :py:obj:`extract_audio_slice <ffmpeg_wrapper.extract_audio_slice>`\ (audiofile_path, start, end, target_file_name)
      - Extract a slice of the audio file using ffmpeg
    * - :py:obj:`get_first_frame_as_image_ffmpeg <ffmpeg_wrapper.get_first_frame_as_image_ffmpeg>`\ (media_url, target_path)
@@ -63,7 +63,7 @@ Functions
    :async:
 
 
-   Save the incoming audio file to a regular mp3 file with a standardised filename
+   Save the incoming audio file to a regular mp3 file with a standardized filename
 
    :param fileName: The path to the audio file to convert
    :type fileName: str

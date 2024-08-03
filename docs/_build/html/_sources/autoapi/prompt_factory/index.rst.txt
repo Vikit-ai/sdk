@@ -26,7 +26,7 @@ Classes
 
    Prompt factory helps getting the right sub class of Prompt depending on
    the input provided. We use the right builder class to make it clear of the operations
-   required to build each type of prompt and optimise it
+   required to build each type of prompt and optimize it
 
    This is also useful to simplify unit testing of prompts as we will inject custom made Prompt objects
    instead of letting builders run some complex stuff involving external services
@@ -103,7 +103,7 @@ Classes
    .. py:method:: get_prompt_handler_chain(prompt_build_settings: vikit.prompt.prompt_build_settings.PromptBuildSettings) -> list[vikit.common.handler.Handler]
 
       Get the handler chain of the Prompt. Can includes handlers to prepare
-      the prompt text by adding more verbosity, or to filter ofensing words, limit
+      the prompt text by adding more verbosity, or to filter offensive words, limit
       the prompt length, etc
 
       :param build_settings: The settings to use for building the prompt

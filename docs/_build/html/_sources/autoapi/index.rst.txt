@@ -12,7 +12,6 @@ This page contains auto-generated API reference documentation [#f1]_.
    /autoapi/prompt/index
    /autoapi/handler/index
    /autoapi/secrets/index
-   /autoapi/telemetry/index
    /autoapi/transition/index
    /autoapi/file_tools/index
    /autoapi/decorators/index
@@ -20,7 +19,6 @@ This page contains auto-generated API reference documentation [#f1]_.
    /autoapi/video_types/index
    /autoapi/build_order/index
    /autoapi/image_prompt/index
-   /autoapi/app_analytics/index
    /autoapi/vikit_gateway/index
    /autoapi/ffmpeg_wrapper/index
    /autoapi/imported_video/index

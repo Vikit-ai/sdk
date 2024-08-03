@@ -52,9 +52,9 @@ Classes
       * - :py:obj:`get_children_build_settings <composite_video.CompositeVideo.get_children_build_settings>`\ ()
         - Get the  build settings for children Video
       * - :py:obj:`get_duration <composite_video.CompositeVideo.get_duration>`\ ()
-        - Get the duration of the video, we recompute it everytime
+        - Get the duration of the video, we recompute it every time
       * - :py:obj:`get_title <composite_video.CompositeVideo.get_title>`\ ()
-        - Get the title of the video, we recompute it everytime
+        - Get the title of the video, we recompute it every time
       * - :py:obj:`is_composite_video <composite_video.CompositeVideo.is_composite_video>`\ ()
         - \-
       * - :py:obj:`run_build_core_logic_hook <composite_video.CompositeVideo.run_build_core_logic_hook>`\ (build_settings)
@@ -107,13 +107,13 @@ Classes
 
    .. py:method:: get_duration()
 
-      Get the duration of the video, we recompute it everytime
+      Get the duration of the video, we recompute it every time
       as the duration of the video can change if we add or remove videos
 
 
    .. py:method:: get_title()
 
-      Get the title of the video, we recompute it everytime
+      Get the title of the video, we recompute it every time
       as the title of the video can change if we add or remove videos
 
 
@@ -126,10 +126,10 @@ Classes
       Mix all the videos in the list: here we actually build and stitch the videos together,
       will take some time and resources as we call external services and run video mixing locally.
 
-      Warning: order is very importamnt here, and the first pass is supposed to happen from the rootcomposite levels
+      Warning: order is very important here, and the first pass is supposed to happen from the rootcomposite levels
 
       Today we do generate the videos so the first ones are the ones that will be used to generate the final video
-      This requires a specific order, and generating videos ahad of time won't work unless you take care
+      This requires a specific order, and generating videos ahead of time won't work unless you take care
       of building the videos in the child composite video list first.
 
       params:

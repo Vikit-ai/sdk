@@ -113,7 +113,7 @@ Functions
 
    Check if the path is valid: could be a local path or a remote one
    (http, etc). We don't test the actual access and credentials at this stage,
-   just the path fornat.
+   just the path format.
 
    :param path: The path to validate
    :type path: str, os.PathLike

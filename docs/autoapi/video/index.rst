@@ -36,7 +36,7 @@ Classes
 
    Video is a class that helps to manage video files, be it a small video to be mixed or the final one.
 
-   - it stores metadata about itself amd possibly subvideos
+   - it stores metadata about itself amd possibly sub-videos
    - Video is actually really generated when you do call the build method. This is an immutable operation, i.e. once built, you cannot rebuild or change the properties of the video object.
 
 
@@ -207,7 +207,7 @@ Classes
       Rename the video media file to the output_file_name if not already set
       as the current media file.
 
-      Todday this function only works for local files.
+      Today this function only works for local files.
 
       We fail open: in case no target file name works, we just keep the video
       as it is and where it stands. We send a warning to the logger though.

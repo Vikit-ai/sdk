@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="config" href="../config/index.html" /><link rel="prev" title="vikit.music_building_context" href="../vikit/music_building_context/index.html" />
 
     <!-- Generated with Sphinx 7.4.6 and Furo 2024.07.18 -->
-        <title>video - vikit.ai SDK 0.2 documentation</title>
+        <title>video - Vikit.ai SDK 0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -169,7 +169,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">vikit.ai SDK 0.2 documentation</div></a>
+      <a href="../../index.html"><div class="brand">Vikit.ai SDK 0.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -193,7 +193,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">vikit.ai SDK 0.2 documentation</span>
+  <span class="sidebar-brand-text">Vikit.ai SDK 0.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -212,7 +212,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../prompt/index.html">prompt</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handler/index.html">handler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../secrets/index.html">secrets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../telemetry/index.html">telemetry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../transition/index.html">transition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../file_tools/index.html">file_tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../decorators/index.html">decorators</a></li>
@@ -220,7 +219,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../video_types/index.html">video_types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../build_order/index.html">build_order</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../image_prompt/index.html">image_prompt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../app_analytics/index.html">app_analytics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vikit_gateway/index.html">vikit_gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ffmpeg_wrapper/index.html">ffmpeg_wrapper</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../imported_video/index.html">imported_video</a></li>
@@ -335,7 +333,7 @@
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
 <p>Video is a class that helps to manage video files, be it a small video to be mixed or the final one.</p>
 <ul class="simple">
-<li><p>it stores metadata about itself amd possibly subvideos</p></li>
+<li><p>it stores metadata about itself amd possibly sub-videos</p></li>
 <li><p>Video is actually really generated when you do call the build method. This is an immutable operation, i.e. once built, you cannot rebuild or change the properties of the video object.</p></li>
 </ul>
 <p class="rubric">Overview</p>
@@ -534,7 +532,7 @@ a given way, and another video another way, all in the same composite video</p>
 <span class="sig-name descname"><span class="pre">set_final_video_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#video.Video.set_final_video_name" title="Link to this definition">¶</a></dt>
 <dd><p>Rename the video media file to the output_file_name if not already set
 as the current media file.</p>
-<p>Todday this function only works for local files.</p>
+<p>Today this function only works for local files.</p>
 <p>We fail open: in case no target file name works, we just keep the video
 as it is and where it stands. We send a warning to the logger though.</p>
 <dl class="field-list simple">
@@ -589,7 +587,7 @@ as it is and where it stands. We send a warning to the logger though.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2024, vikit.ai team
+                Copyright &#169; 2024, Vikit.ai team
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

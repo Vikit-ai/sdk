@@ -7,7 +7,7 @@
 Vikit.ai
 ========================================
 
-Welcome to vikit.ai SDK's documentation!
+Welcome to Vikit.ai SDK's documentation!
 
 **Vikit** let you develop easily video generators leveraging generative AI and other AI models. You may see this as a langchain to orchestrate AI models and video editing tools.
 

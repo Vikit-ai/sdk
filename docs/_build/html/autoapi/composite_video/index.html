@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="prompt_cleaning" href="../prompt_cleaning/index.html" /><link rel="prev" title="video_file_name" href="../video_file_name/index.html" />
 
     <!-- Generated with Sphinx 7.4.6 and Furo 2024.07.18 -->
-        <title>composite_video - vikit.ai SDK 0.2 documentation</title>
+        <title>composite_video - Vikit.ai SDK 0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -169,7 +169,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">vikit.ai SDK 0.2 documentation</div></a>
+      <a href="../../index.html"><div class="brand">Vikit.ai SDK 0.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -193,7 +193,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">vikit.ai SDK 0.2 documentation</span>
+  <span class="sidebar-brand-text">Vikit.ai SDK 0.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -212,7 +212,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../prompt/index.html">prompt</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handler/index.html">handler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../secrets/index.html">secrets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../telemetry/index.html">telemetry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../transition/index.html">transition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../file_tools/index.html">file_tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../decorators/index.html">decorators</a></li>
@@ -220,7 +219,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../video_types/index.html">video_types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../build_order/index.html">build_order</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../image_prompt/index.html">image_prompt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../app_analytics/index.html">app_analytics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vikit_gateway/index.html">vikit_gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ffmpeg_wrapper/index.html">ffmpeg_wrapper</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../imported_video/index.html">imported_video</a></li>
@@ -347,10 +345,10 @@
 <td><p>Get the  build settings for children Video</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.get_duration" title="composite_video.CompositeVideo.get_duration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_duration</span></code></a>()</p></td>
-<td><p>Get the duration of the video, we recompute it everytime</p></td>
+<td><p>Get the duration of the video, we recompute it every time</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.get_title" title="composite_video.CompositeVideo.get_title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_title</span></code></a>()</p></td>
-<td><p>Get the title of the video, we recompute it everytime</p></td>
+<td><p>Get the title of the video, we recompute it every time</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#composite_video.CompositeVideo.is_composite_video" title="composite_video.CompositeVideo.is_composite_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_composite_video</span></code></a>()</p></td>
 <td><p>-</p></td>
@@ -424,14 +422,14 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="composite_video.CompositeVideo.get_duration">
 <span class="sig-name descname"><span class="pre">get_duration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#composite_video.CompositeVideo.get_duration" title="Link to this definition">¶</a></dt>
-<dd><p>Get the duration of the video, we recompute it everytime
+<dd><p>Get the duration of the video, we recompute it every time
 as the duration of the video can change if we add or remove videos</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="composite_video.CompositeVideo.get_title">
 <span class="sig-name descname"><span class="pre">get_title</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#composite_video.CompositeVideo.get_title" title="Link to this definition">¶</a></dt>
-<dd><p>Get the title of the video, we recompute it everytime
+<dd><p>Get the title of the video, we recompute it every time
 as the title of the video can change if we add or remove videos</p>
 </dd></dl>
 
@@ -445,9 +443,9 @@ as the title of the video can change if we add or remove videos</p>
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run_build_core_logic_hook</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">build_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">VideoBuildSettings()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#composite_video.CompositeVideo.run_build_core_logic_hook" title="Link to this definition">¶</a></dt>
 <dd><p>Mix all the videos in the list: here we actually build and stitch the videos together,
 will take some time and resources as we call external services and run video mixing locally.</p>
-<p>Warning: order is very importamnt here, and the first pass is supposed to happen from the rootcomposite levels</p>
+<p>Warning: order is very important here, and the first pass is supposed to happen from the rootcomposite levels</p>
 <p>Today we do generate the videos so the first ones are the ones that will be used to generate the final video
-This requires a specific order, and generating videos ahad of time won’t work unless you take care
+This requires a specific order, and generating videos ahead of time won’t work unless you take care
 of building the videos in the child composite video list first.</p>
 <dl class="simple">
 <dt>params:</dt><dd><p>build_settings: The settings to be used for the build</p>
@@ -513,7 +511,7 @@ of building the videos in the child composite video list first.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2024, vikit.ai team
+                Copyright &#169; 2024, Vikit.ai team
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

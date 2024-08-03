@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="video_file_name" href="../video_file_name/index.html" /><link rel="prev" title="video_metadata" href="../video_metadata/index.html" />
 
     <!-- Generated with Sphinx 7.4.6 and Furo 2024.07.18 -->
-        <title>prompt_factory - vikit.ai SDK 0.2 documentation</title>
+        <title>prompt_factory - Vikit.ai SDK 0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=613ab9ff" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -169,7 +169,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">vikit.ai SDK 0.2 documentation</div></a>
+      <a href="../../index.html"><div class="brand">Vikit.ai SDK 0.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -193,7 +193,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">vikit.ai SDK 0.2 documentation</span>
+  <span class="sidebar-brand-text">Vikit.ai SDK 0.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -212,7 +212,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../prompt/index.html">prompt</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handler/index.html">handler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../secrets/index.html">secrets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../telemetry/index.html">telemetry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../transition/index.html">transition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../file_tools/index.html">file_tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../decorators/index.html">decorators</a></li>
@@ -220,7 +219,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../video_types/index.html">video_types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../build_order/index.html">build_order</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../image_prompt/index.html">image_prompt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../app_analytics/index.html">app_analytics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../vikit_gateway/index.html">vikit_gateway</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ffmpeg_wrapper/index.html">ffmpeg_wrapper</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../imported_video/index.html">imported_video</a></li>
@@ -324,7 +322,7 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">prompt_factory.</span></span><span class="sig-name descname"><span class="pre">PromptFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ml_gateway</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vikit.gateways.ML_models_gateway.MLModelsGateway</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_build_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vikit.prompt.prompt_build_settings.PromptBuildSettings</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#prompt_factory.PromptFactory" title="Link to this definition">¶</a></dt>
 <dd><p>Prompt factory helps getting the right sub class of Prompt depending on
 the input provided. We use the right builder class to make it clear of the operations
-required to build each type of prompt and optimise it</p>
+required to build each type of prompt and optimize it</p>
 <p>This is also useful to simplify unit testing of prompts as we will inject custom made Prompt objects
 instead of letting builders run some complex stuff involving external services</p>
 <p class="rubric">Overview</p>
@@ -416,7 +414,7 @@ i.e. all the sentences text and timings</p>
 <dt class="sig sig-object py" id="prompt_factory.PromptFactory.get_prompt_handler_chain">
 <span class="sig-name descname"><span class="pre">get_prompt_handler_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_build_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vikit.prompt.prompt_build_settings.PromptBuildSettings</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><span class="pre">vikit.common.handler.Handler</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#prompt_factory.PromptFactory.get_prompt_handler_chain" title="Link to this definition">¶</a></dt>
 <dd><p>Get the handler chain of the Prompt. Can includes handlers to prepare
-the prompt text by adding more verbosity, or to filter ofensing words, limit
+the prompt text by adding more verbosity, or to filter offensive words, limit
 the prompt length, etc</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -483,7 +481,7 @@ to guide how we should build the prompt</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2024, vikit.ai team
+                Copyright &#169; 2024, Vikit.ai team
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
