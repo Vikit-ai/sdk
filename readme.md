@@ -18,7 +18,7 @@ To see the video in full resolution, click on the GIF.
 
 ## How to use Vikit.ai SDK?
 You need a personal access token, which you can easily obtain from [here](https://www.vikit.ai/#/platform).  
-Vikit.ai SDK is easy to test standalone using [Google Colab](https://colab.research.google.com/drive/1jLiwbezF-myky21tIWSxG6LRlcU9ivya).
+Vikit.ai SDK is easy to test standalone using [Google Colab](https://colab.research.google.com/drive/1yZ-GC0GxRP6zKZD2lJfi9Rz16nRezLaa#scrollTo=72LXhJCils2Q).
 It is easy to develop through Dev Containers. Dev container file and instructions will be published soon.
 ### Requirements for local installation
 - Python 3.8+ 
