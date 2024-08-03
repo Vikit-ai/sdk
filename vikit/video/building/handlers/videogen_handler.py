@@ -37,19 +37,17 @@ class VideoGenHandler(Handler):
             The video with the media URL set to the generated video
         """
         logger.info(f"About to generate video: {video.id}, title: {video.get_title()}")
-        with tracer.start_as_current_span("VideoGenHandler execute_async"):
-
-            logger.debug(
-                f"Target Model provider in the handler: {video.build_settings.target_model_provider}"
-            )
-            video.media_url = (
-                await (  # Should give a link on a web storage
-                    video.build_settings.get_ml_models_gateway().generate_video_async(
-                        prompt=self.video_gen_prompt_text,
-                        model_provider=video.build_settings.target_model_provider,
-                    )
+        logger.debug(
+            f"Target Model provider in the handler: {video.build_settings.target_model_provider}"
+        )
+        video.media_url = (
+            await (  # Should give a link on a web storage
+                video.build_settings.get_ml_models_gateway().generate_video_async(
+                    prompt=self.video_gen_prompt_text,
+                    model_provider=video.build_settings.target_model_provider,
                 )
             )
+        )
 
-            logger.debug(f"Video generated from prompt: {video.media_url}")
-            return video
+        logger.debug(f"Video generated from prompt: {video.media_url}")
+        return video
