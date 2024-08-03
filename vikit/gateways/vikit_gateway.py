@@ -13,38 +13,31 @@
 # limitations under the License.
 # ==============================================================================
 
-import os
 import asyncio
-import aiohttp
 import base64
+import io
 import json
+import os
 import subprocess
+import time
 import uuid as uid
 
-from tenacity import (
-    retry,
-    before_log,
-    after_log,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-    AsyncRetrying,
-)
+import aiohttp
 from loguru import logger
-from vikit.common.file_tools import download_or_copy_file
-from vikit.common.decorators import log_function_params
-from vikit.gateways.ML_models_gateway import MLModelsGateway
-from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
-from vikit.common.secrets import get_replicate_api_token, get_vikit_api_token
+from PIL import Image
+from tenacity import (AsyncRetrying, after_log, before_log, retry,
+                      retry_if_exception_type, stop_after_attempt,
+                      wait_exponential)
+
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
 from vikit.common.config import get_nb_retries_http_calls
-from vikit.common.secrets import has_eleven_labs_api_key
+from vikit.common.decorators import log_function_params
+from vikit.common.file_tools import download_or_copy_file
+from vikit.common.secrets import (get_replicate_api_token, get_vikit_api_token,
+                                  has_eleven_labs_api_key)
+from vikit.gateways.ML_models_gateway import MLModelsGateway
+from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
-
-import io
-from PIL import Image
-
-import time
 
 os.environ["REPLICATE_API_TOKEN"] = get_replicate_api_token()
 vikit_api_key = get_vikit_api_token()

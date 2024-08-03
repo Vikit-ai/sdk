@@ -14,11 +14,12 @@
 # ==============================================================================
 
 import os
-from google.cloud import storage
-from vikit.video.video import Video
-import vikit.common.config as config
 
+from google.cloud import storage
 from loguru import logger
+
+import vikit.common.config as config
+from vikit.video.video import Video
 
 
 def upload_to_GCS_cloud_bucket(video: Video):

@@ -17,9 +17,9 @@ import os
 import pysrt
 from loguru import logger
 
-from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
-from vikit.prompt.prompt import Prompt
 import vikit.common.config as config
+from vikit.prompt.prompt import Prompt
+from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
 
 
 class RecordedPrompt(Prompt):

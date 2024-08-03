@@ -13,15 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
-from vikit.video.video import Video, VideoBuildSettings
-from vikit.video.transition import Transition
-from vikit.video.building.handlers.transition_handler import (
-    VideoBuildingHandlerTransition,
-)
-from vikit.video.building.handlers.interpolation_handler import (
-    VideoInterpolationHandler,
-)
 from vikit.common.handler import Handler
+from vikit.video.building.handlers.interpolation_handler import \
+    VideoInterpolationHandler
+from vikit.video.building.handlers.transition_handler import \
+    VideoBuildingHandlerTransition
+from vikit.video.transition import Transition
+from vikit.video.video import Video, VideoBuildSettings
 
 
 class SeineTransition(Transition):

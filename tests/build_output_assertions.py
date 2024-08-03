@@ -16,6 +16,7 @@
 from vikit.video.video_file_name import VideoFileName
 from vikit.video.video_types import VideoType
 
+
 class BuildOutputAssertor():
 
     def __init__(self, files: list[str]):

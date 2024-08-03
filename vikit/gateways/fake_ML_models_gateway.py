@@ -13,19 +13,19 @@
 # limitations under the License.
 # ==============================================================================
 
+import asyncio
 import os
+import shutil
 from pathlib import Path
 from time import sleep
-import asyncio
-import shutil
+from urllib.parse import urljoin
+from urllib.request import pathname2url
 
 from loguru import logger
 
 import tests.testing_medias as tests_medias
-from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
-from urllib.parse import urljoin
-from urllib.request import pathname2url
 from vikit.gateways.ML_models_gateway import MLModelsGateway
+from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 
 TESTS_MEDIA_FOLDER = "tests/medias/"
 STUDENT_ARM_WRITING = "student_arm_writting.mp4"

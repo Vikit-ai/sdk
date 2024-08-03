@@ -13,15 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 
-import pytest
 import warnings
+
+import pytest
 from loguru import logger
 
+from tests.testing_medias import (get_test_prompt_image,
+                                  get_test_prompt_recording)
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.prompt.prompt_factory import PromptFactory
-from tests.testing_medias import get_test_prompt_recording, get_test_prompt_image
-from vikit.gateways import vikit_gateway as vgateway
 from vikit.gateways import replicate_gateway as replicate_gateway
+from vikit.gateways import vikit_gateway as vgateway
+from vikit.prompt.prompt_factory import PromptFactory
 
 mp3_transcription = (
     "ceci est un test rapide avec nma voix enregistrée pour faire un test"

@@ -14,12 +14,13 @@
 # ==============================================================================
 
 from urllib.request import urlretrieve
+
 from loguru import logger
 
+from vikit.common.decorators import log_function_params
 from vikit.common.handler import Handler
 from vikit.video.building.handlers.videogen_handler import VideoGenHandler
 from vikit.video.video import Video
-from vikit.common.decorators import log_function_params
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
 

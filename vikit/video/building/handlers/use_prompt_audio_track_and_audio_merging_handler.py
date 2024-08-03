@@ -15,11 +15,9 @@
 
 from loguru import logger
 
-from vikit.prompt.recorded_prompt import RecordedPrompt
 from vikit.common.handler import Handler
-from vikit.wrappers.ffmpeg_wrapper import (
-    merge_audio,
-)
+from vikit.prompt.recorded_prompt import RecordedPrompt
+from vikit.wrappers.ffmpeg_wrapper import merge_audio
 
 
 class UsePromptAudioTrackAndAudioMergingHandler(Handler):

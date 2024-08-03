@@ -16,9 +16,7 @@
 from loguru import logger
 
 from vikit.common.handler import Handler
-from vikit.wrappers.ffmpeg_wrapper import (
-    merge_audio,
-)
+from vikit.wrappers.ffmpeg_wrapper import merge_audio
 
 
 class ReadAloudPromptAudioMergingHandler(Handler):

@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 from loguru import logger
 

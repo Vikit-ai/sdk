@@ -14,6 +14,7 @@
 # ==============================================================================
 
 import warnings
+
 import pytest
 
 from vikit.video.raw_text_based_video import RawTextBasedVideo

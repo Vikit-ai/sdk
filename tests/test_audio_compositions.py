@@ -23,20 +23,17 @@ import warnings
 import pytest
 from loguru import logger
 
-from tests.testing_medias import (
-    get_cat_video_path,
-    get_generated_3s_forest_video_1_path,
-    get_generated_3s_forest_video_2_path,
-)
-from vikit.video.video import VideoBuildSettings
-from vikit.video.imported_video import ImportedVideo
-from vikit.video.composite_video import CompositeVideo
-from vikit.common.context_managers import WorkingFolderContext
+from tests.testing_medias import (get_cat_video_path,
+                                  get_generated_3s_forest_video_1_path,
+                                  get_generated_3s_forest_video_2_path)
 from tests.testing_tools import test_prompt_library
+from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
-from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handler import (
-    ReadAloudPromptAudioMergingHandler,
-)
+from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handler import \
+    ReadAloudPromptAudioMergingHandler
+from vikit.video.composite_video import CompositeVideo
+from vikit.video.imported_video import ImportedVideo
+from vikit.video.video import VideoBuildSettings
 
 
 class TestAudioCompositions:

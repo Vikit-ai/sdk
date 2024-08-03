@@ -13,29 +13,25 @@
 # limitations under the License.
 # ==============================================================================
 
+import base64
+import os
+
 from loguru import logger
 
-import os
-import base64
-
-from vikit.prompt.image_prompt import ImagePrompt
-from vikit.prompt.recorded_prompt import RecordedPrompt
-from vikit.prompt.recorded_prompt_subtitles_extractor import (
-    RecordedPromptSubtitlesExtractor,
-)
 import vikit.common.config as config
-from vikit.gateways.ML_models_gateway import MLModelsGateway
-from vikit.common.handler import Handler
-from vikit.prompt.prompt_build_settings import PromptBuildSettings
-
-from vikit.prompt.building.handlers.prompt_by_keywords_handler import (
-    PromptByKeywordsHandler,
-)
-from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
-    PromptByRawUserTextHandler,
-)
-from vikit.wrappers.ffmpeg_wrapper import get_media_duration
 from vikit.common.decorators import log_function_params
+from vikit.common.handler import Handler
+from vikit.gateways.ML_models_gateway import MLModelsGateway
+from vikit.prompt.building.handlers.prompt_by_keywords_handler import \
+    PromptByKeywordsHandler
+from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import \
+    PromptByRawUserTextHandler
+from vikit.prompt.image_prompt import ImagePrompt
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
+from vikit.prompt.recorded_prompt import RecordedPrompt
+from vikit.prompt.recorded_prompt_subtitles_extractor import \
+    RecordedPromptSubtitlesExtractor
+from vikit.wrappers.ffmpeg_wrapper import get_media_duration
 
 
 class PromptFactory:

@@ -14,20 +14,19 @@
 # ==============================================================================
 
 import os
-import pytest
-
-from loguru import logger
-
 import warnings
 
-# from unittest.mock import patch, MagicMock, Mock
-from vikit.video.raw_image_based_video import RawImageBasedVideo
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.video.video import VideoBuildSettings
-from vikit.common.context_managers import WorkingFolderContext
-from vikit.music_building_context import MusicBuildingContext
+import pytest
+from loguru import logger
+
 import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
 from tests.testing_medias import get_test_prompt_image
+from vikit.common.context_managers import WorkingFolderContext
+from vikit.music_building_context import MusicBuildingContext
+from vikit.prompt.prompt_factory import PromptFactory
+# from unittest.mock import patch, MagicMock, Mock
+from vikit.video.raw_image_based_video import RawImageBasedVideo
+from vikit.video.video import VideoBuildSettings
 
 TEST_PROMPT = get_test_prompt_image()
 
