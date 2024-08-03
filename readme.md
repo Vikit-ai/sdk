@@ -1,7 +1,7 @@
 <div align="center">
 <img src='./medias/vikit_logo.jpg' style="height:150px"></img>
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1jLiwbezF-myky21tIWSxG6LRlcU9ivya)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1yZ-GC0GxRP6zKZD2lJfi9Rz16nRezLaa#scrollTo=72LXhJCils2Q)
 
 
 </div>
@@ -29,60 +29,61 @@ It is easy to develop through Dev Containers. Dev container file and instruction
 ## Code examples
 Generating a video from simple text prompt:
 ```python
-from vikit.video.video import Video, VideoBuildSettings
+from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
-from vikit.music import MusicBuildingContext
 from vikit.video.prompt_based_video import PromptBasedVideo
+from vikit.video.video_build_settings import VideoBuildSettings
 
-prompt = "A forest full of mystical spirits"
-music_context = MusicBuildingContext(
-    apply_background_music=True, generate_background_music=True
-)
+prompt = "Paris, the City of Light, is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere. The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions."
+
 video_build_settings = VideoBuildSettings(
-    music_building_context=music_context,
+    music_building_context=MusicBuildingContext(
+        apply_background_music=True,
+        generate_background_music=True,
+    ),
+    include_read_aloud_prompt=True,
     test_mode=False,
-    include_audio_read_subtitles=True,
 )
+
 gw = video_build_settings.get_ml_models_gateway()
-prompt = PromptFactory(ml_gateway=gw).create_prompt_from_text(prompt)
+prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(prompt)
 video = PromptBasedVideo(prompt=prompt)
-video.build(build_settings=video_build_settings)
+await video.build(build_settings=video_build_settings)
 
 ```
 You can orchestrate several videos, using ```CompositeVideo()```. Here is an example showing how to generate two videos from a ```subtitle```:
 ```python
-vid_cp_sub = CompositeVideo()
 
-# Generate the first video from keywords
-keyword_based_vid = RawTextBasedVideo(subtitle.text).build(
-    build_settings=VideoBuildSettings(
-        generate_from_llm_keyword=True,
-        generate_from_llm_prompt=False,
-        test_mode=video_build_settings.test_mode,
-    )
-)
+from vikit.video.composite_video import CompositeVideo
+from vikit.video.raw_text_based_video import RawTextBasedVideo
+from vikit.video.seine_transition import SeineTransition
+from vikit.video.video_build_settings import VideoBuildSettings
 
-# Generate the second video from raw text
-prompt_based_vid = RawTextBasedVideo(subtitle.text).build(
-    build_settings=VideoBuildSettings(
-        generate_from_llm_prompt=True,
-        generate_from_llm_keyword=False,
-        test_mode=video_build_settings.test_mode,
-    )
-)
+prompt1 = "Paris, the City of Light, is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere."
+prompt2 = "The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions."
 
+video_composite = CompositeVideo()
+
+video1 = RawTextBasedVideo(prompt1)
+video2 = RawTextBasedVideo(prompt2)
 # Generate the transition to pass from the first to the second video
 transit = SeineTransition(
-    source_video=keyword_based_vid,
-    target_video=prompt_based_vid,
+    source_video=video1,
+    target_video=video2,
 )
 
-# Append the first video, transition, and second video together
-vid_cp_sub.append_video(keyword_based_vid).append_video(transit).append_video(prompt_based_vid)
+video_composite.append_video(video1).append_video(transit).append_video(video2)
+
+await video_composite.build(
+    build_settings=VideoBuildSettings(
+        test_mode=False,
+        output_video_file_name="Composite.mp4",
+    )
+)
 
 ```
 
-More detailed examples can be found in our [Google Colab](https://colab.research.google.com/drive/1jLiwbezF-myky21tIWSxG6LRlcU9ivya). For additional information, please refer to the [Documentation](./docs/_build/html/index.html).
+More elaborated examples can be found in [script_example.py](script_example.py) or in our [Google Colab](https://colab.research.google.com/drive/1yZ-GC0GxRP6zKZD2lJfi9Rz16nRezLaa#scrollTo=72LXhJCils2Q). For additional information, please refer to the [Documentation]().
 
 ## Support
 If you've encountered a bug, have a feature request, or have any suggestions to improve the project, we encourage you to open an issue on our GitHub repository. To do so, go to the "Issues" tab in our GitHub repository and click "New Issue." Please provide a clear title and detailed description, including steps to reproduce, environment setup, and any relevant screenshots or code snippets. 
@@ -121,6 +122,6 @@ Please make sure your changes are consistent with these common guidelines:
 - Please identify yourself with a valid email address as explained here [Setting your commit email address](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address)
 
 ## Disclaimer
-The content generated by the models in this repository is the sole responsibility of the user who initiates the generation. Users must ensure that their use of the generated content complies with all applicable laws, regulations, and ethical guidelines. The project contributors are not liable for any misuse, harm, or legal implications resulting from the use of the models provided. Users are encouraged to exercise caution and discretion when using generative AI tools.
-
-If you use the default background music, which is royaltee free, you still must comply with Pixabay Content License Agreement (https://pixabay.com/fr/service/license-summary/).
+- The content generated by the models in this repository is the sole responsibility of the user who initiates the generation. Users must ensure that their use of the generated content complies with all applicable laws, regulations, and ethical guidelines. The project contributors are not liable for any misuse, harm, or legal implications resulting from the use of the models provided. Users are encouraged to exercise caution and discretion when using generative AI tools.
+- If you use the default background music, which is royaltee free, you still must comply with Pixabay Content License Agreement (https://pixabay.com/fr/service/license-summary/).
+- Too many parallel video generation processes might slow things down, just keep an eye on your local CPU usage. Happy coding! 🚀😊
