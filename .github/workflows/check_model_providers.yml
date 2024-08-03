@@ -1,4 +1,4 @@
-name: Run Tests Hourly
+name: Run Tests Twice Daily
 
 on:
   schedule:
