@@ -44,7 +44,7 @@ class Video(ABC):
     """
     Video is a class that helps to manage video files, be it a small video to be mixed or the final one.
 
-    - it stores metadata about itself amd possibly subvideos
+    - it stores metadata about itself amd possibly sub-videos
     - Video is actually really generated when you do call the build method. This is an immutable operation, i.e. once built, you cannot rebuild or change the properties of the video object.
 
     """
@@ -264,7 +264,7 @@ class Video(ABC):
         if not self.are_build_settings_prepared:
             self.build_settings = build_settings
             self._source = type(
-                build_settings.get_ml_models_gateway()  # TODO: this is hacky anbd should be refactored
+                build_settings.get_ml_models_gateway()  # TODO: this is hacky and should be refactored
                 # so that we infer source from the different handlers (initial video generator, interpolation, etc)
             ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
 
@@ -376,7 +376,7 @@ class Video(ABC):
         Rename the video media file to the output_file_name if not already set
         as the current media file.
 
-        Todday this function only works for local files.
+        Today this function only works for local files.
 
         We fail open: in case no target file name works, we just keep the video
         as it is and where it stands. We send a warning to the logger though.
@@ -388,7 +388,7 @@ class Video(ABC):
             The video with the target file name
         """
         current_file_name = os.path.basename(self.media_url)
-        # We should already be positionned in the right target folder
+        # We should already be positioned in the right target folder
         if current_file_name != output_file_name:
             new_file_path = output_file_name
             logger.debug(
@@ -419,7 +419,7 @@ class Video(ABC):
         if not build_settings and not self.build_settings:
             raise ValueError("build_settings should be set")
 
-        infered_name = str(
+        inferred_name = str(
             VideoFileName(
                 video_type=self.short_type_name,
                 video_metadata=self.metadata,
@@ -428,7 +428,7 @@ class Video(ABC):
                 ),
             )
         )
-        return infered_name
+        return inferred_name
 
     def generate_background_music_prompt(self):
         """

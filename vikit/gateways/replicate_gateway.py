@@ -224,7 +224,7 @@ class ReplicateGateway(MLModelsGateway):
         """
 
         if text is None:
-            text = "finaly there is no prompt so just unleash your own imagination"
+            text = "finally there is no prompt so just unleash your own imagination"
 
         llm_keywords = await replicate.async_run(
             "mistralai/mixtral-8x7b-instruct-v0.1",

@@ -18,7 +18,7 @@ from vikit.video.video import Video
 
 class VideoBuildHistory:
     """
-    Video build history: Not ilmplmented yet, will be used pretty much like Keras model fit history
+    Video build history: Not implemented yet, will be used pretty much like Keras model fit history
     and for instrumentation purposes
     """
 

@@ -41,7 +41,7 @@ def get_lazy_dependency_chain_build_order(
     Get the first videos first build order
 
     Here we generate the video in a lazy way, starting from the leaf composite and
-    going up to the root composite as depency resolution is done
+    going up to the root composite as dependency resolution is done
 
     So this is a width traversal of the video tree, but we go down the dependency chain too
 

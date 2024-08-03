@@ -26,8 +26,7 @@ from urllib.request import urlopen
 import aiofiles
 import aiohttp
 from loguru import logger
-from tenacity import (after_log, before_log, retry, stop_after_attempt,
-                      wait_exponential)
+from tenacity import after_log, before_log, retry, stop_after_attempt, wait_exponential
 
 from vikit.common.config import get_nb_retries_http_calls
 from vikit.common.decorators import log_function_params
@@ -149,7 +148,7 @@ def is_valid_path(path: Optional[Union[str, os.PathLike]]) -> bool:
     """
     Check if the path is valid: could be a local path or a remote one
     (http, etc). We don't test the actual access and credentials at this stage,
-    just the path fornat.
+    just the path format.
 
     Args:
         path (str, os.PathLike): The path to validate

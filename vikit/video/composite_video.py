@@ -22,12 +22,17 @@ from loguru import logger
 import vikit.common.config as config
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.building.build_order import (
-    get_lazy_dependency_chain_build_order, is_composite_video)
+    get_lazy_dependency_chain_build_order,
+    is_composite_video,
+)
 from vikit.video.video import DEFAULT_VIDEO_TITLE, Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
-from vikit.wrappers.ffmpeg_wrapper import (concatenate_videos,
-                                           get_media_duration, get_media_fps)
+from vikit.wrappers.ffmpeg_wrapper import (
+    concatenate_videos,
+    get_media_duration,
+    get_media_fps,
+)
 
 
 class CompositeVideo(Video, is_composite_video):
@@ -126,7 +131,7 @@ class CompositeVideo(Video, is_composite_video):
 
     def get_duration(self):
         """
-        Get the duration of the video, we recompute it everytime
+        Get the duration of the video, we recompute it every time
         as the duration of the video can change if we add or remove videos
         """
         if self.metadata.is_video_built:
@@ -142,7 +147,7 @@ class CompositeVideo(Video, is_composite_video):
 
     def get_title(self):
         """
-        Get the title of the video, we recompute it everytime
+        Get the title of the video, we recompute it every time
         as the title of the video can change if we add or remove videos
         """
         title = "_".join([subvideo.get_title() for subvideo in self.video_list])
@@ -166,7 +171,7 @@ class CompositeVideo(Video, is_composite_video):
             self.metadata.is_interpolated
         elif nb_interpolated == 0:
             self.metadata.is_interpolated = False
-            # TODO: handle partially interpolated videos, not really importnat for now
+            # TODO: handle partially interpolated videos, not really important for now
 
     def cleanse_video_list(self):
         """
@@ -192,10 +197,10 @@ class CompositeVideo(Video, is_composite_video):
         Mix all the videos in the list: here we actually build and stitch the videos together,
         will take some time and resources as we call external services and run video mixing locally.
 
-        Warning: order is very importamnt here, and the first pass is supposed to happen from the rootcomposite levels
+        Warning: order is very important here, and the first pass is supposed to happen from the rootcomposite levels
 
         Today we do generate the videos so the first ones are the ones that will be used to generate the final video
-        This requires a specific order, and generating videos ahad of time won't work unless you take care
+        This requires a specific order, and generating videos ahead of time won't work unless you take care
         of building the videos in the child composite video list first.
 
         params:
@@ -225,7 +230,7 @@ class CompositeVideo(Video, is_composite_video):
             with_dependency_videos = [
                 v for v in ordered_video_list if v.video_dependencies
             ]
-            # Répéter le processus jusqu'à ce que toutes les vidéos soient traitées
+            # Repeat the process until all videos are processed.
             while with_dependency_videos:
                 tasks = []
                 for video in with_dependency_videos[:]:
@@ -243,7 +248,7 @@ class CompositeVideo(Video, is_composite_video):
                 if tasks:
                     await asyncio.gather(*tasks)
                 else:
-                    raise Exception("Certaines dépendances n'ont pas pu être traitées.")
+                    raise Exception("Some dependencies could not be processed.")
 
         # at this stage we should have all the videos generated. Will be improved in the future
         # in case we are called directly on a child composite without starting by the composite root

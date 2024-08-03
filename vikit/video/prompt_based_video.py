@@ -117,7 +117,7 @@ class PromptBasedVideo(CompositeVideo):
                 prompt_based_vid
             )  # Building a set of 2 videos around the same text + a transition
 
-            self.append_video(vid_cp_sub)  # Adding the comnposite to the overall video
+            self.append_video(vid_cp_sub)  # Adding the composite to the overall video
 
         return self
 

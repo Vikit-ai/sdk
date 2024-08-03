@@ -331,7 +331,7 @@ async def composite_mixed_prompting(
     await vid_cp_sub.build(build_settings=composite_build_settings)
 
 
-async def prompte_based_composite(prompt: str, model_provider="stabilityai"):
+async def prompt_based_composite(prompt: str, model_provider="stabilityai"):
 
     # It is strongly recommended to activate interpolate for videocrafter model
     to_interpolate = True if model_provider == "videocrafter" else False
@@ -416,4 +416,4 @@ if __name__ == "__main__":
         with WorkingFolderContext("./examples/inputs/PromptBased/"):
             logger.add("log.txt")
             prompt = """Paris, the City of Light, is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere. The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions. Paris is also famous for its charming cafes, chic boutiques, and world-class cuisine, offering visitors a delightful blend of history, elegance, and joie de vivre along the scenic Seine River."""
-            asyncio.run(prompte_based_composite(prompt=prompt))
+            asyncio.run(prompt_based_composite(prompt=prompt))

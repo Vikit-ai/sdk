@@ -40,7 +40,7 @@ class ReadAloudPromptAudioMergingHandler(Handler):
             The video including generated synthetic voice that reads the prompt
         """
         logger.info(
-            f"about to merge read aloud prompt audio to video: {video.id}, read alout media:  {self.recorded_prompt.audio_recording}"
+            f"about to merge read aloud prompt audio to video: {video.id}, read aloud media:  {self.recorded_prompt.audio_recording}"
         )
         video.metadata.is_prompt_read_aloud = True
 

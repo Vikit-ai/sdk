@@ -66,7 +66,7 @@ class SubtitleExtractor:
 
         returns:
             list of text tokens corresponding to the subtitles in some sort
-            of human readeable format
+            of human readable format
         """
         texts = []
         step = 0

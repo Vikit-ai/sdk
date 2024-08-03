@@ -205,7 +205,7 @@ async def extract_audio_slice(
 @log_function_params
 async def convert_as_mp3_file(fileName, target_file_name: str):
     """
-    Save the incoming audio file to a regular mp3 file with a standardised filename
+    Save the incoming audio file to a regular mp3 file with a standardized filename
 
     Args:
 
@@ -479,7 +479,7 @@ async def _merge_audio_and_video_without_audio_track(
 ):
     """
     Merge audio with the video in the case where video has no audio track, typically
-    when generated out of a video genration ML Model
+    when generated out of a video generation ML Model
 
     Args:
         media_url (str): The media url to merge
@@ -621,10 +621,10 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
         "-i",
         media_url,
         "-vf",
-        "select=eq(n\\,0)",  # c'est un filtre vidéo qui sélectionne les frames à extraire. eq(n\,0)
-        # signifie qu'il sélectionne la frame où n (le numéro de la frame) est égal à 0, c'est-à-dire la première frame
-        "-vframes",  # spécifie le nombre de frames vidéo à sortir
-        "1",  # on veut une seule frame
+        "select=eq(n\\,0)",  # It is a video filter that selects the frames to extract
+        #  eq(n\\,0) means it selects the frame where n (the frame number) is equal to 0, in other word, the first frame.
+        "-vframes",  # Specifies the number of video frames to output.
+        "1",  # We want one single frame
         target_path,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
@@ -659,13 +659,13 @@ async def get_last_frame_as_image_ffmpeg(media_url, target_path=None):
 
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
-        "-sseof",  # spécifie qu'il doit commencer à x secondes de la fin du fichier.
-        "-3",  # on veut les 3 dernières secondes
+        "-sseof",  # Specifies that it should start x seconds from the end of the file
+        "-3",  # We want the last 3 seconds.
         "-i",
         media_url,
-        "-update",  # signifie qu'il doit mettre à jour l'image de sortie si x nouvelle frame est disponible.
-        "1",  # on veut une seule frame
-        "-q:v",  # -q:v 1 spécifie la qualité de l'image de sortie (1 étant la meilleure qualité).
+        "-update",  # Means that it should update the output image if a new frame is available
+        "1",  # We want one single frame
+        "-q:v",  # -q:v 1  specifies the quality of the output image (1 being the best quality).
         "1",
         target_path,
         stdout=asyncio.subprocess.PIPE,

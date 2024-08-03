@@ -22,15 +22,18 @@ import vikit.common.config as config
 from vikit.common.decorators import log_function_params
 from vikit.common.handler import Handler
 from vikit.gateways.ML_models_gateway import MLModelsGateway
-from vikit.prompt.building.handlers.prompt_by_keywords_handler import \
-    PromptByKeywordsHandler
-from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import \
-    PromptByRawUserTextHandler
+from vikit.prompt.building.handlers.prompt_by_keywords_handler import (
+    PromptByKeywordsHandler,
+)
+from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
+    PromptByRawUserTextHandler,
+)
 from vikit.prompt.image_prompt import ImagePrompt
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.prompt.recorded_prompt import RecordedPrompt
-from vikit.prompt.recorded_prompt_subtitles_extractor import \
-    RecordedPromptSubtitlesExtractor
+from vikit.prompt.recorded_prompt_subtitles_extractor import (
+    RecordedPromptSubtitlesExtractor,
+)
 from vikit.wrappers.ffmpeg_wrapper import get_media_duration
 
 
@@ -38,7 +41,7 @@ class PromptFactory:
     """
     Prompt factory helps getting the right sub class of Prompt depending on
     the input provided. We use the right builder class to make it clear of the operations
-    required to build each type of prompt and optimise it
+    required to build each type of prompt and optimize it
 
     This is also useful to simplify unit testing of prompts as we will inject custom made Prompt objects
     instead of letting builders run some complex stuff involving external services
@@ -204,7 +207,7 @@ class PromptFactory:
     ) -> list[Handler]:
         """
         Get the handler chain of the Prompt. Can includes handlers to prepare
-        the prompt text by adding more verbosity, or to filter ofensing words, limit
+        the prompt text by adding more verbosity, or to filter offensive words, limit
         the prompt length, etc
 
         Args:

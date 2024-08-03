@@ -45,6 +45,6 @@ async def generate_mp3_from_text_async(text, target_file):
                     async for chunk in response.content.iter_chunked(CHUNK_SIZE):
                         if chunk:
                             await f.write(chunk)
-                    logger.debug("mp3 sucessfully written")
+                    logger.debug("mp3 successfully written")
             else:
                 logger.error(f"Failed to fetch audio: {response.status}")
