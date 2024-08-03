@@ -39,28 +39,31 @@ Classes
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`build <raw_text_based_video.RawTextBasedVideo.build>`\ (build_settings, excluded_words)
-        - Generate the actual inner video
+      * - :py:obj:`get_core_handlers <raw_text_based_video.RawTextBasedVideo.get_core_handlers>`\ (build_settings)
+        - Get the handler chain of the video. Order matters here.
       * - :py:obj:`get_title <raw_text_based_video.RawTextBasedVideo.get_title>`\ ()
+        - \-
+      * - :py:obj:`run_build_core_logic_hook <raw_text_based_video.RawTextBasedVideo.run_build_core_logic_hook>`\ (build_settings)
         - \-
 
 
    .. rubric:: Members
 
-   .. py:method:: build(build_settings=VideoBuildSettings(), excluded_words='')
+   .. py:method:: get_core_handlers(build_settings: vikit.video.video_build_settings.VideoBuildSettings) -> list[vikit.common.handler.Handler]
 
-      Generate the actual inner video
+       Get the handler chain of the video. Order matters here.
+       At this stage, we should already have the enhanced prompt and title for this video
 
-      Params:
-          - build_settings: allow some customization
-          - generate_from_keywords: generate the video out of keywords infered from the given prompt, and using an LLM.
-          If False, we will generate an enhanced prompt and generate the video out of it
-          - excluded_words: words to exclude from the prompt. This is used so as to prevent too much repetition across distant video scenes
+      :param build_settings: The settings for building the video
+      :type build_settings: VideoBuildSettings
 
-      :returns: The current instance
+       Returns:
+           list: The list of handlers to use for building the video
 
 
    .. py:method:: get_title()
+
+   .. py:method:: run_build_core_logic_hook(build_settings: vikit.video.video_build_settings.VideoBuildSettings)
 
 
 

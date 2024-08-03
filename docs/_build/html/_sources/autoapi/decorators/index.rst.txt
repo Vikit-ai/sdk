@@ -14,8 +14,6 @@ Overview
    :widths: auto
    :class: summarytable
 
-   * - :py:obj:`delay <decorators.delay>`\ (seconds)
-     - Decorator to delay the execution of a function
    * - :py:obj:`log_function_params <decorators.log_function_params>`\ (func)
      - Decorator to log the parameters of a function
 
@@ -24,11 +22,6 @@ Overview
 
 Functions
 ---------
-.. py:function:: delay(seconds)
-
-   Decorator to delay the execution of a function
-
-
 .. py:function:: log_function_params(func)
 
    Decorator to log the parameters of a function

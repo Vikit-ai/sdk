@@ -8,6 +8,14 @@ config
 Overview
 --------
 
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`singletons <config.singletons>`
+     - A class to hold singletons
+
 
 .. list-table:: Function
    :header-rows: 0
@@ -57,6 +65,36 @@ Overview
      - \-
    * - :py:obj:`env_file <config.env_file>`
      - \-
+
+
+Classes
+-------
+
+.. py:class:: singletons
+
+   A class to hold singletons
+
+
+   .. rubric:: Overview
+
+
+   .. list-table:: Methods
+      :header-rows: 0
+      :widths: auto
+      :class: summarytable
+
+      * - :py:obj:`get_process_executor <config.singletons.get_process_executor>`\ ()
+        - :summarylabel:`static` The process executor to use for parallel processing
+
+
+   .. rubric:: Members
+
+   .. py:method:: get_process_executor()
+      :staticmethod:
+
+
+      The process executor to use for parallel processing
+
 
 
 

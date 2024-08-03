@@ -38,17 +38,11 @@ Classes
 
       * - :py:obj:`get_ml_models_gateway <ML_models_gateway_factory.MLModelsGatewayFactory.get_ml_models_gateway>`\ (test_mode)
         - \-
-      * - :py:obj:`get_ml_models_gateway_static <ML_models_gateway_factory.MLModelsGatewayFactory.get_ml_models_gateway_static>`\ (test_mode)
-        - :summarylabel:`static` \-
 
 
    .. rubric:: Members
 
    .. py:method:: get_ml_models_gateway(test_mode: bool = True)
-
-   .. py:method:: get_ml_models_gateway_static(test_mode: bool = True)
-      :staticmethod:
-
 
 
 

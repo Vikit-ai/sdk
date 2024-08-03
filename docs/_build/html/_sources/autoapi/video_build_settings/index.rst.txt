@@ -22,7 +22,7 @@ Overview
 Classes
 -------
 
-.. py:class:: VideoBuildSettings(delete_interim_files: bool = False, run_async: bool = False, test_mode: bool = True, expected_length: float = None, include_audio_read_subtitles: bool = False, prompt: vikit.prompt.recorded_prompt.RecordedPrompt = None, generate_from_llm_keyword: bool = False, generate_from_llm_prompt: bool = True, interpolate: bool = True, music_building_context: vikit.music_building_context.MusicBuildingContext = MusicBuildingContext(), target_path: str = None)
+.. py:class:: VideoBuildSettings(delete_interim_files: bool = False, test_mode: bool = True, target_model_provider: str = None, expected_length: float = None, include_read_aloud_prompt: bool = False, prompt: vikit.prompt.prompt.Prompt = None, interpolate: bool = False, music_building_context: vikit.music_building_context.MusicBuildingContext = MusicBuildingContext(), cascade_build_settings: bool = False, target_dir_path: str = None, output_video_file_name: str = None)
 
    Bases: :py:obj:`vikit.common.GeneralBuildSettings.GeneralBuildSettings`
 

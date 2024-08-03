@@ -47,29 +47,31 @@ Classes
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`compose_music_from_text <replicate_gateway.ReplicateGateway.compose_music_from_text>`\ (prompt_text, duration)
+      * - :py:obj:`compose_music_from_text_async <replicate_gateway.ReplicateGateway.compose_music_from_text_async>`\ (prompt_text, duration)
         - Compose a music for a prompt text
-      * - :py:obj:`generate_background_music <replicate_gateway.ReplicateGateway.generate_background_music>`\ (duration, prompt)
+      * - :py:obj:`generate_background_music_async <replicate_gateway.ReplicateGateway.generate_background_music_async>`\ (duration, prompt, target_file_name)
         - Here we generate the music to add as background music
-      * - :py:obj:`generate_seine_transition <replicate_gateway.ReplicateGateway.generate_seine_transition>`\ (source_image_path, target_image_path)
+      * - :py:obj:`generate_seine_transition_async <replicate_gateway.ReplicateGateway.generate_seine_transition_async>`\ (source_image_path, target_image_path)
         - Generate a transition between two videos
-      * - :py:obj:`generate_video <replicate_gateway.ReplicateGateway.generate_video>`\ (prompt)
+      * - :py:obj:`generate_video_async <replicate_gateway.ReplicateGateway.generate_video_async>`\ (prompt)
         - Generate a video from the given prompt
-      * - :py:obj:`get_enhanced_prompt <replicate_gateway.ReplicateGateway.get_enhanced_prompt>`\ (subtitleText)
+      * - :py:obj:`get_enhanced_prompt_async <replicate_gateway.ReplicateGateway.get_enhanced_prompt_async>`\ (subtitleText)
         - Generates an enhanced prompt from an original one, probably written by a user or
-      * - :py:obj:`get_keywords_from_prompt <replicate_gateway.ReplicateGateway.get_keywords_from_prompt>`\ (subtitleText, excluded_words)
+      * - :py:obj:`get_keywords_from_prompt_async <replicate_gateway.ReplicateGateway.get_keywords_from_prompt_async>`\ (subtitleText, excluded_words)
         - Generates keywords from a subtitle text using the Replicate API.
-      * - :py:obj:`get_music_generation_keywords <replicate_gateway.ReplicateGateway.get_music_generation_keywords>`\ (text)
+      * - :py:obj:`get_music_generation_keywords_async <replicate_gateway.ReplicateGateway.get_music_generation_keywords_async>`\ (text)
         - Generate keywords from a text using the Replicate API
-      * - :py:obj:`get_subtitles <replicate_gateway.ReplicateGateway.get_subtitles>`\ (audiofile_path)
+      * - :py:obj:`get_subtitles_async <replicate_gateway.ReplicateGateway.get_subtitles_async>`\ (audiofile_path)
         - Extract subtitles from an audio file using the Replicate API
-      * - :py:obj:`interpolate <replicate_gateway.ReplicateGateway.interpolate>`\ (video)
+      * - :py:obj:`interpolate_async <replicate_gateway.ReplicateGateway.interpolate_async>`\ (video)
         - Run some interpolation magic. This model may fail after timeout, so you
 
 
    .. rubric:: Members
 
-   .. py:method:: compose_music_from_text(prompt_text: str, duration: int)
+   .. py:method:: compose_music_from_text_async(prompt_text: str, duration: int)
+      :async:
+
 
       Compose a music for a prompt text
 
@@ -79,18 +81,23 @@ Classes
       :returns: The link to the generated music
 
 
-   .. py:method:: generate_background_music(duration: int = 3, prompt: str = None) -> str
+   .. py:method:: generate_background_music_async(duration: int = 3, prompt: str = None, target_file_name: str = None) -> str
+      :async:
+
 
       Here we generate the music to add as background music
 
       :param duration: int - the duration of the music in seconds
       :param prompt: str - the prompt to generate the music from
+      :param target_file_name: str - the name of the file to save the music to
 
       :returns: the path to the generated music
       :rtype: str
 
 
-   .. py:method:: generate_seine_transition(source_image_path, target_image_path)
+   .. py:method:: generate_seine_transition_async(source_image_path, target_image_path)
+      :async:
+
 
       Generate a transition between two videos
 
@@ -100,7 +107,9 @@ Classes
       :returns: The link to the generated video
 
 
-   .. py:method:: generate_video(prompt: str)
+   .. py:method:: generate_video_async(prompt: str)
+      :async:
+
 
       Generate a video from the given prompt
 
@@ -109,7 +118,9 @@ Classes
       :returns: the video
 
 
-   .. py:method:: get_enhanced_prompt(subtitleText)
+   .. py:method:: get_enhanced_prompt_async(subtitleText)
+      :async:
+
 
       Generates an enhanced prompt from an original one, probably written by a user or
       translated from an audio
@@ -119,7 +130,9 @@ Classes
       :returns: A white space separated string of keywords composing the enhanced prompt
 
 
-   .. py:method:: get_keywords_from_prompt(subtitleText, excluded_words: str = None)
+   .. py:method:: get_keywords_from_prompt_async(subtitleText, excluded_words: str = None)
+      :async:
+
 
       Generates keywords from a subtitle text using the Replicate API.
 
@@ -128,7 +141,9 @@ Classes
       :returns: A white space separated string of keywords
 
 
-   .. py:method:: get_music_generation_keywords(text) -> str
+   .. py:method:: get_music_generation_keywords_async(text) -> str
+      :async:
+
 
       Generate keywords from a text using the Replicate API
 
@@ -140,7 +155,9 @@ Classes
       :returns: A list of keywords
 
 
-   .. py:method:: get_subtitles(audiofile_path)
+   .. py:method:: get_subtitles_async(audiofile_path)
+      :async:
+
 
       Extract subtitles from an audio file using the Replicate API
 
@@ -151,7 +168,9 @@ Classes
       :rtype: subs
 
 
-   .. py:method:: interpolate(video)
+   .. py:method:: interpolate_async(video)
+      :async:
+
 
       Run some interpolation magic. This model may fail after timeout, so you
       should call it with retry logic
