@@ -35,10 +35,7 @@ Two additional features we hope you will find handy:
 
 1) it is now possible to specify a target path where to save your videos. It could be a remote path provided you access it without authentication. Ffeel free to submit pull requests if you strongly need support for Cloud buckets or other target file systems.
 
-2) 
-
-Fixed: 
-- Target file name now works
+2) You may cascade build settings, which means all the tree made of your composite video will share the same overall settings
 
 ## V0.1
 This is the very first version, experimental MVP, of Vikit.ai SDK. 
