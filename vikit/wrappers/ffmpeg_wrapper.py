@@ -552,9 +552,8 @@ async def reencode_video(video_url, target_video_name=None):
     with generated ones or among themselves
 
     Args:
-        params (tuple): The parameters to reencode the video
-        video,
-        video.media_url
+        video_url (str): The video url to reencode
+        target_video_name (str): The target video name
 
     Returns:
         Video: The reencoded video

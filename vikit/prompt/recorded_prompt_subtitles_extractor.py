@@ -22,8 +22,7 @@ from loguru import logger
 import vikit.common.config as config
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.subtitle_extractor import SubtitleExtractor
-from vikit.wrappers.ffmpeg_wrapper import (extract_audio_slice,
-                                           get_media_duration)
+from vikit.wrappers.ffmpeg_wrapper import extract_audio_slice, get_media_duration
 
 
 class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
@@ -47,8 +46,7 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
         Generate subtitles from a recorded audio file
 
                 inputs: NA
-                returns:
-                    - Subtitle Rip File object
+                returns: Subtitle Rip File object
         """
         # Obtain the duration of the audio file in seconds
         if recorded_prompt_file_path is None:
