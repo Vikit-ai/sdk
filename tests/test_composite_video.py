@@ -22,8 +22,10 @@ from loguru import logger
 import tests.testing_medias as test_media
 import tests.testing_tools as tools  # used to get a library of test prompts
 import vikit.wrappers.ffmpeg_wrapper as ffmpegwrapper
-from tests.testing_medias import (get_cat_video_path,
-                                  get_test_transition_stones_trainboy_path)
+from tests.testing_medias import (
+    get_cat_video_path,
+    get_test_transition_stones_trainboy_path,
+)
 from tests.testing_tools import test_prompt_library
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
@@ -178,7 +180,7 @@ class TestCompositeVideo:
                 test_video_gpt.append_video(video)
 
             video_build_settings = VideoBuildSettings(
-                test_mode=True,
+                test_mode=False,
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True, generate_background_music=True
                 ),

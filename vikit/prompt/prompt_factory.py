@@ -172,7 +172,9 @@ class PromptFactory:
         )
         text = extractor.build_subtitles_as_text_tokens(merged_subs)
         prompt = RecordedPrompt(subtitles=merged_subs, text=text)
-        prompt.convert_recorded_audio_prompt_path_to_mp3(recorded_audio_prompt_path)
+        await prompt.convert_recorded_audio_prompt_path_to_mp3(
+            recorded_audio_prompt_path
+        )
 
         return prompt
 

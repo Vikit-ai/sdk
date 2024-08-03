@@ -167,7 +167,7 @@ async def create_single_image_based_video(
     ).create_prompt_from_image(image_path=prompt_content, text=text)
 
     video = RawImageBasedVideo(
-        raw_image_prompt=image_prompt._image,
+        raw_image_prompt=image_prompt.image,
     )
     video.build_settings = build_settings
     build_settings.prompt = image_prompt

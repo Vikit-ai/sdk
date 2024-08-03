@@ -63,7 +63,7 @@ class RecordedPrompt(Prompt):
             recorded_audio_prompt_path
         ), f"The provided target recording path does not exists/ {recorded_audio_prompt_path}"
 
-        self.prompt.audio_recording = await convert_as_mp3_file(
+        self.audio_recording = await convert_as_mp3_file(
             recorded_audio_prompt_path,
             (
                 prompt_mp3_file_name
@@ -72,6 +72,6 @@ class RecordedPrompt(Prompt):
             ),
         )
 
-        logger.debug(f"Recorded audio prompt path {self.prompt.audio_recording}")
+        logger.debug(f"Recorded audio prompt path {self.audio_recording}")
 
         return self

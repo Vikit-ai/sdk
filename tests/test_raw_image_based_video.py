@@ -24,6 +24,7 @@ from tests.testing_medias import get_test_prompt_image
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
+
 # from unittest.mock import patch, MagicMock, Mock
 from vikit.video.raw_image_based_video import RawImageBasedVideo
 from vikit.video.video import VideoBuildSettings
@@ -134,7 +135,7 @@ class TestRawImagePromptBasedVideo:
                     ml_gateway=build_settings.get_ml_models_gateway()
                 )
                 .create_prompt_from_image(TEST_PROMPT)
-                ._image,
+                .image,
                 title="test_image_prompt",
             )
 

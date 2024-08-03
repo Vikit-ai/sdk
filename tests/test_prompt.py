@@ -18,8 +18,7 @@ import warnings
 import pytest
 from loguru import logger
 
-from tests.testing_medias import (get_test_prompt_image,
-                                  get_test_prompt_recording)
+from tests.testing_medias import get_test_prompt_image, get_test_prompt_recording
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.gateways import replicate_gateway as replicate_gateway
 from vikit.gateways import vikit_gateway as vgateway
@@ -54,7 +53,7 @@ class TestPrompt:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
-    async def test_build_basic_audio_prompt(self):
+    async def test_build_basic_audio_prompt_from_existing_recording(self):
         with WorkingFolderContext():
             """
             here we check a prompt has been created sucessfully from an mp3 recording
@@ -66,13 +65,11 @@ class TestPrompt:
             )
             assert prompt is not None, "Prompt is None"
             assert prompt.text is not None, "Prompt text is None"
-            assert (
-                prompt.audio_recording is not None
-            ), "Prompt sound recording path is None"
+            assert prompt.audio_recording is not None, "Prompt recording path is None"
 
     @pytest.mark.integration
     @pytest.mark.asyncio
-    async def test_build_basic_text_prompt(self):
+    async def test_build_basic_text_prompt_from_text(self):
         with WorkingFolderContext():  # we work in the temp folder once for all the script
             prompt = await PromptFactory(
                 ml_gateway=vgateway.VikitGateway()
