@@ -20,7 +20,6 @@ from typing import Any
 import vikit.common.secrets as secrets
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
-
 os.environ["REPLICATE_API_TOKEN"] = secrets.get_replicate_api_token()
 """
 A subtitle file content looks lke this:

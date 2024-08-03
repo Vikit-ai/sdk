@@ -47,7 +47,6 @@ jobs:
         ELEVEN_LABS_API_URI: ${{ vars.ELEVEN_LABS_API_URI }}
         NB_RETRIES_HTTP_CALLS: ${{ vars.NB_RETRIES_HTTP_CALLS }}
         SUBTITLES_MIN_DURATION: ${{ vars.SUBTITLES_MIN_DURATION }}
-        STEPS: ${{ vars.STEPS }}
         NUMBER_OF_SUBTITLES_PER_VIDEO_PROMPT: ${{ vars.NUMBER_OF_SUBTITLES_PER_VIDEO_PROMPT }}
         SUBTITLES_FILE_NAME : ${{ vars.SUBTITLES_FILE_NAME }}
         CLEANUP_TEMPFILES: ${{ vars.CLEANUP_TEMPFILES }}
@@ -56,9 +55,7 @@ jobs:
         VIDEO_ENCODED_WITHOUT_MUSIC_FILE_PREFIX: ${{ vars.VIDEO_ENCODED_WITHOUT_MUSIC_FILE_PREFIX }}
         INITIAL_AUDIO_FILE_NAME: ${{ vars.INITIAL_AUDIO_FILE_NAME }}
         VIDEO_LIST_FILE_NAME :  ${{ vars.VIDEO_LIST_FILE_NAME }}
-        NB_WORDS_PER_SUBTITLE :  ${{ vars.NB_WORDS_PER_SUBTITLE }}
-        NB_SECONDS_PER_WORDS :  ${{ vars.NB_SECONDS_PER_WORDS }}
         DEFAULT_BACKGROUND_MUSIC :  ${{ vars.DEFAULT_BACKGROUND_MUSIC }}        
       run: |
         pytest -s -m "unit"
-        # pytest -s -m "local_integration" to add back soon while quite heavy
+        pytest -s -n 2 -m "local_integration" tests/test_composite_video.py

@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+import os
 
 import pysrt
+from loguru import logger
 
+import vikit.common.config as config
 from vikit.prompt.prompt import Prompt
-from vikit.prompt.recorded_prompt_subtitles_extractor import (
-    RecordedPromptSubtitlesExtractor,
-)
+from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
 
 
 class RecordedPrompt(Prompt):
@@ -27,14 +28,14 @@ class RecordedPrompt(Prompt):
     to generate a prompt from a recorded audio file, like a podcast or a video soundtrack (e.g. a musical video clip)
     """
 
-    def __init__(self):
+    def __init__(self, audio_recording=None, subtitles=None, duration=None, text=None):
         """
-        Initialize the prompt with the path to the recorded audio prompt after having converted it to mp3
+        Initialize the prompt with the path to the recorded audio prompt
         """
-        self.audio_recording = None
-        self.subtitles: list[pysrt.SubRipItem] = None
-        self._subtitle_extractor = RecordedPromptSubtitlesExtractor()
-        self.duration = None
+        self.audio_recording = audio_recording
+        self.subtitles: list[pysrt.SubRipItem] = subtitles
+        self.duration = duration
+        self.text = text
 
     def get_full_text(self) -> str:
         """
@@ -44,3 +45,33 @@ class RecordedPrompt(Prompt):
             return ""
         else:
             return " ".join([subtitle.text for subtitle in self.subtitles])
+
+    async def convert_recorded_audio_prompt_path_to_mp3(
+        self, recorded_audio_prompt_path: str, prompt_mp3_file_name=None
+    ):
+        """
+        Convert the recorded audio prompt to mp3
+
+        Args:
+            recorded_audio_prompt_path: The path to the recorded audio file
+            prompt_mp3_file_name: The name of the mp3 file to save the recording as
+        """
+
+        if recorded_audio_prompt_path is None:
+            raise ValueError("The path to the recorded audio file is not provided")
+        assert os.path.exists(
+            recorded_audio_prompt_path
+        ), f"The provided target recording path does not exists/ {recorded_audio_prompt_path}"
+
+        self.prompt.audio_recording = await convert_as_mp3_file(
+            recorded_audio_prompt_path,
+            (
+                prompt_mp3_file_name
+                if prompt_mp3_file_name
+                else config.get_prompt_mp3_file_name()
+            ),
+        )
+
+        logger.debug(f"Recorded audio prompt path {self.prompt.audio_recording}")
+
+        return self

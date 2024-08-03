@@ -13,14 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
+import warnings
+
 import pytest
 from loguru import logger
 
-import warnings
-
-from vikit.video.video import VideoBuildSettings
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.video.raw_text_based_video import RawTextBasedVideo
+from vikit.video.video import VideoBuildSettings
 
 warnings.simplefilter("ignore", category=ResourceWarning)
 warnings.simplefilter("ignore", category=UserWarning)

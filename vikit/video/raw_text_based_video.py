@@ -17,16 +17,13 @@ import os
 
 from loguru import logger
 
-from vikit.video.video_build_settings import VideoBuildSettings
-from vikit.video.video import Video
-from vikit.video.video_types import VideoType
-from vikit.video.building.handlers.videogen_handler import (
-    VideoGenHandler,
-)
-from vikit.video.building.handlers.interpolation_handler import (
-    VideoInterpolationHandler,
-)
 from vikit.common.handler import Handler
+from vikit.video.building.handlers.interpolation_handler import \
+    VideoInterpolationHandler
+from vikit.video.building.handlers.videogen_handler import VideoGenHandler
+from vikit.video.video import Video
+from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.video.video_types import VideoType
 
 
 class RawTextBasedVideo(Video):

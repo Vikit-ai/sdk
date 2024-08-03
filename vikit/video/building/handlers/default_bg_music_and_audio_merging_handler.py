@@ -15,11 +15,11 @@
 import os
 
 from loguru import logger
-from vikit.common.handler import Handler
 
 # from vikit.video.video import Video
 import vikit.common.config as config
-from vikit.wrappers.ffmpeg_wrapper import merge_audio, extract_audio_slice
+from vikit.common.handler import Handler
+from vikit.wrappers.ffmpeg_wrapper import extract_audio_slice, merge_audio
 
 
 class DefaultBGMusicAndAudioMergingHandler(Handler):

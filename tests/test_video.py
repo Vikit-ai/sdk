@@ -17,14 +17,13 @@ import os
 import warnings
 
 import pytest
-
 from loguru import logger
-from vikit.video.imported_video import ImportedVideo
-from vikit.video.video import Video
-from vikit.video.prompt_based_video import PromptBasedVideo
-from vikit.common.context_managers import WorkingFolderContext
-import tests.testing_tools as tools  # used to get a library of test prompts
 
+import tests.testing_tools as tools  # used to get a library of test prompts
+from vikit.common.context_managers import WorkingFolderContext
+from vikit.video.imported_video import ImportedVideo
+from vikit.video.prompt_based_video import PromptBasedVideo
+from vikit.video.video import Video
 
 TESTS_MEDIA_FOLDER = "medias/"
 SMALL_VIDEO_CHAT_FILE = "chat_video_super8.mp4"

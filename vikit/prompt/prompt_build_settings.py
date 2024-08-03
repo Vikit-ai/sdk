@@ -13,9 +13,9 @@
 # limitations under the License.
 # ==============================================================================
 
+from vikit.common.GeneralBuildSettings import GeneralBuildSettings
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-from vikit.common.GeneralBuildSettings import GeneralBuildSettings
 
 
 class PromptBuildSettings(GeneralBuildSettings):

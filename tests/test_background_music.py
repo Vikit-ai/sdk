@@ -14,14 +14,14 @@
 # ==============================================================================
 
 import os
+import warnings
 
 import pytest
 from loguru import logger
 
-import warnings
 import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
-from vikit.gateways.vikit_gateway import VikitGateway
 from vikit.common.context_managers import WorkingFolderContext
+from vikit.gateways.vikit_gateway import VikitGateway
 
 TEST_PROMPT = "A group of stones in a forest, with symbols"
 

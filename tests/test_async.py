@@ -14,14 +14,13 @@
 # ==============================================================================
 
 import os
-import pytest
-
-from loguru import logger
 import warnings
+
+import pytest
+from loguru import logger
 
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.video.raw_text_based_video import RawTextBasedVideo
-
 
 warnings.simplefilter("ignore", category=ResourceWarning)
 warnings.simplefilter("ignore", category=UserWarning)

@@ -13,27 +13,25 @@
 # limitations under the License.
 # ==============================================================================
 
-import warnings
 import os
+import warnings
 
 import pytest
 from loguru import logger
 
 import tests.testing_medias as test_media
-from vikit.video.video import Video, VideoBuildSettings
-from vikit.video.composite_video import CompositeVideo
-from vikit.common.context_managers import WorkingFolderContext
-from vikit.video.raw_text_based_video import RawTextBasedVideo
 import tests.testing_tools as tools  # used to get a library of test prompts
 import vikit.wrappers.ffmpeg_wrapper as ffmpegwrapper
-from vikit.music_building_context import MusicBuildingContext
+from tests.testing_medias import (get_cat_video_path,
+                                  get_test_transition_stones_trainboy_path)
 from tests.testing_tools import test_prompt_library
-from vikit.video.imported_video import ImportedVideo
+from vikit.common.context_managers import WorkingFolderContext
+from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
-from tests.testing_medias import (
-    get_cat_video_path,
-    get_test_transition_stones_trainboy_path,
-)
+from vikit.video.composite_video import CompositeVideo
+from vikit.video.imported_video import ImportedVideo
+from vikit.video.raw_text_based_video import RawTextBasedVideo
+from vikit.video.video import Video, VideoBuildSettings
 
 prompt_mystic = tools.test_prompt_library["moss_stones-train_boy"]
 logger.add("log_test_composite_video.txt", rotation="10 MB")
@@ -67,34 +65,33 @@ class TestCompositeVideo:
     ):
         # Check the  ratioToMultiplyAnimations = (self.get_duration() / build_settings.prompt.duration
         # is applied properly
-        with WorkingFolderContext():
-            imp_video = ImportedVideo(test_media.get_cat_video_path())
-            assert imp_video.media_url, "Media URL should not be null"
-            cp_video = CompositeVideo()
-            cp_video.append_video(imp_video)
-            cp_vid_durartion = cp_video.get_duration()
-            assert (
-                cp_vid_durartion == imp_video.get_duration()
-            ), f"Duration should be the same, {cp_video.get_duration()} != {imp_video.get_duration()}"
+        imp_video = ImportedVideo(test_media.get_cat_video_path())
+        assert imp_video.media_url, "Media URL should not be null"
+        cp_video = CompositeVideo()
+        cp_video.append_video(imp_video)
+        cp_vid_durartion = cp_video.get_duration()
+        assert (
+            cp_vid_durartion == imp_video.get_duration()
+        ), f"Duration should be the same, {cp_video.get_duration()} != {imp_video.get_duration()}"
 
-            prompt = tools.test_prompt_library["tired"]
-            build_settings = VideoBuildSettings(
-                expected_length=None,
-                test_mode=True,
-                prompt=prompt,
-            )
+        prompt = tools.test_prompt_library["tired"]
+        build_settings = VideoBuildSettings(
+            expected_length=None,
+            test_mode=True,
+            prompt=prompt,
+        )
 
-            ratio = cp_video._get_ratio_to_multiply_animations(
-                build_settings=build_settings,
-            )
+        ratio = cp_video._get_ratio_to_multiply_animations(
+            build_settings=build_settings,
+        )
 
-            assert ratio is not None, "Ratio should not be None"
-            assert ratio > 0, "Ratio should be greater than 0"
-            # Here the ratio should be low as we have a 6s video and a very long prompt which last much longer.
-            # so the ratio will make it so a 6s video is slowed down to match the prompt duration
-            assert (
-                ratio == cp_vid_durartion / prompt.duration
-            ), f"Ratio should be {cp_vid_durartion / prompt.duration} but is {ratio}"
+        assert ratio is not None, "Ratio should not be None"
+        assert ratio > 0, "Ratio should be greater than 0"
+        # Here the ratio should be low as we have a 6s video and a very long prompt which last much longer.
+        # so the ratio will make it so a 6s video is slowed down to match the prompt duration
+        assert (
+            ratio == cp_vid_durartion / prompt.duration
+        ), f"Ratio should be {cp_vid_durartion / prompt.duration} but is {ratio}"
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
@@ -142,7 +139,7 @@ class TestCompositeVideo:
             video.build_settings = VideoBuildSettings(
                 prompt=tools.test_prompt_library["moss_stones-train_boy"]
             )
-            video_imp = ImportedVideo(test_media.get_cat_video_path())
+            video_imp = ImportedVideo(test_media.get_generated_3s_forest_video_1_path())
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video).append_video(video_imp)
             assert (
@@ -316,6 +313,12 @@ class TestCompositeVideo:
                 )
             )
 
+            assert video_comp.media_url is not None
+            assert video_comp.background_music is not None
+            # assert (
+            #     video_comp.get_duration() == tools.test_prompt_library["tired"].duration
+            # ), f"Duration should be {tools.test_prompt_library['tired'].duration} but is {video_comp.get_duration()}"
+
     @pytest.mark.local_integration
     @pytest.mark.skip
     @pytest.mark.asyncio
@@ -349,7 +352,7 @@ class TestCompositeVideo:
     ):
         with WorkingFolderContext():
             build_stgs = VideoBuildSettings(test_mode=False)
-            test_prompt = tools.test_prompt_library["train_boy"]
+            test_prompt = tools.test_prompt_library["moss_stones-train_boy"]
             video = RawTextBasedVideo(test_prompt.text)
             video2 = ImportedVideo(test_media.get_cat_video_path())
             test_video_mixer = CompositeVideo()
@@ -367,7 +370,7 @@ class TestCompositeVideo:
             test_mode = False
 
             final_composite_video = CompositeVideo()
-            for subtitle in test_prompt_library["train_boy"].subtitles:
+            for subtitle in test_prompt_library["moss_stones-train_boy"].subtitles:
                 video = RawTextBasedVideo(subtitle.text)
                 await video.build(
                     build_settings=VideoBuildSettings(
@@ -384,7 +387,7 @@ class TestCompositeVideo:
                     ),
                     test_mode=test_mode,
                     include_read_aloud_prompt=True,
-                    prompt=test_prompt_library["train_boy"],
+                    prompt=test_prompt_library["moss_stones-train_boy"],
                 )
             )
 
@@ -404,7 +407,7 @@ class TestCompositeVideo:
                 interpolate=True,
                 test_mode=True,
                 include_read_aloud_prompt=True,
-                prompt=test_prompt_library["train_boy"],
+                prompt=test_prompt_library["moss_stones-train_boy"],
             )
             comp_start = CompositeVideo().append_video(
                 ImportedVideo(test_media.get_cat_video_path())

@@ -15,17 +15,15 @@
 
 import warnings
 
+import pysrt
 import pytest
 from loguru import logger
-import pysrt
 
-from vikit.prompt.recorded_prompt_subtitles_extractor import (
-    RecordedPromptSubtitlesExtractor,
-)
-from vikit.gateways import vikit_gateway
-from vikit.common.context_managers import WorkingFolderContext
 import tests.testing_tools as tools  # used to get a library of test prompts
-
+from vikit.common.context_managers import WorkingFolderContext
+from vikit.gateways import vikit_gateway
+from vikit.prompt.recorded_prompt_subtitles_extractor import \
+    RecordedPromptSubtitlesExtractor
 
 SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in an abandoned forest, revealing intricate carvings
 and symbols. This is additional text to make sure we generate serveral subtitles. """

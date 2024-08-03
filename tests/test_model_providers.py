@@ -14,18 +14,19 @@
 # ==============================================================================
 
 import warnings
+
 import pytest
 from loguru import logger
 
-from vikit.video.video import VideoBuildSettings
-from vikit.video.composite_video import CompositeVideo
-from vikit.common.context_managers import WorkingFolderContext
-from vikit.video.raw_text_based_video import RawTextBasedVideo
-from vikit.music_building_context import MusicBuildingContext
-from tests.testing_tools import test_prompt_library
-from vikit.video.prompt_based_video import PromptBasedVideo
-from vikit.prompt.prompt_factory import PromptFactory
 import tests.testing_tools as tools  # used to get a library of test prompts
+from tests.testing_tools import test_prompt_library
+from vikit.common.context_managers import WorkingFolderContext
+from vikit.music_building_context import MusicBuildingContext
+from vikit.prompt.prompt_factory import PromptFactory
+from vikit.video.composite_video import CompositeVideo
+from vikit.video.prompt_based_video import PromptBasedVideo
+from vikit.video.raw_text_based_video import RawTextBasedVideo
+from vikit.video.video import VideoBuildSettings
 
 prompt_mystic = tools.test_prompt_library["moss_stones-train_boy"]
 logger.add("log_test_model_providers.txt", rotation="10 MB")
@@ -41,7 +42,9 @@ class TestModelProviders:
         with WorkingFolderContext():
             final_composite_video = CompositeVideo()
             # train_boy has 4 subtitles
-            for i, subtitle in enumerate(test_prompt_library["train_boy"].subtitles):
+            for i, subtitle in enumerate(
+                test_prompt_library["moss_stones-train_boy"].subtitles
+            ):
                 if i % 3 == 0:
                     target_model_provider = "vikit"
                 elif i % 3 == 1:
@@ -68,7 +71,7 @@ class TestModelProviders:
                     ),
                     test_mode=False,
                     include_read_aloud_prompt=True,
-                    prompt=test_prompt_library["train_boy"],
+                    prompt=test_prompt_library["moss_stones-train_boy"],
                 )
             )
 

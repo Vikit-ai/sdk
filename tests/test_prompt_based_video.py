@@ -14,22 +14,19 @@
 # ==============================================================================
 
 import os
+import warnings
 
 import pytest
-
 from loguru import logger
-
-import warnings
 
 # from unittest.mock import patch, MagicMock, Mock
 import tests.testing_medias as test_media
-from vikit.video.prompt_based_video import PromptBasedVideo
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.video.video import VideoBuildSettings
+import tests.testing_tools as tools  # used to get a library of test prompts
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
-import tests.testing_tools as tools  # used to get a library of test prompts
-from vikit.prompt.prompt_build_settings import PromptBuildSettings
+from vikit.prompt.prompt_factory import PromptFactory
+from vikit.video.prompt_based_video import PromptBasedVideo
+from vikit.video.video import VideoBuildSettings
 
 TEST_PROMPT = "A group of stones in a forest, with symbols"
 logger.add("log_test_prompt_based_video.txt", rotation="10 MB")
@@ -44,7 +41,7 @@ class TestPromptBasedVideo:
         with pytest.raises(ValueError):
             _ = PromptBasedVideo(str(""))
 
-    @pytest.mark.unit
+    @pytest.mark.local_integration
     @pytest.mark.asyncio
     async def test_get_title(self):
         with WorkingFolderContext():
@@ -60,7 +57,7 @@ class TestPromptBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_build_single_video_no_bg_music_without_subs(self):
+    async def test_build_prompt_based_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(
                 await PromptFactory().create_prompt_from_text(
@@ -75,7 +72,7 @@ class TestPromptBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_build_single_video_no_bg_music_read_aloud_prompt(self):
+    async def test_build_prompt_based_video_no_bg_music_read_aloud_prompt(self):
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(tools.test_prompt_library["moss_stones-train_boy"])
             await pbvid.build(
@@ -88,7 +85,9 @@ class TestPromptBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_build_single_video_with_default_bg_music_read_aloud_prompt(self):
+    async def test_build_prompt_based_video_with_default_bg_music_read_aloud_prompt(
+        self,
+    ):
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(tools.test_prompt_library["moss_stones-train_boy"])
             await pbvid.build(
@@ -136,7 +135,9 @@ class TestPromptBasedVideo:
     @pytest.mark.integration
     @pytest.mark.asyncio
     @pytest.mark.skip("duplicate?")
-    async def test_build_single_video_with_generated_bg_music_read_aloud_prompt(self):
+    async def test_build_prompt_based_video_with_generated_bg_music_read_aloud_prompt(
+        self,
+    ):
         with WorkingFolderContext():
 
             bld_settings = VideoBuildSettings(
@@ -161,14 +162,14 @@ class TestPromptBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_generate_short_video_single_sub(self):
+    async def test_generate_prompt_based_video_single_sentence_sub(self):
         with WorkingFolderContext():
 
             prompt = await PromptFactory().create_prompt_from_text(
                 "A group of stones in a forest",
             )
             pbv = PromptBasedVideo(prompt=prompt)
-            result = await pbv.build()
+            result = await pbv.build(build_settings=VideoBuildSettings(prompt=prompt))
             assert result is not None
             assert os.path.exists(result.media_url)
 
@@ -207,24 +208,6 @@ class TestPromptBasedVideo:
 
             assert vid_final.media_url is not None
             assert vid_final.background_music is not None
-
-    @pytest.mark.integration
-    @pytest.mark.asyncio
-    async def test_build_nominal_prompt_without_bk_music_wthout_subs(self):
-        with WorkingFolderContext():
-            build_settings = VideoBuildSettings(
-                music_building_context=MusicBuildingContext(
-                    apply_background_music=False
-                ),
-                include_read_aloud_prompt=False,
-                test_mode=False,
-            )
-            test_prompt = tools.test_prompt_library["moss_stones-train_boy"]
-            video = PromptBasedVideo(test_prompt)
-            await video.build(build_settings=build_settings)
-
-            assert video.media_url is not None
-            assert os.path.exists(video.media_url)
 
     # @pytest.mark.skip("To be activated on case by case basis")
     @pytest.mark.integration
@@ -276,57 +259,6 @@ class TestPromptBasedVideo:
 
             video = PromptBasedVideo(prompt=test_prompt)
             await video.build(bld_sett)
-
-            assert video.media_url is not None
-            assert os.path.exists(video.media_url)
-
-    @pytest.mark.local_integration
-    @pytest.mark.skip
-    @pytest.mark.asyncio
-    async def test_local_int_reunion_island_prompt_with_bk_music_subs(self):
-        with WorkingFolderContext():
-            bld_sett = VideoBuildSettings(
-                music_building_context=MusicBuildingContext(
-                    apply_background_music=True
-                ),
-                include_read_aloud_prompt=True,
-                test_mode=False,
-            )
-            test_prompt = await PromptFactory(
-                bld_sett.get_ml_models_gateway()
-            ).create_prompt_from_text(
-                """A travel over Reunion Island, taken fomm birdview at 2000meters above 
-                the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
-                , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
-            )
-
-            video = PromptBasedVideo(prompt=test_prompt)
-            await video.build(bld_sett)
-
-            assert video.media_url is not None
-            assert os.path.exists(video.media_url)
-
-    @pytest.mark.local_integration
-    @pytest.mark.asyncio
-    @pytest.mark.skip("skipping tests used to validate bug fixing")
-    async def test_collab_integration(self):
-        with WorkingFolderContext():
-            prompt = await PromptFactory(
-                prompt_build_settings=PromptBuildSettings(test_mode=True)
-            ).create_prompt_from_text(
-                "A young girl traveling in the train alongside Mediterranean coast",
-            )
-            video_build_settings = VideoBuildSettings(
-                music_building_context=MusicBuildingContext(
-                    apply_background_music=True, generate_background_music=True
-                ),
-                test_mode=True,
-                include_read_aloud_prompt=True,
-                prompt=prompt,
-            )
-            video = PromptBasedVideo(prompt=prompt)
-
-            await video.build(build_settings=video_build_settings)
 
             assert video.media_url is not None
             assert os.path.exists(video.media_url)

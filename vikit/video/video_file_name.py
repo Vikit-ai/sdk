@@ -13,9 +13,9 @@
 # limitations under the License.
 # ==============================================================================
 
-import random
 import datetime
 import os
+import random
 
 from loguru import logger
 

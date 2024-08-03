@@ -14,18 +14,18 @@
 # ==============================================================================
 
 import warnings
+
 import pytest
 
-from vikit.video.video_build_settings import VideoBuildSettings
-from vikit.video.prompt_based_video import PromptBasedVideo
-from vikit.common.context_managers import WorkingFolderContext
 import tests.testing_tools as tools
+from vikit.common.context_managers import WorkingFolderContext
+from vikit.video.building.build_order import \
+    get_lazy_dependency_chain_build_order
 from vikit.video.composite_video import CompositeVideo
+from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.transition import Transition
-from vikit.video.building.build_order import (
-    get_lazy_dependency_chain_build_order,
-)
+from vikit.video.video_build_settings import VideoBuildSettings
 
 
 class TestVideoBuildingStrategies:
@@ -41,31 +41,30 @@ class TestVideoBuildingStrategies:
         Test that the video tree is correctly generated, with right order,
         using a simple video tree
         """
-        with WorkingFolderContext():
-            build_settings = VideoBuildSettings(test_mode=True)
-            composite = CompositeVideo()
-            rtbv = RawTextBasedVideo("test")
-            composite.append_video(rtbv)
+        build_settings = VideoBuildSettings(test_mode=True)
+        composite = CompositeVideo()
+        rtbv = RawTextBasedVideo("test")
+        composite.append_video(rtbv)
 
-            # Here we are testing the ordered list of video to be build
-            # conforms to the expected order
-            video_build_order = get_lazy_dependency_chain_build_order(
-                video_build_order=[],
-                video_tree=[composite],
-                build_settings=build_settings,
-                already_added=set(),
-            )
+        # Here we are testing the ordered list of video to be build
+        # conforms to the expected order
+        video_build_order = get_lazy_dependency_chain_build_order(
+            video_build_order=[],
+            video_tree=[composite],
+            build_settings=build_settings,
+            already_added=set(),
+        )
 
-            assert video_build_order is not None
-            # here we check the leaf has been generated first, then the root composite
-            assert (
-                len(video_build_order) == 2
-            ), f"Should have 2 videos, instead we had {len(video_build_order)}"
+        assert video_build_order is not None
+        # here we check the leaf has been generated first, then the root composite
+        assert (
+            len(video_build_order) == 2
+        ), f"Should have 2 videos, instead we had {len(video_build_order)}"
 
-            assert video_build_order[0].id == rtbv.id
-            assert video_build_order[1].id == composite.id
-            assert isinstance(video_build_order[0], RawTextBasedVideo)
-            assert isinstance(video_build_order[1], CompositeVideo)
+        assert video_build_order[0].id == rtbv.id
+        assert video_build_order[1].id == composite.id
+        assert isinstance(video_build_order[0], RawTextBasedVideo)
+        assert isinstance(video_build_order[1], CompositeVideo)
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -79,7 +78,7 @@ class TestVideoBuildingStrategies:
         build_settings = VideoBuildSettings(test_mode=True)
         build_settings._ml_models_gateway = build_settings.get_ml_models_gateway()
         pbv = PromptBasedVideo(
-            tools.test_prompt_library["train_boy"]
+            tools.test_prompt_library["moss_stones-train_boy"]
         )  # 4 subtitles -> 4 composite videos of 3 vids each
         await pbv.compose(build_settings=build_settings)
 

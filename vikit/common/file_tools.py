@@ -15,22 +15,21 @@
 
 import os
 import re
-import uuid as uuid
-import sys
 import shutil
-
-import aiohttp
-import aiofiles
+import sys
 import urllib.parse
-from typing import Union, Optional
-from loguru import logger
-from urllib.request import urlopen
+import uuid as uuid
+from typing import Optional, Union
 from urllib.error import URLError
-from tenacity import retry, before_log, after_log, stop_after_attempt, wait_exponential
+from urllib.request import urlopen
+
+import aiofiles
+import aiohttp
+from loguru import logger
+from tenacity import (after_log, before_log, retry, stop_after_attempt,
+                      wait_exponential)
 
 from vikit.common.config import get_nb_retries_http_calls
-
-
 from vikit.common.decorators import log_function_params
 
 TIMEOUT = 10  # seconds before stopping the request to check an URL exists
