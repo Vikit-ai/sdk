@@ -53,25 +53,35 @@ Classes
 
       * - :py:obj:`cleanse_llm_keywords <fake_ML_models_gateway.FakeMLModelsGateway.cleanse_llm_keywords>`\ (input)
         - \-
-      * - :py:obj:`compose_music_from_text <fake_ML_models_gateway.FakeMLModelsGateway.compose_music_from_text>`\ (prompt_text, duration)
+      * - :py:obj:`compose_music_from_text_async <fake_ML_models_gateway.FakeMLModelsGateway.compose_music_from_text_async>`\ (prompt_text, duration, sleep_time)
         - \-
       * - :py:obj:`extract_audio_slice <fake_ML_models_gateway.FakeMLModelsGateway.extract_audio_slice>`\ (i, end, audiofile_path, target_file_name)
         - \-
-      * - :py:obj:`generate_background_music <fake_ML_models_gateway.FakeMLModelsGateway.generate_background_music>`\ (duration, prompt)
+      * - :py:obj:`extract_audio_slice_async <fake_ML_models_gateway.FakeMLModelsGateway.extract_audio_slice_async>`\ (i, end, audiofile_path, target_file_name, sleep_time)
         - \-
-      * - :py:obj:`generate_seine_transition <fake_ML_models_gateway.FakeMLModelsGateway.generate_seine_transition>`\ (source_image_path, target_image_path)
+      * - :py:obj:`generate_background_music_async <fake_ML_models_gateway.FakeMLModelsGateway.generate_background_music_async>`\ (duration, prompt, sleep_time)
         - \-
-      * - :py:obj:`generate_video <fake_ML_models_gateway.FakeMLModelsGateway.generate_video>`\ (prompt)
+      * - :py:obj:`generate_mp3_from_text_async <fake_ML_models_gateway.FakeMLModelsGateway.generate_mp3_from_text_async>`\ (prompt_text, target_file)
         - \-
-      * - :py:obj:`get_enhanced_prompt <fake_ML_models_gateway.FakeMLModelsGateway.get_enhanced_prompt>`\ (subtitleText)
+      * - :py:obj:`generate_seine_transition_async <fake_ML_models_gateway.FakeMLModelsGateway.generate_seine_transition_async>`\ (source_image_path, target_image_path, sleep_time)
         - \-
-      * - :py:obj:`get_keywords_from_prompt <fake_ML_models_gateway.FakeMLModelsGateway.get_keywords_from_prompt>`\ (subtitleText, excluded_words)
+      * - :py:obj:`generate_video_async <fake_ML_models_gateway.FakeMLModelsGateway.generate_video_async>`\ (prompt, sleep_time, model_provider)
         - \-
-      * - :py:obj:`get_music_generation_keywords <fake_ML_models_gateway.FakeMLModelsGateway.get_music_generation_keywords>`\ (text)
+      * - :py:obj:`get_enhanced_prompt_async <fake_ML_models_gateway.FakeMLModelsGateway.get_enhanced_prompt_async>`\ (subtitleText, excluded_words, sleep_time)
         - \-
-      * - :py:obj:`get_subtitles <fake_ML_models_gateway.FakeMLModelsGateway.get_subtitles>`\ (audiofile_path)
+      * - :py:obj:`get_keywords_from_prompt <fake_ML_models_gateway.FakeMLModelsGateway.get_keywords_from_prompt>`\ (subtitleText, excluded_words, sleep_time)
         - \-
-      * - :py:obj:`interpolate <fake_ML_models_gateway.FakeMLModelsGateway.interpolate>`\ (link_to_video)
+      * - :py:obj:`get_keywords_from_prompt_async <fake_ML_models_gateway.FakeMLModelsGateway.get_keywords_from_prompt_async>`\ (subtitleText, excluded_words, sleep_time)
+        - \-
+      * - :py:obj:`get_music_generation_keywords_async <fake_ML_models_gateway.FakeMLModelsGateway.get_music_generation_keywords_async>`\ (text, sleep_time)
+        - \-
+      * - :py:obj:`get_subtitles <fake_ML_models_gateway.FakeMLModelsGateway.get_subtitles>`\ (audiofile_path, sleep_time)
+        - \-
+      * - :py:obj:`get_subtitles_async <fake_ML_models_gateway.FakeMLModelsGateway.get_subtitles_async>`\ (audiofile_path, sleep_time)
+        - \-
+      * - :py:obj:`interpolate_async <fake_ML_models_gateway.FakeMLModelsGateway.interpolate_async>`\ (link_to_video, sleep_time)
+        - \-
+      * - :py:obj:`sleep <fake_ML_models_gateway.FakeMLModelsGateway.sleep>`\ (sleep_time)
         - \-
 
 
@@ -79,25 +89,61 @@ Classes
 
    .. py:method:: cleanse_llm_keywords(input)
 
-   .. py:method:: compose_music_from_text(prompt_text: str, duration: int)
+   .. py:method:: compose_music_from_text_async(prompt_text: str, duration: int, sleep_time: int = 0)
+      :async:
+
 
    .. py:method:: extract_audio_slice(i, end, audiofile_path, target_file_name: str = None)
 
-   .. py:method:: generate_background_music(duration: float = 3, prompt: str = None) -> str
+   .. py:method:: extract_audio_slice_async(i, end, audiofile_path, target_file_name: str = None, sleep_time: int = 0)
+      :async:
 
-   .. py:method:: generate_seine_transition(source_image_path, target_image_path)
 
-   .. py:method:: generate_video(prompt: str = None)
+   .. py:method:: generate_background_music_async(duration: float = 3, prompt: str = None, sleep_time: int = 0) -> str
+      :async:
 
-   .. py:method:: get_enhanced_prompt(subtitleText)
 
-   .. py:method:: get_keywords_from_prompt(subtitleText, excluded_words: str = None)
+   .. py:method:: generate_mp3_from_text_async(prompt_text, target_file: str = None)
+      :async:
 
-   .. py:method:: get_music_generation_keywords(text) -> str
 
-   .. py:method:: get_subtitles(audiofile_path)
+   .. py:method:: generate_seine_transition_async(source_image_path, target_image_path, sleep_time: int = 0)
+      :async:
 
-   .. py:method:: interpolate(link_to_video: str)
+
+   .. py:method:: generate_video_async(prompt: str = None, sleep_time: int = 0, model_provider: str = None)
+      :async:
+
+
+   .. py:method:: get_enhanced_prompt_async(subtitleText, excluded_words: str = None, sleep_time: int = 0)
+      :async:
+
+
+   .. py:method:: get_keywords_from_prompt(subtitleText, excluded_words: str = None, sleep_time: int = 0)
+      :async:
+
+
+   .. py:method:: get_keywords_from_prompt_async(subtitleText, excluded_words: str = None, sleep_time: int = 0)
+      :async:
+
+
+   .. py:method:: get_music_generation_keywords_async(text, sleep_time: int = 0) -> str
+      :async:
+
+
+   .. py:method:: get_subtitles(audiofile_path, sleep_time: int = 0)
+      :async:
+
+
+   .. py:method:: get_subtitles_async(audiofile_path, sleep_time: int = 0)
+      :async:
+
+
+   .. py:method:: interpolate_async(link_to_video: str, sleep_time: int = 0)
+      :async:
+
+
+   .. py:method:: sleep(sleep_time=1)
 
 
 

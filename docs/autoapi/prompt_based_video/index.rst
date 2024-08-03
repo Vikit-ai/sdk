@@ -22,9 +22,9 @@ Overview
 Classes
 -------
 
-.. py:class:: PromptBasedVideo(prompt=None)
+.. py:class:: PromptBasedVideo(prompt: vikit.prompt.prompt.Prompt = None)
 
-   Bases: :py:obj:`vikit.video.video.Video`
+   Bases: :py:obj:`vikit.video.composite_video.CompositeVideo`
 
    PromptBasedVideo is a simple way to generate a video based out of a text prompt
 
@@ -42,17 +42,36 @@ Classes
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`build <prompt_based_video.PromptBasedVideo.build>`\ (build_settings)
-        - Generate the actual inner video
-      * - :py:obj:`get_file_name_by_state <prompt_based_video.PromptBasedVideo.get_file_name_by_state>`\ (build_settings)
-        - Get the file name of the video
+      * - :py:obj:`compose <prompt_based_video.PromptBasedVideo.compose>`\ (build_settings)
+        - Compose the inner composite video
       * - :py:obj:`get_title <prompt_based_video.PromptBasedVideo.get_title>`\ ()
         - Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
+      * - :py:obj:`prepare_build <prompt_based_video.PromptBasedVideo.prepare_build>`\ (build_settings)
+        - Generate the actual inner video
 
 
    .. rubric:: Members
 
-   .. py:method:: build(build_settings=VideoBuildSettings())
+   .. py:method:: compose(build_settings: vikit.video.video.VideoBuildSettings)
+      :async:
+
+
+      Compose the inner composite video
+
+      Params:
+          - build_settings: allow some customization
+
+      :returns: The inner composite video
+
+
+   .. py:method:: get_title()
+
+      Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
+
+
+   .. py:method:: prepare_build(build_settings=VideoBuildSettings())
+      :async:
+
 
       Generate the actual inner video
 
@@ -60,19 +79,6 @@ Classes
           - build_settings: allow some customization
 
       :returns: The current instance
-
-
-   .. py:method:: get_file_name_by_state(build_settings: vikit.video.video.VideoBuildSettings)
-
-      Get the file name of the video
-
-      :returns: The file name of the video
-      :rtype: str
-
-
-   .. py:method:: get_title()
-
-      Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
 
 
 

@@ -551,7 +551,7 @@ async def reencode_video(video_url, target_video_name=None):
     Reencode the video, doing this for imported video that might not concatenate well
     with generated ones or among themselves
 
-    params:
+    Args:
         video_url (str): The video url to reencode
         target_video_name (str): The target video name
 

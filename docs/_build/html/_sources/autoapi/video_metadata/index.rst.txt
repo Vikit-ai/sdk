@@ -22,11 +22,13 @@ Overview
 Classes
 -------
 
-.. py:class:: VideoMetadata(id: uuid = None, title=None, duration=None, width: int = None, height: int = None, top_parent_id=None, is_video_built=False, is_reencoded=False, is_interpolated=False, is_bg_music_applied=False, is_subtitle_audio_applied=False, is_bg_music_generated=None, is_prompt_read_aloud=False, **custom_metadata)
+.. py:class:: VideoMetadata(id: uuid = None, temp_id=None, title=None, duration=None, width: int = None, height: int = None, is_video_built=False, is_reencoded=False, is_interpolated=False, is_bg_music_applied=False, is_subtitle_audio_applied=False, is_bg_music_generated=None, is_default_bg_music_applied=False, is_prompt_read_aloud=False, media_url=None, **custom_metadata)
 
    Hybrid DTO class for storing video metadata.
 
    Attributes:
+   id (uuid): Unique identifier of the video.
+   temp_id (str): Temporary identifier of the video, used when it was being built
    title (str): Title of the video.
    duration (int): Duration of the video in seconds.
    height (str): height of the video.

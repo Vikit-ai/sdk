@@ -46,19 +46,20 @@ Classes
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`extract_subtitles <recorded_prompt_subtitles_extractor.RecordedPromptSubtitlesExtractor.extract_subtitles>`\ (recorded_prompt_file_path, ml_models_gateway)
+      * - :py:obj:`extract_subtitles_async <recorded_prompt_subtitles_extractor.RecordedPromptSubtitlesExtractor.extract_subtitles_async>`\ (recorded_prompt_file_path, ml_models_gateway)
         - Generate subtitles from a recorded audio file
 
 
    .. rubric:: Members
 
-   .. py:method:: extract_subtitles(recorded_prompt_file_path, ml_models_gateway: vikit.gateways.ML_models_gateway.MLModelsGateway = None)
+   .. py:method:: extract_subtitles_async(recorded_prompt_file_path, ml_models_gateway: vikit.gateways.ML_models_gateway.MLModelsGateway = None)
+      :async:
+
 
       Generate subtitles from a recorded audio file
 
               inputs: NA
-              returns:
-                  - Subtitle Rip File object
+              returns: Subtitle Rip File object
 
 
 

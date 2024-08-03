@@ -26,6 +26,8 @@ Overview
      - \-
    * - :py:obj:`get_vikit_api_token <secrets.get_vikit_api_token>`\ ()
      - \-
+   * - :py:obj:`has_eleven_labs_api_key <secrets.has_eleven_labs_api_key>`\ ()
+     - \-
 
 
 .. list-table:: Attributes
@@ -53,6 +55,8 @@ Functions
 .. py:function:: get_sendinblue_api_key()
 
 .. py:function:: get_vikit_api_token()
+
+.. py:function:: has_eleven_labs_api_key()
 
 
 Attributes

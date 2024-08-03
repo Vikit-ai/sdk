@@ -46,6 +46,8 @@ Classes
         - \-
       * - :py:obj:`PRMPTBASD <video_types.VideoType.PRMPTBASD>`
         - \-
+      * - :py:obj:`RAWIMAGE <video_types.VideoType.RAWIMAGE>`
+        - \-
       * - :py:obj:`RAWTEXT <video_types.VideoType.RAWTEXT>`
         - \-
       * - :py:obj:`TRANSITION <video_types.VideoType.TRANSITION>`
@@ -69,6 +71,10 @@ Classes
 
    .. py:attribute:: PRMPTBASD
       :value: 5
+
+
+   .. py:attribute:: RAWIMAGE
+      :value: 6
 
 
    .. py:attribute:: RAWTEXT

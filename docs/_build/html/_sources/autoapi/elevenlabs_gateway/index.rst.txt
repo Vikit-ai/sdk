@@ -14,7 +14,7 @@ Overview
    :widths: auto
    :class: summarytable
 
-   * - :py:obj:`generate_mp3_from_text <elevenlabs_gateway.generate_mp3_from_text>`\ (text, target_file)
+   * - :py:obj:`generate_mp3_from_text_async <elevenlabs_gateway.generate_mp3_from_text_async>`\ (text, target_file)
      - \-
 
 
@@ -22,7 +22,9 @@ Overview
 
 Functions
 ---------
-.. py:function:: generate_mp3_from_text(text, target_file)
+.. py:function:: generate_mp3_from_text_async(text, target_file)
+   :async:
+
 
 
 
