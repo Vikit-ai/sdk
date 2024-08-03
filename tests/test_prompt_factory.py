@@ -13,12 +13,13 @@
 # limitations under the License.
 # ==============================================================================
 
-import pytest
 import warnings
+
+import pytest
 from loguru import logger
 
-from vikit.prompt.prompt_factory import PromptFactory
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
+from vikit.prompt.prompt_factory import PromptFactory
 
 
 class TestPromptFactory:

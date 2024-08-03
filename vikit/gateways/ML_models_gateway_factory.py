@@ -13,8 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 
-from vikit.gateways.vikit_gateway import VikitGateway
 from vikit.gateways.fake_ML_models_gateway import FakeMLModelsGateway
+from vikit.gateways.vikit_gateway import VikitGateway
 
 
 class MLModelsGatewayFactory:

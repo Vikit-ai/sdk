@@ -13,23 +13,21 @@
 # limitations under the License.
 # ==============================================================================
 
+import asyncio
 import os
 import uuid as uid
-import asyncio
 
 from loguru import logger
-from vikit.video.video import Video
-from vikit.video.video_build_settings import VideoBuildSettings
+
 import vikit.common.config as config
-from vikit.wrappers.ffmpeg_wrapper import get_media_duration
-from vikit.video.video_types import VideoType
-from vikit.video.building.build_order import (
-    get_lazy_dependency_chain_build_order,
-    is_composite_video,
-)
 from vikit.music_building_context import MusicBuildingContext
-from vikit.wrappers.ffmpeg_wrapper import concatenate_videos, get_media_fps
-from vikit.video.video import DEFAULT_VIDEO_TITLE
+from vikit.video.building.build_order import (
+    get_lazy_dependency_chain_build_order, is_composite_video)
+from vikit.video.video import DEFAULT_VIDEO_TITLE, Video
+from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.video.video_types import VideoType
+from vikit.wrappers.ffmpeg_wrapper import (concatenate_videos,
+                                           get_media_duration, get_media_fps)
 
 
 class CompositeVideo(Video, is_composite_video):

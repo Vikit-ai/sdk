@@ -14,8 +14,8 @@
 # ==============================================================================
 
 from vikit.common import GeneralBuildSettings
-from vikit.prompt.prompt import Prompt
 from vikit.music_building_context import MusicBuildingContext
+from vikit.prompt.prompt import Prompt
 
 
 class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):

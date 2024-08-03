@@ -15,8 +15,8 @@
 
 from loguru import logger
 
-from vikit.video.video import Video
 from vikit.common.handler import Handler
+from vikit.video.video import Video
 
 
 class VideoGenHandler(Handler):

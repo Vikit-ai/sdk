@@ -13,29 +13,24 @@
 # limitations under the License.
 # ==============================================================================
 
-from abc import abstractmethod, ABC
 import os
+import random
 import shutil
 import uuid as uid
-import random
+from abc import ABC, abstractmethod
 
 from loguru import logger
 
-from vikit.wrappers.ffmpeg_wrapper import (
-    get_media_duration,
-    get_first_frame_as_image_ffmpeg,
-    get_last_frame_as_image_ffmpeg,
-)
-from vikit.video.video_build_settings import VideoBuildSettings
-from vikit.video.video_metadata import VideoMetadata
+from vikit.common.file_tools import (download_or_copy_file, is_valid_filename,
+                                     is_valid_path)
 from vikit.common.handler import Handler
-from vikit.video.video_file_name import VideoFileName
-from vikit.common.file_tools import (
-    is_valid_path,
-    download_or_copy_file,
-    is_valid_filename,
-)
 from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
+from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.video.video_file_name import VideoFileName
+from vikit.video.video_metadata import VideoMetadata
+from vikit.wrappers.ffmpeg_wrapper import (get_first_frame_as_image_ffmpeg,
+                                           get_last_frame_as_image_ffmpeg,
+                                           get_media_duration)
 
 DEFAULT_VIDEO_TITLE = "no-title-yet"
 

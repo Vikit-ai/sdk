@@ -14,7 +14,6 @@
 # ==============================================================================
 
 import os
-
 # from unittest.mock import patch, MagicMock, Mock
 import warnings
 
@@ -22,10 +21,10 @@ import pytest
 from loguru import logger
 
 from tests.testing_medias import get_cat_video_path
-from vikit.video.video import VideoBuildSettings
+from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.imported_video import ImportedVideo
-from vikit.common.context_managers import WorkingFolderContext
+from vikit.video.video import VideoBuildSettings
 
 
 class TestImportedVideo:

@@ -18,17 +18,14 @@ import warnings
 import pytest
 from loguru import logger
 
-from vikit.video.building.handlers.videogen_handler import (
-    VideoGenHandler,
-)
-from vikit.video.building.handlers.use_prompt_audio_track_and_audio_merging_handler import (
-    UsePromptAudioTrackAndAudioMergingHandler,
-)
+from tests.testing_medias import get_test_prompt_recording_trainboy
+from vikit.common.context_managers import WorkingFolderContext
+from vikit.prompt.recorded_prompt import RecordedPrompt
+from vikit.video.building.handlers.use_prompt_audio_track_and_audio_merging_handler import \
+    UsePromptAudioTrackAndAudioMergingHandler
+from vikit.video.building.handlers.videogen_handler import VideoGenHandler
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video_build_settings import VideoBuildSettings
-from vikit.prompt.recorded_prompt import RecordedPrompt
-from vikit.common.context_managers import WorkingFolderContext
-from tests.testing_medias import get_test_prompt_recording_trainboy
 
 
 class TestVideoBuildingHandler:

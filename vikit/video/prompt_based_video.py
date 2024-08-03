@@ -18,14 +18,14 @@ import os
 import pysrt
 from loguru import logger
 
-from vikit.video.video import VideoBuildSettings
-from vikit.video.composite_video import CompositeVideo
 from vikit.prompt.prompt import Prompt
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
+from vikit.prompt.prompt_factory import PromptFactory
+from vikit.video.composite_video import CompositeVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.seine_transition import SeineTransition
+from vikit.video.video import VideoBuildSettings
 from vikit.video.video_types import VideoType
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 
 class PromptBasedVideo(CompositeVideo):

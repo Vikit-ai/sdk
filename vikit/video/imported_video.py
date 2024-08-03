@@ -16,8 +16,8 @@
 import os
 
 from vikit.video.video import Video
-from vikit.video.video_types import VideoType
 from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.video.video_types import VideoType
 
 
 class ImportedVideo(Video):

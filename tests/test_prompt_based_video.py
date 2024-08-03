@@ -14,21 +14,19 @@
 # ==============================================================================
 
 import os
+import warnings
 
 import pytest
-
 from loguru import logger
-
-import warnings
 
 # from unittest.mock import patch, MagicMock, Mock
 import tests.testing_medias as test_media
-from vikit.video.prompt_based_video import PromptBasedVideo
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.video.video import VideoBuildSettings
+import tests.testing_tools as tools  # used to get a library of test prompts
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
-import tests.testing_tools as tools  # used to get a library of test prompts
+from vikit.prompt.prompt_factory import PromptFactory
+from vikit.video.prompt_based_video import PromptBasedVideo
+from vikit.video.video import VideoBuildSettings
 
 TEST_PROMPT = "A group of stones in a forest, with symbols"
 logger.add("log_test_prompt_based_video.txt", rotation="10 MB")

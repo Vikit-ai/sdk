@@ -14,10 +14,10 @@
 # ==============================================================================
 
 import os
-from os import path
-from dotenv import load_dotenv
 from concurrent.futures import ProcessPoolExecutor
+from os import path
 
+from dotenv import load_dotenv
 from loguru import logger
 
 # Get the absolute path to the directory this file is in.

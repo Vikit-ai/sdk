@@ -13,19 +13,19 @@
 # limitations under the License.
 # ==============================================================================
 
+import asyncio
 import os
 import subprocess
-import asyncio
-
-from tenacity import retry, before_log, after_log, stop_after_attempt
-from loguru import logger
 from urllib.request import urlretrieve
-import replicate
 
+import replicate
+from loguru import logger
+from tenacity import after_log, before_log, retry, stop_after_attempt
+
+from vikit.common.config import get_nb_retries_http_calls
+from vikit.common.secrets import get_replicate_api_token
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
-from vikit.common.secrets import get_replicate_api_token
-from vikit.common.config import get_nb_retries_http_calls
 
 os.environ["REPLICATE_API_TOKEN"] = get_replicate_api_token()
 

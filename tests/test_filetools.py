@@ -13,15 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 
-import pytest
-import warnings
 import os
+import warnings
 
+import pytest
 from loguru import logger
 
-from vikit.common.file_tools import download_or_copy_file
-from vikit.common.context_managers import WorkingFolderContext
 import tests.testing_medias as testing_medias
+from vikit.common.context_managers import WorkingFolderContext
+from vikit.common.file_tools import download_or_copy_file
 
 
 class TestFileTools:

@@ -13,15 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 
-import pytest
-import warnings
 import os
+import warnings
 
+import pytest
 from loguru import logger
 
-from vikit.wrappers.ffmpeg_wrapper import concatenate_videos, reencode_video
-from vikit.common.context_managers import WorkingFolderContext
 import tests.testing_medias as tests_medias
+from vikit.common.context_managers import WorkingFolderContext
+from vikit.wrappers.ffmpeg_wrapper import concatenate_videos, reencode_video
 
 
 class TestFFMPEGWrapper:

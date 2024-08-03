@@ -13,18 +13,16 @@
 # limitations under the License.
 # ==============================================================================
 
-import pytest
-
 import warnings
+
+import pytest
 from loguru import logger
 
+from vikit.prompt.building.handlers.prompt_by_keywords_handler import \
+    PromptByKeywordsHandler
+from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import \
+    PromptByRawUserTextHandler
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
-from vikit.prompt.building.handlers.prompt_by_keywords_handler import (
-    PromptByKeywordsHandler,
-)
-from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
-    PromptByRawUserTextHandler,
-)
 
 logger.add("log_test_prompt_building_handlers.txt", rotation="10 MB")
 warnings.simplefilter("ignore", category=ResourceWarning)

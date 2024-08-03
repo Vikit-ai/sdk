@@ -15,16 +15,15 @@
 
 import os
 from pathlib import Path
-from vikit.video.video import Video
-from vikit.prompt.recorded_prompt import RecordedPrompt
-from tests.testing_medias import (
-    get_test_prompt_recording_trainboy,
-    get_test_recorded_prompt_path,
-    get_test_prompt_recording_stones_trainboy_path,
-)
-from vikit.prompt.subtitle_extractor import SubtitleExtractor
 
 import pysrt
+
+from tests.testing_medias import (
+    get_test_prompt_recording_stones_trainboy_path,
+    get_test_prompt_recording_trainboy, get_test_recorded_prompt_path)
+from vikit.prompt.recorded_prompt import RecordedPrompt
+from vikit.prompt.subtitle_extractor import SubtitleExtractor
+from vikit.video.video import Video
 
 SAMPLE_MEDIA_FOLDER = "tests/medias/"
 
