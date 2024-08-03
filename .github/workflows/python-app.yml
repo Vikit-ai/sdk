@@ -58,4 +58,4 @@ jobs:
         DEFAULT_BACKGROUND_MUSIC :  ${{ vars.DEFAULT_BACKGROUND_MUSIC }}        
       run: |
         pytest -s -m "unit"
-        # pytest -s -m "local_integration" to add back soon while quite heavy
+        pytest -s -n 2 -m "local_integration" tests/test_composite_video.py
