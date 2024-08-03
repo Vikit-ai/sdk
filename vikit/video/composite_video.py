@@ -21,7 +21,7 @@ from loguru import logger
 from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 import vikit.common.config as config
-
+from vikit.wrappers.ffmpeg_wrapper import get_media_duration
 from vikit.video.video_types import VideoType
 from vikit.video.building.build_order import (
     get_lazy_dependency_chain_build_order,
@@ -29,7 +29,6 @@ from vikit.video.building.build_order import (
 )
 from vikit.music_building_context import MusicBuildingContext
 from vikit.wrappers.ffmpeg_wrapper import concatenate_videos, get_media_fps
-from vikit.common.handler import Handler
 from vikit.video.video import DEFAULT_VIDEO_TITLE
 
 
@@ -132,13 +131,16 @@ class CompositeVideo(Video, is_composite_video):
         Get the duration of the video, we recompute it everytime
         as the duration of the video can change if we add or remove videos
         """
-        all_video_duration = 0
-        for video in self.video_list:
-            all_video_duration += video.get_duration()
-        self._duration = all_video_duration
+        if self.metadata.is_video_built:
+            return self.metadata.duration
+        else:
+            all_video_duration = 0
+            for video in self.video_list:
+                all_video_duration += video.get_duration()
+            self._duration = all_video_duration
 
-        self.metadata.duration = all_video_duration
-        return all_video_duration
+            self.metadata.duration = all_video_duration
+            return all_video_duration
 
     def get_title(self):
         """
@@ -331,6 +333,7 @@ class CompositeVideo(Video, is_composite_video):
                 logger.info(
                     f"Your final video name is : {build_settings.target_file_name}"
                 )
+        self.metadata.duration = get_media_duration(self.media_url)
 
     def generate_background_music_prompt(self):
         """
