@@ -18,3 +18,4 @@ opentelemetry-exporter-otlp==1.26.0
 opentelemetry-instrumentation==0.47b0
 opentelemetry-proto==1.26.0
 opentelemetry-sdk==1.26.0
+posthog==3.5.0
