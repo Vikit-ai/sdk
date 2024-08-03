@@ -21,7 +21,6 @@ from abc import ABC, abstractmethod
 
 from loguru import logger
 
-from vikit.common.app_analytics import capture_event
 from vikit.common.file_tools import (
     download_or_copy_file,
     is_valid_filename,
@@ -244,9 +243,6 @@ class Video(ABC):
             Video: The built video
 
         """
-        if not build_settings.test_mode:
-            capture_event(id=self.id, event="build_video")
-
         if self._is_video_built:
             logger.info(f"Video {self.id} is already built, returning itself")
             return self
@@ -296,8 +292,6 @@ class Video(ABC):
             )  # go back to the original working folder
 
         self.is_video_built = True
-
-        capture_event(id=self.id, event="video is built")
 
         return built_video
 
