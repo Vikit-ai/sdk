@@ -31,34 +31,6 @@ else:
     load_dotenv(dotenv_path=env_file)
 
 
-def use_app_analytics() -> bool:
-    use_app_analytics = os.getenv("USE_APP_ANALYTICS", False)
-    if use_app_analytics is None:
-        raise Exception("USE_APP_ANALYTICS is not set")
-    return bool(use_app_analytics)
-
-
-def get_app_analytics_endpoint() -> str:
-    app_analytics_endpoint = os.getenv("VIKIT_APP_ANALYTICS_ENDPOINT", None)
-    if app_analytics_endpoint is None:
-        raise Exception("VIKIT_APP_ANALYTICS_ENDPOINT is not set")
-    return app_analytics_endpoint
-
-
-def use_telemetry() -> bool:
-    use_telemetry = os.getenv("USE_TELEMETRY", False)
-    if use_telemetry is None:
-        raise Exception("USE_TELEMETRY is not set")
-    return bool(use_telemetry)
-
-
-def get_telemetry_endpoint() -> str:
-    telemetry_endpoint = os.getenv("VIKIT_TELEMETRY_ENDPOINT", None)
-    if telemetry_endpoint is None:
-        raise Exception("VIKIT_TELEMETRY_ENDPOINT is not set")
-    return telemetry_endpoint
-
-
 def get_default_background_music() -> str:
     default_background_music = os.getenv("DEFAULT_BACKGROUND_MUSIC", None)
     if default_background_music is None:
@@ -109,20 +81,6 @@ def get_subtitles_min_duration() -> int:
     return int(subtitles_min_duration)
 
 
-def get_nb_words_per_subtitle() -> int:
-    nb_words_per_subtitle = os.getenv("NB_WORDS_PER_SUBTITLE", 15)
-    if nb_words_per_subtitle is None:
-        raise Exception("NB_WORDS_PER_SUBTITLE is not set")
-    return int(nb_words_per_subtitle)
-
-
-def get_seconds_per_word() -> float:
-    nb_seconds_per_words = os.getenv("NB_SECONDS_PER_WORDS", 0.5)
-    if nb_seconds_per_words is None:
-        raise Exception("NB_SECONDS_PER_WORDS is not set")
-    return float(nb_seconds_per_words)
-
-
 def get_video_length_per_subtitle() -> int:
     """
     The length of the video generated for each subtitle is currently directly
@@ -167,6 +125,16 @@ def get_cleanup_tempfiles() -> bool:
     return bool(cleanup_tempfiles)
 
 
+def get_test_mode() -> bool:
+    """
+    Are we using the real Vikit Gateway or a fake one for local_integration tests
+    """
+    test_mode = os.getenv("TEST_MODE", False)
+    if test_mode is None:
+        raise Exception("TEST_MODE is not set")
+    return bool(test_mode)
+
+
 def get_sub_audio_for_subtitle_prefix():
     """
     The prefix for the file name of the audio file that will be used for the subtitles video
@@ -197,34 +165,3 @@ def get_video_list_file_name():
     if video_list_file_name is None:
         raise Exception("VIDEO_LIST_FILE_NAME is not set")
     return video_list_file_name
-
-
-def get_cloud_bucket_url():
-    """
-    The cloud storage bucket where final videos are stored
-    """
-    cloud_bucket_url = os.getenv("CLOUD_BUCKET_URL", None)
-    if cloud_bucket_url is None:
-        raise Exception("CLOUD_BUCKET_URL is not set")
-    return cloud_bucket_url
-
-
-class singletons:
-    """
-    A class to hold singletons
-    """
-
-    def __init__(self):
-        pass
-
-    _process_pool_executor = None
-
-    @staticmethod
-    def get_process_executor():
-        """
-        The process executor to use for parallel processing
-        """
-        if not singletons._process_pool_executor:
-            singletons._process_pool_executor = ProcessPoolExecutor()
-
-        return singletons._process_pool_executor
