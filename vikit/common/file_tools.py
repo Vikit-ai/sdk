@@ -18,7 +18,6 @@ import re
 import shutil
 import sys
 import urllib.parse
-import uuid as uuid
 from typing import Optional, Union
 from urllib.error import URLError
 from urllib.request import urlopen
@@ -26,7 +25,7 @@ from urllib.request import urlopen
 import aiofiles
 import aiohttp
 from loguru import logger
-from tenacity import after_log, before_log, retry, stop_after_attempt, wait_exponential
+from tenacity import retry, stop_after_attempt
 
 from vikit.common.config import get_nb_retries_http_calls
 from vikit.common.decorators import log_function_params
