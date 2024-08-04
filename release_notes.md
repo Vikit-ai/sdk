@@ -22,7 +22,7 @@ Note: a Dev Environment version is in the works to get you started quickly with 
 Last but not least, we now integrate with **Stability AI** (for testing purpose) and **Haiper**, and still have the possibility to use **VideoCrafter**! The first two providers let you leap forward in the quality of generated video, enjoy!
 Important note: Haiper do work, though we are working with their teams to figure out an operational issue , be sure we do everything for this feature to be back soon 🙂
 
-Stay tuned for new integrations to come on the Video generation and music generation space ([Now what!](#nowwhat)).
+Stay tuned for new integrations to come on the Video generation and music generation space ([Now what!](#and-now-what)).
 
 Some other features you might want to experiment: 
 
@@ -30,9 +30,9 @@ Some other features you might want to experiment:
 
 - Also, the video generation process is streamlined trough two ways:
 
-1) You can now use Hooks to get your code run adjust before the build (```run_pre_build_actions_hook```) , during (```run_build_core_logic_hook```) and after build (run_post_build_actions_hook). Not too hard, huh?
+  1) You can now use Hooks to get your code run adjust before the build (```run_pre_build_actions_hook```) , during (```run_build_core_logic_hook```) and after build (run_post_build_actions_hook). Not too hard, huh?
 
-2) Handlers! just stack handlers in the order you want and let the process happen! You shall adapt or implement ```get_core_handlers``` function in the different type of ```Videos``` available to date set your own handlers if needs be...
+  2) Handlers! just stack handlers in the order you want and let the process happen! You shall adapt or implement ```get_core_handlers``` function in the different type of ```Videos``` available to date set your own handlers if needs be...
 
 Two additional features we hope you will find handy:
 
