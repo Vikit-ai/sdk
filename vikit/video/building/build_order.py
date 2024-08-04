@@ -53,7 +53,7 @@ def get_lazy_dependency_chain_build_order(
     Returns:
         list: The build order
     """
-    logger.debug(f"video_tree len is {len(video_tree)}")
+    logger.trace(f"video_tree len is {len(video_tree)}")
     if len(video_tree) == 1:
         logger.debug(
             f"video_tree single object is  {video_tree[0].id} and type is {type(video_tree[0])}"

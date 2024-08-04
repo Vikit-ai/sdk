@@ -83,7 +83,7 @@ class PromptBasedVideo(CompositeVideo):
         Returns:
             The current instance
         """
-        super().prepare_build(build_settings=build_settings)
+        await super().prepare_build(build_settings=build_settings)
         return await self.compose(build_settings=build_settings)
 
     async def compose(self, build_settings: VideoBuildSettings):
