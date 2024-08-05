@@ -44,15 +44,11 @@ def get_telemetry_api_key() -> str:
 
 def get_openai_whisper_api_key():
     openai_whisper_api_key = getenv("OPENAI_WHISPER_MODEL_ID", "dev")
-    if openai_whisper_api_key is None:
-        raise Exception("OPENAI_WHISPER_MODEL_ID is not set")
     return openai_whisper_api_key
 
 
 def get_replicate_api_token():
     replicate_api_key = getenv("REPLICATE_API_TOKEN", "dev")
-    if replicate_api_key is None:
-        raise Exception("REPLICATE_API_TOKEN is not set")
     return replicate_api_key
 
 
@@ -66,8 +62,6 @@ def get_vikit_api_token():
 
 def get_eleven_labs_api_key():
     eleven_labs_api_key = getenv("ELEVEN_LABS_KEY", "dev")
-    if eleven_labs_api_key is None:
-        raise Exception("ELEVEN_LABS_KEY is not set")
     return eleven_labs_api_key
 
 
