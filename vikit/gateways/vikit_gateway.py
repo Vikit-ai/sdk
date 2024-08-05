@@ -25,16 +25,23 @@ import uuid as uid
 import aiohttp
 from loguru import logger
 from PIL import Image
-from tenacity import (AsyncRetrying, after_log, before_log, retry,
-                      retry_if_exception_type, stop_after_attempt,
-                      wait_exponential)
+from tenacity import (
+    AsyncRetrying,
+    after_log,
+    before_log,
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
 from vikit.common.config import get_nb_retries_http_calls
-from vikit.common.decorators import log_function_params
 from vikit.common.file_tools import download_or_copy_file
-from vikit.common.secrets import (get_replicate_api_token, get_vikit_api_token,
-                                  has_eleven_labs_api_key)
+from vikit.common.secrets import (
+    get_replicate_api_token,
+    get_vikit_api_token,
+    has_eleven_labs_api_key,
+)
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
@@ -109,7 +116,6 @@ class VikitGateway(MLModelsGateway):
             await convert_as_mp3_file("temp.wav", target_file)
             return response
 
-    @log_function_params
     async def generate_background_music_async(
         self, duration: int = 3, prompt: str = None
     ) -> str:
@@ -168,7 +174,6 @@ class VikitGateway(MLModelsGateway):
 
         return lowered_music_filename
 
-    @log_function_params
     async def generate_seine_transition_async(
         self, source_image_path, target_image_path
     ):
@@ -253,7 +258,6 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
-    @log_function_params
     async def compose_music_from_text_async(self, prompt_text: str, duration: int):
         """
         Compose a music for a prompt text
@@ -312,7 +316,6 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
-    @log_function_params
     async def get_music_generation_keywords_async(self, text) -> str:
         """
         Generate keywords from a text using the Replicate API
@@ -364,7 +367,6 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("DEBUG").no),
         after=after_log(logger, logger.level("DEBUG").no),
     )
-    @log_function_params
     async def interpolate_async(self, video):
         """
         Run some interpolation magic. This model may fail after timeout, so you
@@ -405,7 +407,6 @@ class VikitGateway(MLModelsGateway):
         return output
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    @log_function_params
     async def get_keywords_from_prompt_async(
         self, subtitleText, excluded_words: str = None
     ):
@@ -462,7 +463,6 @@ class VikitGateway(MLModelsGateway):
         return clean_result, title_from_keywords_as_tokens
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    @log_function_params
     async def get_enhanced_prompt_async(self, subtitleText):
         """
         Generates an enhanced prompt from an original one, probably written by a user or
@@ -503,7 +503,6 @@ class VikitGateway(MLModelsGateway):
         # Transform the list of keywords into a single string, we do keep the final title within
         return clean_result, title_from_keywords_as_tokens
 
-    @log_function_params
     async def get_subtitles_async(self, audiofile_path):
         # Obtain subtitles using Replicate API
         """

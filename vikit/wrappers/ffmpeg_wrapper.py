@@ -121,7 +121,6 @@ def get_media_fps(input_video_path):
     )
 
 
-@log_function_params
 async def extract_audio_slice(
     audiofile_path: str, start: float = 0, end: float = 1, target_file_name: str = None
 ):
@@ -202,7 +201,6 @@ async def extract_audio_slice(
     return target_file_name
 
 
-@log_function_params
 async def convert_as_mp3_file(fileName, target_file_name: str):
     """
     Save the incoming audio file to a regular mp3 file with a standardized filename
