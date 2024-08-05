@@ -108,12 +108,9 @@ class PromptBasedVideo(CompositeVideo):
             (
                 keyword_based_vid,
                 prompt_based_vid,
-                transit,
             ) = await self._prepare_basic_building_block(sub, build_stgs=build_settings)
 
             vid_cp_sub.append_video(keyword_based_vid).append_video(
-                transit
-            ).append_video(
                 prompt_based_vid
             )  # Building a set of 2 videos around the same text + a transition
 
@@ -128,7 +125,6 @@ class PromptBasedVideo(CompositeVideo):
         build the basic building block of the full video/
         - One RawTextBasedVideo from the keyword
         - One RawTextBasedVideo from the prompt
-        - One SeineTransition between the two
 
         Calling prepare_build allows for injecting dedicated build settings for each video
         and not the default on from the parent composite
@@ -140,7 +136,6 @@ class PromptBasedVideo(CompositeVideo):
         Returns:
             - keyword_based_vid: the video generated from the keyword
             - prompt_based_vid: the video generated from the prompt
-            - transit: the transition between the two
         """
 
         prompt_fact = PromptFactory(
@@ -187,9 +182,4 @@ class PromptBasedVideo(CompositeVideo):
         assert keyword_based_vid is not None, "keyword_based_vid cannot be None"
         assert prompt_based_vid is not None, "prompt_based_vid cannot be None"
 
-        transit = SeineTransition(
-            source_video=keyword_based_vid,
-            target_video=prompt_based_vid,
-        )
-
-        return keyword_based_vid, prompt_based_vid, transit
+        return keyword_based_vid, prompt_based_vid
