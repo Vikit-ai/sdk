@@ -28,7 +28,6 @@ from loguru import logger
 from tenacity import retry, stop_after_attempt
 
 from vikit.common.config import get_nb_retries_http_calls
-from vikit.common.decorators import log_function_params
 
 TIMEOUT = 10  # seconds before stopping the request to check an URL exists
 
