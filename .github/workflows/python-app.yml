@@ -5,9 +5,9 @@ name: Python application
 
 on:
   push:
-    branches: [ "main", async-calls-to-apis ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main", async-calls-to-apis ]
+    branches: [ "main" ]
 
 
 permissions:
@@ -56,12 +56,6 @@ jobs:
         INITIAL_AUDIO_FILE_NAME: ${{ vars.INITIAL_AUDIO_FILE_NAME }}
         VIDEO_LIST_FILE_NAME :  ${{ vars.VIDEO_LIST_FILE_NAME }}
         DEFAULT_BACKGROUND_MUSIC :  ${{ vars.DEFAULT_BACKGROUND_MUSIC }}        
-        VIKIT_APP_ANALYTICS_PROJECT_ID: ${{ secrets.VIKIT_APP_ANALYTICS_PROJECT_ID }}
-        VIKIT_APP_ANALYTICS_API_KEY: ${{ secrets.VIKIT_APP_ANALYTICS_API_KEY }}
-        VIKIT_APP_ANALYTICS_ENDPOINT: ${{ vars.INITIAL_AUDIO_FILE_NAME }}
-        USE_APP_ANALYTICS: ${{ vars.USE_APP_ANALYTICS }} 
-        USE_TELEMETRY: ${{ vars.USE_TELEMETRY }} 
-        VIKIT_TELEMETRY_ENDPOINT: ${{ vars.VIKIT_TELEMETRY_ENDPOINT }}
       run: |
         pytest -s -m "unit"
         pytest -s -n 2 -m "local_integration" tests/test_composite_video.py

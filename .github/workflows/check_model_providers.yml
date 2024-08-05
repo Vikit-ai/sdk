@@ -15,22 +15,16 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9'  
+        python-version: "3.10"
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Test with pytest
       env:
         VIKIT_API_TOKEN: ${{ secrets.VIKIT_API_TOKEN }}
-        VIKIT_APP_ANALYTICS_PROJECT_ID: ${{ secrets.VIKIT_APP_ANALYTICS_PROJECT_ID }}
-        VIKIT_APP_ANALYTICS_API_KEY: ${{ secrets.VIKIT_APP_ANALYTICS_API_KEY }}
-        VIKIT_APP_ANALYTICS_ENDPOINT: ${{ vars.INITIAL_AUDIO_FILE_NAME }}
-        USE_APP_ANALYTICS: ${{ vars.USE_APP_ANALYTICS }} 
-        USE_TELEMETRY: ${{ vars.USE_TELEMETRY }} 
-        VIKIT_TELEMETRY_ENDPOINT: ${{ vars.VIKIT_TELEMETRY_ENDPOINT }}
       run: |
           pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_stabilityai_provider_and_generate
           pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_videocrafter_provider_and_generate
