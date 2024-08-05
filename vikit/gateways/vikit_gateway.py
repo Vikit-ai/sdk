@@ -628,7 +628,7 @@ class VikitGateway(MLModelsGateway):
                 # Convert result to Base64
                 buffer = io.BytesIO()
                 output = json.loads(output)
-                logger.debug(f"Output: {output.keys()}")
+                logger.trace(f"Output: {output.keys()}")
                 if "error" in output.keys():
                     err = output["error"]
                     logger.debug(f"Error: {err}")
