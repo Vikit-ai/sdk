@@ -119,7 +119,6 @@ def web_url_exists(url):
         return False
 
 
-@log_function_params
 def url_exists(url: str):
     """
     Check if a URL exists somewhere on the internet or locally. To be superseded by a more
