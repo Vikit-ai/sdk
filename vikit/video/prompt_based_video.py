@@ -14,6 +14,7 @@
 # ==============================================================================
 
 import os
+import re
 
 import pysrt
 from loguru import logger
@@ -23,7 +24,6 @@ from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
-from vikit.video.seine_transition import SeineTransition
 from vikit.video.video import VideoBuildSettings
 from vikit.video.video_types import VideoType
 
@@ -64,7 +64,11 @@ class PromptBasedVideo(CompositeVideo):
             # backup plan: If no title existing yet (should be generated straight from an LLM)
             # then get the first and last words of the prompt
             splitted_prompt = self._prompt.subtitles[0].text.split(" ")
-            clean_title_words = [word for word in splitted_prompt if word.isalnum()]
+            clean_title_words = [
+                re.sub(r"[^\w]", "", word)
+                for word in splitted_prompt
+                if re.sub(r"[^\w]", "", word).isalnum()
+            ]
             if len(clean_title_words) == 1:
                 summarised_title = clean_title_words[0]
             else:
