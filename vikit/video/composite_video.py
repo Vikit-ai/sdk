@@ -86,7 +86,7 @@ class CompositeVideo(Video, is_composite_video):
         Get the  build settings for children Video
         """
         logger.debug(
-            f"Composite video {self.id} getting cascaded build settings from {self.build_settings}"
+            f"Composite video {self.id} getting children build settings from {self.build_settings}"
         )
         if self.build_settings.cascade_build_settings:
             return self.build_settings

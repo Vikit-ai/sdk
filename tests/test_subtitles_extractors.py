@@ -22,8 +22,9 @@ from loguru import logger
 import tests.testing_tools as tools  # used to get a library of test prompts
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.gateways import vikit_gateway
-from vikit.prompt.recorded_prompt_subtitles_extractor import \
-    RecordedPromptSubtitlesExtractor
+from vikit.prompt.recorded_prompt_subtitles_extractor import (
+    RecordedPromptSubtitlesExtractor,
+)
 
 SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in an abandoned forest, revealing intricate carvings
 and symbols. This is additional text to make sure we generate serveral subtitles. """
@@ -40,7 +41,7 @@ class TestSubtitlesExtrators:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
-    async def test_reunion_island_prompt(self):
+    async def test_trainboy_moss_stones_prompt(self):
         with WorkingFolderContext():
             gw = vikit_gateway.VikitGateway()
             sub_extractor = RecordedPromptSubtitlesExtractor()
@@ -51,6 +52,7 @@ class TestSubtitlesExtrators:
                 ml_models_gateway=gw,
             )
 
+            assert len(subs) == 3, f"awaited 4 subs, got {len(subs)}"
             for sub in subs:
                 sub = pysrt.SubRipItem(sub)
                 assert sub.text is not None
