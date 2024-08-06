@@ -89,5 +89,7 @@ class RawImageBasedVideo(Video):
              list: The list of handlers to use for building the video
         """
         handlers = []
-        handlers.append(VideoGenHandler(video_gen_text_prompt=self._image))
+        handlers.append(
+            VideoGenHandler(video_gen_text_prompt=self.build_settings.prompt)
+        )
         return handlers
