@@ -42,6 +42,7 @@ def get_estimated_duration(composite: CompositeVideo) -> float:
         "stabilityai": 4.04,
         "stabilityai_image": 4.04,
         "videocrafter": 2.0,
+        "dynamicrafter": 2.0,
         "haiper": 4.0,
         "transition": 2.0,
     }
@@ -212,11 +213,13 @@ async def batch_image_based_prompting(prompt_file: str):
 async def composite_imageonly_prompting(prompt_file: str):
 
     TEST_MODE = False
+    model_provider = "stabilityai_image"
+
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
 
     single_video_buildsettings = VideoBuildSettings(
         test_mode=TEST_MODE,
-        target_model_provider="stabilityai_image",
+        target_model_provider=model_provider,
     )
 
     vid_cp_sub = CompositeVideo()
@@ -247,7 +250,7 @@ async def composite_imageonly_prompting(prompt_file: str):
             expected_music_length=total_duration * 1.5,
         ),
         test_mode=TEST_MODE,
-        target_model_provider="stabilityai_image",
+        target_model_provider=model_provider,
         output_video_file_name="Composite.mp4",
         expected_length=total_duration,
     )

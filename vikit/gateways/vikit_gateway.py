@@ -81,7 +81,9 @@ class VikitGateway(MLModelsGateway):
         await elevenlabs_gateway.generate_mp3_from_text_async(
             text=prompt_text, target_file=target_file
         )
-        assert os.path.exists(target_file), "The generated audio file does not exists"
+        assert os.path.exists(
+            target_file
+        ), f"The generated audio file does not exists: {target_file}"
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     async def generate_mp3_from_text_async(
@@ -589,6 +591,8 @@ class VikitGateway(MLModelsGateway):
             return await self.generate_video_haiper_async(prompt)
         elif model_provider == "videocrafter":
             return await self.generate_video_VideoCrafter2_async(prompt)
+        elif model_provider == "dynamicrafter":
+            return await self.generate_video_DynamiCrafter_image_async(prompt)
         elif model_provider == "stabilityai_image":
             return await self.generate_video_from_image_stabilityai_async(prompt)
 
@@ -736,6 +740,39 @@ class VikitGateway(MLModelsGateway):
         return output
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    async def generate_video_DynamiCrafter_image_async(self, prompt: str):
+        """
+        Generate a video from the given prompt
+
+        Args:
+            prompt: The prompt to generate the video from
+
+        returns:
+                The link to the generated video
+        """
+        logger.debug(f"Generating video from prompt: {prompt.text[:50]}")
+        async with aiohttp.ClientSession(timeout=http_timeout) as session:
+            payload = {
+                "key": vikit_api_key,
+                "model": "camenduru/dynami-crafter-576x1024:e79ff8d01e81cbd90acfa1df4f209f637da2c68307891d77a6e4227f4ec350f1",
+                "input": {
+                    "i2v_eta": 1,
+                    "i2v_seed": 123,
+                    "i2v_steps": 50,
+                    "i2v_motion": 4,
+                    "i2v_cfg_scale": 7.5,
+                    "i2v_input_text": prompt.text,
+                    "i2v_input_image": "data:image/jpg;base64," + prompt.image,
+                },
+            }
+            async with session.post(vikit_backend_url, json=payload) as response:
+                output = await response.text()
+
+        if not output.startswith("http"):
+            raise AttributeError("The result Videocrafter video link is not a link")
+        return output
+
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     async def generate_video_from_image_stabilityai_async(self, prompt: str):
         """
         Generate a video from the given image prompt
@@ -749,11 +786,12 @@ class VikitGateway(MLModelsGateway):
 
         # TO DO: include camera motion parameters
         output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
-        logger.debug(f"Generating video from image prompt {prompt.title} ")
+        logger.debug(f"Generating video from image prompt {prompt.text} ")
         async with aiohttp.ClientSession() as session:
             logger.debug("Resizing image for video generator")
             # Convert result to Base64
-            image_data = base64.b64decode(prompt)
+            image_data = base64.b64decode(prompt.image)
+
             image = Image.open(io.BytesIO(image_data))
             target_size = (1024, 576)
 
