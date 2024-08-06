@@ -18,9 +18,11 @@ import random
 import shutil
 import uuid as uid
 from abc import ABC, abstractmethod
+import re
 
 from loguru import logger
 
+from vikit.common.decorators import log_function_params
 from vikit.common.file_tools import (
     download_or_copy_file,
     is_valid_filename,
@@ -158,6 +160,39 @@ class Video(ABC):
     @title.setter
     def title(self, value):
         self.metadata.title = value
+
+    @log_function_params
+    def get_title_from_description(self, description: str = None):
+        """
+        Get the title from the description, could be the text from a prompt,
+        first subtitle from a subtitle list, whatever as long as it is text and
+        describes the video so we can infer a nice title from it
+
+        Args:
+            description (str): The description to get the title from
+
+        Returns:
+            str: The title
+        """
+        if not description:
+            return DEFAULT_VIDEO_TITLE
+
+        #  get the first and last words of the prompt
+        splitted_prompt = description.split(" ")
+        clean_title_words = [
+            re.sub(r"[^\w]", "", word)
+            for word in splitted_prompt
+            if re.sub(r"[^\w]", "", word).isalnum()
+        ]
+        if len(clean_title_words) == 0:
+            summarised_title = splitted_prompt[0]
+        elif len(clean_title_words) == 1:
+            summarised_title = clean_title_words[0]
+        else:
+            summarised_title = clean_title_words[0] + "-" + clean_title_words[-1]
+        self.metadata.title = summarised_title
+
+        return self.metadata.title
 
     @abstractmethod
     def get_title(self):

@@ -57,25 +57,9 @@ class PromptBasedVideo(CompositeVideo):
         return str(VideoType.PRMPTBASD)
 
     def get_title(self):
-        """
-        Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
-        """
-        if not self.metadata.title:
-            # backup plan: If no title existing yet (should be generated straight from an LLM)
-            # then get the first and last words of the prompt
-            splitted_prompt = self._prompt.subtitles[0].text.split(" ")
-            clean_title_words = [
-                re.sub(r"[^\w]", "", word)
-                for word in splitted_prompt
-                if re.sub(r"[^\w]", "", word).isalnum()
-            ]
-            if len(clean_title_words) == 1:
-                summarised_title = clean_title_words[0]
-            else:
-                summarised_title = clean_title_words[0] + "-" + clean_title_words[-1]
-            self.metadata.title = summarised_title
-
-        return self.metadata.title
+        return self.get_title_from_description(
+            description=self._prompt.subtitles[0].text
+        )
 
     async def prepare_build(self, build_settings=VideoBuildSettings()):
         """
