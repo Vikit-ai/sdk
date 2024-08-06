@@ -50,7 +50,7 @@ class RawImageBasedVideo(Video):
         self._needs_reencoding = False
         if title:
             self.metadata.title = title
-        self.duration = 4.0  # currently generated video are 4s long, this will be variabilized per models later
+        self.duration = 4.0  # Currently generated videos are 4 seconds long; this will be variable per model later
 
     @property
     def short_type_name(self):

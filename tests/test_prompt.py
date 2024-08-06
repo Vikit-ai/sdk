@@ -24,9 +24,7 @@ from vikit.gateways import replicate_gateway as replicate_gateway
 from vikit.gateways import vikit_gateway as vgateway
 from vikit.prompt.prompt_factory import PromptFactory
 
-mp3_transcription = (
-    "ceci est un test rapide avec nma voix enregistrée pour faire un test"
-)
+mp3_transcription = "This is a quick test with my recorded voice to do a test"
 
 
 class TestPrompt:
@@ -56,7 +54,7 @@ class TestPrompt:
     async def test_build_basic_audio_prompt_from_existing_recording(self):
         with WorkingFolderContext():
             """
-            here we check a prompt has been created sucessfully from an mp3 recording
+            here we check a prompt has been created successfully from an mp3 recording
             """
             prompt = await PromptFactory(
                 ml_gateway=vgateway.VikitGateway()

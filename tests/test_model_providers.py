@@ -85,7 +85,7 @@ class TestModelProviders:
                         apply_background_music=True, generate_background_music=True
                     ),
                     test_mode=True,
-                    target_model_provider="an unexisting model",
+                    target_model_provider="a nonexistent model",
                 )
 
                 prompt = (

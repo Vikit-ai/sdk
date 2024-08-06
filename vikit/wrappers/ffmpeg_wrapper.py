@@ -404,7 +404,7 @@ async def _merge_audio_and_video_with_existing_audio(
     target_file_name=None,
 ):
     """
-    Merge audio with the video in the case where video already has at least oneaudio track, typically
+    Merge audio with the video in the case where video already has at least one audio track, typically
     when the video is imported / already existing
 
     Args:
@@ -446,8 +446,8 @@ async def _merge_audio_and_video_with_existing_audio(
         "-ac",
         "2",  # This tells FFmpeg to use 2 audio channels.
         target_file_name,
-        stdout=asyncio.subprocess.PIPE,  # Capture la sortie standard
-        stderr=asyncio.subprocess.PIPE,  # Capture la sortie d'erreur
+        stdout=asyncio.subprocess.PIPE,  # Capture the error output
+        stderr=asyncio.subprocess.PIPE,  # Capture the error output
     )
     stdout, stderr = await process.communicate()
     if process.returncode != 0:

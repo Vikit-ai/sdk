@@ -27,7 +27,7 @@ from vikit.prompt.recorded_prompt_subtitles_extractor import (
 )
 
 SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in an abandoned forest, revealing intricate carvings
-and symbols. This is additional text to make sure we generate serveral subtitles. """
+and symbols. This is additional text to make sure we generate several subtitles. """
 
 # Below are real integration tests, not to be run all the time
 

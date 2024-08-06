@@ -21,7 +21,7 @@ class BuildOutputAssertor():
 
     def __init__(self, files: list[str]):
         """
-        Initialises the list of file names to work upon in one pass
+        Initializes the list of file names to work upon in one pass
 
         params:
             files: The list of file names to work upon

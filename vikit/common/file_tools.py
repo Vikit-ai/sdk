@@ -230,11 +230,11 @@ async def download_or_copy_file(url, local_path):
                 logger.debug(f"Downloading file from {url} to {local_path}")
                 async with session.get(url) as response:
                     if response.status == 200:
-                        # Utilisez aiofiles pour écrire le contenu de manière asynchrone
+                        # Use aiofiles to write the content asynchronously.
                         async with aiofiles.open(local_path, "wb") as f:
                             while (
                                 True
-                            ):  # Lire le contenu par morceaux pour ne pas surcharger la mémoire
+                            ):  # Read the content in chunks to avoid overloading the memory
                                 chunk = await response.content.read(1024)
                                 if not chunk:
                                     break

@@ -197,7 +197,7 @@ class CompositeVideo(Video, is_composite_video):
         Mix all the videos in the list: here we actually build and stitch the videos together,
         will take some time and resources as we call external services and run video mixing locally.
 
-        Warning: order is very important here, and the first pass is supposed to happen from the rootcomposite levels
+        Warning: order is very important here, and the first pass is supposed to happen from the root composite levels
 
         Today we do generate the videos so the first ones are the ones that will be used to generate the final video
         This requires a specific order, and generating videos ahead of time won't work unless you take care

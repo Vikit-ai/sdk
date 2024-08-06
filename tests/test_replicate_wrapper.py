@@ -24,7 +24,7 @@ from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.prompt.prompt_factory import PromptFactory
 
 SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in an abandoned forest, revealing intricate carvings
-and symbols. This is additional text to make sure we generate serveral subtitles. """
+and symbols. This is additional text to make sure we generate several subtitles. """
 
 
 class TestReplicateWrapper:
