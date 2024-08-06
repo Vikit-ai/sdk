@@ -48,10 +48,10 @@ def get_elevenLabs_url() -> str:
 
 
 def get_videho_email_contact() -> str:
-    videoho_email = os.getenv("VIDEHO_EMAIL_CONTACT", None)
-    if videoho_email is None:
+    videho_email = os.getenv("VIDEHO_EMAIL_CONTACT", None)
+    if videho_email is None:
         raise Exception("VIDEHO_EMAIL_CONTACT is not set")
-    return videoho_email
+    return videho_email
 
 
 def get_nb_retries_http_calls() -> int:
@@ -84,7 +84,7 @@ def get_subtitles_min_duration() -> int:
 def get_video_length_per_subtitle() -> int:
     """
     The length of the video generated for each subtitle is currently directly
-    linked to the maximum anmount of time allowed by videcrafter
+    linked to the maximum amount of time allowed by videocrafter
     """
     video_length_per_subtitle = os.getenv("STEPS", 300)
     if video_length_per_subtitle is None:

@@ -331,7 +331,7 @@ class VikitGateway(MLModelsGateway):
         """
 
         if text is None:
-            text = "finaly there is no prompt so just unleash your own imagination"
+            text = "finally there is no prompt so just unleash your own imagination"
 
         async with aiohttp.ClientSession(timeout=http_timeout) as session:
             payload = {

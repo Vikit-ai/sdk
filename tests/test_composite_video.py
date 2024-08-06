@@ -71,9 +71,9 @@ class TestCompositeVideo:
         assert imp_video.media_url, "Media URL should not be null"
         cp_video = CompositeVideo()
         cp_video.append_video(imp_video)
-        cp_vid_durartion = cp_video.get_duration()
+        cp_vid_duration = cp_video.get_duration()
         assert (
-            cp_vid_durartion == imp_video.get_duration()
+            cp_vid_duration == imp_video.get_duration()
         ), f"Duration should be the same, {cp_video.get_duration()} != {imp_video.get_duration()}"
 
         prompt = tools.test_prompt_library["tired"]
@@ -92,12 +92,12 @@ class TestCompositeVideo:
         # Here the ratio should be low as we have a 6s video and a very long prompt which last much longer.
         # so the ratio will make it so a 6s video is slowed down to match the prompt duration
         assert (
-            ratio == cp_vid_durartion / prompt.duration
-        ), f"Ratio should be {cp_vid_durartion / prompt.duration} but is {ratio}"
+            ratio == cp_vid_duration / prompt.duration
+        ), f"Ratio should be {cp_vid_duration / prompt.duration} but is {ratio}"
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life(
+    async def test_create_video_mix_with_preexisting_video_bin_default_bkg_music_subtitles_tired_life(
         self,
     ):
         with WorkingFolderContext():
@@ -119,7 +119,7 @@ class TestCompositeVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_int_create_video_mix_with_preexiting_video_bin_no_bkg_music(self):
+    async def test_int_create_video_mix_with_preexisting_video_bin_no_bkg_music(self):
 
         with WorkingFolderContext():
             video = ImportedVideo(test_media.get_cat_video_path())
@@ -134,7 +134,7 @@ class TestCompositeVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_combine_generated_and_preexiting_video_based_video(self):
+    async def test_combine_generated_and_preexisting_video_based_video(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo("Some text")
             video._needs_video_reencoding = True
@@ -296,7 +296,7 @@ class TestCompositeVideo:
         self,
     ):
         """
-        Create a single video mix with 2 imported video initially nade from gen video
+        Create a single video mix with 2 imported video initially made from gen video
         and use default bg music
         """
         with WorkingFolderContext():
@@ -326,8 +326,8 @@ class TestCompositeVideo:
     @pytest.mark.asyncio
     async def test_video_build_expected_video_length(self):
         """
-        Create a single video mix with 2 imported video initially nade from gen video
-        and check the viddeo expected length is applied
+        Create a single video mix with 2 imported video initially made from gen video
+        and check the video expected length is applied
         """
         with WorkingFolderContext():
             vid1 = ImportedVideo(test_media.get_generated_3s_forest_video_1_path())
@@ -349,7 +349,7 @@ class TestCompositeVideo:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
-    async def test_combine_generated_and_preexiting_video_no_build_settings(
+    async def test_combine_generated_and_preexisting_video_no_build_settings(
         self,
     ):
         with WorkingFolderContext():
@@ -397,7 +397,7 @@ class TestCompositeVideo:
     @pytest.mark.asyncio
     async def test_issue_6(self):
         """
-        Transition between two compositve videos won't work #6
+        Transition between two composite videos won't work #6
         https://github.com/leclem/aivideo/issues/6
         """
         with WorkingFolderContext():
@@ -432,7 +432,7 @@ class TestCompositeVideo:
     @pytest.mark.asyncio
     async def test_issue_6_generated_subvids(self):
         """
-        Transition between two compositve videos won't work #6
+        Transition between two composite videos won't work #6
         https://github.com/leclem/aivideo/issues/6
         """
         with WorkingFolderContext():

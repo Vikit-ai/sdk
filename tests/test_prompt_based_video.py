@@ -120,7 +120,7 @@ class TestPromptBasedVideo:
                 ml_gateway=bld_settings.get_ml_models_gateway()
             ).create_prompt_from_text(
                 """Tom Cruise's face reflects focus, his eyes filled with purpose and drive. He drives a moto very fast on a 
-                skyscrapper rooftop, jumps from the moto to an 
+                skyscraper rooftop, jumps from the moto to an 
                 helicopter, this last 3 seconds, then Tom Cruse dives into a swimming pool from the helicopter while the helicopter without pilot crashes 
                   near the beach"""
             )
@@ -225,7 +225,7 @@ class TestPromptBasedVideo:
             test_prompt = await PromptFactory(
                 bld_sett.get_ml_models_gateway()
             ).create_prompt_from_text(
-                """A travel over Reunion Island, taken fomm birdview at 2000meters above 
+                """A travel over Reunion Island, taken from bird-view at 2000meters above 
                 the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
                 , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
             )
@@ -252,7 +252,7 @@ class TestPromptBasedVideo:
             test_prompt = await PromptFactory(
                 bld_sett.get_ml_models_gateway()
             ).create_prompt_from_text(
-                """A travel over Reunion Island, taken fomm birdview at 2000meters above 
+                """A travel over Reunion Island, taken from bird-view at 2000meters above 
                 the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
                 , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
             )

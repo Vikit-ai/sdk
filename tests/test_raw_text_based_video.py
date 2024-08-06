@@ -38,7 +38,7 @@ class TestRawTextBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life(
+    async def test_create_video_mix_with_preexsiting_video_bin_default_bkg_music_subtitles_tired_life(
         self,
     ):
         with WorkingFolderContext():

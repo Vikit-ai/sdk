@@ -43,7 +43,7 @@ class VideoReencodingHandler(Handler):
                 build_settings=video.build_settings
             )
             logger.debug(
-                f"Reencoding video target_file_name: {target_file_name}, currrent media_url: {video.media_url}"
+                f"Reencoding video target_file_name: {target_file_name}, current media_url: {video.media_url}"
             )
             if target_file_name == video.media_url:
                 logger.warning(

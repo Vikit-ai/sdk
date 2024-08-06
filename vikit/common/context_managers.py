@@ -71,14 +71,14 @@ class WorkingFolderContext:
 
     def __exit__(self, type, value, traceback):
         os.chdir(self.original_path)
-        # We may uncomment this line to debug the program and see what has been gemerated
+        # We may uncomment this line to debug the program and see what has been generated
         if self.delete_on_exit:
             os.rmdir(self.path)
-        if type is not None:  # Une exception a été levée
+        if type is not None:  # An exception was raised
             logger.error(
                 f"Exception handled, with details: {value} and trace {traceback}"
             )
-        return False  # Propager l'exception
+        return False  # Propagate the exception.
 
     def __call__(self, func):
         def wrapper(*args, **kwargs):
