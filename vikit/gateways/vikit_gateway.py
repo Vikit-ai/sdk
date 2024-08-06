@@ -750,7 +750,6 @@ class VikitGateway(MLModelsGateway):
         returns:
                 The link to the generated video
         """
-        breakpoint()
         logger.debug(f"Generating video from prompt: {prompt.text[:50]}")
         async with aiohttp.ClientSession(timeout=http_timeout) as session:
             payload = {
