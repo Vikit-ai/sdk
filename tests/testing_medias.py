@@ -57,6 +57,10 @@ def get_stabilityai_video_path():
     return os.path.join(_media_dir, SMALL_STABILITY_VIDEO_FILE_NAME)
 
 
+def get_dynamicrafter_image_video_path(prompt):
+    return os.path.join(_media_dir, SMALL_VIDEOCRAFTER_VIDEO_FILE_NAME)
+
+
 def get_stabilityai_image_video_path():
     return os.path.join(_media_dir, SMALL_STABILITY_VIDEO_FILE_NAME)
 
