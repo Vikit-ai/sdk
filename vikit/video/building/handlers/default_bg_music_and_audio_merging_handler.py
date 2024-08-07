@@ -19,7 +19,11 @@ from loguru import logger
 # from vikit.video.video import Video
 import vikit.common.config as config
 from vikit.common.handler import Handler
-from vikit.wrappers.ffmpeg_wrapper import extract_audio_slice, merge_audio
+from vikit.wrappers.ffmpeg_wrapper import (
+    extract_audio_slice,
+    merge_audio,
+    get_media_duration,
+)
 
 
 class DefaultBGMusicAndAudioMergingHandler(Handler):
@@ -45,9 +49,16 @@ class DefaultBGMusicAndAudioMergingHandler(Handler):
         )
 
         assert video.media_url is not None, "Media URL is required for the video"
-        expected_music_duration = self.duration
+        if self.duration:
+            self.duration = float(self.duration)
+            logger.info(f"Using provided music duration: {self.duration}")
+        else:
+            self.duration = get_media_duration(video.media_url)
+            logger.info(
+                f"Using video media duration as music duration: {self.duration}"
+            )
         audio_file = await self._fit_standard_background_music(
-            expected_music_duration=expected_music_duration, video=video
+            expected_music_duration=self.duration, video=video
         )
         video.metadata.bg_music_applied = True
         video.metadata.is_default_bg_music_applied = True

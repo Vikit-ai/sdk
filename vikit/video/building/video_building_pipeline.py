@@ -102,7 +102,7 @@ class VideoBuildingPipeline:
                         build_settings.prompt
                         and build_settings.include_read_aloud_prompt
                     )
-                    else video.get_duration()
+                    else None  # We will let the handlers use the final media duration after build
                 )
             )
 

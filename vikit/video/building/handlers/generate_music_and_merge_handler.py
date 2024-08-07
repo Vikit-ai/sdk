@@ -16,13 +16,13 @@
 from loguru import logger
 
 from vikit.common.handler import Handler
-from vikit.wrappers.ffmpeg_wrapper import merge_audio
+from vikit.wrappers.ffmpeg_wrapper import merge_audio, get_media_duration
 
 
 class GenerateMusicAndMergeHandler(Handler):
     def __init__(
         self,
-        music_duration: float,
+        music_duration: float = None,
         bg_music_prompt: str = None,
     ):
         self.music_duration = music_duration
@@ -44,6 +44,15 @@ class GenerateMusicAndMergeHandler(Handler):
             if self.bg_music_prompt
             else video.build_settings.prompt.text
         )
+        if self.music_duration:
+            self.music_duration = float(self.music_duration)
+            logger.info(f"Using provided music duration: {self.music_duration}")
+        else:
+            self.music_duration = get_media_duration(video.media_url)
+            logger.info(
+                f"Using video media duration as music duration: {self.music_duration}"
+            )
+
         bg_music_file = await video.build_settings.get_ml_models_gateway().generate_background_music_async(
             duration=self.music_duration,
             prompt=self.bg_music_prompt,

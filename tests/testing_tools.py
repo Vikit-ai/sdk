@@ -19,8 +19,9 @@ from pathlib import Path
 import pysrt
 
 from tests.testing_medias import (
-    get_test_prompt_recording_stones_trainboy_path,
-    get_test_prompt_recording_trainboy, get_test_recorded_prompt_path)
+    get_test_prompt_recording_trainboy,
+    get_test_recorded_prompt_path,
+)
 from vikit.prompt.recorded_prompt import RecordedPrompt
 from vikit.prompt.subtitle_extractor import SubtitleExtractor
 from vikit.video.video import Video
@@ -39,7 +40,7 @@ def create_fake_prompt_for_local_tests_moss_stones_train_boy():
     subs_as_text_tokens = SubtitleExtractor().build_subtitles_as_text_tokens(
         prompt.subtitles
     )
-    prompt.audio_recording = get_test_prompt_recording_stones_trainboy_path()
+    prompt.audio_recording = get_test_prompt_recording_trainboy()
     prompt.text = " ".join(subs_as_text_tokens)
     prompt._subtitle_as_text_tokens = subs_as_text_tokens
     prompt.duration = 14

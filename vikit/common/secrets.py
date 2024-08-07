@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
+from sys import exit
 from os import getenv, path
 
 from dotenv import load_dotenv
@@ -56,9 +56,12 @@ def get_replicate_api_token():
 
 
 def get_vikit_api_token():
-    replicate_api_key = getenv("VIKIT_API_TOKEN", "dev")
+    replicate_api_key = getenv("VIKIT_API_TOKEN", None)
     if replicate_api_key is None:
-        raise Exception("VIKIT_API_TOKEN is not set")
+        logger.error(
+            "VIKIT_API_TOKEN is not set. If you do not have a token, get one at https://vikit.ai/#/platform and add it to your .env.secrets file. Restart and rerun the file if you are working in a Colab or Jupyter notebook."
+        )
+        exit(1)
     return replicate_api_key
 
 
