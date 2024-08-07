@@ -56,6 +56,7 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
         mp3_duration = get_media_duration(recorded_prompt_file_path)
         cat_command_args = ""
         video_length_per_subtitle = config.get_video_length_per_subtitle()
+        secondsToAdd = 0
         for i in range(0, int(mp3_duration), video_length_per_subtitle):
             # Determine the end time for the current slice
             end = (
@@ -75,9 +76,19 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
             logger.debug(f"Subtitles in subtitle extractor: {subs}")
 
             subtitle_file_path = "_".join(["subSubtitle", str(i), str(end)]) + ".srt"
+
             # Write subtitles to a temporary SRT file
-            with open(subtitle_file_path, "a") as f:
+            with open(subtitle_file_path, "w") as f:
                 f.write(subs["transcription"])
+
+            #We shift subtitles if this is not the first file
+            currentSubtitles = pysrt.open(subtitle_file_path)
+            currentSubtitles.shift(seconds=secondsToAdd)
+            currentSubtitles.save(subtitle_file_path)
+
+            #We save the new time of the last subtitle to add it to the next batch of subtitles
+            last_subtitle = currentSubtitles[-1]
+            secondsToAdd = last_subtitle.end.hours * 3600 + last_subtitle.end.minutes * 60 + last_subtitle.end.seconds
 
             # Append SRT file path to cat command arguments
             cat_command_args = " ".join([cat_command_args, subtitle_file_path])
