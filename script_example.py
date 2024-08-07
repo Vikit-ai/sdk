@@ -32,6 +32,8 @@ from vikit.video.seine_transition import SeineTransition
 from vikit.video.transition import Transition
 from vikit.video.video import VideoBuildSettings
 
+negative_prompt = "Abnormal Anatomy, Blurry faces, hands with six finger"
+
 
 @log_function_params
 def get_estimated_duration(composite: CompositeVideo) -> float:
@@ -87,9 +89,7 @@ async def batch_raw_text_based_prompting(
         ).create_prompt_from_text(prompt_content)
 
         # you can set negative prompt, for the moment it is  effective only for Haiper
-        prompt_obj.negative_prompt = (
-            "Abnormal Anatomy, Blurry faces, hands with six finger"
-        )
+        prompt_obj.negative_prompt = negative_prompt
         video_build_settings.prompt = prompt_obj
 
         video = RawTextBasedVideo(prompt_content)
@@ -151,7 +151,7 @@ async def composite_textonly_prompting(
         ml_gateway=composite_build_settings.get_ml_models_gateway()
     ).create_prompt_from_text(subtitle_total)
     # you can set negative prompt, for the moment it is  effective only for Haiper
-    prompt.negative_prompt = "Abnormal Anatomy, Blurry faces, hands with six finger"
+    prompt.negative_prompt = negative_prompt
     composite_build_settings.prompt = prompt
 
     await vid_cp_sub.build(build_settings=composite_build_settings)
@@ -362,7 +362,7 @@ async def prompt_based_composite(prompt: str, model_provider="stabilityai"):
     gw = video_build_settings.get_ml_models_gateway()
     prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(prompt)
     # you can set negative prompt, for the moment it is  effective only for Haiper
-    prompt.negative_prompt = "Abnormal Anatomy, Blurry faces, hands with six finger"
+    prompt.negative_prompt = negative_prompt
     video = PromptBasedVideo(prompt=prompt)
     await video.build(build_settings=video_build_settings)
 
