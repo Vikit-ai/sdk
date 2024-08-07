@@ -15,7 +15,6 @@
 
 import pytest
 
-
 import vikit.gateways.fake_ML_models_gateway as fake_ML_models_gateway
 
 

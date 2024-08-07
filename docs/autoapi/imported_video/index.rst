@@ -37,38 +37,30 @@ Classes
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`build <imported_video.ImportedVideo.build>`\ (build_settings)
-        - Build the video
-      * - :py:obj:`get_file_name_by_state <imported_video.ImportedVideo.get_file_name_by_state>`\ (build_settings)
-        - Get the file name of the video
       * - :py:obj:`get_title <imported_video.ImportedVideo.get_title>`\ ()
         - Returns the title of the video.
+      * - :py:obj:`prepare_build_hook <imported_video.ImportedVideo.prepare_build_hook>`\ (build_settings)
+        - Prepare the video build
 
 
    .. rubric:: Members
 
-   .. py:method:: build(build_settings: vikit.video.video.VideoBuildSettings = None)
-
-      Build the video
-
-      :param build_settings: The settings for building the video
-      :type build_settings: VideoBuildSettings
-
-      :returns: The built video
-      :rtype: ImportedVideo
-
-
-   .. py:method:: get_file_name_by_state(build_settings: vikit.video.video.VideoBuildSettings)
-
-      Get the file name of the video
-
-      :returns: The file name of the video
-      :rtype: str
-
-
    .. py:method:: get_title()
 
       Returns the title of the video.
+
+
+   .. py:method:: prepare_build_hook(build_settings: vikit.video.video_build_settings.VideoBuildSettings)
+      :async:
+
+
+      Prepare the video build
+
+      :param build_settings: The build settings
+      :type build_settings: VideoBuildSettings
+
+      :returns: The video build order
+      :rtype: list
 
 
 

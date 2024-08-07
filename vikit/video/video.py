@@ -13,29 +13,31 @@
 # limitations under the License.
 # ==============================================================================
 
-from abc import abstractmethod, ABC
 import os
+import random
 import shutil
 import uuid as uid
-import random
+from abc import ABC, abstractmethod
+import re
 
 from loguru import logger
 
-from vikit.wrappers.ffmpeg_wrapper import (
-    get_media_duration,
-    get_first_frame_as_image_ffmpeg,
-    get_last_frame_as_image_ffmpeg,
-)
-from vikit.video.video_build_settings import VideoBuildSettings
-from vikit.video.video_metadata import VideoMetadata
-from vikit.common.handler import Handler
-from vikit.video.video_file_name import VideoFileName
+from vikit.common.decorators import log_function_params
 from vikit.common.file_tools import (
-    is_valid_path,
     download_or_copy_file,
     is_valid_filename,
+    is_valid_path,
 )
+from vikit.common.handler import Handler
 from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
+from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.video.video_file_name import VideoFileName
+from vikit.video.video_metadata import VideoMetadata
+from vikit.wrappers.ffmpeg_wrapper import (
+    get_first_frame_as_image_ffmpeg,
+    get_last_frame_as_image_ffmpeg,
+    get_media_duration,
+)
 
 DEFAULT_VIDEO_TITLE = "no-title-yet"
 
@@ -44,7 +46,7 @@ class Video(ABC):
     """
     Video is a class that helps to manage video files, be it a small video to be mixed or the final one.
 
-    - it stores metadata about itself amd possibly subvideos
+    - it stores metadata about itself amd possibly sub-videos
     - Video is actually really generated when you do call the build method. This is an immutable operation, i.e. once built, you cannot rebuild or change the properties of the video object.
 
     """
@@ -159,6 +161,39 @@ class Video(ABC):
     def title(self, value):
         self.metadata.title = value
 
+    @log_function_params
+    def get_title_from_description(self, description: str = None):
+        """
+        Get the title from the description, could be the text from a prompt,
+        first subtitle from a subtitle list, whatever as long as it is text and
+        describes the video so we can infer a nice title from it
+
+        Args:
+            description (str): The description to get the title from
+
+        Returns:
+            str: The title
+        """
+        if not description:
+            return DEFAULT_VIDEO_TITLE
+
+        #  get the first and last words of the prompt
+        splitted_prompt = description.split(" ")
+        clean_title_words = [
+            re.sub(r"[^\w]", "", word)
+            for word in splitted_prompt
+            if re.sub(r"[^\w]", "", word).isalnum()
+        ]
+        if len(clean_title_words) == 0:
+            summarised_title = splitted_prompt[0]
+        elif len(clean_title_words) == 1:
+            summarised_title = clean_title_words[0]
+        else:
+            summarised_title = clean_title_words[0] + "-" + clean_title_words[-1]
+        self.metadata.title = summarised_title
+
+        return self.metadata.title
+
     @abstractmethod
     def get_title(self):
         """
@@ -264,7 +299,7 @@ class Video(ABC):
         if not self.are_build_settings_prepared:
             self.build_settings = build_settings
             self._source = type(
-                build_settings.get_ml_models_gateway()  # TODO: this is hacky anbd should be refactored
+                build_settings.get_ml_models_gateway()  # TODO: this is hacky and should be refactored
                 # so that we infer source from the different handlers (initial video generator, interpolation, etc)
             ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
 
@@ -376,7 +411,7 @@ class Video(ABC):
         Rename the video media file to the output_file_name if not already set
         as the current media file.
 
-        Todday this function only works for local files.
+        Today this function only works for local files.
 
         We fail open: in case no target file name works, we just keep the video
         as it is and where it stands. We send a warning to the logger though.
@@ -388,7 +423,7 @@ class Video(ABC):
             The video with the target file name
         """
         current_file_name = os.path.basename(self.media_url)
-        # We should already be positionned in the right target folder
+        # We should already be positioned in the right target folder
         if current_file_name != output_file_name:
             new_file_path = output_file_name
             logger.debug(
@@ -419,7 +454,7 @@ class Video(ABC):
         if not build_settings and not self.build_settings:
             raise ValueError("build_settings should be set")
 
-        infered_name = str(
+        inferred_name = str(
             VideoFileName(
                 video_type=self.short_type_name,
                 video_metadata=self.metadata,
@@ -428,7 +463,7 @@ class Video(ABC):
                 ),
             )
         )
-        return infered_name
+        return inferred_name
 
     def generate_background_music_prompt(self):
         """

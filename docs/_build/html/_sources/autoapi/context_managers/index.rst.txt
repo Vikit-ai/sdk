@@ -13,8 +13,6 @@ Overview
    :widths: auto
    :class: summarytable
 
-   * - :py:obj:`Step <context_managers.Step>`
-     - This class is a context manager to print a message with an emoji before and after a block of code
    * - :py:obj:`WorkingFolderContext <context_managers.WorkingFolderContext>`
      - This class is a context manager to change the working directory to the one specified
 
@@ -24,15 +22,7 @@ Overview
 Classes
 -------
 
-.. py:class:: Step(msg='', emoji='')
-
-   This class is a context manager to print a message with an emoji before and after a block of code
-   Maybe deprecated in the near future
-
-
-
-
-.. py:class:: WorkingFolderContext(path=None, delete_on_exit=False, mark: str = None)
+.. py:class:: WorkingFolderContext(path=None, delete_on_exit=False, mark: str = None, include_mark=True)
 
    This class is a context manager to change the working directory to the one specified
    in the constructor

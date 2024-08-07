@@ -15,23 +15,19 @@
 
 import os
 import re
-import uuid as uuid
-import sys
 import shutil
-
-import aiohttp
-import aiofiles
+import sys
 import urllib.parse
-from typing import Union, Optional
-from loguru import logger
-from urllib.request import urlopen
+from typing import Optional, Union
 from urllib.error import URLError
-from tenacity import retry, before_log, after_log, stop_after_attempt, wait_exponential
+from urllib.request import urlopen
+
+import aiofiles
+import aiohttp
+from loguru import logger
+from tenacity import retry, stop_after_attempt
 
 from vikit.common.config import get_nb_retries_http_calls
-
-
-from vikit.common.decorators import log_function_params
 
 TIMEOUT = 10  # seconds before stopping the request to check an URL exists
 
@@ -122,7 +118,6 @@ def web_url_exists(url):
         return False
 
 
-@log_function_params
 def url_exists(url: str):
     """
     Check if a URL exists somewhere on the internet or locally. To be superseded by a more
@@ -150,7 +145,7 @@ def is_valid_path(path: Optional[Union[str, os.PathLike]]) -> bool:
     """
     Check if the path is valid: could be a local path or a remote one
     (http, etc). We don't test the actual access and credentials at this stage,
-    just the path fornat.
+    just the path format.
 
     Args:
         path (str, os.PathLike): The path to validate
@@ -235,11 +230,11 @@ async def download_or_copy_file(url, local_path):
                 logger.debug(f"Downloading file from {url} to {local_path}")
                 async with session.get(url) as response:
                     if response.status == 200:
-                        # Utilisez aiofiles pour écrire le contenu de manière asynchrone
+                        # Use aiofiles to write the content asynchronously.
                         async with aiofiles.open(local_path, "wb") as f:
                             while (
                                 True
-                            ):  # Lire le contenu par morceaux pour ne pas surcharger la mémoire
+                            ):  # Read the content in chunks to avoid overloading the memory
                                 chunk = await response.content.read(1024)
                                 if not chunk:
                                     break

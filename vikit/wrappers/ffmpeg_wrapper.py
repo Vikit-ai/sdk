@@ -13,10 +13,10 @@
 # limitations under the License.
 # ==============================================================================
 
-import subprocess
-import os
-import json
 import asyncio
+import json
+import os
+import subprocess
 
 from loguru import logger
 
@@ -85,6 +85,7 @@ def get_media_duration(input_video_path):
     result.check_returncode()
     return float(float(result.stdout))
 
+
 def get_media_fps(input_video_path):
     """
     Get the frames per second of a media file.
@@ -115,10 +116,11 @@ def get_media_fps(input_video_path):
     )
     result.check_returncode()
 
-    return float(str(result.stdout).split("/")[0].replace("b'", "")) / float(str(result.stdout).split("/")[1].replace("\\n'", ""))
+    return float(str(result.stdout).split("/")[0].replace("b'", "")) / float(
+        str(result.stdout).split("/")[1].replace("\\n'", "")
+    )
 
 
-@log_function_params
 async def extract_audio_slice(
     audiofile_path: str, start: float = 0, end: float = 1, target_file_name: str = None
 ):
@@ -199,10 +201,9 @@ async def extract_audio_slice(
     return target_file_name
 
 
-@log_function_params
 async def convert_as_mp3_file(fileName, target_file_name: str):
     """
-    Save the incoming audio file to a regular mp3 file with a standardised filename
+    Save the incoming audio file to a regular mp3 file with a standardized filename
 
     Args:
 
@@ -243,7 +244,12 @@ async def convert_as_mp3_file(fileName, target_file_name: str):
 
 
 async def concatenate_videos(
-    input_file: str, target_file_name=None, ratioToMultiplyAnimations=1, bias=0.33, fps=16, max_fps=16
+    input_file: str,
+    target_file_name=None,
+    ratioToMultiplyAnimations=1,
+    bias=0.33,
+    fps=16,
+    max_fps=16,
 ):
     """
     Concatenate all the videos in the list using a concatenation file
@@ -266,25 +272,45 @@ async def concatenate_videos(
             f"Ratio to multiply animations should be greater than 0. Got {ratioToMultiplyAnimations}"
         )
 
-    logger.debug("Merge with ffmpeg command: ffmpeg" + " " + 
-        "-y" + " " + 
-        "-f" + " " + 
-        "concat" + " " + 
-        "-safe" + " " + 
-        "0" + " " + 
-        "-i" + " " + 
-        input_file + " " + 
-        "-vf" + " " + 
-        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB+ STARTPTS,fps={fps}"  + " " + 
-        "-c:v"  + " " + 
-        "libx264" + " " + 
-        "-crf" + " " + 
-        "23" + " " + 
-        "-c:a" + " " + 
-        "aac" + " " + 
-        "-b:a" + " " + 
-        "192k" + " " + 
-        target_file_name)
+    logger.debug(
+        "Merge with ffmpeg command: ffmpeg"
+        + " "
+        + "-y"
+        + " "
+        + "-f"
+        + " "
+        + "concat"
+        + " "
+        + "-safe"
+        + " "
+        + "0"
+        + " "
+        + "-i"
+        + " "
+        + input_file
+        + " "
+        + "-vf"
+        + " "
+        + f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB+ STARTPTS,fps={fps}"
+        + " "
+        + "-c:v"
+        + " "
+        + "libx264"
+        + " "
+        + "-crf"
+        + " "
+        + "23"
+        + " "
+        + "-c:a"
+        + " "
+        + "aac"
+        + " "
+        + "-b:a"
+        + " "
+        + "192k"
+        + " "
+        + target_file_name
+    )
 
     # Build the ffmpeg command
     process = await asyncio.create_subprocess_exec(
@@ -297,7 +323,7 @@ async def concatenate_videos(
         "-i",
         input_file,
         "-vf",
-        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB + STARTPTS,fps={fps}", #
+        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB + STARTPTS,fps={fps}",  #
         "-c:v",
         "libx264",
         "-crf",
@@ -378,7 +404,7 @@ async def _merge_audio_and_video_with_existing_audio(
     target_file_name=None,
 ):
     """
-    Merge audio with the video in the case where video already has at least oneaudio track, typically
+    Merge audio with the video in the case where video already has at least one audio track, typically
     when the video is imported / already existing
 
     Args:
@@ -400,7 +426,7 @@ async def _merge_audio_and_video_with_existing_audio(
         "-i",
         media_url,
         "-filter_complex",
-        f"[0:a]apad,loudnorm,volume={audio_file_relative_volume}[A];[1:a][A]amerge[out]",
+        f"[0:a]apad,loudnorm,volume={audio_file_relative_volume},aformat=sample_fmts=u8|s16:channel_layouts=stereo[A];[1:a][A]amerge[out]",
         "-map",
         "1:v",
         "-c:v",
@@ -420,8 +446,8 @@ async def _merge_audio_and_video_with_existing_audio(
         "-ac",
         "2",  # This tells FFmpeg to use 2 audio channels.
         target_file_name,
-        stdout=asyncio.subprocess.PIPE,  # Capture la sortie standard
-        stderr=asyncio.subprocess.PIPE,  # Capture la sortie d'erreur
+        stdout=asyncio.subprocess.PIPE,  # Capture the error output
+        stderr=asyncio.subprocess.PIPE,  # Capture the error output
     )
     stdout, stderr = await process.communicate()
     if process.returncode != 0:
@@ -451,7 +477,7 @@ async def _merge_audio_and_video_without_audio_track(
 ):
     """
     Merge audio with the video in the case where video has no audio track, typically
-    when generated out of a video genration ML Model
+    when generated out of a video generation ML Model
 
     Args:
         media_url (str): The media url to merge
@@ -524,9 +550,8 @@ async def reencode_video(video_url, target_video_name=None):
     with generated ones or among themselves
 
     Args:
-        params (tuple): The parameters to reencode the video
-        video,
-        video.media_url
+        video_url (str): The video url to reencode
+        target_video_name (str): The target video name
 
     Returns:
         Video: The reencoded video
@@ -594,10 +619,10 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
         "-i",
         media_url,
         "-vf",
-        "select=eq(n\\,0)",  # c'est un filtre vidéo qui sélectionne les frames à extraire. eq(n\,0)
-        # signifie qu'il sélectionne la frame où n (le numéro de la frame) est égal à 0, c'est-à-dire la première frame
-        "-vframes",  # spécifie le nombre de frames vidéo à sortir
-        "1",  # on veut une seule frame
+        "select=eq(n\\,0)",  # It is a video filter that selects the frames to extract
+        #  eq(n\\,0) means it selects the frame where n (the frame number) is equal to 0, in other word, the first frame.
+        "-vframes",  # Specifies the number of video frames to output.
+        "1",  # We want one single frame
         target_path,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
@@ -632,13 +657,13 @@ async def get_last_frame_as_image_ffmpeg(media_url, target_path=None):
 
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
-        "-sseof",  # spécifie qu'il doit commencer à x secondes de la fin du fichier.
-        "-3",  # on veut les 3 dernières secondes
+        "-sseof",  # Specifies that it should start x seconds from the end of the file
+        "-3",  # We want the last 3 seconds.
         "-i",
         media_url,
-        "-update",  # signifie qu'il doit mettre à jour l'image de sortie si x nouvelle frame est disponible.
-        "1",  # on veut une seule frame
-        "-q:v",  # -q:v 1 spécifie la qualité de l'image de sortie (1 étant la meilleure qualité).
+        "-update",  # Means that it should update the output image if a new frame is available
+        "1",  # We want one single frame
+        "-q:v",  # -q:v 1  specifies the quality of the output image (1 being the best quality).
         "1",
         target_path,
         stdout=asyncio.subprocess.PIPE,

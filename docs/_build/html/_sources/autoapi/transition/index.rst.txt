@@ -17,24 +17,6 @@ Overview
      - Base class for transitions between videos.
 
 
-.. list-table:: Function
-   :header-rows: 0
-   :widths: auto
-   :class: summarytable
-
-   * - :py:obj:`url_exists <transition.url_exists>`\ (url)
-     - Check if a URL exists somewhere on the internet or locally
-   * - :py:obj:`web_url_exists <transition.web_url_exists>`\ (url)
-     - Check if a URL exists on the web
-
-
-.. list-table:: Attributes
-   :header-rows: 0
-   :widths: auto
-   :class: summarytable
-
-   * - :py:obj:`TIMEOUT <transition.TIMEOUT>`
-     - \-
 
 
 Classes
@@ -55,53 +37,25 @@ Classes
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`build <transition.Transition.build>`\ (build_settings)
-        - \-
-      * - :py:obj:`get_file_name_by_state <transition.Transition.get_file_name_by_state>`\ (build_settings)
-        - Get the file name of the video
+      * - :py:obj:`generate_background_music_prompt <transition.Transition.generate_background_music_prompt>`\ ()
+        - Get the background music prompt from the source and target videos.
       * - :py:obj:`get_title <transition.Transition.get_title>`\ ()
         - \-
 
 
    .. rubric:: Members
 
-   .. py:method:: build(build_settings: vikit.video.video_build_settings.VideoBuildSettings = None)
+   .. py:method:: generate_background_music_prompt()
 
-   .. py:method:: get_file_name_by_state(build_settings: vikit.video.video_build_settings.VideoBuildSettings)
+      Get the background music prompt from the source and target videos.
 
-      Get the file name of the video
-
-      :returns: The file name of the video
+      :returns: The background music prompt
       :rtype: str
 
 
    .. py:method:: get_title()
 
 
-
-Functions
----------
-.. py:function:: url_exists(url: str)
-
-   Check if a URL exists somewhere on the internet or locally
-
-   :param url: The URL to check
-   :type url: str
-
-   :returns: True if the URL exists, False otherwise
-   :rtype: bool
-
-
-.. py:function:: web_url_exists(url)
-
-   Check if a URL exists on the web
-
-
-
-Attributes
-----------
-.. py:data:: TIMEOUT
-   :value: 5
 
 
 

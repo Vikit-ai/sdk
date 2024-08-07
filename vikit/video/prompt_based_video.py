@@ -14,18 +14,18 @@
 # ==============================================================================
 
 import os
+import re
 
 import pysrt
 from loguru import logger
 
-from vikit.video.video import VideoBuildSettings
-from vikit.video.composite_video import CompositeVideo
 from vikit.prompt.prompt import Prompt
-from vikit.video.raw_text_based_video import RawTextBasedVideo
-from vikit.video.seine_transition import SeineTransition
-from vikit.video.video_types import VideoType
-from vikit.prompt.prompt_factory import PromptFactory
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
+from vikit.prompt.prompt_factory import PromptFactory
+from vikit.video.composite_video import CompositeVideo
+from vikit.video.raw_text_based_video import RawTextBasedVideo
+from vikit.video.video import VideoBuildSettings
+from vikit.video.video_types import VideoType
 
 
 class PromptBasedVideo(CompositeVideo):
@@ -57,21 +57,9 @@ class PromptBasedVideo(CompositeVideo):
         return str(VideoType.PRMPTBASD)
 
     def get_title(self):
-        """
-        Title of the prompt based video, generated from an LLM. If not available, we generate it from the prompt
-        """
-        if not self.metadata.title:
-            # backup plan: If no title existing yet (should be generated straight from an LLM)
-            # then get the first and last words of the prompt
-            splitted_prompt = self._prompt.subtitles[0].text.split(" ")
-            clean_title_words = [word for word in splitted_prompt if word.isalnum()]
-            if len(clean_title_words) == 1:
-                summarised_title = clean_title_words[0]
-            else:
-                summarised_title = clean_title_words[0] + "-" + clean_title_words[-1]
-            self.metadata.title = summarised_title
-
-        return self.metadata.title
+        return self.get_title_from_description(
+            description=self._prompt.subtitles[0].text
+        )
 
     async def prepare_build(self, build_settings=VideoBuildSettings()):
         """
@@ -83,7 +71,7 @@ class PromptBasedVideo(CompositeVideo):
         Returns:
             The current instance
         """
-        super().prepare_build(build_settings=build_settings)
+        await super().prepare_build(build_settings=build_settings)
         return await self.compose(build_settings=build_settings)
 
     async def compose(self, build_settings: VideoBuildSettings):
@@ -108,16 +96,13 @@ class PromptBasedVideo(CompositeVideo):
             (
                 keyword_based_vid,
                 prompt_based_vid,
-                transit,
             ) = await self._prepare_basic_building_block(sub, build_stgs=build_settings)
 
             vid_cp_sub.append_video(keyword_based_vid).append_video(
-                transit
-            ).append_video(
                 prompt_based_vid
             )  # Building a set of 2 videos around the same text + a transition
 
-            self.append_video(vid_cp_sub)  # Adding the comnposite to the overall video
+            self.append_video(vid_cp_sub)  # Adding the composite to the overall video
 
         return self
 
@@ -128,7 +113,6 @@ class PromptBasedVideo(CompositeVideo):
         build the basic building block of the full video/
         - One RawTextBasedVideo from the keyword
         - One RawTextBasedVideo from the prompt
-        - One SeineTransition between the two
 
         Calling prepare_build allows for injecting dedicated build settings for each video
         and not the default on from the parent composite
@@ -140,7 +124,6 @@ class PromptBasedVideo(CompositeVideo):
         Returns:
             - keyword_based_vid: the video generated from the keyword
             - prompt_based_vid: the video generated from the prompt
-            - transit: the transition between the two
         """
 
         prompt_fact = PromptFactory(
@@ -187,9 +170,4 @@ class PromptBasedVideo(CompositeVideo):
         assert keyword_based_vid is not None, "keyword_based_vid cannot be None"
         assert prompt_based_vid is not None, "prompt_based_vid cannot be None"
 
-        transit = SeineTransition(
-            source_video=keyword_based_vid,
-            target_video=prompt_based_vid,
-        )
-
-        return keyword_based_vid, prompt_based_vid, transit
+        return keyword_based_vid, prompt_based_vid

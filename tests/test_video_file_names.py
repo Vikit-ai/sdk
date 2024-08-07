@@ -13,18 +13,17 @@
 # limitations under the License.
 # ==============================================================================
 
+import datetime
 import random
+import warnings
+
 import pytest
 
-import warnings
-import datetime
-
 from vikit.common.context_managers import WorkingFolderContext
-
+from vikit.video.composite_video import CompositeVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_file_name import VideoFileName
-from vikit.video.composite_video import CompositeVideo
 from vikit.video.video_metadata import VideoMetadata
 
 

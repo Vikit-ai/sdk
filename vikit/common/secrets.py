@@ -27,11 +27,18 @@ else:
     load_dotenv(dotenv_path=env_file)
 
 
-def get_sendinblue_api_key():
-    sendinblue_api_key = getenv("SENDINBLUE_API_KEY", "dev")
-    if sendinblue_api_key is None:
-        raise Exception("SENDINBLUE_API_KEY is not set")
-    return sendinblue_api_key
+def get_app_analytics_api_key() -> str:
+    app_analytics_api_key = getenv("VIKIT_APP_ANALYTICS_PROJECT_ID", None)
+    if app_analytics_api_key is None:
+        raise Exception("VIKIT_APP_ANALYTICS_PROJECT_ID is not set")
+    return app_analytics_api_key
+
+
+def get_telemetry_api_key() -> str:
+    telemetry_key = getenv("VIKIT_TELEMETRY_API_TOKEN", None)
+    if telemetry_key is None:
+        raise Exception("VIKIT_TELEMETRY_API_TOKEN is not set")
+    return telemetry_key
 
 
 def get_openai_whisper_api_key():
@@ -61,12 +68,6 @@ def get_eleven_labs_api_key():
         raise Exception("ELEVEN_LABS_KEY is not set")
     return eleven_labs_api_key
 
-
-def get_discord_api_key():
-    discord_api_key = getenv("DISCORD_API_KEY", "dev")
-    if discord_api_key is None:
-        raise Exception("DISCORD_API_KEY is not set")
-    return discord_api_key
 
 def has_eleven_labs_api_key():
     eleven_labs_api_key = getenv("ELEVEN_LABS_KEY", "dev")

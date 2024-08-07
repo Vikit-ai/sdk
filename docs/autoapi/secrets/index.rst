@@ -14,7 +14,7 @@ Overview
    :widths: auto
    :class: summarytable
 
-   * - :py:obj:`get_discord_api_key <secrets.get_discord_api_key>`\ ()
+   * - :py:obj:`get_app_analytics_api_key <secrets.get_app_analytics_api_key>`\ ()
      - \-
    * - :py:obj:`get_eleven_labs_api_key <secrets.get_eleven_labs_api_key>`\ ()
      - \-
@@ -22,9 +22,11 @@ Overview
      - \-
    * - :py:obj:`get_replicate_api_token <secrets.get_replicate_api_token>`\ ()
      - \-
-   * - :py:obj:`get_sendinblue_api_key <secrets.get_sendinblue_api_key>`\ ()
+   * - :py:obj:`get_telemetry_api_key <secrets.get_telemetry_api_key>`\ ()
      - \-
    * - :py:obj:`get_vikit_api_token <secrets.get_vikit_api_token>`\ ()
+     - \-
+   * - :py:obj:`has_eleven_labs_api_key <secrets.has_eleven_labs_api_key>`\ ()
      - \-
 
 
@@ -42,7 +44,7 @@ Overview
 
 Functions
 ---------
-.. py:function:: get_discord_api_key()
+.. py:function:: get_app_analytics_api_key() -> str
 
 .. py:function:: get_eleven_labs_api_key()
 
@@ -50,9 +52,11 @@ Functions
 
 .. py:function:: get_replicate_api_token()
 
-.. py:function:: get_sendinblue_api_key()
+.. py:function:: get_telemetry_api_key() -> str
 
 .. py:function:: get_vikit_api_token()
+
+.. py:function:: has_eleven_labs_api_key()
 
 
 Attributes

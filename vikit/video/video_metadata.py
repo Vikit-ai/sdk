@@ -68,7 +68,7 @@ class VideoMetadata:
         self.is_interpolated = is_interpolated
         self.bg_music_applied = is_bg_music_applied
         self.is_subtitle_audio_applied = is_subtitle_audio_applied
-        self.is_bg_music_generated = is_bg_music_generated  # if not using gnerated we infer the default bg music is used
+        self.is_bg_music_generated = is_bg_music_generated  # if not using generated we infer the default bg music is used
         self.is_default_bg_music_applied = is_default_bg_music_applied
         self.is_prompt_read_aloud = is_prompt_read_aloud
         self.media_url = media_url

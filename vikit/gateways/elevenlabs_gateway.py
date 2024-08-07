@@ -13,10 +13,9 @@
 # limitations under the License.
 # ==============================================================================
 
-from loguru import logger
-
-import aiohttp
 import aiofiles
+import aiohttp
+from loguru import logger
 
 from vikit.common.config import get_elevenLabs_url
 from vikit.common.secrets import get_eleven_labs_api_key
@@ -46,6 +45,6 @@ async def generate_mp3_from_text_async(text, target_file):
                     async for chunk in response.content.iter_chunked(CHUNK_SIZE):
                         if chunk:
                             await f.write(chunk)
-                    logger.debug("mp3 sucessfully written")
+                    logger.debug("mp3 successfully written")
             else:
                 logger.error(f"Failed to fetch audio: {response.status}")

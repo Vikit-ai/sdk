@@ -14,17 +14,17 @@
 # ==============================================================================
 
 import warnings
+
 import pytest
 from loguru import logger
 
-from vikit.prompt.prompt_factory import PromptFactory
 import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
-from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.common.context_managers import WorkingFolderContext
-
+from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
+from vikit.prompt.prompt_factory import PromptFactory
 
 SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in an abandoned forest, revealing intricate carvings
-and symbols. This is additional text to make sure we generate serveral subtitles. """
+and symbols. This is additional text to make sure we generate several subtitles. """
 
 
 class TestReplicateWrapper:

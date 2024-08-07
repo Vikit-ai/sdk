@@ -17,16 +17,14 @@ import os
 
 from loguru import logger
 
-from vikit.video.video_build_settings import VideoBuildSettings
-from vikit.video.video import Video
-from vikit.video.video_types import VideoType
-from vikit.video.building.handlers.videogen_handler import (
-    VideoGenHandler,
-)
+from vikit.common.handler import Handler
 from vikit.video.building.handlers.interpolation_handler import (
     VideoInterpolationHandler,
 )
-from vikit.common.handler import Handler
+from vikit.video.building.handlers.videogen_handler import VideoGenHandler
+from vikit.video.video import Video
+from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.video.video_types import VideoType
 
 
 class RawTextBasedVideo(Video):
@@ -80,21 +78,7 @@ class RawTextBasedVideo(Video):
         return str(VideoType.RAWTEXT)
 
     def get_title(self):
-        if self._title:
-            return self._title
-        else:
-            # If no title existing yet (should be generated straight from an LLM)
-            # then get the first and last words of the prompt
-            splitted_prompt = self.text.split(" ")
-            clean_title_words = [word for word in splitted_prompt if word.isalnum()]
-            if len(clean_title_words) == 1:
-                summarised_title = clean_title_words[0]
-            else:
-                summarised_title = clean_title_words[0] + "-" + clean_title_words[-1]
-
-            # Add a unique identifier suffix to prevent several videos having the same title in a composite down the road
-            self._title = summarised_title
-            return self._title
+        return self.get_title_from_description(description=self.text)
 
     def run_build_core_logic_hook(self, build_settings: VideoBuildSettings):
         return super().run_build_core_logic_hook(build_settings)

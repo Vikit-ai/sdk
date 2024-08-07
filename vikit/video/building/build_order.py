@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 from loguru import logger
 
@@ -41,7 +41,7 @@ def get_lazy_dependency_chain_build_order(
     Get the first videos first build order
 
     Here we generate the video in a lazy way, starting from the leaf composite and
-    going up to the root composite as depency resolution is done
+    going up to the root composite as dependency resolution is done
 
     So this is a width traversal of the video tree, but we go down the dependency chain too
 
@@ -53,7 +53,7 @@ def get_lazy_dependency_chain_build_order(
     Returns:
         list: The build order
     """
-    logger.debug(f"video_tree len is {len(video_tree)}")
+    logger.trace(f"video_tree len is {len(video_tree)}")
     if len(video_tree) == 1:
         logger.debug(
             f"video_tree single object is  {video_tree[0].id} and type is {type(video_tree[0])}"

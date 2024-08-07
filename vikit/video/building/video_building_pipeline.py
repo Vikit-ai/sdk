@@ -15,13 +15,8 @@
 
 from loguru import logger
 
-from vikit.video.video_build_settings import VideoBuildSettings
-
 from vikit.video.building.handlers.default_bg_music_and_audio_merging_handler import (
     DefaultBGMusicAndAudioMergingHandler,
-)
-from vikit.video.building.handlers.use_prompt_audio_track_and_audio_merging_handler import (
-    UsePromptAudioTrackAndAudioMergingHandler,
 )
 from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handler import (
     ReadAloudPromptAudioMergingHandler,
@@ -29,9 +24,13 @@ from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handl
 from vikit.video.building.handlers.generate_music_and_merge_handler import (
     GenerateMusicAndMergeHandler,
 )
+from vikit.video.building.handlers.use_prompt_audio_track_and_audio_merging_handler import (
+    UsePromptAudioTrackAndAudioMergingHandler,
+)
 from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
+from vikit.video.video_build_settings import VideoBuildSettings
 
 
 class VideoBuildingPipeline:
@@ -45,7 +44,7 @@ class VideoBuildingPipeline:
         """
         handlers = []
 
-        # Special case here: the video used for testing should always be reencoded as coming from hetegenous sources
+        # Special case here: the video used for testing should always be reencoded as coming from heterogenous sources
         if video.build_settings.test_mode:
             video._needs_video_reencoding = True
 
@@ -87,7 +86,7 @@ class VideoBuildingPipeline:
 
             if not bg_music_text_prompt or bg_music_text_prompt == "":
                 logger.warning(
-                    "No text prompt could be used or infered for background music generation, using arbitrary text prompt for background music generation"
+                    "No text prompt could be used or inferred for background music generation, using arbitrary text prompt for background music generation"
                 )
                 bg_music_text_prompt = "generate a nice chill electro background music"
 

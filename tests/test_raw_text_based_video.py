@@ -19,9 +19,9 @@ import warnings
 import pytest
 from loguru import logger
 
-from vikit.video.video import VideoBuildSettings
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.video.raw_text_based_video import RawTextBasedVideo
+from vikit.video.video import VideoBuildSettings
 
 logger.add("log_test_raw_text_based_video.txt", rotation="10 MB")
 warnings.simplefilter("ignore", category=ResourceWarning)
@@ -38,7 +38,7 @@ class TestRawTextBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life(
+    async def test_create_video_mix_with_preexsiting_video_bin_default_bkg_music_subtitles_tired_life(
         self,
     ):
         with WorkingFolderContext():

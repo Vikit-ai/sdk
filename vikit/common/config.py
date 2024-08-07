@@ -14,10 +14,10 @@
 # ==============================================================================
 
 import os
-from os import path
-from dotenv import load_dotenv
 from concurrent.futures import ProcessPoolExecutor
+from os import path
 
+from dotenv import load_dotenv
 from loguru import logger
 
 # Get the absolute path to the directory this file is in.
@@ -48,10 +48,10 @@ def get_elevenLabs_url() -> str:
 
 
 def get_videho_email_contact() -> str:
-    videoho_email = os.getenv("VIDEHO_EMAIL_CONTACT", None)
-    if videoho_email is None:
+    videho_email = os.getenv("VIDEHO_EMAIL_CONTACT", None)
+    if videho_email is None:
         raise Exception("VIDEHO_EMAIL_CONTACT is not set")
-    return videoho_email
+    return videho_email
 
 
 def get_nb_retries_http_calls() -> int:
@@ -81,24 +81,10 @@ def get_subtitles_min_duration() -> int:
     return int(subtitles_min_duration)
 
 
-def get_nb_words_per_subtitle() -> int:
-    nb_words_per_subtitle = os.getenv("NB_WORDS_PER_SUBTITLE", 15)
-    if nb_words_per_subtitle is None:
-        raise Exception("NB_WORDS_PER_SUBTITLE is not set")
-    return int(nb_words_per_subtitle)
-
-
-def get_seconds_per_word() -> float:
-    nb_seconds_per_words = os.getenv("NB_SECONDS_PER_WORDS", 0.5)
-    if nb_seconds_per_words is None:
-        raise Exception("NB_SECONDS_PER_WORDS is not set")
-    return float(nb_seconds_per_words)
-
-
 def get_video_length_per_subtitle() -> int:
     """
     The length of the video generated for each subtitle is currently directly
-    linked to the maximum anmount of time allowed by videcrafter
+    linked to the maximum amount of time allowed by videocrafter
     """
     video_length_per_subtitle = os.getenv("STEPS", 300)
     if video_length_per_subtitle is None:
@@ -139,6 +125,16 @@ def get_cleanup_tempfiles() -> bool:
     return bool(cleanup_tempfiles)
 
 
+def get_test_mode() -> bool:
+    """
+    Are we using the real Vikit Gateway or a fake one for local_integration tests
+    """
+    test_mode = os.getenv("TEST_MODE", False)
+    if test_mode is None:
+        raise Exception("TEST_MODE is not set")
+    return bool(test_mode)
+
+
 def get_sub_audio_for_subtitle_prefix():
     """
     The prefix for the file name of the audio file that will be used for the subtitles video
@@ -169,34 +165,3 @@ def get_video_list_file_name():
     if video_list_file_name is None:
         raise Exception("VIDEO_LIST_FILE_NAME is not set")
     return video_list_file_name
-
-
-def get_cloud_bucket_url():
-    """
-    The cloud storage bucket where final videos are stored
-    """
-    cloud_bucket_url = os.getenv("CLOUD_BUCKET_URL", None)
-    if cloud_bucket_url is None:
-        raise Exception("CLOUD_BUCKET_URL is not set")
-    return cloud_bucket_url
-
-
-class singletons:
-    """
-    A class to hold singletons
-    """
-
-    def __init__(self):
-        pass
-
-    _process_pool_executor = None
-
-    @staticmethod
-    def get_process_executor():
-        """
-        The process executor to use for parallel processing
-        """
-        if not singletons._process_pool_executor:
-            singletons._process_pool_executor = ProcessPoolExecutor()
-
-        return singletons._process_pool_executor

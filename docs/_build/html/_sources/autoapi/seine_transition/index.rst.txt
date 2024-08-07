@@ -35,21 +35,22 @@ Classes
       :widths: auto
       :class: summarytable
 
-      * - :py:obj:`build <seine_transition.SeineTransition.build>`\ (build_settings)
-        - Apply the Seine transition between the source and target video
+      * - :py:obj:`get_core_handlers <seine_transition.SeineTransition.get_core_handlers>`\ (build_settings)
+        - Get the handler chain of the video.
 
 
    .. rubric:: Members
 
-   .. py:method:: build(build_settings: vikit.video.video.VideoBuildSettings = None) -> vikit.video.transition.Transition
+   .. py:method:: get_core_handlers(build_settings: vikit.video.video.VideoBuildSettings) -> list[vikit.common.handler.Handler]
 
-      Apply the Seine transition between the source and target video
+      Get the handler chain of the video.
+      Defining the handler chain is the main way to define how the video is built
+      so it is up to the child classes to implement this method
 
-      :param build_settings: The settings for building the video
-      :type build_settings: VideoBuildSettings
+      At this stage, we should already have the enhanced prompt and title for this video
 
-      :returns: The path to the generated transition video
-      :rtype: str
+      :returns: The list of handlers to use for building the video
+      :rtype: list
 
 
 

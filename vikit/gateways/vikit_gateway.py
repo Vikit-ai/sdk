@@ -13,38 +13,38 @@
 # limitations under the License.
 # ==============================================================================
 
-import os
 import asyncio
-import aiohttp
 import base64
+import io
 import json
+import os
 import subprocess
+import time
 import uuid as uid
 
+import aiohttp
+from loguru import logger
+from PIL import Image
 from tenacity import (
-    retry,
-    before_log,
+    AsyncRetrying,
     after_log,
-    retry_if_exception_type,
+    before_log,
+    retry,
     stop_after_attempt,
     wait_exponential,
-    AsyncRetrying,
 )
-from loguru import logger
-from vikit.common.file_tools import download_or_copy_file
-from vikit.common.decorators import log_function_params
-from vikit.gateways.ML_models_gateway import MLModelsGateway
-from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
-from vikit.common.secrets import get_replicate_api_token, get_vikit_api_token
+
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
 from vikit.common.config import get_nb_retries_http_calls
-from vikit.common.secrets import has_eleven_labs_api_key
+from vikit.common.file_tools import download_or_copy_file
+from vikit.common.secrets import (
+    get_replicate_api_token,
+    get_vikit_api_token,
+    has_eleven_labs_api_key,
+)
+from vikit.gateways.ML_models_gateway import MLModelsGateway
+from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
-
-import io
-from PIL import Image
-
-import time
 
 os.environ["REPLICATE_API_TOKEN"] = get_replicate_api_token()
 vikit_api_key = get_vikit_api_token()
@@ -81,7 +81,9 @@ class VikitGateway(MLModelsGateway):
         await elevenlabs_gateway.generate_mp3_from_text_async(
             text=prompt_text, target_file=target_file
         )
-        assert os.path.exists(target_file), "The generated audio file does not exists"
+        assert os.path.exists(
+            target_file
+        ), f"The generated audio file does not exists: {target_file}"
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     async def generate_mp3_from_text_async(
@@ -116,7 +118,6 @@ class VikitGateway(MLModelsGateway):
             await convert_as_mp3_file("temp.wav", target_file)
             return response
 
-    @log_function_params
     async def generate_background_music_async(
         self, duration: int = 3, prompt: str = None
     ) -> str:
@@ -175,7 +176,6 @@ class VikitGateway(MLModelsGateway):
 
         return lowered_music_filename
 
-    @log_function_params
     async def generate_seine_transition_async(
         self, source_image_path, target_image_path
     ):
@@ -251,7 +251,7 @@ class VikitGateway(MLModelsGateway):
                         )
                     else:
                         return response
-        except e:
+        except Exception as e:
             raise Exception("Retry failed {e}")
 
     @retry(
@@ -260,7 +260,6 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
-    @log_function_params
     async def compose_music_from_text_async(self, prompt_text: str, duration: int):
         """
         Compose a music for a prompt text
@@ -319,7 +318,6 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("TRACE").no),
         after=after_log(logger, logger.level("TRACE").no),
     )
-    @log_function_params
     async def get_music_generation_keywords_async(self, text) -> str:
         """
         Generate keywords from a text using the Replicate API
@@ -335,7 +333,7 @@ class VikitGateway(MLModelsGateway):
         """
 
         if text is None:
-            text = "finaly there is no prompt so just unleash your own imagination"
+            text = "finally there is no prompt so just unleash your own imagination"
 
         async with aiohttp.ClientSession(timeout=http_timeout) as session:
             payload = {
@@ -371,7 +369,6 @@ class VikitGateway(MLModelsGateway):
         before=before_log(logger, logger.level("DEBUG").no),
         after=after_log(logger, logger.level("DEBUG").no),
     )
-    @log_function_params
     async def interpolate_async(self, video):
         """
         Run some interpolation magic. This model may fail after timeout, so you
@@ -412,7 +409,6 @@ class VikitGateway(MLModelsGateway):
         return output
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    @log_function_params
     async def get_keywords_from_prompt_async(
         self, subtitleText, excluded_words: str = None
     ):
@@ -469,7 +465,6 @@ class VikitGateway(MLModelsGateway):
         return clean_result, title_from_keywords_as_tokens
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    @log_function_params
     async def get_enhanced_prompt_async(self, subtitleText):
         """
         Generates an enhanced prompt from an original one, probably written by a user or
@@ -510,7 +505,6 @@ class VikitGateway(MLModelsGateway):
         # Transform the list of keywords into a single string, we do keep the final title within
         return clean_result, title_from_keywords_as_tokens
 
-    @log_function_params
     async def get_subtitles_async(self, audiofile_path):
         # Obtain subtitles using Replicate API
         """
@@ -570,7 +564,7 @@ class VikitGateway(MLModelsGateway):
 
                     logger.trace(f"Subtitles: {subs}")
                     return json.loads(subs)
-        except e:
+        except Exception as e:
             raise Exception("Retry failed {e}")
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
@@ -597,6 +591,8 @@ class VikitGateway(MLModelsGateway):
             return await self.generate_video_haiper_async(prompt)
         elif model_provider == "videocrafter":
             return await self.generate_video_VideoCrafter2_async(prompt)
+        elif model_provider == "dynamicrafter":
+            return await self.generate_video_DynamiCrafter_image_async(prompt)
         elif model_provider == "stabilityai_image":
             return await self.generate_video_from_image_stabilityai_async(prompt)
 
@@ -636,7 +632,7 @@ class VikitGateway(MLModelsGateway):
                 # Convert result to Base64
                 buffer = io.BytesIO()
                 output = json.loads(output)
-                logger.debug(f"Output: {output.keys()}")
+                logger.trace(f"Output: {output.keys()}")
                 if "error" in output.keys():
                     err = output["error"]
                     logger.debug(f"Error: {err}")
@@ -744,6 +740,39 @@ class VikitGateway(MLModelsGateway):
         return output
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    async def generate_video_DynamiCrafter_image_async(self, prompt: str):
+        """
+        Generate a video from the given prompt
+
+        Args:
+            prompt: The prompt to generate the video from
+
+        returns:
+                The link to the generated video
+        """
+        logger.debug(f"Generating video from prompt: {prompt.text[:50]}")
+        async with aiohttp.ClientSession(timeout=http_timeout) as session:
+            payload = {
+                "key": vikit_api_key,
+                "model": "camenduru/dynami-crafter-576x1024:e79ff8d01e81cbd90acfa1df4f209f637da2c68307891d77a6e4227f4ec350f1",
+                "input": {
+                    "i2v_eta": 1,
+                    "i2v_seed": 123,
+                    "i2v_steps": 50,
+                    "i2v_motion": 4,
+                    "i2v_cfg_scale": 7.5,
+                    "i2v_input_text": prompt.text,
+                    "i2v_input_image": "data:image/jpg;base64," + prompt.image,
+                },
+            }
+            async with session.post(vikit_backend_url, json=payload) as response:
+                output = await response.text()
+
+        if not output.startswith("http"):
+            raise AttributeError("The result Videocrafter video link is not a link")
+        return output
+
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     async def generate_video_from_image_stabilityai_async(self, prompt: str):
         """
         Generate a video from the given image prompt
@@ -757,11 +786,12 @@ class VikitGateway(MLModelsGateway):
 
         # TO DO: include camera motion parameters
         output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
-        logger.debug(f"Generating video from image prompt {prompt.title} ")
+        logger.debug(f"Generating video from image prompt {prompt.text} ")
         async with aiohttp.ClientSession() as session:
             logger.debug("Resizing image for video generator")
             # Convert result to Base64
-            image_data = base64.b64decode(prompt)
+            image_data = base64.b64decode(prompt.image)
+
             image = Image.open(io.BytesIO(image_data))
             target_size = (1024, 576)
 

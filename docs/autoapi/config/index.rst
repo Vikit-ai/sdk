@@ -8,12 +8,22 @@ config
 Overview
 --------
 
+.. list-table:: Classes
+   :header-rows: 0
+   :widths: auto
+   :class: summarytable
+
+   * - :py:obj:`singletons <config.singletons>`
+     - A class to hold singletons
+
 
 .. list-table:: Function
    :header-rows: 0
    :widths: auto
    :class: summarytable
 
+   * - :py:obj:`get_app_analytics_endpoint <config.get_app_analytics_endpoint>`\ ()
+     - \-
    * - :py:obj:`get_cleanup_tempfiles <config.get_cleanup_tempfiles>`\ ()
      - Whether to cleanup temporary files or not. By default we set it to False
    * - :py:obj:`get_cloud_bucket_url <config.get_cloud_bucket_url>`\ ()
@@ -40,12 +50,18 @@ Overview
      - The default name used to save the subtitles file in the working directory
    * - :py:obj:`get_subtitles_min_duration <config.get_subtitles_min_duration>`\ ()
      - \-
+   * - :py:obj:`get_telemetry_endpoint <config.get_telemetry_endpoint>`\ ()
+     - \-
    * - :py:obj:`get_videho_email_contact <config.get_videho_email_contact>`\ ()
      - \-
    * - :py:obj:`get_video_length_per_subtitle <config.get_video_length_per_subtitle>`\ ()
      - The length of the video generated for each subtitle is currently directly
    * - :py:obj:`get_video_list_file_name <config.get_video_list_file_name>`\ ()
      - The file name of the list of videos files to mix with ffmpeg
+   * - :py:obj:`use_app_analytics <config.use_app_analytics>`\ ()
+     - \-
+   * - :py:obj:`use_telemetry <config.use_telemetry>`\ ()
+     - \-
 
 
 .. list-table:: Attributes
@@ -59,9 +75,41 @@ Overview
      - \-
 
 
+Classes
+-------
+
+.. py:class:: singletons
+
+   A class to hold singletons
+
+
+   .. rubric:: Overview
+
+
+   .. list-table:: Methods
+      :header-rows: 0
+      :widths: auto
+      :class: summarytable
+
+      * - :py:obj:`get_process_executor <config.singletons.get_process_executor>`\ ()
+        - :summarylabel:`static` The process executor to use for parallel processing
+
+
+   .. rubric:: Members
+
+   .. py:method:: get_process_executor()
+      :staticmethod:
+
+
+      The process executor to use for parallel processing
+
+
+
 
 Functions
 ---------
+.. py:function:: get_app_analytics_endpoint() -> str
+
 .. py:function:: get_cleanup_tempfiles() -> bool
 
    Whether to cleanup temporary files or not. By default we set it to False
@@ -113,6 +161,8 @@ Functions
 
 .. py:function:: get_subtitles_min_duration() -> int
 
+.. py:function:: get_telemetry_endpoint() -> str
+
 .. py:function:: get_videho_email_contact() -> str
 
 .. py:function:: get_video_length_per_subtitle() -> int
@@ -125,6 +175,10 @@ Functions
 
    The file name of the list of videos files to mix with ffmpeg
 
+
+.. py:function:: use_app_analytics() -> bool
+
+.. py:function:: use_telemetry() -> bool
 
 
 Attributes

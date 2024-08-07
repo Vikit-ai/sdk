@@ -13,19 +13,19 @@
 # limitations under the License.
 # ==============================================================================
 
+import asyncio
 import os
+import shutil
 from pathlib import Path
 from time import sleep
-import asyncio
-import shutil
+from urllib.parse import urljoin
+from urllib.request import pathname2url
 
 from loguru import logger
 
 import tests.testing_medias as tests_medias
-from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
-from urllib.parse import urljoin
-from urllib.request import pathname2url
 from vikit.gateways.ML_models_gateway import MLModelsGateway
+from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 
 TESTS_MEDIA_FOLDER = "tests/medias/"
 STUDENT_ARM_WRITING = "student_arm_writting.mp4"
@@ -150,12 +150,21 @@ class FakeMLModelsGateway(MLModelsGateway):
             test_file = tests_medias.get_videocrafter_video_path()
         elif model_provider == "stabilityai_image":
             test_file = tests_medias.get_stabilityai_image_video_path()
+        elif model_provider == "dynamicrafter":
+            test_file = tests_medias.get_dynamicrafter_image_video_path(prompt)
         else:
             raise ValueError(f"Unknown model provider: {model_provider}")
 
-        logger.debug(
-            f"Generating video from prompt: {prompt[:5]}, return a link: {test_file}"
-        )
+        if isinstance(prompt, str):
+            logger.debug(
+                f"Generating video from prompt: {prompt[:5]}, return a link: {test_file}"
+            )
+        # image-based prompt
+        else:
+            logger.debug(
+                f"Generating video from prompt: {prompt.text[:5]}, return a link: {test_file}"
+            )
+
         return test_file
 
     async def extract_audio_slice_async(

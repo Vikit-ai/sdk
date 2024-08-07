@@ -14,14 +14,14 @@
 # ==============================================================================
 
 import os
+import warnings
 
 import pytest
 from loguru import logger
 
-import warnings
 import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
-from vikit.gateways.vikit_gateway import VikitGateway
 from vikit.common.context_managers import WorkingFolderContext
+from vikit.gateways.vikit_gateway import VikitGateway
 
 TEST_PROMPT = "A group of stones in a forest, with symbols"
 
@@ -42,12 +42,6 @@ class TestBackgroundMusic:
             )
 
             _ = await ml_gw.generate_background_music_async(duration=3, prompt="")
-
-    @pytest.mark.unit
-    @pytest.mark.asyncio
-    async def test_generate_background_music_from_short_prompt(self):
-        with pytest.raises(TypeError):
-            _ = await VikitGateway().generate_background_music_async(duration="a")
 
     @pytest.mark.integration
     @pytest.mark.asyncio

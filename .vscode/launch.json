@@ -10,7 +10,7 @@
             "request": "launch",
             "module": "pytest",
             "args": [
-                "tests/test_composite_video.py::TestCompositeVideo::test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life",
+                "tests/test_composite_video.py::TestCompositeVideo::test_create_video_mix_with_preexisting_video_bin_default_bkg_music_subtitles_tired_life",
             ],
             "console": "integratedTerminal"
         }
@@ -29,7 +29,7 @@
 //                 "--tb=short",
 //                 "--capture=no",
 //                 "-p", "pytest-asyncio",
-//                 "tests/test_composite_video.py::TestCompositeVideo::test_create_video_mix_with_preexiting_video_bin_default_bkg_music_subtitles_tired_life"
+//                 "tests/test_composite_video.py::TestCompositeVideo::test_create_video_mix_with_preexisting_video_bin_default_bkg_music_subtitles_tired_life"
 //             ],           
 //             "env": {},
 //             "console": "integratedTerminal"

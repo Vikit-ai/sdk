@@ -13,9 +13,9 @@
 # limitations under the License.
 # ==============================================================================
 
-import random
 import datetime
 import os
+import random
 
 from loguru import logger
 
@@ -49,7 +49,7 @@ class VideoFileName:
         file_extension: str = "mp4",
     ):
         """
-        Initialises the file name with the metadata
+        Initializes the file name with the metadata
 
         params:
             build_settings: The build settings of the video: provides the build id, the build date and the build time

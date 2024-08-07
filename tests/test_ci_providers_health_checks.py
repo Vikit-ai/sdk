@@ -13,18 +13,18 @@
 # limitations under the License.
 # ==============================================================================
 
+import warnings
+
 import pytest
 from loguru import logger
 
-import warnings
-
-from vikit.video.video import VideoBuildSettings
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.video.raw_text_based_video import RawTextBasedVideo
+from vikit.video.video import VideoBuildSettings
 
 warnings.simplefilter("ignore", category=ResourceWarning)
 warnings.simplefilter("ignore", category=UserWarning)
-logger.add("log_test_CI_prviders_health_checks.txt", rotation="10 MB")
+logger.add("log_test_CI_providers_health_checks.txt", rotation="10 MB")
 
 
 class TestProvidersHealthChecks:
@@ -32,7 +32,7 @@ class TestProvidersHealthChecks:
     @pytest.mark.integration
     @pytest.mark.asyncio
     @pytest.mark.skip(
-        reason="This test is not working now due to throtling error on Haiper provider"
+        reason="This test is not working now due to throttling error on Haiper provider"
     )
     async def test_haiper_provider_and_generate(self):
         with WorkingFolderContext():

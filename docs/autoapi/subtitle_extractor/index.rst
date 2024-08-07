@@ -51,7 +51,7 @@ Classes
       :param subtitles: The subtitles to process
 
       :returns: list of text tokens corresponding to the subtitles in some sort
-                of human readeable format
+                of human readable format
 
 
    .. py:method:: merge_short_subtitles(subtitles, min_duration=7)

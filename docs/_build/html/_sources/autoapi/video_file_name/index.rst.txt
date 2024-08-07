@@ -25,6 +25,8 @@ Overview
 
    * - :py:obj:`MANAGED_FEATURES <video_file_name.MANAGED_FEATURES>`
      - \-
+   * - :py:obj:`split_separator <video_file_name.split_separator>`
+     - \-
 
 
 Classes
@@ -63,8 +65,6 @@ Classes
         - :summarylabel:`static` Parse a file name to extract the metadata
       * - :py:obj:`infer_features <video_file_name.VideoFileName.infer_features>`\ ()
         - Infer the features from the video features string
-      * - :py:obj:`is_video_file_name <video_file_name.VideoFileName.is_video_file_name>`\ (file_name)
-        - :summarylabel:`static` Check if a file name is a video file name
       * - :py:obj:`truncate <video_file_name.VideoFileName.truncate>`\ (gap)
         - Truncate the file name to fit the file system's limits
 
@@ -72,7 +72,7 @@ Classes
    .. rubric:: Members
 
    .. py:attribute:: VIDEO_TITLE_MAX_LENGTH
-      :value: 30
+      :value: 20
 
 
    .. py:method:: extract_features_as_string()
@@ -100,19 +100,6 @@ Classes
       In case unknown features are found, a warning is logged
 
 
-   .. py:method:: is_video_file_name(file_name: str)
-      :staticmethod:
-
-
-      Check if a file name is a video file name
-
-      params:
-          file_name: The file name to check
-
-      :returns: True if the file name is a video file name, False otherwise
-      :rtype: bool
-
-
    .. py:method:: truncate(gap: int)
 
       Truncate the file name to fit the file system's limits
@@ -132,7 +119,11 @@ Classes
 Attributes
 ----------
 .. py:data:: MANAGED_FEATURES
-   :value: 'dogrpvi'
+   :value: 'dogrvip'
+
+
+.. py:data:: split_separator
+   :value: '__'
 
 
 
