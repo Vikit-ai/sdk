@@ -47,6 +47,7 @@ class Prompt(ABC):
         self.build_settings: PromptBuildSettings = PromptBuildSettings()
         self.title = "NoTitle"
         self._extended_fields: dict[str, Any] = {}
+        self.negative_prompt = None
 
     @property
     def extended_fields(self) -> dict[str, Any]:

@@ -82,9 +82,15 @@ async def batch_raw_text_based_prompting(
             test_mode=False,
         )
 
-        video_build_settings.prompt = await PromptFactory(
+        prompt_obj = await PromptFactory(
             ml_gateway=video_build_settings.get_ml_models_gateway()
         ).create_prompt_from_text(prompt_content)
+
+        # you can set negative prompt, for the moment it is  effective only for Haiper
+        prompt_obj.negative_prompt = (
+            "Abnormal Anatomy, Blurry faces, hands with six finger"
+        )
+        video_build_settings.prompt = prompt_obj
 
         video = RawTextBasedVideo(prompt_content)
         await video.build(build_settings=video_build_settings)
@@ -144,6 +150,8 @@ async def composite_textonly_prompting(
     prompt = await PromptFactory(
         ml_gateway=composite_build_settings.get_ml_models_gateway()
     ).create_prompt_from_text(subtitle_total)
+    # you can set negative prompt, for the moment it is  effective only for Haiper
+    prompt.negative_prompt = "Abnormal Anatomy, Blurry faces, hands with six finger"
     composite_build_settings.prompt = prompt
 
     await vid_cp_sub.build(build_settings=composite_build_settings)
@@ -353,6 +361,8 @@ async def prompt_based_composite(prompt: str, model_provider="stabilityai"):
 
     gw = video_build_settings.get_ml_models_gateway()
     prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(prompt)
+    # you can set negative prompt, for the moment it is  effective only for Haiper
+    prompt.negative_prompt = "Abnormal Anatomy, Blurry faces, hands with six finger"
     video = PromptBasedVideo(prompt=prompt)
     await video.build(build_settings=video_build_settings)
 
@@ -384,7 +394,9 @@ if __name__ == "__main__":
         # Example 2- Create a batch of text-based videos:
         with WorkingFolderContext("./examples/inputs/TextOnly"):
             logger.add("log.txt")
-            asyncio.run(batch_raw_text_based_prompting("./input.csv"))
+            asyncio.run(
+                batch_raw_text_based_prompting("./input.csv", model_provider="haiper")
+            )
 
     elif run_an_example == 3:
         # Example 3 - Create a batch of videos from images

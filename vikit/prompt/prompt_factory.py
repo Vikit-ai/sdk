@@ -68,8 +68,7 @@ class PromptFactory:
             self._ml_gateway = prompt_build_settings.get_ml_models_gateway()
 
     async def create_prompt_from_text(
-        self,
-        prompt_text: str = None,
+        self, prompt_text: str = None, negative_prompt: str = None
     ):
         """
         Create a recorded prompt object from a text by  creating
@@ -78,6 +77,7 @@ class PromptFactory:
 
         args:
             - prompt_text: the text of the prompt
+            - negative_prompt: the text for negative prompting (for the moment only applicable for haiper)
 
         returns:
             a RecordedPrompt object
@@ -111,6 +111,7 @@ class PromptFactory:
             audio_recording=config.get_prompt_mp3_file_name(),
             duration=get_media_duration(config.get_prompt_mp3_file_name()),
         )
+        prompt.negative_prompt = negative_prompt
         return prompt
 
     async def create_prompt_from_audio_file(

@@ -697,6 +697,9 @@ class VikitGateway(MLModelsGateway):
                         "prompt": prompt,  # + ", 4k",
                     },
                 }
+                if hasattr(prompt, "negative_prompt"):
+                    payload["input"]["negative_prompt"] = prompt.negative_prompt
+
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
                     logger.debug(f"{output}")
