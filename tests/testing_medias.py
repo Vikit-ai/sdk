@@ -31,7 +31,6 @@ GENERATED_TRANSITION_FOREST_TREASURE_VIDEO_SAMPLE = (
 )
 TEST_PROMPT_RECORDING = "test.mp3"
 TEST_PROMPT_RECORDING_TRAIN_BOY = "sub_audio_for_subtitle_from_0_to_13.mp3"
-TEST_PROMPT_RECORDING_STONES_TRAIN_BOY = "sub_audio_for_subtitle_from_0_to_14.mp3"
 SAMPLE_GENERATED_MUSIC = "knowledgeStones_Forest_Symbols.mp3"
 SAMPLE_GENERATED_BG_MUSIC = "PodcastSerenity.mp3"
 SAMPLE_IMAGE_PROMPT = "image_prompt.jpeg"
@@ -110,13 +109,6 @@ def get_test_prompt_recording_trainboy():
     Return the path of a short prompt recording
     """
     return os.path.join(_media_dir, TEST_PROMPT_RECORDING_TRAIN_BOY)
-
-
-def get_test_prompt_recording_stones_trainboy_path():
-    """
-    Return the path of a short prompt recording for Stones and trainboy
-    """
-    return os.path.join(_media_dir, TEST_PROMPT_RECORDING_STONES_TRAIN_BOY)
 
 
 def get_test_transition_stones_trainboy_path():
