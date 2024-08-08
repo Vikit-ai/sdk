@@ -57,8 +57,8 @@ jobs:
         VIDEO_LIST_FILE_NAME :  ${{ vars.VIDEO_LIST_FILE_NAME }}
         DEFAULT_BACKGROUND_MUSIC :  ${{ vars.DEFAULT_BACKGROUND_MUSIC }}        
       run: |
-        pytest -s -m "unit"
-        pytest -s -n 2 -m "local_integration" tests/test_composite_video.py
+        pytest -s --cov=. --cov-report=xml -m "unit"
+        pytest -s --cov=. --cov-report=xml -n 2 -m "local_integration" tests/test_composite_video.py
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
