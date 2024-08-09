@@ -8,6 +8,7 @@ loguru==0.7.2
 python-dotenv==1.0.1
 pydantic==2.7.4
 tenacity==8.2.3
+pytest-cov==5.0.0
 pytest==8.1.1
 pytest-xdist==3.6.1
 pytest-asyncio==0.23.7
