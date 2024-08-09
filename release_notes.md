@@ -10,6 +10,16 @@
 # Vikit.ai Software Development  Kit - Release notes
 
 
+## under development :  better prompts, simpler to build, models negative prompts, SDK easier to use and install
+
+- Better prompts: we are working on a enriched prompt generation model that will allow for more coherent and engaging video scripts. This follows the work done during sessions with Microsoft AI Co-innovation lab in SF to better leverage Chatgpt 4o.
+
+- Simpler to build: we are working on simplifying the prompts features and the way to build them, so you can add many more descriptions of your scenes and let the AI do the rest (depending on target model capabilities)
+
+- Models negative prompts: integration of negative prompts to avoid certain elements in the scene 
+
+- PIP package and Dev Container version: we are working on a PIP package to make it easier to install and use the SDK. We are also working on a Dev Container version to make it easier to develop with the SDK.
+
 ## V0.2 : Faster, more providers and Image Prompts
 
 Now you have the possibility to use Image Based Prompt, kinda cool! 😎 Why doing this? You may want to start your new scenes from previous scenes context (for instance leverage ```get_last_frame_as_image```), or guide the video generation models with a given aesthetic.
