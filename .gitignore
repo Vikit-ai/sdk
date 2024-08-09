@@ -65,8 +65,7 @@ log*.txt
 target/
 
 # DotEnv configuration
-.env
-.env.*
+.env.secrets.*
 
 # Database
 *.db
