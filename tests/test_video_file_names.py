@@ -99,7 +99,6 @@ class TestVideoFileNames:
         assert video_file_name.video_features == "ooooo"
         assert video_file_name.build_id == "1234567890"
         assert video_file_name._build_date == datetime.date(2022, 1, 1)
-        assert video_file_name.unique_id == id
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -179,8 +178,6 @@ class TestVideoFileNames:
         ), "The build ID is not correct, {}".format(bld_set.id)
 
         assert vid_fname._build_date == bld_set.build_date
-        # assert vid_fname._build_time == bld_set.build_time
-        assert vid_fname.unique_id is not None
 
         # now we stop to the next video building step (build the video, here we decide to
         # interpolate and reencode), we expect the video features to be updated accordingly

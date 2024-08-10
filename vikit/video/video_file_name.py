@@ -127,11 +127,15 @@ class VideoFileName:
         returns:
             VideoFileName: The video file name object
         """
+
         parts = file_name.split("__")
         title = parts[0]
         bld_settings = VideoBuildSettings()
         bld_settings.id = parts[3]
-        bld_settings.build_date = datetime.date.fromisoformat(parts[4])
+        date_str = parts[4]
+        if date_str.endswith(".mp4"):
+            date_str = date_str[:-4]
+        bld_settings.build_date = datetime.date.fromisoformat(date_str)
         video_file_name = VideoFileName(
             build_settings=bld_settings, video_metadata=VideoMetadata(title=title)
         )
