@@ -82,7 +82,6 @@ class VideoFileName:
 
         self._build_id = build_settings.id
         self._build_date = build_settings.build_date
-        self.unique_id = random.getrandbits(16)
         self._video_temp_id = str(video_metadata.temp_id)
         self._file_extension = file_extension
         self._file_name = None
@@ -138,7 +137,6 @@ class VideoFileName:
         )
         video_file_name._video_type = parts[1]
         video_file_name._video_features = parts[2]
-        video_file_name.unique_id = parts[6].split(".")[0]
 
         return video_file_name
 
@@ -203,7 +201,7 @@ class VideoFileName:
             return self._file_name
 
         # file_name = f"{self.title}oOo{str(self.video_type)}oOo{self.video_features}oOo{self.build_id}oOo{self._build_date}oOoUIDoOo{self._video_temp_id}.{self._file_extension}"
-        file_name = f"{self.title}oOo{str(self.video_type)}oOo{self.video_features}oOo{self.build_id}oOo{self._build_date}oOoUIDoOo{self.unique_id}.{self._file_extension}"
+        file_name = f"{self.title}oOo{str(self.video_type)}oOo{self.video_features}oOo{self.build_id}oOo{self._build_date}.{self._file_extension}"
         file_name = file_name.replace("oOo", split_separator)
         logger.debug(f"file name by state to be returned: {file_name} ")
         self._file_name = file_name
@@ -213,7 +211,7 @@ class VideoFileName:
         return self._fit(target_path=self._build_settings.output_path)
 
     def __repr__(self):
-        return f"Title: {self.title}, Video Type: {self._video_type}, Video Features: {self._video_features} , Build ID: {self._build_id}, Build Date: {self._build_date}, Unique ID: {self.unique_id},"
+        return f"Title: {self.title}, Video Type: {self._video_type}, Video Features: {self._video_features} , Build ID: {self._build_id}, Build Date: {self._build_date}"
 
     @property
     def video_features(self):
@@ -235,6 +233,8 @@ class VideoFileName:
             str: The truncated title
         """
         if len(title) > max_length:
+            # first we make it so the title is clean, not taking back the video features string
+            title = title.split(split_separator)[0]
             return title[:max_length]
         return title
 
@@ -252,8 +252,6 @@ class VideoFileName:
         """
         return (
             self.file_name[: len(self.file_name) - gap - 36 - 4]
-            + "_UID_"
-            + str(self.unique_id)
             + "."
             + self._file_extension
         )
