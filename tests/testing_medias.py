@@ -29,6 +29,8 @@ GENERATED_3S_FOREST_VIDEO_SAMPLE__2 = "treasures.mp4"
 GENERATED_TRANSITION_FOREST_TREASURE_VIDEO_SAMPLE = (
     "transition_[seine]_from_treasures_to_forest.mp4"
 )
+PARIS_VIDEO = "Paris.mp4"
+PARIS_SUBTITLE = "Paris_subtitles.srt"
 TEST_PROMPT_RECORDING = "test.mp3"
 TEST_PROMPT_RECORDING_TRAIN_BOY = "sub_audio_for_subtitle_from_0_to_13.mp3"
 SAMPLE_GENERATED_MUSIC = "knowledgeStones_Forest_Symbols.mp3"
@@ -38,6 +40,14 @@ SAMPLE_IMAGE_PROMPT = "image_prompt.jpeg"
 _media_dir = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), TESTS_MEDIA_FOLDER
 )
+
+
+def get_paris_subtitle_file():
+    return os.path.join(_media_dir, PARIS_SUBTITLE)
+
+
+def get_paris_video():
+    return os.path.join(_media_dir, PARIS_VIDEO)
 
 
 def get_interpolate_video():

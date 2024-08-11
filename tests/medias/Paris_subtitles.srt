@@ -1,0 +1,8 @@
+1
+00:00:00,000 --> 00:00:09,000
+Paris, the city of light, is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere.
+
+2
+00:00:09,000 --> 00:00:24,000
+The Eiffel Tower, Louvre Museum, and Notre Dame Cathedral are just a few of the city's must-see attractions.
+

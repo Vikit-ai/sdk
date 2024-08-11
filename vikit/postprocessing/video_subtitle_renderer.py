@@ -15,7 +15,8 @@
 
 import pysrt
 from loguru import logger
-from moviepy.editor import ColorClip, CompositeVideoClip, TextClip, VideoFileClip
+from moviepy.editor import (ColorClip, CompositeVideoClip, TextClip,
+                            VideoFileClip)
 
 
 class VideoSubtitleRenderer:
