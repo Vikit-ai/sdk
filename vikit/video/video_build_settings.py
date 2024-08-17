@@ -32,6 +32,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         cascade_build_settings: bool = False,
         target_dir_path: str = None,
         output_video_file_name: str = None,
+        vikit_api_key: str = None,
     ):
         """
         VideoBuildSettings class constructor
@@ -68,3 +69,4 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.interpolate = interpolate
         self.target_model_provider = target_model_provider
         self.cascade_build_settings = cascade_build_settings
+        self.vikit_api_key = vikit_api_key
