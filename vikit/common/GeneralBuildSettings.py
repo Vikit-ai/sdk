@@ -27,6 +27,7 @@ class GeneralBuildSettings:
         test_mode: bool = False,
         target_dir_path: str = None,
         target_file_name: str = None,
+        vikit_api_key: str = None,
     ):
         """
         Initialize the build settings
@@ -47,6 +48,7 @@ class GeneralBuildSettings:
         self.build_time = datetime.datetime.now().time().strftime("%H:%M")
         self.target_dir_path = target_dir_path
         self.target_file_name = target_file_name
+        self.vikit_api_key = vikit_api_key
 
     def get_ml_models_gateway(self):
         """
@@ -56,7 +58,8 @@ class GeneralBuildSettings:
         if self._ml_models_gateway is None:
             self._ml_models_gateway = (
                 mlfactory.MLModelsGatewayFactory().get_ml_models_gateway(
-                    test_mode=self.test_mode
+                    test_mode=self.test_mode,
+                    vikit_api_key=self.vikit_api_key
                 )
             )
         return self._ml_models_gateway
