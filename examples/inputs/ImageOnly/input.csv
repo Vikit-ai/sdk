@@ -1,4 +1,4 @@
 ﻿name;prompt;type
-1;./1.jpg;image
-2;./2.jpg;image
-3;./3.jpg;image
+1;/home/leclem/vikit/sdk/examples/inputs/ImageOnly/1.jpg;image
+2;/home/leclem/vikit/sdk/examples/inputs/ImageOnly/2.jpg;image
+3;/home/leclem/vikit/sdk/examples/inputs/ImageOnly/3.jpg;image
