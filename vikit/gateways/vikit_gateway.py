@@ -219,6 +219,8 @@ class VikitGateway(MLModelsGateway):
             open(target_image_path, "rb").read()
         ).decode("ascii")
 
+        src_img.close()
+        trg_img.close()
         try:
             async for attempt in AsyncRetrying(
                 stop=stop_after_attempt(get_nb_retries_http_calls()),
@@ -642,13 +644,18 @@ class VikitGateway(MLModelsGateway):
                         f'Output does not contain image: {output["error"]}'
                     )
                 imgdata = base64.b64decode(output["image"])
-                img = Image.open(io.BytesIO(imgdata))
+                image_io = io.BytesIO(imgdata)
+                img = Image.open(image_io)
                 new_img = img.resize((1024, 576))  # x, y
                 new_img.save(buffer, format="PNG")
                 img_b64 = "data:image/png;base64," + base64.b64encode(
                     buffer.getvalue()
                 ).decode("utf-8")
 
+                image_io.close()
+                buffer.close()
+                img.close()
+                
                 logger.debug("Generating video from image")
                 # Ask for a video
                 async with aiohttp.ClientSession() as session:
@@ -794,8 +801,8 @@ class VikitGateway(MLModelsGateway):
             logger.debug("Resizing image for video generator")
             # Convert result to Base64
             image_data = base64.b64decode(prompt.image)
-
-            image = Image.open(io.BytesIO(image_data))
+            image_io = io.BytesIO(image_data)
+            image = Image.open(image_io)
             target_size = (1024, 576)
 
             # Check the size and resize if needed
@@ -810,6 +817,11 @@ class VikitGateway(MLModelsGateway):
             img_b64 = "data:image/png;base64," + base64.b64encode(
                 buffer.getvalue()
             ).decode("utf-8")
+
+            #Close images and buffers
+            image_io.close()
+            image.close()
+            buffer.close()
 
             logger.debug("Generating video from image")
             # Ask for a video
