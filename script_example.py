@@ -32,7 +32,10 @@ from vikit.video.seine_transition import SeineTransition
 from vikit.video.transition import Transition
 from vikit.video.video import VideoBuildSettings
 
-negative_prompt = "Abnormal Anatomy, Blurry faces, hands with six finger"
+negative_prompt = """bad anatomy, bad hands, missing fingers, extra fingers, three hands, 
+three legs, bad arms, missing legs, missing arms, poorly drawn face, bad face, fused face, 
+cloned face, three crus, fused feet, fused thigh, extra crus, ugly fingers, amputation,
+ disconnected limbs"""
 
 
 @log_function_params
