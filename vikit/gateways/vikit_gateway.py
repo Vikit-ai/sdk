@@ -24,7 +24,6 @@ import uuid as uid
 
 import aiohttp
 from loguru import logger
-from PIL import Image
 from tenacity import (
     AsyncRetrying,
     after_log,
@@ -45,6 +44,8 @@ from vikit.common.secrets import (
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
+import cv2
+import numpy as np
 
 os.environ["REPLICATE_API_TOKEN"] = get_replicate_api_token()
 vikit_api_key = get_vikit_api_token()
@@ -202,25 +203,28 @@ class VikitGateway(MLModelsGateway):
             raise FileNotFoundError(
                 f"The target image path does not exist: {target_image_path}"
             )
-        # Resize the image
-        src_img = Image.open(source_image_path)
-        trg_img = Image.open(target_image_path)
-        if src_img.size != trg_img.size:
-            target_size = (512, 320)
+        
+        #Resize images
+        # Open the images using OpenCV
+        src_img = cv2.imread(source_image_path)
+        trg_img = cv2.imread(target_image_path)
+
+        # Check if the sizes are different
+        if src_img.shape[:2] != trg_img.shape[:2]:
+            # Resize the images
             for img_path in [source_image_path, target_image_path]:
-                with Image.open(img_path) as img:
-                    resized_img = img.resize(target_size)
-                    resized_img.save(img_path)
+                img = cv2.imread(img_path)
+                resized_img = cv2.resize(img, target_size, interpolation=cv2.INTER_AREA)
+                cv2.imwrite(img_path, resized_img)
 
-        source_image_base64 = base64.b64encode(
-            open(source_image_path, "rb").read()
-        ).decode("ascii")
-        target_image_base64 = base64.b64encode(
-            open(target_image_path, "rb").read()
-        ).decode("ascii")
+        # Encode the resized images to base64
+        with open(source_image_path, "rb") as src_file:
+            source_image_base64 = base64.b64encode(src_file.read()).decode("ascii")
 
-        src_img.close()
-        trg_img.close()
+        with open(target_image_path, "rb") as trg_file:
+            target_image_base64 = base64.b64encode(trg_file.read()).decode("ascii")
+        
+
         try:
             async for attempt in AsyncRetrying(
                 stop=stop_after_attempt(get_nb_retries_http_calls()),
@@ -643,18 +647,25 @@ class VikitGateway(MLModelsGateway):
                     raise ValueError(
                         f'Output does not contain image: {output["error"]}'
                     )
-                imgdata = base64.b64decode(output["image"])
-                image_io = io.BytesIO(imgdata)
-                img = Image.open(image_io)
-                new_img = img.resize((1024, 576))  # x, y
-                new_img.save(buffer, format="PNG")
-                img_b64 = "data:image/png;base64," + base64.b64encode(
-                    buffer.getvalue()
-                ).decode("utf-8")
 
-                image_io.close()
-                buffer.close()
-                img.close()
+                # Convert result to Base64
+                image_data = base64.b64decode(output["image"])
+
+                # Convert the image data to a NumPy array
+                np_arr = np.frombuffer(image_data, np.uint8)
+
+                # Decode the image using OpenCV
+                image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+                # Resize the image using OpenCV
+                target_size = (1024, 576)
+                resized_image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
+
+                # Encode the resized image back to base64
+                _, buffer = cv2.imencode('.png', resized_image)
+
+                # Encode the image as base64
+                img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode('utf-8')
                 
                 logger.debug("Generating video from image")
                 # Ask for a video
@@ -799,30 +810,26 @@ class VikitGateway(MLModelsGateway):
         logger.debug(f"Generating video from image prompt {prompt.text} ")
         async with aiohttp.ClientSession() as session:
             logger.debug("Resizing image for video generator")
+            
             # Convert result to Base64
             image_data = base64.b64decode(prompt.image)
-            image_io = io.BytesIO(image_data)
-            image = Image.open(image_io)
+
+            # Convert the image data to a NumPy array
+            np_arr = np.frombuffer(image_data, np.uint8)
+
+            # Decode the image using OpenCV
+            image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+            # Resize the image using OpenCV
             target_size = (1024, 576)
+            resized_image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
 
-            # Check the size and resize if needed
-            if image.size != target_size:
-                image = image.resize(target_size)
-
-            # Save the image to a buffer
-            buffer = io.BytesIO()
-            image.save(buffer, format="PNG")
+            # Encode the resized image back to base64
+            _, buffer = cv2.imencode('.png', resized_image)
 
             # Encode the image as base64
-            img_b64 = "data:image/png;base64," + base64.b64encode(
-                buffer.getvalue()
-            ).decode("utf-8")
-
-            #Close images and buffers
-            image_io.close()
-            image.close()
-            buffer.close()
-
+            img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode('utf-8')
+            
             logger.debug("Generating video from image")
             # Ask for a video
             async with aiohttp.ClientSession() as session:
