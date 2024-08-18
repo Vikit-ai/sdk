@@ -15,8 +15,7 @@
 
 import pysrt
 from loguru import logger
-from moviepy.editor import (ColorClip, CompositeVideoClip, TextClip,
-                            VideoFileClip)
+from moviepy.editor import ColorClip, CompositeVideoClip, TextClip, VideoFileClip
 
 
 class VideoSubtitleRenderer:
@@ -65,7 +64,6 @@ class VideoSubtitleRenderer:
         logger.debug(f"Loading video from {input_video_path} to add subtitle ...")
         video = VideoFileClip(input_video_path)
         video_duration = video.duration  # Get the original video duration
-        video_fps = video.fps  # Get the original video FPS
 
         # Calculate the parameters relative to the video height
         font_size = int(video.h * self.font_size_ratio)
