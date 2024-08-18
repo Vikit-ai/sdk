@@ -96,7 +96,7 @@ class VikitGateway(MLModelsGateway):
         prompt_text: str,
         target_file: str,
     ):
-        tempUuid = str(uuid.uuid4())
+        tempUuid = str(uid.uuid4())
         if has_eleven_labs_api_key():
             await self.generate_mp3_from_text_async_elevenlabs(
                 prompt_text,

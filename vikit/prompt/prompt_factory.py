@@ -36,6 +36,7 @@ from vikit.prompt.recorded_prompt_subtitles_extractor import (
 )
 from vikit.wrappers.ffmpeg_wrapper import get_media_duration
 
+import uuid
 
 class PromptFactory:
     """
@@ -59,6 +60,9 @@ class PromptFactory:
             ml_gateway: The ML Gateway to use to generate the prompt from the audio file
 
         """
+        
+        self.prompt_factory_uuid = str(uuid.uuid4())
+        print("new uuid " + self.prompt_factory_uuid)
         prompt_build_settings = (
             prompt_build_settings if prompt_build_settings else PromptBuildSettings()
         )
@@ -91,12 +95,12 @@ class PromptFactory:
         # calling a model like Whisper from openAI
         await self._ml_gateway.generate_mp3_from_text_async(
             prompt_text=prompt_text,
-            target_file=config.get_prompt_mp3_file_name(),
+            target_file=config.get_prompt_mp3_file_name() + self.prompt_factory_uuid + ".mp3",
         )
 
         extractor = RecordedPromptSubtitlesExtractor()
         subs = await extractor.extract_subtitles_async(
-            recorded_prompt_file_path=config.get_prompt_mp3_file_name(),
+            recorded_prompt_file_path=config.get_prompt_mp3_file_name() + self.prompt_factory_uuid + ".mp3",
             ml_models_gateway=self._ml_gateway,
         )
         merged_subs = (
@@ -108,8 +112,8 @@ class PromptFactory:
         prompt = RecordedPrompt(
             text=prompt_text,
             subtitles=merged_subs,
-            audio_recording=config.get_prompt_mp3_file_name(),
-            duration=get_media_duration(config.get_prompt_mp3_file_name()),
+            audio_recording=config.get_prompt_mp3_file_name() + self.prompt_factory_uuid + ".mp3",
+            duration=get_media_duration(config.get_prompt_mp3_file_name() + self.prompt_factory_uuid + ".mp3"),
         )
         prompt.negative_prompt = negative_prompt
         return prompt

@@ -64,13 +64,13 @@ def get_nb_retries_http_calls() -> int:
     return int(nb_retries_http_calls)
 
 
-def get_prompt_mp3_file_name() -> str:
+def get_prompt_mp3_file_name(uuid = creation_uuid) -> str:
     """
     The name of the mp3 file either converted from user  or
     generated using an llm and that we use to extract subtitles from the video
     """
     prompt_mp3_file_name = os.getenv(
-        "PROMPT_MP3_FILE_NAME", "loose_faith_prompt_upload_" + creation_uuid + ".mp3"
+        "PROMPT_MP3_FILE_NAME", "loose_faith_prompt_upload_" + uuid + ".mp3"
     )
     if prompt_mp3_file_name is None:
         raise Exception("PROMPT_MP3_FILE_NAME is not set")
@@ -105,12 +105,12 @@ def get_nb_subs_per_video() -> int:
     return int(nb_subs_per_video)
 
 
-def get_subtitles_default_file_name() -> str:
+def get_subtitles_default_file_name(uuid = creation_uuid) -> str:
     """
     The default name used to save the subtitles file in the working directory
     It is typically build from smaller subtitles generated for subvideos
     """
-    subtitles_default_file_name = os.getenv("SUBTITLES_FILE_NAME", "subtitles_" + creation_uuid + ".srt")
+    subtitles_default_file_name = os.getenv("SUBTITLES_FILE_NAME", "subtitles_" + uuid + ".srt")
     if subtitles_default_file_name is None:
         raise Exception("SUBTITLES_FILE_NAME is not set")
     return subtitles_default_file_name
