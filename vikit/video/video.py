@@ -27,6 +27,7 @@ from vikit.common.file_tools import (
     download_or_copy_file,
     is_valid_filename,
     is_valid_path,
+    wait_for_file_availability,
 )
 from vikit.common.handler import Handler
 from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
@@ -96,7 +97,46 @@ class Video(ABC):
 
     @property
     def media_url(self):
-        return self.metadata.media_url
+        """
+        Get the media URL of the video, and wait a bit if the video is not available yet
+        Beware the code might be counter intuitive here but this is on purpose:
+        None: we return it as no value to wait for
+        URL is there: let's get it and wait a bit for it in case it is not available yet
+
+        Returns:
+            str: The media URL of the video
+        """
+
+        if self.metadata.media_url is None:
+            return self.metadata.media_url
+        else:
+            import asyncio
+
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            # If there's already a running loop, create a new task and wait for it
+            task = loop.create_task(
+                coro=wait_for_file_availability(
+                    url=self.metadata.media_url,
+                    interval_sleep_time=1,
+                    max_attempts=10,
+                ),
+            )
+            res = asyncio.run_coroutine_threadsafe(task, loop).result(timeout=2)
+            return res
+        else:
+            # If no loop is running, use asyncio.run
+            return asyncio.run(
+                wait_for_file_availability(
+                    url=self.metadata.media_url,
+                    interval_sleep_time=1,
+                    max_attempts=10,
+                )
+            )
 
     @media_url.setter
     def media_url(self, value):

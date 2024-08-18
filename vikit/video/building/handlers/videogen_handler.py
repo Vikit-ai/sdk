@@ -30,6 +30,11 @@ class VideoGenHandler(Handler):
         Process the video generation binaries: the video binary is generated from Gen AI, hosted behind an API
         which could be distant as well as local. The video binary is then stored in a web storage or locally.
 
+        Important: The video generation is a long process, so it is executed asynchronously. Depending on the platform
+        providing it, the video generation could take a few seconds to a few minutes, and the video binary might not be
+        available immediately even though a URL is returned. This is not an issue on this handler but it might
+        be for subsequent handlers as they will need to reprocess the video.
+
         Args:
             video (Video): The video to process
 

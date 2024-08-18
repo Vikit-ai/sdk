@@ -21,6 +21,7 @@ import urllib.parse
 from typing import Optional, Union
 from urllib.error import URLError
 from urllib.request import urlopen
+import asyncio
 
 import aiofiles
 import aiohttp
@@ -110,12 +111,22 @@ def web_url_exists(url):
     Check if a URL exists on the web
     """
     try:
-        urlopen(url, timeout=TIMEOUT)
+        urlopen(url=url, timeout=TIMEOUT)
         return True
     except URLError:
         return False
     except ValueError:
         return False
+
+
+def file_url_exists(url):
+    """
+    Check if a file URL exists locally
+    """
+    if url.startswith("file://"):
+        file_path = url[7:]  # Remove 'file://' prefix
+        return os.path.exists(file_path)
+    return False
 
 
 def url_exists(url: str):
@@ -135,10 +146,37 @@ def url_exists(url: str):
     if os.path.exists(url):
         url_exists = True
 
+    if file_url_exists(url):
+        url_exists = True
+
     if web_url_exists(url):
         url_exists = True
 
     return url_exists
+
+
+async def wait_for_file_availability(
+    url: str, interval_sleep_time: int = 1, max_attempts: int = 10
+):
+    """
+    Wait for the file to be available.
+
+    Args:
+        url (str): The URL of the file to wait for
+        sleep_time (int): The time to wait between each check
+        max_attempts (int): The maximum number of attempts to check the URL
+    """
+    attempts = 0
+    while True and attempts < max_attempts:
+        if url_exists(url):
+            break
+        await asyncio.sleep(interval_sleep_time)
+        attempts += 1
+
+    if attempts >= max_attempts:
+        raise TimeoutError(f"File {url} not available after {max_attempts} attempts")
+
+    return url
 
 
 def is_valid_path(path: Optional[Union[str, os.PathLike]]) -> bool:
