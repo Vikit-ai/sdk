@@ -95,12 +95,12 @@ class PromptFactory:
         # calling a model like Whisper from openAI
         await self._ml_gateway.generate_mp3_from_text_async(
             prompt_text=prompt_text,
-            target_file=config.get_prompt_mp3_file_name() + self.prompt_factory_uuid + ".mp3",
+            target_file=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
         )
 
         extractor = RecordedPromptSubtitlesExtractor()
         subs = await extractor.extract_subtitles_async(
-            recorded_prompt_file_path=config.get_prompt_mp3_file_name() + self.prompt_factory_uuid + ".mp3",
+            recorded_prompt_file_path=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
             ml_models_gateway=self._ml_gateway,
         )
         merged_subs = (
@@ -112,8 +112,8 @@ class PromptFactory:
         prompt = RecordedPrompt(
             text=prompt_text,
             subtitles=merged_subs,
-            audio_recording=config.get_prompt_mp3_file_name() + self.prompt_factory_uuid + ".mp3",
-            duration=get_media_duration(config.get_prompt_mp3_file_name() + self.prompt_factory_uuid + ".mp3"),
+            audio_recording=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
+            duration=get_media_duration(config.get_prompt_mp3_file_name(self.prompt_factory_uuid)),
         )
         prompt.negative_prompt = negative_prompt
         return prompt

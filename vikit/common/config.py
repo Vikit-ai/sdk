@@ -160,11 +160,11 @@ def get_initial_audio_file_name():
     return initial_audio_file_name
 
 
-def get_video_list_file_name():
+def get_video_list_file_name(uuid = creation_uuid):
     """
     The file name of the list of videos files to mix with ffmpeg
     """
-    video_list_file_name = os.getenv("VIDEO_LIST_FILE_NAME", "videosToMerge" + creation_uuid + ".txt")
+    video_list_file_name = os.getenv("VIDEO_LIST_FILE_NAME", "videosToMerge" + uuid + ".txt")
     if video_list_file_name is None:
         raise Exception("VIDEO_LIST_FILE_NAME is not set")
     return video_list_file_name
