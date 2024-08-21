@@ -70,7 +70,7 @@ def get_prompt_mp3_file_name(uuid = creation_uuid) -> str:
     generated using an llm and that we use to extract subtitles from the video
     """
     prompt_mp3_file_name = os.getenv(
-        "PROMPT_MP3_FILE_NAME", "loose_faith_prompt_upload_" + uuid + ".mp3"
+        "PROMPT_MP3_FILE_NAME", "prompt_upload_" + uuid + ".mp3"
     )
     if prompt_mp3_file_name is None:
         raise Exception("PROMPT_MP3_FILE_NAME is not set")
