@@ -52,6 +52,8 @@ class CompositeVideo(Video, is_composite_video):
         """
         super().__init__()
 
+        self.composite_video_uuid = str(uid.uuid4())
+
         self.is_root_video_composite = True  # true until we have a composite video that will add this composite as a child using append
         self.video_list = []
 
@@ -99,6 +101,7 @@ class CompositeVideo(Video, is_composite_video):
                 ),
                 test_mode=self.build_settings.test_mode,
                 target_model_provider=self.build_settings.target_model_provider,
+                vikit_api_key=self.build_settings.vikit_api_key,
             )
 
     def append_video(self, video: Video):
@@ -264,7 +267,7 @@ class CompositeVideo(Video, is_composite_video):
             [
                 self.get_title()[:5],
                 str(self.temp_id),
-                config.get_video_list_file_name(),
+                config.get_video_list_file_name(self.composite_video_uuid),
             ]
         )
         ratio = self._get_ratio_to_multiply_animations(

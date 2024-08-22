@@ -96,6 +96,7 @@ class VikitGateway(MLModelsGateway):
         prompt_text: str,
         target_file: str,
     ):
+        tempUuid = str(uid.uuid4())
         if has_eleven_labs_api_key():
             await self.generate_mp3_from_text_async_elevenlabs(
                 prompt_text,
@@ -119,8 +120,8 @@ class VikitGateway(MLModelsGateway):
                     response = await response.text()
                     if not response.startswith("http"):
                         raise AttributeError("The result audio link is not a link")
-                    await download_or_copy_file(url=response, local_path="temp.wav")
-            await convert_as_mp3_file("temp.wav", target_file)
+                    await download_or_copy_file(url=response, local_path="temp" + tempUuid + ".wav")
+            await convert_as_mp3_file("temp" + tempUuid + ".wav", target_file)
             return response
 
     async def generate_background_music_async(

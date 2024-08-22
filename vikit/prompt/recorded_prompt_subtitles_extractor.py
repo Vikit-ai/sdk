@@ -23,7 +23,7 @@ import vikit.common.config as config
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.subtitle_extractor import SubtitleExtractor
 from vikit.wrappers.ffmpeg_wrapper import extract_audio_slice, get_media_duration
-
+import uuid
 
 class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
     """
@@ -94,7 +94,8 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
             cat_command_args = " ".join([cat_command_args, subtitle_file_path])
 
             # Concatenate the temporary SRT files to a prompt wide srt file
-            with open(config.get_subtitles_default_file_name(), "w") as f:
+            tempUuid = self.prompt_factory_uuid = str(uuid.uuid4())
+            with open(config.get_subtitles_default_file_name(tempUuid), "w") as f:
                 p = subprocess.Popen(
                     ["cat"] + cat_command_args.split(), stdout=f, stderr=subprocess.PIPE
                 )
@@ -105,8 +106,8 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
                     )
 
             assert os.path.exists(
-                config.get_subtitles_default_file_name()
+                config.get_subtitles_default_file_name(tempUuid)
             ), "The generated subtitles file does not exists after having generating subtitles from audio file"
-            subs = pysrt.open(config.get_subtitles_default_file_name())
+            subs = pysrt.open(config.get_subtitles_default_file_name(tempUuid))
 
         return subs
