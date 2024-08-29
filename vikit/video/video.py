@@ -16,20 +16,17 @@
 import os
 import random
 import shutil
-import time
 import uuid as uid
 from abc import ABC, abstractmethod
 import re
 
 from loguru import logger
 
-from vikit.common.config import get_media_polling_interval
 from vikit.common.decorators import log_function_params
 from vikit.common.file_tools import (
     download_or_copy_file,
     is_valid_filename,
     is_valid_path,
-    url_exists,
 )
 from vikit.common.handler import Handler
 from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
