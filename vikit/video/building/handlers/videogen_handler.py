@@ -61,7 +61,7 @@ class VideoGenHandler(Handler):
 
         if not url_exists(video.media_url):
             logger.warning(
-                f"Media URL {self.metadata.media_url} is not available yet, waiting for it for {get_media_polling_interval()} seconds"
+                f"Media URL {video.media_url} is not available yet, waiting for it for {get_media_polling_interval()} seconds"
             )
             time.sleep(get_media_polling_interval())
             if url_exists(video.media_url):
