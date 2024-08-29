@@ -14,7 +14,6 @@
 # ==============================================================================
 
 import os
-from concurrent.futures import ProcessPoolExecutor
 from os import path
 
 from dotenv import load_dotenv
@@ -33,6 +32,13 @@ else:
     load_dotenv(dotenv_path=env_file)
 
 creation_uuid = str(uuid.uuid4())
+
+def get_media_polling_interval() -> int:
+    media_polling_interval = os.getenv("MEDIA_POLLING_INTERVAL", 10)
+    if media_polling_interval is None:
+        raise Exception("MEDIA_POLLING_INTERVAL is not set")
+    return int(media_polling_interval)
+
 
 def get_default_background_music() -> str:
     default_background_music = os.getenv("DEFAULT_BACKGROUND_MUSIC", None)

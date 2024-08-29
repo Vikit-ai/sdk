@@ -96,6 +96,15 @@ class Video(ABC):
 
     @property
     def media_url(self):
+        """
+        Get the media URL of the video, and wait a bit if the video is not available yet
+        Beware the code might be counter intuitive here but this is on purpose:
+        None: we return it as no value to wait for
+        URL is there: let's get it and wait a bit for it in case it is not available yet
+
+        Returns:
+            str: The media URL of the video
+        """
         return self.metadata.media_url
 
     @media_url.setter
