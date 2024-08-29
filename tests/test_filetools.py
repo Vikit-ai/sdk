@@ -23,7 +23,6 @@ import tests.testing_medias as testing_medias
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.common.file_tools import (
     download_or_copy_file,
-    wait_for_file_availability,
 )
 
 logger.add("log_test_Filetools.txt", rotation="10 MB")
@@ -53,30 +52,3 @@ class TestFileTools:
             assert downloaded_file != ""
             assert os.path.exists(downloaded_file)
             assert os.path.getsize(downloaded_file) > 0
-
-    @pytest.mark.unit
-    @pytest.mark.asyncio
-    async def test_video_building_handler_success(self):
-        url = await wait_for_file_availability(
-            url="https://www.google.com", interval_sleep_time=1, max_attempts=10
-        )
-        assert url == "https://www.google.com"
-
-    @pytest.mark.unit
-    @pytest.mark.asyncio
-    async def test_video_building_handler_raising_timeout_exception(self):
-        with pytest.raises(TimeoutError):
-            await wait_for_file_availability("https://example.invalid", 1, 3)
-
-    @pytest.mark.local_integration
-    @pytest.mark.asyncio
-    async def test_video_building_handler_immediate_success(self):
-        with WorkingFolderContext():
-            with open("test.txt", "w") as f:
-                f.write("test")
-            url = await wait_for_file_availability("file://test.txt", 1, 2)
-            assert url == "file://test.txt"
-
-
-# We need a more advanced test here but it requires a more complex setup with parralel threads
-# and synchronization between them. We will implement it in the future.

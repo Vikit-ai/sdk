@@ -14,7 +14,6 @@
 # ==============================================================================
 
 import os
-from concurrent.futures import ProcessPoolExecutor
 from os import path
 
 from dotenv import load_dotenv
@@ -29,6 +28,13 @@ if not os.path.exists(env_file):
     logger.warning(f"config file {env_file} does not exist")
 else:
     load_dotenv(dotenv_path=env_file)
+
+
+def get_media_polling_interval() -> int:
+    media_polling_interval = os.getenv("MEDIA_POLLING_INTERVAL", 10)
+    if media_polling_interval is None:
+        raise Exception("MEDIA_POLLING_INTERVAL is not set")
+    return int(media_polling_interval)
 
 
 def get_default_background_music() -> str:

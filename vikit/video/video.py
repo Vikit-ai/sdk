@@ -16,18 +16,20 @@
 import os
 import random
 import shutil
+import time
 import uuid as uid
 from abc import ABC, abstractmethod
 import re
 
 from loguru import logger
 
+from vikit.common.config import get_media_polling_interval
 from vikit.common.decorators import log_function_params
 from vikit.common.file_tools import (
     download_or_copy_file,
     is_valid_filename,
     is_valid_path,
-    wait_for_file_availability,
+    url_exists,
 )
 from vikit.common.handler import Handler
 from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
@@ -106,37 +108,7 @@ class Video(ABC):
         Returns:
             str: The media URL of the video
         """
-
-        if self.metadata.media_url is None:
-            return self.metadata.media_url
-        else:
-            import asyncio
-
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            loop = None
-
-        if loop and loop.is_running():
-            # If there's already a running loop, create a new task and wait for it
-            task = loop.create_task(
-                coro=wait_for_file_availability(
-                    url=self.metadata.media_url,
-                    interval_sleep_time=1,
-                    max_attempts=10,
-                ),
-            )
-            res = asyncio.run_coroutine_threadsafe(task, loop).result(timeout=2)
-            return res
-        else:
-            # If no loop is running, use asyncio.run
-            return asyncio.run(
-                wait_for_file_availability(
-                    url=self.metadata.media_url,
-                    interval_sleep_time=1,
-                    max_attempts=10,
-                )
-            )
+        return self.metadata.media_url
 
     @media_url.setter
     def media_url(self, value):

@@ -14,9 +14,14 @@
 # ==============================================================================
 
 from loguru import logger
+import time
 
 from vikit.common.handler import Handler
 from vikit.video.video import Video
+from vikit.common.config import get_media_polling_interval
+from vikit.common.file_tools import (
+    url_exists,
+)
 
 
 class VideoGenHandler(Handler):
@@ -53,6 +58,18 @@ class VideoGenHandler(Handler):
                 )
             )
         )
+
+        if not url_exists(video.media_url):
+            logger.warning(
+                f"Media URL {self.metadata.media_url} is not available yet, waiting for it for {get_media_polling_interval()} seconds"
+            )
+            time.sleep(get_media_polling_interval())
+            if url_exists(video.media_url):
+                return video.media_url
+            else:
+                logger.error(
+                    f"Media URL {self.metadata.media_url} is not available yet, the related video will need to be generated after the overall video generation process"
+                )
 
         logger.debug(f"Video generated from prompt: {video.media_url}")
         return video

@@ -155,30 +155,6 @@ def url_exists(url: str):
     return url_exists
 
 
-async def wait_for_file_availability(
-    url: str, interval_sleep_time: int = 1, max_attempts: int = 10
-):
-    """
-    Wait for the file to be available.
-
-    Args:
-        url (str): The URL of the file to wait for
-        sleep_time (int): The time to wait between each check
-        max_attempts (int): The maximum number of attempts to check the URL
-    """
-    attempts = 0
-    while True and attempts < max_attempts:
-        if url_exists(url):
-            break
-        await asyncio.sleep(interval_sleep_time)
-        attempts += 1
-
-    if attempts >= max_attempts:
-        raise TimeoutError(f"File {url} not available after {max_attempts} attempts")
-
-    return url
-
-
 def is_valid_path(path: Optional[Union[str, os.PathLike]]) -> bool:
     """
     Check if the path is valid: could be a local path or a remote one
