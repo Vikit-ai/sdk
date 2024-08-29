@@ -17,23 +17,23 @@ import warnings
 
 import pytest
 from loguru import logger
+import replicate
 
 import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.prompt.prompt_factory import PromptFactory
 
+
 SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in an abandoned forest, revealing intricate carvings
 and symbols. This is additional text to make sure we generate several subtitles. """
 
+warnings.simplefilter("ignore", category=ResourceWarning)
+warnings.simplefilter("ignore", category=UserWarning)
+logger.add("log_test_replicate_wrapper.txt", rotation="10 MB")
+
 
 class TestReplicateWrapper:
-
-    def setUp(self) -> None:
-        warnings.simplefilter("ignore", category=ResourceWarning)
-        warnings.simplefilter("ignore", category=UserWarning)
-
-        logger.add("log_test_replicate_wrapper.txt", rotation="10 MB")
 
     @pytest.mark.integration
     @pytest.mark.asyncio
@@ -52,6 +52,19 @@ class TestReplicateWrapper:
             )
             assert len(keywords) > 0
             assert len(title) > 0
+
+    @pytest.mark.integration
+    @pytest.mark.asyncio
+    async def test_wait_video_gen_completion(self):
+
+        with WorkingFolderContext():
+            ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
+                test_mode=True
+            )
+
+            video_gen_id = await ml_gw.generate_video_VideoCrafter2_async(
+                prompt=SAMPLE_PROMPT_TEXT
+            )
 
     @pytest.mark.unit
     def test_extract_keywords_clean_nodigits(self):
