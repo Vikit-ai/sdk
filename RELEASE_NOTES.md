@@ -73,4 +73,4 @@ We will prioritize items according to community feedback.
 We are an open community, so you are more than welcomed to help improve Vikit to suit your needs! 
 If you find the SDK useful please add GitHub stars ⭐️, and don't forget you can follow us on [LinkedIn](https://www.linkedin.com/company/vikit) , [YouTube](https://www.youtube.com/@vikitai) and [Discord](https://discord.com/invite/m5HpbpSnUT) !
 
-Thanks for reading and supporting us! 
+Thanks for reading and supporting us!
