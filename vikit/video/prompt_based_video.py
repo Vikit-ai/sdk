@@ -140,7 +140,7 @@ class PromptBasedVideo(CompositeVideo):
             )
         )
 
-        keyword_based_vid = await RawTextBasedVideo(sub.text).prepare_build(
+        keyword_based_vid = await RawTextBasedVideo(enhanced_prompt_from_keywords).prepare_build(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_keywords,
                 test_mode=build_stgs.test_mode,
@@ -159,7 +159,7 @@ class PromptBasedVideo(CompositeVideo):
                 ),
             )
         )
-        prompt_based_vid = await RawTextBasedVideo(sub.text).prepare_build(
+        prompt_based_vid = await RawTextBasedVideo(enhanced_prompt_from_prompt_text).prepare_build(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_prompt_text,
                 test_mode=build_stgs.test_mode,
