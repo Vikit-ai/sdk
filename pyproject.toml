@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "vikit-sdk"
+version = "0.1.2"
+description = ""
+authors = ["Vikit.ai <hello@vikit.ai>"]
+readme = "README.md"
+
+packages = [
+    { include = "vikit/**/*.py" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+opencv-python = "4.10.0.84"
+numpy = "1.26.4"
+pandas = "2.1.4"
+aiohttp = "3.9.5"
+aiofiles = "24.1.0"
+replicate = "0.24.0"
+pysrt = "1.1.2"
+loguru = "0.7.2"
+python-dotenv = "1.0.1"
+pydantic = "2.7.4"
+tenacity = "8.2.3"
+pytest-cov = "5.0.0"
+pytest = "8.1.1"
+pytest-xdist = "3.6.1"
+pytest-asyncio = "0.23.7"
+typing-extensions = "4.12.2"
+
+[tool.poetry.dev-dependencies]
+black = "^21.7b0"
+flake8 = "^3.9.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
