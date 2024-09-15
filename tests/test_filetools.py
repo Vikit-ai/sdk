@@ -21,14 +21,16 @@ from loguru import logger
 
 import tests.testing_medias as testing_medias
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.common.file_tools import download_or_copy_file
+from vikit.common.file_tools import (
+    download_or_copy_file,
+)
+
+logger.add("log_test_Filetools.txt", rotation="10 MB")
+warnings.simplefilter("ignore", category=UserWarning)
+warnings.simplefilter("ignore", ResourceWarning)
 
 
 class TestFileTools:
-    def setup():
-        logger.add("log_test_Filetools.txt", rotation="10 MB")
-        warnings.simplefilter("ignore", category=UserWarning)
-        warnings.simplefilter("ignore", ResourceWarning)
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio

@@ -21,6 +21,7 @@ import urllib.parse
 from typing import Optional, Union
 from urllib.error import URLError
 from urllib.request import urlopen
+import asyncio
 
 import aiofiles
 import aiohttp
@@ -110,12 +111,22 @@ def web_url_exists(url):
     Check if a URL exists on the web
     """
     try:
-        urlopen(url, timeout=TIMEOUT)
+        urlopen(url=url, timeout=TIMEOUT)
         return True
     except URLError:
         return False
     except ValueError:
         return False
+
+
+def file_url_exists(url):
+    """
+    Check if a file URL exists locally
+    """
+    if url.startswith("file://"):
+        file_path = url[7:]  # Remove 'file://' prefix
+        return os.path.exists(file_path)
+    return False
 
 
 def url_exists(url: str):
@@ -133,6 +144,9 @@ def url_exists(url: str):
     assert url, "url cannot be None"
 
     if os.path.exists(url):
+        url_exists = True
+
+    if file_url_exists(url):
         url_exists = True
 
     if web_url_exists(url):

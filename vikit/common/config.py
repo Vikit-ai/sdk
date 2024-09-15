@@ -14,11 +14,12 @@
 # ==============================================================================
 
 import os
-from concurrent.futures import ProcessPoolExecutor
 from os import path
 
 from dotenv import load_dotenv
 from loguru import logger
+
+import uuid
 
 # Get the absolute path to the directory this file is in.
 dir_path = path.dirname(path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -29,6 +30,14 @@ if not os.path.exists(env_file):
     logger.warning(f"config file {env_file} does not exist")
 else:
     load_dotenv(dotenv_path=env_file)
+
+creation_uuid = str(uuid.uuid4())
+
+def get_media_polling_interval() -> int:
+    media_polling_interval = os.getenv("MEDIA_POLLING_INTERVAL", 10)
+    if media_polling_interval is None:
+        raise Exception("MEDIA_POLLING_INTERVAL is not set")
+    return int(media_polling_interval)
 
 
 def get_default_background_music() -> str:
@@ -61,13 +70,13 @@ def get_nb_retries_http_calls() -> int:
     return int(nb_retries_http_calls)
 
 
-def get_prompt_mp3_file_name() -> str:
+def get_prompt_mp3_file_name(uuid = creation_uuid) -> str:
     """
     The name of the mp3 file either converted from user  or
     generated using an llm and that we use to extract subtitles from the video
     """
     prompt_mp3_file_name = os.getenv(
-        "PROMPT_MP3_FILE_NAME", "loose_faith_prompt_upload.mp3"
+        "PROMPT_MP3_FILE_NAME", "prompt_upload_" + uuid + ".mp3"
     )
     if prompt_mp3_file_name is None:
         raise Exception("PROMPT_MP3_FILE_NAME is not set")
@@ -102,12 +111,12 @@ def get_nb_subs_per_video() -> int:
     return int(nb_subs_per_video)
 
 
-def get_subtitles_default_file_name() -> str:
+def get_subtitles_default_file_name(uuid = creation_uuid) -> str:
     """
     The default name used to save the subtitles file in the working directory
     It is typically build from smaller subtitles generated for subvideos
     """
-    subtitles_default_file_name = os.getenv("SUBTITLES_FILE_NAME", "subtitles.srt")
+    subtitles_default_file_name = os.getenv("SUBTITLES_FILE_NAME", "subtitles_" + uuid + ".srt")
     if subtitles_default_file_name is None:
         raise Exception("SUBTITLES_FILE_NAME is not set")
     return subtitles_default_file_name
@@ -140,7 +149,7 @@ def get_sub_audio_for_subtitle_prefix():
     The prefix for the file name of the audio file that will be used for the subtitles video
     """
     sub_audio_for_subtitle_prefix = os.getenv(
-        "SUB_AUDIO_FOR_SOUND_PREFIX", "sub_audio_for_sound"
+        "SUB_AUDIO_FOR_SOUND_PREFIX", "sub_audio_for_sound_" + creation_uuid
     )
     if sub_audio_for_subtitle_prefix is None:
         raise Exception("SUB_AUDIO_FOR_SOUND_PREFIX is not set")
@@ -151,17 +160,17 @@ def get_initial_audio_file_name():
     """
     The file name of the user provided or llm generated audio file
     """
-    initial_audio_file_name = os.getenv("INITIAL_AUDIO_FILE_NAME", "upload.mp3")
+    initial_audio_file_name = os.getenv("INITIAL_AUDIO_FILE_NAME", "upload_" + creation_uuid + ".mp3")
     if initial_audio_file_name is None:
         raise Exception("INITIAL_AUDIO_FILE_NAME is not set")
     return initial_audio_file_name
 
 
-def get_video_list_file_name():
+def get_video_list_file_name(uuid = creation_uuid):
     """
     The file name of the list of videos files to mix with ffmpeg
     """
-    video_list_file_name = os.getenv("VIDEO_LIST_FILE_NAME", "videosToMerge.txt")
+    video_list_file_name = os.getenv("VIDEO_LIST_FILE_NAME", "videosToMerge" + uuid + ".txt")
     if video_list_file_name is None:
         raise Exception("VIDEO_LIST_FILE_NAME is not set")
     return video_list_file_name
