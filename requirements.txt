@@ -13,4 +13,5 @@ pytest-xdist==3.6.1
 pytest-asyncio==0.23.7
 typing_extensions==4.12.2
 pandas==2.2.2
+moviepy==1.0.3
 opencv-python==4.10.0.84

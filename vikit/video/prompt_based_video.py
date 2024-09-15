@@ -140,15 +140,6 @@ class PromptBasedVideo(CompositeVideo):
             )
         )
 
-        keyword_based_vid = await RawTextBasedVideo(sub.text).prepare_build(
-            build_settings=VideoBuildSettings(
-                prompt=enhanced_prompt_from_keywords,
-                test_mode=build_stgs.test_mode,
-                target_model_provider=build_stgs.target_model_provider,
-                interpolate=build_stgs.interpolate,
-            )
-        )
-
         enhanced_prompt_from_prompt_text = (
             await prompt_fact.get_reengineered_prompt_text_from_raw_text(
                 prompt=sub.text,
@@ -159,7 +150,8 @@ class PromptBasedVideo(CompositeVideo):
                 ),
             )
         )
-        prompt_based_vid = await RawTextBasedVideo(sub.text).prepare_build(
+        
+        prompt_based_vid = await RawTextBasedVideo(enhanced_prompt_from_prompt_text).prepare_build(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_prompt_text,
                 test_mode=build_stgs.test_mode,
@@ -167,7 +159,17 @@ class PromptBasedVideo(CompositeVideo):
                 interpolate=build_stgs.interpolate,
             )
         )
-        assert keyword_based_vid is not None, "keyword_based_vid cannot be None"
-        assert prompt_based_vid is not None, "prompt_based_vid cannot be None"
 
-        return keyword_based_vid, prompt_based_vid
+        
+        prompt_based_vid2 = await RawTextBasedVideo(enhanced_prompt_from_prompt_text).prepare_build(
+            build_settings=VideoBuildSettings(
+                prompt=enhanced_prompt_from_prompt_text,
+                test_mode=build_stgs.test_mode,
+                target_model_provider=build_stgs.target_model_provider,
+                interpolate=build_stgs.interpolate,
+            )
+        )
+        assert prompt_based_vid is not None, "prompt_based_vid cannot be None"
+        assert prompt_based_vid2 is not None, "prompt_based_vid2 cannot be None"
+
+        return prompt_based_vid2, prompt_based_vid

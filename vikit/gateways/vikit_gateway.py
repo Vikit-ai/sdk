@@ -548,7 +548,7 @@ class VikitGateway(MLModelsGateway):
                                 "model": "cjwbw/whisper:b70a8e9dc4aa40bf4309285fbaefe3ed3d3a313f1f32ea61826fc64cdb4917a5",
                                 "input": {
                                     "model": "base",
-                                    "translate": True,
+                                    "translate": False,
                                     "temperature": 0,
                                     "transcription": "srt",
                                     "suppress_tokens": "-1",
