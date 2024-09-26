@@ -214,6 +214,8 @@ class VikitGateway(MLModelsGateway):
         src_img = cv2.imread(source_image_path)
         trg_img = cv2.imread(target_image_path)
 
+        target_size = (src_img.shape[1], src_img.shape[0])
+
         # Check if the sizes are different
         if src_img.shape[:2] != trg_img.shape[:2]:
             # Resize the images
@@ -606,6 +608,8 @@ class VikitGateway(MLModelsGateway):
             return await self.generate_video_DynamiCrafter_image_async(prompt)
         elif model_provider == "stabilityai_image":
             return await self.generate_video_from_image_stabilityai_async(prompt)
+        elif model_provider == "luma":
+            return await self.generate_video_luma_async(prompt)
 
         else:
             raise ValueError(f"Unknown model provider: {model_provider}")
@@ -855,3 +859,48 @@ class VikitGateway(MLModelsGateway):
                     with open(output_vid_file_name, "wb") as video_file:
                         video_file.write(base64.b64decode(output["video"]))
                     return output_vid_file_name
+
+    @retry(
+        stop=stop_after_attempt(get_nb_retries_http_calls()),
+        reraise=True,
+        wait=wait_exponential(min=1, max=5),
+    )
+    async def generate_video_luma_async(self, prompt: str):
+        """
+        Generate a video from the given image prompt
+
+        Args:
+            prompt: Image prompt to generate the video from in base64 format
+
+        returns:
+                The link to the generated video
+        """
+
+        try:
+            logger.debug(f"Generating video from prompt: {prompt}")
+            async with aiohttp.ClientSession(timeout=http_timeout) as session:
+                payload = {
+                    "key": self.vikit_api_key,
+                    "model": "luma_text2video",
+                    "input": {
+                        "prompt": prompt,  # + ", 4k",
+                    },
+                }
+                if hasattr(prompt, "negative_prompt"):
+                    payload["input"]["negative_prompt"] = prompt.negative_prompt
+
+                async with session.post(vikit_backend_url, json=payload) as response:
+                    output = await response.text()
+                    logger.debug(f"{output}")
+                    output = json.loads(output)
+
+                    video_url = output.get("video_url")
+                    
+                    if video_url and video_url.startswith("http"):
+                        return video_url
+                    else:
+                        raise AttributeError("The result Luma video link is not a valid link")
+
+        except Exception as e:
+            logger.error(f"Error generating video from prompt: {e}")
+            raise   
