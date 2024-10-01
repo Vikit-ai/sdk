@@ -77,9 +77,25 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
 
             subtitle_file_path = "_".join(["subSubtitle", str(i), str(end)]) + ".srt"
 
+            if "output" in subs:
+                if "transcription" in subs["output"]:
+                    transcription = subs["output"]["transcription"]
+                else:
+                    transcription = ""
+                    print("Warning: 'transcription' key exists but has no content.")
+            else:
+                transcription = ""
+                print("Warning: 'output' key does not exist in the subtitles dictionary.")
+
+            if transcription:
+                with open(subtitle_file_path, "w") as f:
+                    f.write(transcription)
+            else:
+                print("No valid transcription available to write to the subtitle file.")
+            
             # Write subtitles to a temporary SRT file
-            with open(subtitle_file_path, "w") as f:
-                f.write(subs["transcription"])
+            #with open(subtitle_file_path, "w") as f:
+            #    f.write(subs["transcription"])
 
             #We shift subtitles if this is not the first file
             currentSubtitles = pysrt.open(subtitle_file_path)
