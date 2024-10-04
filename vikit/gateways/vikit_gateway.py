@@ -147,6 +147,7 @@ class VikitGateway(MLModelsGateway):
                     except json.JSONDecodeError:
                         raise ValueError("The response could not be parsed as JSON.")
 
+
             await convert_as_mp3_file("temp" + tempUuid + ".wav", target_file)
             return response
 

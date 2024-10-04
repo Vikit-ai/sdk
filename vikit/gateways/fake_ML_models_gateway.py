@@ -152,6 +152,8 @@ class FakeMLModelsGateway(MLModelsGateway):
             test_file = tests_medias.get_stabilityai_image_video_path()
         elif model_provider == "dynamicrafter":
             test_file = tests_medias.get_dynamicrafter_image_video_path(prompt)
+        elif model_provider == "luma":
+            test_file = tests_medias.get_luma_video_path()
         else:
             raise ValueError(f"Unknown model provider: {model_provider}")
 
