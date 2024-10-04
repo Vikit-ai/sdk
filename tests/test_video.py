@@ -70,6 +70,7 @@ class TestVideo:
         ), "Duration is not 0"
 
     @pytest.mark.local_integration
+    @pytest.mark.core_local_integration
     @pytest.mark.asyncio
     async def test_get_first_frame_as_image_path_with_sample_video(self):
         sample_video_path = os.path.join(get_cat())
