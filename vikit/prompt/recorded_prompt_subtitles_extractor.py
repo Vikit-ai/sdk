@@ -25,6 +25,7 @@ from vikit.prompt.subtitle_extractor import SubtitleExtractor
 from vikit.wrappers.ffmpeg_wrapper import extract_audio_slice, get_media_duration
 import uuid
 
+
 class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
     """
     A class to extract subtitles from a sound recording,
@@ -81,30 +82,29 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
                 if "transcription" in subs["output"]:
                     transcription = subs["output"]["transcription"]
                 else:
-                    transcription = ""
-                    print("Warning: 'transcription' key exists but has no content.")
+                    raise ValueError(
+                        "Error: 'transcription' key exists but has no content."
+                    )
             else:
-                transcription = ""
-                print("Warning: 'output' key does not exist in the subtitles dictionary.")
+                raise ValueError(
+                    "Error: 'transcription' key exists but has no content."
+                )
 
-            if transcription:
-                with open(subtitle_file_path, "w") as f:
-                    f.write(transcription)
-            else:
-                print("No valid transcription available to write to the subtitle file.")
-            
-            # Write subtitles to a temporary SRT file
-            #with open(subtitle_file_path, "w") as f:
-            #    f.write(subs["transcription"])
+            with open(subtitle_file_path, "w") as f:
+                f.write(transcription)
 
-            #We shift subtitles if this is not the first file
+            # We shift subtitles if this is not the first file
             currentSubtitles = pysrt.open(subtitle_file_path)
             currentSubtitles.shift(seconds=secondsToAdd)
             currentSubtitles.save(subtitle_file_path)
 
-            #We save the new time of the last subtitle to add it to the next batch of subtitles
+            # We save the new time of the last subtitle to add it to the next batch of subtitles
             last_subtitle = currentSubtitles[-1]
-            secondsToAdd = last_subtitle.end.hours * 3600 + last_subtitle.end.minutes * 60 + last_subtitle.end.seconds
+            secondsToAdd = (
+                last_subtitle.end.hours * 3600
+                + last_subtitle.end.minutes * 60
+                + last_subtitle.end.seconds
+            )
 
             # Append SRT file path to cat command arguments
             cat_command_args = " ".join([cat_command_args, subtitle_file_path])

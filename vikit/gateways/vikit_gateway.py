@@ -55,12 +55,13 @@ http_timeout = aiohttp.ClientTimeout(
     total=1500, connect=500, sock_read=500, sock_connect=500
 )
 
+
 class VikitGateway(MLModelsGateway):
     """
     A Gateway to interact with the Vikit API
     """
 
-    def __init__(self, vikit_api_key: str=None):
+    def __init__(self, vikit_api_key: str = None):
         super().__init__()
         if vikit_api_key != None:
             self.vikit_api_key = vikit_api_key
@@ -119,29 +120,32 @@ class VikitGateway(MLModelsGateway):
                 async with session.post(vikit_backend_url, json=payload) as response:
 
                     if response.status == 403:
-                        raise PermissionError("Access to the Vikit API was forbidden (403). You may have reached your API call limit. Please check your API permissions or credentials or buy more credits.")
+                        raise PermissionError(
+                            "Access to the Vikit API was forbidden (403). Please check your API credentials."
+                        )
 
                     if response.status != 200:
-                        raise RuntimeError("We failed to connect to Vikit API. Please check the API URL.")
-                    
+                        raise RuntimeError(
+                            f"We failed to connect to Vikit API. Returned Error: {response.status}, {response.reason}"
+                        )
+
                     response = await response.text()
 
                     try:
                         response_json = json.loads(response)
                         audio_link = response_json.get("output")
-                        
+
                         if audio_link is None or not audio_link.startswith("http"):
-                            raise AttributeError("The result audio link is not a valid URL. Please verify the API response.")
-                        
-                        await download_or_copy_file(url=audio_link, local_path="temp" + tempUuid + ".wav")
+                            raise AttributeError(
+                                "The result audio link is not a valid URL. Please verify the API response."
+                            )
+
+                        await download_or_copy_file(
+                            url=audio_link, local_path="temp" + tempUuid + ".wav"
+                        )
 
                     except json.JSONDecodeError:
                         raise ValueError("The response could not be parsed as JSON.")
-                    
-                    #if not response.startswith("http"):
-                    #    raise AttributeError("The result audio link is not a valid URL. Please verify the API response.")
-                    
-                    #await download_or_copy_file(url=response, local_path="temp" + tempUuid + ".wav")
 
             await convert_as_mp3_file("temp" + tempUuid + ".wav", target_file)
             return response
@@ -230,8 +234,8 @@ class VikitGateway(MLModelsGateway):
             raise FileNotFoundError(
                 f"The target image path does not exist: {target_image_path}"
             )
-        
-        #Resize images
+
+        # Resize images
         # Open the images using OpenCV
         src_img = cv2.imread(source_image_path)
         trg_img = cv2.imread(target_image_path)
@@ -252,7 +256,6 @@ class VikitGateway(MLModelsGateway):
 
         with open(target_image_path, "rb") as trg_file:
             target_image_base64 = base64.b64encode(trg_file.read()).decode("ascii")
-        
 
         try:
             async for attempt in AsyncRetrying(
@@ -337,17 +340,17 @@ class VikitGateway(MLModelsGateway):
 
             async with session.post(vikit_backend_url, json=payload) as response:
                 result_music_link = await response.text()
-        
+
         if result_music_link is None:
             raise AttributeError("The result music link is None")
         if len(result_music_link) < 1:
             raise AttributeError("The result music link is empty")
-        
+
         response_json = json.loads(result_music_link)
-        
+
         if "output" in response_json:
             result_music_link = response_json["output"]
-    
+
         if not result_music_link.startswith("http"):
             raise AttributeError("The result music link is not a link")
 
@@ -444,10 +447,10 @@ class VikitGateway(MLModelsGateway):
                 output = await response.text()
 
         response_json = json.loads(output)
-        
+
         if "output" in response_json:
             output = response_json["output"]
-    
+
         if not output.startswith("http"):
             raise AttributeError("The result interpolated link is not a link")
 
@@ -701,14 +704,18 @@ class VikitGateway(MLModelsGateway):
 
                 # Resize the image using OpenCV
                 target_size = (1024, 576)
-                resized_image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
+                resized_image = cv2.resize(
+                    image, target_size, interpolation=cv2.INTER_AREA
+                )
 
                 # Encode the resized image back to base64
-                _, buffer = cv2.imencode('.png', resized_image)
+                _, buffer = cv2.imencode(".png", resized_image)
 
                 # Encode the image as base64
-                img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode('utf-8')
-                
+                img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode(
+                    "utf-8"
+                )
+
                 logger.debug("Generating video from image")
                 # Ask for a video
                 async with aiohttp.ClientSession() as session:
@@ -798,12 +805,12 @@ class VikitGateway(MLModelsGateway):
             }
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
-        
+
         response_json = json.loads(output)
-        
+
         if "output" in response_json:
             output = response_json["output"]
-            
+
         if not output.startswith("http"):
             raise AttributeError("The result Videocrafter video link is not a link")
         return output
@@ -858,7 +865,7 @@ class VikitGateway(MLModelsGateway):
         logger.debug(f"Generating video from image prompt {prompt.text} ")
         async with aiohttp.ClientSession() as session:
             logger.debug("Resizing image for video generator")
-            
+
             # Convert result to Base64
             image_data = base64.b64decode(prompt.image)
 
@@ -873,11 +880,13 @@ class VikitGateway(MLModelsGateway):
             resized_image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
 
             # Encode the resized image back to base64
-            _, buffer = cv2.imencode('.png', resized_image)
+            _, buffer = cv2.imencode(".png", resized_image)
 
             # Encode the image as base64
-            img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode('utf-8')
-            
+            img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode(
+                "utf-8"
+            )
+
             logger.debug("Generating video from image")
             # Ask for a video
             async with aiohttp.ClientSession() as session:
@@ -915,31 +924,28 @@ class VikitGateway(MLModelsGateway):
                 The link to the generated video
         """
 
-        try:
-            logger.debug(f"Generating video from prompt: {prompt}")
-            async with aiohttp.ClientSession(timeout=http_timeout) as session:
-                payload = {
-                    "key": self.vikit_api_key,
-                    "model": "luma_text2video",
-                    "input": {
-                        "prompt": prompt,  # + ", 4k",
-                    },
-                }
-                if hasattr(prompt, "negative_prompt"):
-                    payload["input"]["negative_prompt"] = prompt.negative_prompt
+        logger.debug(f"Generating video from prompt: {prompt}")
+        async with aiohttp.ClientSession(timeout=http_timeout) as session:
+            payload = {
+                "key": self.vikit_api_key,
+                "model": "luma_text2video",
+                "input": {
+                    "prompt": prompt,  # + ", 4k",
+                },
+            }
+            if hasattr(prompt, "negative_prompt"):
+                payload["input"]["negative_prompt"] = prompt.negative_prompt
 
-                async with session.post(vikit_backend_url, json=payload) as response:
-                    output = await response.text()
-                    logger.debug(f"{output}")
-                    output = json.loads(output)
+            async with session.post(vikit_backend_url, json=payload) as response:
+                output = await response.text()
+                logger.debug(f"{output}")
+                output = json.loads(output)
 
-                    video_url = output.get("video_url")
-                    
-                    if video_url and video_url.startswith("http"):
-                        return video_url
-                    else:
-                        raise AttributeError("The result Luma video link is not a valid link")
+                video_url = output.get("video_url")
 
-        except Exception as e:
-            logger.error(f"Error generating video from prompt: {e}")
-            raise   
+                if video_url and video_url.startswith("http"):
+                    return video_url
+                else:
+                    raise AttributeError(
+                        "The result Luma video link is not a valid link"
+                    )
