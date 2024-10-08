@@ -485,9 +485,9 @@ class VikitGateway(MLModelsGateway):
                         "top_p": 0.9,
                         "prompt": "I want you to act as a english keyword generator for Midjourney's artificial intelligence program."
                         + "Your job is to provide detailed and creative descriptions that will inspire unique and interesting images from "
-                        + "the AI for a video in less  than 50 characters. Keep in mind that the AI is capable of understanding a wide range of language and can "
+                        + "the AI for a video in less than 100 characters. Keep in mind that the AI is capable of understanding a wide range of language and can "
                         + "interpret abstract concepts, so feel free to be as imaginative and descriptive as possible. Don't repeat keywords. The more detailed "
-                        + "and imaginative your keywords, the more interesting the resulting image will be. Do not use more than 50 characters. Here is the sentence from "
+                        + "and imaginative your keywords, the more interesting the resulting image will be. Do not use more than 100 characters. Here is the sentence from "
                         + "which to extract keywords: '"
                         ""
                         + subtitleText
@@ -535,7 +535,7 @@ class VikitGateway(MLModelsGateway):
                 "input": {
                     "top_k": 50,
                     "top_p": 0.9,
-                    "prompt": "I want you to act as a one sentence prompt creator for Midjourney's artificial intelligence program. Your job is to provide one detailed and creative sentence that will inspire unique and interesting video from the AI to create with no more than 50 characters. Keep in mind that the AI is capable of understanding a wide range of language and can interpret abstract concepts, so feel free to be as imaginative and descriptive as possible.  The more detailed and imaginative your description, the more interesting the resulting image will be. Do not use more than 50 characters. Here is the paragraph to summarize in one sentence that describes a scenario for a video: '"
+                    "prompt": "I want you to act as a one sentence prompt creator for Midjourney's artificial intelligence program. Your job is to provide one detailed and creative sentence that will inspire unique and interesting video from the AI to create with no more than 100 characters. Keep in mind that the AI is capable of understanding a wide range of language and can interpret abstract concepts, so feel free to be as imaginative and descriptive as possible.  The more detailed and imaginative your description, the more interesting the resulting image will be. Do not use more than 100 characters. Here is the paragraph to summarize in one sentence that describes a scenario for a video: '"
                     + subtitleText
                     + "'. Just give me a short summary of what is said in a way that would make a good video. Please avoid speaking about anything related to text."
                     + "The last 3 words of your answer should be a summary of all the other keywords so I can generate a file name out of it",
