@@ -14,7 +14,7 @@
 # ==============================================================================
 
 import asyncio
-import base64f
+import base64
 import io
 import json
 import os
