@@ -54,19 +54,20 @@ http_timeout = aiohttp.ClientTimeout(
     total=1500, connect=500, sock_read=500, sock_connect=500
 )
 
+mistral_version = "mistralai/mixtral-8x7b-instruct-v0.1"
+
 
 class VikitGateway(MLModelsGateway):
     """
     A Gateway to interact with the Vikit API
     """
 
-    def __init__(self, vikit_api_key: str=None):
+    def __init__(self, vikit_api_key: str = None):
         super().__init__()
         if vikit_api_key != None:
             self.vikit_api_key = vikit_api_key
         else:
             self.vikit_api_key = get_vikit_api_token()
-
 
     async def generate_mp3_from_text_async_elevenlabs(
         self,
@@ -120,7 +121,9 @@ class VikitGateway(MLModelsGateway):
                     response = await response.text()
                     if not response.startswith("http"):
                         raise AttributeError("The result audio link is not a link")
-                    await download_or_copy_file(url=response, local_path="temp" + tempUuid + ".wav")
+                    await download_or_copy_file(
+                        url=response, local_path="temp" + tempUuid + ".wav"
+                    )
             await convert_as_mp3_file("temp" + tempUuid + ".wav", target_file)
             return response
 
@@ -208,8 +211,8 @@ class VikitGateway(MLModelsGateway):
             raise FileNotFoundError(
                 f"The target image path does not exist: {target_image_path}"
             )
-        
-        #Resize images
+
+        # Resize images
         # Open the images using OpenCV
         src_img = cv2.imread(source_image_path)
         trg_img = cv2.imread(target_image_path)
@@ -228,7 +231,6 @@ class VikitGateway(MLModelsGateway):
 
         with open(target_image_path, "rb") as trg_file:
             target_image_base64 = base64.b64encode(trg_file.read()).decode("ascii")
-        
 
         try:
             async for attempt in AsyncRetrying(
@@ -349,7 +351,7 @@ class VikitGateway(MLModelsGateway):
         async with aiohttp.ClientSession(timeout=http_timeout) as session:
             payload = {
                 "key": self.vikit_api_key,
-                "model": "mistralai/mistral-7b-instruct-v0.2",
+                "model": mistral_version,
                 "input": {
                     "top_k": 50,
                     "top_p": 0.9,
@@ -439,7 +441,7 @@ class VikitGateway(MLModelsGateway):
             payload = (
                 {
                     "key": self.vikit_api_key,
-                    "model": "mistralai/mistral-7b-instruct-v0.2",
+                    "model": mistral_version,
                     "input": {
                         "top_k": 50,
                         "top_p": 0.9,
@@ -491,7 +493,7 @@ class VikitGateway(MLModelsGateway):
         async with aiohttp.ClientSession(timeout=http_timeout) as session:
             payload = {
                 "key": self.vikit_api_key,
-                "model": "mistralai/mistral-7b-instruct-v0.2",
+                "model": mistral_version,
                 "input": {
                     "top_k": 50,
                     "top_p": 0.9,
@@ -664,14 +666,18 @@ class VikitGateway(MLModelsGateway):
 
                 # Resize the image using OpenCV
                 target_size = (1024, 576)
-                resized_image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
+                resized_image = cv2.resize(
+                    image, target_size, interpolation=cv2.INTER_AREA
+                )
 
                 # Encode the resized image back to base64
-                _, buffer = cv2.imencode('.png', resized_image)
+                _, buffer = cv2.imencode(".png", resized_image)
 
                 # Encode the image as base64
-                img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode('utf-8')
-                
+                img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode(
+                    "utf-8"
+                )
+
                 logger.debug("Generating video from image")
                 # Ask for a video
                 async with aiohttp.ClientSession() as session:
@@ -815,7 +821,7 @@ class VikitGateway(MLModelsGateway):
         logger.debug(f"Generating video from image prompt {prompt.text} ")
         async with aiohttp.ClientSession() as session:
             logger.debug("Resizing image for video generator")
-            
+
             # Convert result to Base64
             image_data = base64.b64decode(prompt.image)
 
@@ -830,11 +836,13 @@ class VikitGateway(MLModelsGateway):
             resized_image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
 
             # Encode the resized image back to base64
-            _, buffer = cv2.imencode('.png', resized_image)
+            _, buffer = cv2.imencode(".png", resized_image)
 
             # Encode the image as base64
-            img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode('utf-8')
-            
+            img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode(
+                "utf-8"
+            )
+
             logger.debug("Generating video from image")
             # Ask for a video
             async with aiohttp.ClientSession() as session:
