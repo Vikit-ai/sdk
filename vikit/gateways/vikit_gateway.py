@@ -55,6 +55,8 @@ http_timeout = aiohttp.ClientTimeout(
     total=1500, connect=500, sock_read=500, sock_connect=500
 )
 
+mistral_version = "mistralai/mixtral-8x7b-instruct-v0.1"
+
 
 class VikitGateway(MLModelsGateway):
     """
@@ -130,24 +132,11 @@ class VikitGateway(MLModelsGateway):
                         )
 
                     response = await response.text()
-
-                    try:
-                        response_json = json.loads(response)
-                        audio_link = response_json.get("output")
-
-                        if audio_link is None or not audio_link.startswith("http"):
-                            raise AttributeError(
-                                "The result audio link is not a valid URL. Please verify the API response."
-                            )
-
-                        await download_or_copy_file(
-                            url=audio_link, local_path="temp" + tempUuid + ".wav"
-                        )
-
-                    except json.JSONDecodeError:
-                        raise ValueError("The response could not be parsed as JSON.")
-
-
+                    if not response.startswith("http"):
+                        raise AttributeError("The result audio link is not a link")
+                    await download_or_copy_file(
+                        url=response, local_path="temp" + tempUuid + ".wav"
+                    )
             await convert_as_mp3_file("temp" + tempUuid + ".wav", target_file)
             return response
 
@@ -383,7 +372,7 @@ class VikitGateway(MLModelsGateway):
         async with aiohttp.ClientSession(timeout=http_timeout) as session:
             payload = {
                 "key": self.vikit_api_key,
-                "model": "mistralai/mistral-7b-instruct-v0.2",
+                "model": mistral_version,
                 "input": {
                     "top_k": 50,
                     "top_p": 0.9,
@@ -478,7 +467,7 @@ class VikitGateway(MLModelsGateway):
             payload = (
                 {
                     "key": self.vikit_api_key,
-                    "model": "mistralai/mistral-7b-instruct-v0.2",
+                    "model": mistral_version,
                     "input": {
                         "top_k": 50,
                         "top_p": 0.9,
@@ -530,7 +519,7 @@ class VikitGateway(MLModelsGateway):
         async with aiohttp.ClientSession(timeout=http_timeout) as session:
             payload = {
                 "key": self.vikit_api_key,
-                "model": "mistralai/mistral-7b-instruct-v0.2",
+                "model": mistral_version,
                 "input": {
                     "top_k": 50,
                     "top_p": 0.9,
