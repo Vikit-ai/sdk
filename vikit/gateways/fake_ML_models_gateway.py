@@ -134,7 +134,7 @@ class FakeMLModelsGateway(MLModelsGateway):
         return {"transcription": subs}
 
     async def generate_video_async(
-        self, prompt: str = None, sleep_time: int = 0, model_provider: str = None
+        self, prompt_text: str = None, sleep_time: int = 0, model_provider: str = None, prompt_image:str = "", target_ratio=(16,9)
     ):
         await asyncio.sleep(sleep_time)
 
@@ -155,14 +155,14 @@ class FakeMLModelsGateway(MLModelsGateway):
         else:
             raise ValueError(f"Unknown model provider: {model_provider}")
 
-        if isinstance(prompt, str):
+        if isinstance(prompt_text, str):
             logger.debug(
-                f"Generating video from prompt: {prompt[:5]}, return a link: {test_file}"
+                f"Generating video from prompt: {prompt_text[:5]}, return a link: {test_file}"
             )
         # image-based prompt
         else:
             logger.debug(
-                f"Generating video from prompt: {prompt.text[:5]}, return a link: {test_file}"
+                f"Generating video from prompt: {prompt.text:5]}, return a link: {test_file}"
             )
 
         return test_file

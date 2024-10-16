@@ -28,7 +28,7 @@ class RecordedPrompt(Prompt):
     to generate a prompt from a recorded audio file, like a podcast or a video soundtrack (e.g. a musical video clip)
     """
 
-    def __init__(self, audio_recording=None, subtitles=None, duration=None, text=None):
+    def __init__(self, audio_recording=None, subtitles=None, duration=None, text=None, image=None, ratio:tuple = (16,9)):
         """
         Initialize the prompt with the path to the recorded audio prompt
         """
@@ -36,6 +36,8 @@ class RecordedPrompt(Prompt):
         self.subtitles: list[pysrt.SubRipItem] = subtitles
         self.duration = duration
         self.text = text
+        self.image = image
+        self.ratio = ratio
 
     def get_full_text(self) -> str:
         """

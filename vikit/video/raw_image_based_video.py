@@ -90,6 +90,6 @@ class RawImageBasedVideo(Video):
         """
         handlers = []
         handlers.append(
-            VideoGenHandler(video_gen_text_prompt=self.build_settings.prompt)
+            VideoGenHandler(video_gen_prompt=self.build_settings.prompt)
         )
         return handlers

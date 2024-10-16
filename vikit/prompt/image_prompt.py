@@ -21,12 +21,13 @@ class ImagePrompt(Prompt):
     A class to represent an image prompt
     """
 
-    def __init__(self, prompt_image: str = None, text: str = None):
+    def __init__(self, prompt_image: str = None, text: str = None, ratio:tuple = (16,9)):
         super().__init__()
         if prompt_image is None:
             raise ValueError("The image prompt is not provided")
         self.image = prompt_image
         self.text = text
+        self.ratio = ratio
 
     @property
     def duration(self) -> float:

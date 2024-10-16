@@ -581,7 +581,7 @@ class VikitGateway(MLModelsGateway):
             raise Exception("Retry failed {e}")
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def generate_video_async(self, prompt: str, model_provider: str):
+    async def generate_video_async(self, prompt_text, model_provider: str, prompt_image:str = "", target_ratio=(16,9)):
         """
         Generate a video from the given prompt
 
@@ -595,20 +595,21 @@ class VikitGateway(MLModelsGateway):
         logger.debug(f"Generating video using model provider: {model_provider}")
 
         if model_provider == "vikit":
-            return await self.generate_video_stabilityai_async(prompt)
+            return await self.generate_video_stabilityai_async(prompt_text)
         elif model_provider == "stabilityai":
-            return await self.generate_video_stabilityai_async(prompt)
+            return await self.generate_video_stabilityai_async(prompt_text)
         elif model_provider == "" or model_provider is None:
-            return await self.generate_video_stabilityai_async(prompt)
+            return await self.generate_video_stabilityai_async(prompt_text)
         elif model_provider == "haiper":
-            return await self.generate_video_haiper_async(prompt)
+            return await self.generate_video_haiper_async(prompt_text)
         elif model_provider == "videocrafter":
-            return await self.generate_video_VideoCrafter2_async(prompt)
+            return await self.generate_video_VideoCrafter2_async(prompt_text)
         elif model_provider == "dynamicrafter":
-            return await self.generate_video_DynamiCrafter_image_async(prompt)
+            return await self.generate_video_DynamiCrafter_image_async(prompt_text)
         elif model_provider == "stabilityai_image":
-            return await self.generate_video_from_image_stabilityai_async(prompt)
-
+            return await self.generate_video_from_image_stabilityai_async(prompt_text)
+        elif model_provider == "runway":
+            return await self.generate_video_from_image_and_text_runway(prompt_text, prompt_image, target_ratio)
         else:
             raise ValueError(f"Unknown model provider: {model_provider}")
 
@@ -863,3 +864,77 @@ class VikitGateway(MLModelsGateway):
                     with open(output_vid_file_name, "wb") as video_file:
                         video_file.write(base64.b64decode(output["video"]))
                     return output_vid_file_name
+
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    async def generate_video_from_image_and_text_runway(self, prompt: str = "", image:str = "", target_ratio=(16,9)):
+        """
+        Generate a video from the given image prompt
+
+        Args:
+            prompt: Image prompt to generate the video from in base64 format
+
+        returns:
+                The link to the generated video
+        """
+        try:
+            output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
+            logger.debug(f"Generating video from image prompt {image} and prompt {prompt}")
+            
+            image_prompt = image
+            if (target_ratio == (16,9)):
+                target_size=(1280,768)
+            else:
+                target_size=(768, 1280)
+
+            #If base64, we resize it. If URL, we cannot resize without downloading it
+            if (not image.startswith("http")):
+                #Base64 image
+                logger.debug("Resizing image for video generator")
+
+                # Convert result to Base64
+                image_data = base64.b64decode(image)
+
+                # Convert the image data to a NumPy array
+                np_arr = np.frombuffer(image_data, np.uint8)
+
+                # Decode the image using OpenCV
+                image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+                # Resize the image using OpenCV
+                resized_image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
+
+                # Encode the resized image back to base64
+                _, buffer = cv2.imencode(".png", resized_image)
+
+                # Encode the image as base64
+                img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode(
+                    "utf-8"
+                )
+                image_prompt = img_b64
+            
+            logger.debug("Generating video from image")
+            # Ask for a video
+            async with aiohttp.ClientSession() as session:
+                payload = (
+                    {
+                        "key": self.vikit_api_key,
+                        "model": "runway",
+                        "input": {
+                            "model": "gen3a_turbo", 
+                            "promptImage": image, 
+                            "promptText": prompt
+                        },
+                    },
+                )
+                async with session.post(vikit_backend_url, json=payload) as response:
+                    output = await response.text()
+                    logger.debug(f"{output}")
+                    output = json.loads(output)
+                    if not output["video_url"].startswith("http"):
+                        raise AttributeError(
+                            "The result Runway video link is not a link"
+                        )
+                    return output["video_url"]
+        except Exception as e:
+            logger.error(f"Error generating video from prompt: {e}")
+            raise

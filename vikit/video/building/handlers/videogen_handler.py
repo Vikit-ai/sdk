@@ -22,13 +22,14 @@ from vikit.common.config import get_media_polling_interval
 from vikit.common.file_tools import (
     url_exists,
 )
+from vikit.prompt.prompt import Prompt
 
 
 class VideoGenHandler(Handler):
-    def __init__(self, video_gen_text_prompt: str = None):
-        if not video_gen_text_prompt:
-            raise ValueError("Prompt text is not set")
-        self.video_gen_prompt_text = video_gen_text_prompt
+    def __init__(self, video_gen_prompt: Prompt = None):
+        if not video_gen_prompt:
+            raise ValueError("Prompt is not set")
+        self.video_gen_prompt = video_gen_prompt
 
     async def execute_async(self, video: Video):
         """
@@ -53,8 +54,10 @@ class VideoGenHandler(Handler):
         video.media_url = (
             await (  # Should give a link on a web storage
                 video.build_settings.get_ml_models_gateway().generate_video_async(
-                    prompt=self.video_gen_prompt_text,
+                    prompt_text=self.video_gen_prompt.text,
                     model_provider=video.build_settings.target_model_provider,
+                    prompt_image = self.video_gen_prompt.image, 
+                    target_size=self.video_gen_prompt.target_ratio,
                 )
             )
         )
