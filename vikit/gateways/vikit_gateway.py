@@ -913,6 +913,9 @@ class VikitGateway(MLModelsGateway):
                 image_prompt = img_b64
             
             logger.debug(f"Generating video from resized image {image_prompt[:50]}")
+
+            ratio = str(aspect_ratio[0]) + ':' + str(aspect_ratio[1])
+
             # Ask for a video
             async with aiohttp.ClientSession() as session:
                 payload = (
@@ -922,12 +925,15 @@ class VikitGateway(MLModelsGateway):
                         "input": {
                             "model": "gen3a_turbo", 
                             "promptImage": image_prompt, 
-                            "promptText": prompt
+                            "promptText": prompt,
+                            "duration": 5,
+                            "ratio": ratio,
                         },
                     },
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
+                    print(output)
                     logger.debug(f"{output}")
                     output = json.loads(output)
                     if not output["video_url"].startswith("http"):

@@ -242,6 +242,7 @@ async def composite_imageonly_prompting(prompt_file: str):
         video, _ = await create_single_image_based_video(
             prompt_content=prompt_content,
             build_settings=single_video_buildsettings,
+            text="Moving fast"
         )
         # Add transitions from time to time
         if i >= 1 and i % 2 == 0:
@@ -305,6 +306,7 @@ async def composite_mixed_prompting(
                 await create_single_image_based_video(
                     prompt_content=prompt_content,
                     build_settings=image_based_video_buildsettings,
+                    text="Moving fast"
                 )
             )
 

@@ -47,7 +47,7 @@ class VideoGenHandler(Handler):
         Returns:
             The video with the media URL set to the generated video
         """
-        logger.info(f"About to generate video: {video.id}, title: {video.get_title()}")
+        logger.info(f"About to generate video: {video.id}, title: {video.get_title()}, prompt: {self.video_gen_prompt}")
         logger.debug(
             f"Target Model provider in the handler: {video.build_settings.target_model_provider}"
         )
