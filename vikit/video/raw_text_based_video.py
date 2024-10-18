@@ -38,6 +38,7 @@ class RawTextBasedVideo(Video):
         self,
         raw_text_prompt: str = None,
         title=None,
+        target_ratio=(16,9)
     ):
         """
         Initialize the video
@@ -57,6 +58,8 @@ class RawTextBasedVideo(Video):
         super().__init__()
 
         self.text = raw_text_prompt
+        self.image = None
+        self.target_ratio = target_ratio
         self._title = None
         if title:
             self._title = title
@@ -96,7 +99,7 @@ class RawTextBasedVideo(Video):
              list: The list of handlers to use for building the video
         """
         handlers = []
-        handlers.append(VideoGenHandler(video_gen_text_prompt=self.text))
+        handlers.append(VideoGenHandler(video_gen_prompt=self))
         if build_settings.interpolate:
             if build_settings.target_model_provider == "videocrafter":
                 handlers.append(VideoInterpolationHandler())

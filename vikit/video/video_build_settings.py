@@ -33,6 +33,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         target_dir_path: str = None,
         output_video_file_name: str = None,
         vikit_api_key: str = None,
+        aspect_ratio:tuple = (16,9),
     ):
         """
         VideoBuildSettings class constructor

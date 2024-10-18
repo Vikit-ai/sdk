@@ -41,7 +41,7 @@ class TestVideoBuildingHandlers:
         with WorkingFolderContext():
             vid = RawTextBasedVideo(raw_text_prompt="test")
             vid.build_settings = VideoBuildSettings()
-            api_handler = VideoGenHandler(video_gen_text_prompt="test")
+            api_handler = VideoGenHandler(video_gen_prompt="test")
             video_built = await api_handler.execute_async(video=vid)
             assert video_built is not None, "Video built should not be None"
             logger.debug(f"Video built media: {video_built.media_url}")
