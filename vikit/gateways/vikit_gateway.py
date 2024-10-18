@@ -54,7 +54,7 @@ http_timeout = aiohttp.ClientTimeout(
     total=1500, connect=500, sock_read=500, sock_connect=500
 )
 
-mistral_version = "mistralai/mixtral-8x7b-instruct-v0.1"
+mistral_version = "mistralai/mistral-7b-v0.1"
 
 
 class VikitGateway(MLModelsGateway):
