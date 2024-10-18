@@ -72,7 +72,7 @@ class PromptFactory:
             self._ml_gateway = prompt_build_settings.get_ml_models_gateway()
 
     async def create_prompt_from_text(
-        self, prompt_text: str = None, negative_prompt: str = None, ratio:tuple = (16,9)
+        self, prompt_text: str = None, negative_prompt: str = None
     ):
         """
         Create a recorded prompt object from a text by  creating
@@ -114,7 +114,6 @@ class PromptFactory:
             subtitles=merged_subs,
             audio_recording=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
             duration=get_media_duration(config.get_prompt_mp3_file_name(self.prompt_factory_uuid)),
-            ratio=ratio,
         )
         prompt.negative_prompt = negative_prompt
         return prompt
@@ -122,7 +121,6 @@ class PromptFactory:
     async def create_prompt_from_audio_file(
         self,
         recorded_audio_prompt_path: str = None,
-        ratio:tuple = (16,9),
     ):
         """
         Create a prompt object from a recorded audio file
@@ -159,7 +157,6 @@ class PromptFactory:
     async def create_prompt_from_audio_file_async(
         self,
         recorded_audio_prompt_path: str = None,
-        ratio:tuple = (16,9),
     ):
         """
         Create a prompt object from a recorded audio file
@@ -179,7 +176,7 @@ class PromptFactory:
             subs, min_duration=config.get_subtitles_min_duration()
         )
         text = extractor.build_subtitles_as_text_tokens(merged_subs)
-        prompt = RecordedPrompt(subtitles=merged_subs, text=text, ratio=ratio)
+        prompt = RecordedPrompt(subtitles=merged_subs, text=text)
         await prompt.convert_recorded_audio_prompt_path_to_mp3(
             recorded_audio_prompt_path
         )
@@ -239,7 +236,6 @@ class PromptFactory:
         self,
         image_path: str = None,
         text: str = None,
-        ratio:tuple = (16,9),
     ):
         """
         Create a prompt object from a prompt image path
@@ -257,5 +253,5 @@ class PromptFactory:
 
         with open(image_path, "rb") as image_file:
             input_prompt_image = base64.b64encode(image_file.read()).decode("utf-8")
-        img_prompt = ImagePrompt(prompt_image=input_prompt_image, text=text, ratio=ratio)
+        img_prompt = ImagePrompt(prompt_image=input_prompt_image, text=text)
         return img_prompt

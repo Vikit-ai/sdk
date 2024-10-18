@@ -57,7 +57,7 @@ class VideoGenHandler(Handler):
                     prompt_text=self.video_gen_prompt.text,
                     model_provider=video.build_settings.target_model_provider,
                     prompt_image = self.video_gen_prompt.image, 
-                    target_size=self.video_gen_prompt.target_ratio,
+                    aspect_ratio=video.build_settings.aspect_ratio,
                 )
             )
         )

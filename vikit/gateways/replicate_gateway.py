@@ -396,7 +396,7 @@ class ReplicateGateway(MLModelsGateway):
         return subs
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def generate_video_async(self, prompt_text: str, model_provider: str = "videocrafter", prompt_image:str = "", target_ratio=(16,9)):
+    async def generate_video_async(self, prompt_text: str, model_provider: str = "videocrafter", prompt_image:str = "", aspect_ratio=(16,9)):
         """
         Generate a video from the given prompt
 

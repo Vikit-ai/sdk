@@ -50,6 +50,7 @@ def get_estimated_duration(composite: CompositeVideo) -> float:
         "dynamicrafter": 2.0,
         "haiper": 4.0,
         "transition": 2.0,
+        "runway": 10.0,
     }
     duration = 0
     for video in composite.video_list:
@@ -179,7 +180,7 @@ async def create_single_image_based_video(
     ).create_prompt_from_image(image_path=prompt_content, text=text)
 
     video = RawImageBasedVideo(
-        raw_image_prompt=image_prompt.image,
+        prompt=image_prompt,
     )
     video.build_settings = build_settings
     build_settings.prompt = image_prompt
@@ -224,7 +225,7 @@ async def batch_image_based_prompting(prompt_file: str):
 async def composite_imageonly_prompting(prompt_file: str):
 
     TEST_MODE = False
-    model_provider = "stabilityai_image"
+    model_provider = "runway"
 
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
 
