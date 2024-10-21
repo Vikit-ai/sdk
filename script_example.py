@@ -225,7 +225,7 @@ async def batch_image_based_prompting(prompt_file: str):
 async def composite_imageonly_prompting(prompt_file: str):
 
     TEST_MODE = False
-    model_provider = "runway"
+    model_provider = "videocrafter"
 
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
 

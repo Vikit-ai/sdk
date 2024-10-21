@@ -58,7 +58,6 @@ class RawTextBasedVideo(Video):
         super().__init__()
 
         self.text = raw_text_prompt
-        self.image = None
         self.target_ratio = target_ratio
         self._title = None
         if title:
