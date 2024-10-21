@@ -28,6 +28,8 @@ from vikit.video.building.handlers.videogen_handler import VideoGenHandler
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video_build_settings import VideoBuildSettings
 
+from vikit.prompt.prompt_factory import PromptFactory
+
 warnings.simplefilter("ignore", category=ResourceWarning)
 warnings.simplefilter("ignore", category=UserWarning)
 logger.add("log_test_video_building_handlers.txt", rotation="10 MB")
