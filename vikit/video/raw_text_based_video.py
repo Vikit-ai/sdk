@@ -37,8 +37,7 @@ class RawTextBasedVideo(Video):
     def __init__(
         self,
         raw_text_prompt: str = None,
-        title=None,
-        target_ratio=(16,9)
+        title=None
     ):
         """
         Initialize the video
@@ -58,7 +57,6 @@ class RawTextBasedVideo(Video):
         super().__init__()
 
         self.text = raw_text_prompt
-        self.target_ratio = target_ratio
         self._title = None
         if title:
             self._title = title
