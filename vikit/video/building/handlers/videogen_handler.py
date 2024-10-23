@@ -24,6 +24,7 @@ from vikit.common.file_tools import (
 )
 from vikit.prompt.prompt import Prompt
 from vikit.prompt.image_prompt import ImagePrompt
+from vikit.prompt.multimodal_prompt import MultiModalPrompt
 
 class VideoGenHandler(Handler):
     def __init__(self, video_gen_prompt: Prompt = None):
@@ -52,15 +53,14 @@ class VideoGenHandler(Handler):
             f"Target Model provider in the handler: {video.build_settings.target_model_provider}"
         )
         prompt_image = None
-        if isinstance(self.video_gen_prompt, ImagePrompt): 
+        if isinstance(self.video_gen_prompt, ImagePrompt) or isinstance(self.video_gen_prompt, MultiModalPrompt): 
             prompt_image = self.video_gen_prompt.image
 
         video.media_url = (
             await (  # Should give a link on a web storage
                 video.build_settings.get_ml_models_gateway().generate_video_async(
-                    prompt_text=self.video_gen_prompt.text,
+                    prompt=self.video_gen_prompt,
                     model_provider=video.build_settings.target_model_provider,
-                    prompt_image = prompt_image, 
                     aspect_ratio=video.build_settings.aspect_ratio,
                 )
             )

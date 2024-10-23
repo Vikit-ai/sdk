@@ -29,6 +29,7 @@ from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
     PromptByRawUserTextHandler,
 )
 from vikit.prompt.image_prompt import ImagePrompt
+from vikit.prompt.multimodal_prompt import MultiModalPrompt
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.prompt.recorded_prompt import RecordedPrompt
 from vikit.prompt.recorded_prompt_subtitles_extractor import (
@@ -241,7 +242,7 @@ class PromptFactory:
         Create a prompt object from a prompt image path
 
         args:
-            - prompt_image: the image of the prompt
+            - image_path: the path of the image of the prompt
 
         returns:
             self
@@ -253,5 +254,34 @@ class PromptFactory:
 
         with open(image_path, "rb") as image_file:
             input_prompt_image = base64.b64encode(image_file.read()).decode("utf-8")
-        img_prompt = ImagePrompt(prompt_image=input_prompt_image, text=text)
+        img_prompt = MultiModalPrompt(image=input_prompt_image, text=text)
         return img_prompt
+
+    async def create_multimodal_prompt_async(
+        self,
+        text: str = None, 
+        negative_text: str = None,
+        image: str = None, 
+        audio: str = None, 
+        video:str = None, 
+        duration:float = None,
+        seed: int = None,
+    ):
+        """
+        Create a prompt object from a prompt image path
+
+        args:
+            - text: the text of the prompt
+            - image: the image base64, URL or URI of the prompt
+            - audio: the audio base64, URL or URI of the prompt
+            - video: the video base64, URL or URI of the prompt
+            - duration: expected duration of output
+
+        returns:
+            self
+        """
+        if text is None and image is None and audio is None and video is None:
+            raise ValueError("No prompt data is provided")
+        
+        multimodal_prompt = MultiModalPrompt(text=text, negative_text=negative_text, image=image, audio=audio, video=video, duration=duration, seed=seed)
+        return multimodal_prompt
