@@ -66,7 +66,7 @@ class RawImageBasedVideo(Video):
             summarised_title = self.get_title_from_description(
                 description=self.metadata.title
             )
-        else if self.prompt and self.prompt.text:
+        elif self.prompt and self.prompt.text:
             summarised_title = self.get_title_from_description(
                 description=self.text
             )

@@ -233,10 +233,11 @@ class PromptFactory:
         return handlers
 
     @log_function_params
-    def create_prompt_from_image(
+    async def create_prompt_from_image(
         self,
         image_path: str = None,
         text: str = None,
+        reengineer_text:bool = False,
     ):
         """
         Create a prompt object from a prompt image path
@@ -254,12 +255,17 @@ class PromptFactory:
 
         with open(image_path, "rb") as image_file:
             input_prompt_image = base64.b64encode(image_file.read()).decode("utf-8")
+        
+        if reengineer_text:
+            text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
+
         img_prompt = MultiModalPrompt(image=input_prompt_image, text=text)
         return img_prompt
 
     async def create_prompt_from_multimodal_async(
         self,
         text: str = None, 
+        reengineer_text:bool = False,
         negative_text: str = None,
         image: str = None, 
         audio: str = None, 
@@ -283,5 +289,8 @@ class PromptFactory:
         if text is None and image is None and audio is None and video is None:
             raise ValueError("No prompt data is provided")
         
+        if reengineer_text:
+            text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
+
         multimodal_prompt = MultiModalPrompt(text=text, negative_text=negative_text, image=image, audio=audio, video=video, duration=duration, seed=seed)
         return multimodal_prompt
