@@ -20,6 +20,7 @@ from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
 from vikit.prompt.prompt import Prompt
+from vikit.prompt.multimodal_prompt import MultiModalPrompt
 
 class RawMultiModalBasedVideo(Video):
     """
@@ -31,8 +32,8 @@ class RawMultiModalBasedVideo(Video):
     def __init__(
         self,
         title: str = None,
-        prompt: Prompt = None,
-    ):
+        prompt: MultiModalPrompt = None,
+    ): 
         """
         Initialize the video
 
@@ -52,7 +53,38 @@ class RawMultiModalBasedVideo(Video):
         self._needs_reencoding = False
         if title:
             self.metadata.title = title
-        self.duration = 4.0  # Currently generated videos are 4 seconds long; this will be variable per model later
+        if prompt.duration is None:
+            self.duration = 5.0
+        else:
+            self.duration = prompt.duration
+
+    @property
+    def short_type_name(self):
+        """
+        Get the short type name of the video
+        """
+        return str(VideoType.MULTIMODAL)
+
+   @log_function_params
+    def get_title(self):
+        if self.metadata.title:
+            summarised_title = self.get_title_from_description(
+                description=self.metadata.title
+            )
+        else if self.prompt and self.prompt.text:
+            summarised_title = self.get_title_from_description(
+                description=self.text
+            )
+        else:
+            summarised_title = "MultiModalPrompt"
+        self.metadata.title = summarised_title
+        return self.metadata.title
+
+    def get_duration(self):
+        return self.duration
+
+    def run_build_core_logic_hook(self, build_settings: VideoBuildSettings):
+        return super().run_build_core_logic_hook(build_settings)
 
     def get_core_handlers(self, build_settings) -> list[Handler]:
         """

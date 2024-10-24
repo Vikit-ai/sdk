@@ -62,13 +62,16 @@ class RawImageBasedVideo(Video):
 
     @log_function_params
     def get_title(self):
-
-        if not self.metadata.title:
-            summarised_title = "ImagePrompt"
-        else:
+        if self.metadata.title:
             summarised_title = self.get_title_from_description(
                 description=self.metadata.title
             )
+        else if self.prompt and self.prompt.text:
+            summarised_title = self.get_title_from_description(
+                description=self.text
+            )
+        else:
+            summarised_title = "ImagePrompt"
         self.metadata.title = summarised_title
         return self.metadata.title
 
