@@ -63,15 +63,15 @@ class RawMultiModalBasedVideo(Video):
         """
         Get the short type name of the video
         """
-        return str(VideoType.MULTIMODAL)
+        return str(VideoType.RAWMULTIMODAL)
 
-   @log_function_params
+    @log_function_params
     def get_title(self):
         if self.metadata.title:
             summarised_title = self.get_title_from_description(
                 description=self.metadata.title
             )
-        else if self.prompt and self.prompt.text:
+        elif self.prompt and self.prompt.text:
             summarised_title = self.get_title_from_description(
                 description=self.text
             )

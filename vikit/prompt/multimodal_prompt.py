@@ -32,24 +32,3 @@ class MultiModalPrompt(Prompt):
         self.video = video
         self.duration = duration
         self.seed = seed
-
-    def get_core_handlers(self, build_settings) -> list[Handler]:
-        """
-         Get the handler chain of the video. Order matters here.
-
-        Args:
-             build_settings (VideoBuildSettings): The settings for building the video
-
-         Returns:
-             list: The list of handlers to use for building the video
-        """
-        handlers = []
-        if self.prompt is None:
-            handlers.append(
-                VideoGenHandler(video_gen_prompt=self.build_settings.prompt)
-            )
-        else:
-            handlers.append(
-                VideoGenHandler(video_gen_prompt=self.prompt)
-            )
-        return handlers

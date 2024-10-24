@@ -257,7 +257,7 @@ class PromptFactory:
         img_prompt = MultiModalPrompt(image=input_prompt_image, text=text)
         return img_prompt
 
-    async def create_multimodal_prompt_async(
+    async def create_prompt_from_multimodal_async(
         self,
         text: str = None, 
         negative_text: str = None,
