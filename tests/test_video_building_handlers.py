@@ -28,6 +28,8 @@ from vikit.video.building.handlers.videogen_handler import VideoGenHandler
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video_build_settings import VideoBuildSettings
 
+from vikit.prompt.prompt_factory import PromptFactory
+
 warnings.simplefilter("ignore", category=ResourceWarning)
 warnings.simplefilter("ignore", category=UserWarning)
 logger.add("log_test_video_building_handlers.txt", rotation="10 MB")
@@ -41,7 +43,8 @@ class TestVideoBuildingHandlers:
         with WorkingFolderContext():
             vid = RawTextBasedVideo(raw_text_prompt="test")
             vid.build_settings = VideoBuildSettings()
-            api_handler = VideoGenHandler(video_gen_text_prompt="test")
+            prompt = await PromptFactory().create_prompt_from_text("test")
+            api_handler = VideoGenHandler(video_gen_prompt=prompt)
             video_built = await api_handler.execute_async(video=vid)
             assert video_built is not None, "Video built should not be None"
             logger.debug(f"Video built media: {video_built.media_url}")
