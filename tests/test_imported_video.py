@@ -14,6 +14,7 @@
 # ==============================================================================
 
 import os
+
 # from unittest.mock import patch, MagicMock, Mock
 import warnings
 
@@ -35,6 +36,7 @@ class TestImportedVideo:
         logger.add("log_test_imported_video.txt", rotation="10 MB")
 
     @pytest.mark.local_integration
+    @pytest.mark.core_local_integration
     @pytest.mark.asyncio
     async def test_apply_default_bg_sound_on_existing_video(self):
         with WorkingFolderContext():

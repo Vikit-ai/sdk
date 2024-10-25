@@ -134,7 +134,12 @@ class FakeMLModelsGateway(MLModelsGateway):
         return {"transcription": subs}
 
     async def generate_video_async(
-        self, prompt_text: str = None, sleep_time: int = 0, model_provider: str = None, prompt_image:str = "", aspect_ratio=(16,9)
+        self,
+        prompt_text: str = None,
+        sleep_time: int = 0,
+        model_provider: str = None,
+        prompt_image: str = "",
+        aspect_ratio=(16, 9),
     ):
         await asyncio.sleep(sleep_time)
 
