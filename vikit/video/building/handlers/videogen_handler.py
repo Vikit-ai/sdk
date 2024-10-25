@@ -22,14 +22,13 @@ from vikit.common.config import get_media_polling_interval
 from vikit.common.file_tools import (
     url_exists,
 )
-from vikit.prompt.prompt import Prompt
-from vikit.prompt.image_prompt import ImagePrompt
+
 
 class VideoGenHandler(Handler):
-    def __init__(self, video_gen_prompt: Prompt = None):
-        if not video_gen_prompt:
-            raise ValueError("Prompt is not set")
-        self.video_gen_prompt = video_gen_prompt
+    def __init__(self, video_gen_text_prompt: str = None):
+        if not video_gen_text_prompt:
+            raise ValueError("Prompt text is not set")
+        self.video_gen_prompt_text = video_gen_text_prompt
 
     async def execute_async(self, video: Video):
         """
@@ -47,21 +46,15 @@ class VideoGenHandler(Handler):
         Returns:
             The video with the media URL set to the generated video
         """
-        logger.info(f"About to generate video: {video.id}, title: {video.get_title()}, prompt: {self.video_gen_prompt}")
+        logger.info(f"About to generate video: {video.id}, title: {video.get_title()}")
         logger.debug(
             f"Target Model provider in the handler: {video.build_settings.target_model_provider}"
         )
-        prompt_image = None
-        if isinstance(self.video_gen_prompt, ImagePrompt): 
-            prompt_image = self.video_gen_prompt.image
-
         video.media_url = (
             await (  # Should give a link on a web storage
                 video.build_settings.get_ml_models_gateway().generate_video_async(
-                    prompt_text=self.video_gen_prompt.text,
+                    prompt=self.video_gen_prompt_text,
                     model_provider=video.build_settings.target_model_provider,
-                    prompt_image = prompt_image, 
-                    aspect_ratio=video.build_settings.aspect_ratio,
                 )
             )
         )

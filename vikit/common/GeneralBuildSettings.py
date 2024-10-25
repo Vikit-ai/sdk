@@ -28,7 +28,6 @@ class GeneralBuildSettings:
         target_dir_path: str = None,
         target_file_name: str = None,
         vikit_api_key: str = None,
-        aspect_ratio:tuple = (16,9)
     ):
         """
         Initialize the build settings
@@ -50,7 +49,6 @@ class GeneralBuildSettings:
         self.target_dir_path = target_dir_path
         self.target_file_name = target_file_name
         self.vikit_api_key = vikit_api_key
-        self.aspect_ratio = aspect_ratio
 
     def get_ml_models_gateway(self):
         """

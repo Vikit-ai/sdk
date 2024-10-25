@@ -396,7 +396,7 @@ class ReplicateGateway(MLModelsGateway):
         return subs
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def generate_video_async(self, prompt_text: str, model_provider: str = "videocrafter", prompt_image:str = "", aspect_ratio=(16,9)):
+    async def generate_video_async(self, prompt: str):
         """
         Generate a video from the given prompt
 
@@ -406,11 +406,11 @@ class ReplicateGateway(MLModelsGateway):
         returns:
             the video
         """
-        logger.debug(f"Generating video from prompt: {prompt_text}")
+        logger.debug(f"Generating video from prompt: {prompt}")
         output = await replicate.async_run(
             "cjwbw/videocrafter:02edcff3e9d2d11dcc27e530773d988df25462b1ee93ed0257b6f246de4797c8",
             input={
-                "prompt": prompt_text,  # + ", 4k",
+                "prompt": prompt,  # + ", 4k",
                 "save_fps": 8,
                 "ddim_steps": 50,
                 "unconditional_guidance_scale": 12,

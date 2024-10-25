@@ -19,7 +19,6 @@ from vikit.video.building.handlers.videogen_handler import VideoGenHandler
 from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
-from vikit.prompt.prompt import Prompt
 
 
 class RawImageBasedVideo(Video):
@@ -30,25 +29,24 @@ class RawImageBasedVideo(Video):
     def __init__(
         self,
         title: str = None,
-        prompt: Prompt = None,
+        raw_image_prompt: str = None,
     ):
         """
         Initialize the video
 
         Args:
-            prompt (Prompt: The image prompt to generate the video from
+            raw_image_prompt (base64: The raw image prompt to generate the video from
             title (str): The title of the video
 
         Raises:
             ValueError: If the source media URL is not set
         """
-        if prompt is None:
+        if raw_image_prompt is None:
             raise ValueError("raw_image_prompt cannot be None")
 
         super().__init__()
 
-        self._image = prompt.image
-        self._text = prompt.text
+        self._image = raw_image_prompt
         self._needs_reencoding = False
         if title:
             self.metadata.title = title
@@ -92,6 +90,6 @@ class RawImageBasedVideo(Video):
         """
         handlers = []
         handlers.append(
-            VideoGenHandler(video_gen_prompt=self.build_settings.prompt)
+            VideoGenHandler(video_gen_text_prompt=self.build_settings.prompt)
         )
         return handlers

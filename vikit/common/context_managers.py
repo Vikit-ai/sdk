@@ -17,6 +17,7 @@ import inspect
 import os
 import random
 import string
+import shutil
 from datetime import datetime
 
 from loguru import logger
@@ -73,7 +74,29 @@ class WorkingFolderContext:
         os.chdir(self.original_path)
         # We may uncomment this line to debug the program and see what has been generated
         if self.delete_on_exit:
-            os.rmdir(self.path)
+            print('\n\n')
+            print('in the delete')
+            print('\n\n')
+
+            # os.rmdir(self.path)
+
+            try:
+                shutil.rmtree(self.path)
+            except OSError as e:
+                logger.error(f"Error removing directory {self.path}: {e}")
+                print(f"Error removing directory {self.path}: {e}")
+
+        print('\n\n')
+        print(type)
+        print('\n\n')
+
+
+
+
+
+
+
+        
         if type is not None:  # An exception was raised
             logger.error(
                 f"Exception handled, with details: {value} and trace {traceback}"

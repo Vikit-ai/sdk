@@ -37,7 +37,7 @@ class RawTextBasedVideo(Video):
     def __init__(
         self,
         raw_text_prompt: str = None,
-        title=None
+        title=None,
     ):
         """
         Initialize the video
@@ -96,7 +96,7 @@ class RawTextBasedVideo(Video):
              list: The list of handlers to use for building the video
         """
         handlers = []
-        handlers.append(VideoGenHandler(video_gen_prompt=self))
+        handlers.append(VideoGenHandler(video_gen_text_prompt=self.text))
         if build_settings.interpolate:
             if build_settings.target_model_provider == "videocrafter":
                 handlers.append(VideoInterpolationHandler())
