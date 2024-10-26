@@ -52,7 +52,7 @@ class PromptFactory:
     def __init__(
         self,
         ml_gateway: MLModelsGateway = None,
-        prompt_build_settings: PromptBuildSettings = None,
+        prompt_build_settings: PromptBuildSettings = PromptBuildSettings(),
     ):
         """
         Constructor of the prompt factory
@@ -63,10 +63,10 @@ class PromptFactory:
         """
         
         self.prompt_factory_uuid = str(uuid.uuid4())
+        self.prompt_build_settings = prompt_build_settings
+
         print("new uuid " + self.prompt_factory_uuid)
-        self.prompt_build_settings = (
-            prompt_build_settings if prompt_build_settings else PromptBuildSettings()
-        )
+
         if ml_gateway:
             self._ml_gateway = ml_gateway
         else:
@@ -114,8 +114,8 @@ class PromptFactory:
             text=prompt_text,
             subtitles=merged_subs,
             audio_recording=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
-            duration=get_media_duration(config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
-            build_settings=self.prompt_build_settings),
+            duration=get_media_duration(config.get_prompt_mp3_file_name(self.prompt_factory_uuid)),
+            build_settings=self.prompt_build_settings,
         )
         prompt.negative_prompt = negative_prompt
         return prompt

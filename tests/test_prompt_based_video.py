@@ -27,6 +27,7 @@ from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.video import VideoBuildSettings
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 TEST_PROMPT = "A group of stones in a forest, with symbols"
 logger.add("log_test_prompt_based_video.txt", rotation="10 MB")
@@ -46,7 +47,7 @@ class TestPromptBasedVideo:
     async def test_get_title(self):
         with WorkingFolderContext():
             build_settings = VideoBuildSettings()
-            prompt = await PromptFactory().create_prompt_from_text(
+            prompt = await PromptFactory(prompt_build_settings = PromptBuildSettings(test_mode=True)).create_prompt_from_text(
                 "A group of stones",
             )
 
@@ -58,7 +59,7 @@ class TestPromptBasedVideo:
     async def test_build_prompt_based_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(
-                await PromptFactory().create_prompt_from_text(
+                await PromptFactory(prompt_build_settings = PromptBuildSettings(test_mode=True)).create_prompt_from_text(
                     prompt_text=TEST_PROMPT,
                 )
             )
@@ -159,7 +160,7 @@ class TestPromptBasedVideo:
     async def test_generate_prompt_based_video_single_sentence_sub(self):
         with WorkingFolderContext():
 
-            prompt = await PromptFactory().create_prompt_from_text(
+            prompt = await PromptFactory(prompt_build_settings = PromptBuildSettings(test_mode=True)).create_prompt_from_text(
                 "A group of stones in a forest",
             )
             pbv = PromptBasedVideo(prompt=prompt)

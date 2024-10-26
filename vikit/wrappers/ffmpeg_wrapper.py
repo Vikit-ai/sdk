@@ -68,6 +68,16 @@ def get_media_duration(input_video_path):
         float: The duration of the media file in seconds.
     """
     assert os.path.exists(input_video_path), f"File {input_video_path} does not exist"
+    print([
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            input_video_path,
+        ])
     result = subprocess.run(
         [
             "ffprobe",

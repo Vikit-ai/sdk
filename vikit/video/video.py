@@ -52,7 +52,7 @@ class Video(ABC):
 
     """
 
-    def __init__(self, prompt: Prompt):
+    def __init__(self, prompt: Prompt = Prompt()):
         """
         Initialize the video
 
@@ -65,8 +65,12 @@ class Video(ABC):
             ValueError: If the source media URL is not set
 
         """
-        self._width = prompt.ratio[0]
-        self._height = prompt.ratio[1]
+        if hasattr(prompt, "ratio"):
+            self._width = prompt.ratio[0]
+            self._height = prompt.ratio[1]
+        else:
+            self._width = None
+            self._height = None
         self._background_music_file_name = None
         self._duration = None
         self._is_video_built = False
