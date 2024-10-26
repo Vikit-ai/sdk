@@ -25,6 +25,9 @@ from vikit.video.building.handlers.videogen_handler import VideoGenHandler
 from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
+from vikit.prompt.prompt import Prompt
+from vikit.prompt.multimodal_prompt import MultiModalPrompt
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 
 class RawTextBasedVideo(Video):
@@ -37,7 +40,7 @@ class RawTextBasedVideo(Video):
     def __init__(
         self,
         raw_text_prompt: str = None,
-        title=None
+        title=None,
     ):
         """
         Initialize the video
@@ -54,7 +57,7 @@ class RawTextBasedVideo(Video):
         if len(raw_text_prompt) < 1:
             raise ValueError("No text_prompt provided")
 
-        super().__init__()
+        super().__init__(MultiModalPrompt(text=raw_text_prompt))
 
         self.text = raw_text_prompt
         self._title = None
@@ -96,7 +99,7 @@ class RawTextBasedVideo(Video):
              list: The list of handlers to use for building the video
         """
         handlers = []
-        handlers.append(VideoGenHandler(video_gen_prompt=self))
+        handlers.append(VideoGenHandler(video_gen_build_settings = build_settings))
         if build_settings.interpolate:
             if build_settings.target_model_provider == "videocrafter":
                 handlers.append(VideoInterpolationHandler())

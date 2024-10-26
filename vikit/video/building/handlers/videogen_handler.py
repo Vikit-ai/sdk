@@ -25,12 +25,14 @@ from vikit.common.file_tools import (
 from vikit.prompt.prompt import Prompt
 from vikit.prompt.image_prompt import ImagePrompt
 from vikit.prompt.multimodal_prompt import MultiModalPrompt
+from vikit.video.video import VideoBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 class VideoGenHandler(Handler):
-    def __init__(self, video_gen_prompt: Prompt = None):
-        if not video_gen_prompt:
-            raise ValueError("Prompt is not set")
-        self.video_gen_prompt = video_gen_prompt
+    def __init__(self, video_gen_build_settings: VideoBuildSettings = None):
+        if not video_gen_build_settings:
+            raise ValueError("VideoBuildSettings is not set")
+        self.video_gen_build_settings = video_gen_build_settings
 
     async def execute_async(self, video: Video):
         """
@@ -48,20 +50,20 @@ class VideoGenHandler(Handler):
         Returns:
             The video with the media URL set to the generated video
         """
-        logger.info(f"About to generate video: {video.id}, title: {video.get_title()}, prompt: {self.video_gen_prompt}")
+        logger.info(f"About to generate video: {video.id}, title: {video.get_title()}, prompt: {video.prompt}")
         logger.debug(
-            f"Target Model provider in the handler: {video.build_settings.target_model_provider}"
+            f"Target Model provider in the handler: {self.video_gen_build_settings.target_model_provider}"
         )
-        prompt_image = None
-        if isinstance(self.video_gen_prompt, ImagePrompt) or isinstance(self.video_gen_prompt, MultiModalPrompt): 
-            prompt_image = self.video_gen_prompt.image
+        ml_gateway = video.prompt.build_settings.get_ml_models_gateway()
+        if self.video_gen_build_settings.test_mode:
+            ml_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
 
         video.media_url = (
             await (  # Should give a link on a web storage
-                self.video_gen_prompt.build_settings.get_ml_models_gateway().generate_video_async(
-                    prompt=self.video_gen_prompt,
-                    model_provider=video.build_settings.target_model_provider,
-                    aspect_ratio=video.build_settings.aspect_ratio,
+                ml_gateway.generate_video_async(
+                    prompt=video.prompt,
+                    model_provider=self.video_gen_build_settings.target_model_provider,
+                    aspect_ratio=self.video_gen_build_settings.aspect_ratio,
                 )
             )
         )
