@@ -27,6 +27,7 @@ from vikit.video.composite_video import CompositeVideo
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video import VideoBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 prompt_mystic = tools.test_prompt_library["moss_stones-train_boy"]
 logger.add("log_test_model_providers.txt", rotation="10 MB")
@@ -91,8 +92,8 @@ class TestModelProviders:
                 prompt = (
                     "Unlock your radiance with AI Cosmetics."  # @param {type:"string"}
                 )
-                gw = video_build_settings.get_ml_models_gateway()
-                prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(
+                
+                prompt = await PromptFactory().create_prompt_from_text(
                     prompt
                 )
                 video = PromptBasedVideo(prompt=prompt)
@@ -120,8 +121,8 @@ class TestModelProviders:
             )
 
             prompt = "Unlock your radiance with AI Cosmetics."  # @param {type:"string"}
-            gw = video_build_settings.get_ml_models_gateway()
-            prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(prompt)
+
+            prompt = await PromptFactory().create_prompt_from_text(prompt)
             video = PromptBasedVideo(prompt=prompt)
             logger.debug(
                 f"target_model_provider: {video_build_settings.target_model_provider}"

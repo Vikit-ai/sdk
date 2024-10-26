@@ -75,7 +75,7 @@ class TestVideoBuildingStrategies:
         Using Lazy Dependency chain
         """
         build_settings = VideoBuildSettings(test_mode=True)
-        build_settings._ml_models_gateway = build_settings.get_ml_models_gateway()
+
         pbv = PromptBasedVideo(
             tools.test_prompt_library["moss_stones-train_boy"]
         )  # 4 subtitles -> 4 composite videos of 2 vids each

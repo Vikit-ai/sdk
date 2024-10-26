@@ -52,20 +52,6 @@ class GeneralBuildSettings:
         self.vikit_api_key = vikit_api_key
         self.aspect_ratio = aspect_ratio
 
-    def get_ml_models_gateway(self):
-        """
-        Handy function to get the ML models gateway from the buildsettings, as it is used in many places
-        like a context
-        """
-        if self._ml_models_gateway is None:
-            self._ml_models_gateway = (
-                mlfactory.MLModelsGatewayFactory().get_ml_models_gateway(
-                    test_mode=self.test_mode,
-                    vikit_api_key=self.vikit_api_key
-                )
-            )
-        return self._ml_models_gateway
-
     @property
     def output_path(self) -> str:
         """

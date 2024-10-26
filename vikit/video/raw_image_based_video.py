@@ -45,9 +45,8 @@ class RawImageBasedVideo(Video):
         if prompt is None:
             raise ValueError("raw_image_prompt cannot be None")
 
-        super().__init__()
+        super().__init__(prompt)
 
-        self.prompt = prompt
         self._needs_reencoding = False
         if title:
             self.metadata.title = title

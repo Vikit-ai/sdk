@@ -64,7 +64,7 @@ class PromptFactory:
         
         self.prompt_factory_uuid = str(uuid.uuid4())
         print("new uuid " + self.prompt_factory_uuid)
-        prompt_build_settings = (
+        self.prompt_build_settings = (
             prompt_build_settings if prompt_build_settings else PromptBuildSettings()
         )
         if ml_gateway:
@@ -114,7 +114,8 @@ class PromptFactory:
             text=prompt_text,
             subtitles=merged_subs,
             audio_recording=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
-            duration=get_media_duration(config.get_prompt_mp3_file_name(self.prompt_factory_uuid)),
+            duration=get_media_duration(config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
+            build_settings=self.prompt_build_settings),
         )
         prompt.negative_prompt = negative_prompt
         return prompt
@@ -177,7 +178,7 @@ class PromptFactory:
             subs, min_duration=config.get_subtitles_min_duration()
         )
         text = extractor.build_subtitles_as_text_tokens(merged_subs)
-        prompt = RecordedPrompt(subtitles=merged_subs, text=text)
+        prompt = RecordedPrompt(subtitles=merged_subs, text=text, build_settings=self.prompt_build_settings)
         await prompt.convert_recorded_audio_prompt_path_to_mp3(
             recorded_audio_prompt_path
         )
@@ -259,7 +260,7 @@ class PromptFactory:
         if reengineer_text:
             text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
 
-        img_prompt = MultiModalPrompt(image=input_prompt_image, text=text)
+        img_prompt = MultiModalPrompt(image=input_prompt_image, text=text, build_settings=self.prompt_build_settings)
         return img_prompt
 
     async def create_prompt_from_multimodal_async(
@@ -272,6 +273,7 @@ class PromptFactory:
         video:str = None, 
         duration:float = None,
         seed: int = None,
+        ratio:tuple = (16,9),
     ):
         """
         Create a prompt object from a prompt image path
@@ -292,5 +294,5 @@ class PromptFactory:
         if reengineer_text:
             text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
 
-        multimodal_prompt = MultiModalPrompt(text=text, negative_text=negative_text, image=image, audio=audio, video=video, duration=duration, seed=seed)
+        multimodal_prompt = MultiModalPrompt(text=text, negative_text=negative_text, image=image, audio=audio, video=video, duration=duration, seed=seed, ratio= ratio, build_settings=self.prompt_build_settings)
         return multimodal_prompt

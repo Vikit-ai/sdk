@@ -34,6 +34,8 @@ from vikit.video.composite_video import CompositeVideo
 from vikit.video.imported_video import ImportedVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video import Video, VideoBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+
 
 prompt_mystic = tools.test_prompt_library["moss_stones-train_boy"]
 logger.add("log_test_composite_video.txt", rotation="10 MB")
@@ -186,9 +188,7 @@ class TestCompositeVideo:
                 ),
                 include_read_aloud_prompt=False,
             )
-            prompt = await PromptFactory(
-                ml_gateway=video_build_settings.get_ml_models_gateway()
-            ).create_prompt_from_text(prompt_text)
+            prompt = await PromptFactory().create_prompt_from_text(prompt_text)
             video_build_settings.prompt = prompt
 
             await test_video_gpt.build(video_build_settings)

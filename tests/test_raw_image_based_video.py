@@ -24,6 +24,8 @@ from tests.testing_medias import get_test_prompt_image
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
+
 
 # from unittest.mock import patch, MagicMock, Mock
 from vikit.video.raw_image_based_video import RawImageBasedVideo
@@ -40,11 +42,11 @@ class TestRawImagePromptBasedVideo:
         logger.add("log_test_raw_image_based_video.txt", rotation="10 MB")
 
     @pytest.mark.local_integration
-    def test_get_title(self):
+    async def test_get_title(self):
         with WorkingFolderContext():
             video_title = RawImageBasedVideo(
-                prompt=PromptFactory(
-                    ml_gateway=ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway()
+                prompt=await PromptFactory(
+                    prompt_build_settings=PromptBuildSettings(test_mode=True)
                 )
                 .create_prompt_from_image(
                     image_path=TEST_PROMPT, text="test image prompt"
@@ -58,8 +60,8 @@ class TestRawImagePromptBasedVideo:
     @pytest.mark.asyncio
     async def test_build_single_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
-            image_prompt = PromptFactory(
-                ml_gateway=ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway()
+            image_prompt = await PromptFactory(
+                prompt_build_settings=PromptBuildSettings(test_mode=True)
             ).create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
             pbvid = RawImageBasedVideo(
                 prompt=image_prompt,
@@ -79,8 +81,8 @@ class TestRawImagePromptBasedVideo:
     @pytest.mark.asyncio
     async def test_build_single_video_no_bg_music_no_subtitles(self):
         with WorkingFolderContext():
-            image_prompt = PromptFactory(
-                ml_gateway=ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway()
+            image_prompt = await PromptFactory(
+                prompt_build_settings=PromptBuildSettings(test_mode=True)
             ).create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
             pbvid = RawImageBasedVideo(
                 prompt=image_prompt,
@@ -97,8 +99,8 @@ class TestRawImagePromptBasedVideo:
     @pytest.mark.asyncio
     async def test_build_single_video_with_default_bg_music_no_subtitles(self):
         with WorkingFolderContext():
-            image_prompt = PromptFactory(
-                ml_gateway=ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway()
+            image_prompt = await PromptFactory(
+                prompt_build_settings=PromptBuildSettings(test_mode=True)
             ).create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
             pbvid = RawImageBasedVideo(
                 prompt=image_prompt,
@@ -129,9 +131,7 @@ class TestRawImagePromptBasedVideo:
                 test_mode=False,
                 target_model_provider="stabilityai_image",
             )
-            image_prompt = PromptFactory(
-                ml_gateway=build_settings.get_ml_models_gateway()
-            ).create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
+            image_prompt = PromptFactory().create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
             build_settings.prompt = image_prompt
 
             video = RawImageBasedVideo(

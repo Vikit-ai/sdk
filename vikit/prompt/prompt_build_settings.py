@@ -22,7 +22,7 @@ class PromptBuildSettings(GeneralBuildSettings):
     def __init__(
         self,
         delete_interim_files: bool = False,
-        test_mode: bool = True,
+        test_mode: bool = False,
         ml_models_gateway: MLModelsGateway = None,
         generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt
         generate_from_llm_prompt: bool = True,
@@ -42,7 +42,7 @@ class PromptBuildSettings(GeneralBuildSettings):
 
     def get_ml_models_gateway(self):
         """
-        Handy function to get the ML models gateway from the buildsettings, as it is used in many places
+        Handy function to get the ML models gateway from the promptbuildsettings, as it is used in many places
         like a context
         """
         if self._ml_models_gateway is None:

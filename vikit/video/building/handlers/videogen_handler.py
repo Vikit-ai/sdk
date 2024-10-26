@@ -58,7 +58,7 @@ class VideoGenHandler(Handler):
 
         video.media_url = (
             await (  # Should give a link on a web storage
-                video.build_settings.get_ml_models_gateway().generate_video_async(
+                self.video_gen_prompt.build_settings.get_ml_models_gateway().generate_video_async(
                     prompt=self.video_gen_prompt,
                     model_provider=video.build_settings.target_model_provider,
                     aspect_ratio=video.build_settings.aspect_ratio,

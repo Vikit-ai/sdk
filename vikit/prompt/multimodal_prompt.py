@@ -14,6 +14,7 @@
 # ==============================================================================
 
 from vikit.prompt.prompt import Prompt
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 
 class MultiModalPrompt(Prompt):
@@ -21,8 +22,8 @@ class MultiModalPrompt(Prompt):
     A class to represent an image prompt
     """
 
-    def __init__(self, text: str = None, negative_text:str = None, image: str = None, audio: str = None, video:str = None, duration:float = None, seed:int=None):
-        super().__init__()
+    def __init__(self, text: str = None, negative_text:str = None, image: str = None, audio: str = None, video:str = None, duration:float = None, seed:int=None, ratio:tuple = (16,9), build_settings: PromptBuildSettings = PromptBuildSettings()):
+        super().__init__(build_settings = build_settings)
         if text is None and image is None and audio is None and video is None:
             raise ValueError("No prompt data is provided")
         self.image = image
@@ -32,3 +33,4 @@ class MultiModalPrompt(Prompt):
         self.video = video
         self.duration = duration
         self.seed = seed
+        self.ratio = ratio

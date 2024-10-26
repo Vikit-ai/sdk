@@ -38,6 +38,7 @@ from vikit.wrappers.ffmpeg_wrapper import (
     get_last_frame_as_image_ffmpeg,
     get_media_duration,
 )
+from vikit.prompt.prompt import Prompt
 
 DEFAULT_VIDEO_TITLE = "no-title-yet"
 
@@ -51,7 +52,7 @@ class Video(ABC):
 
     """
 
-    def __init__(self, width: int = 512, height: int = 320):
+    def __init__(self, prompt: Prompt):
         """
         Initialize the video
 
@@ -64,8 +65,8 @@ class Video(ABC):
             ValueError: If the source media URL is not set
 
         """
-        self._width = width
-        self._height = height
+        self._width = prompt.ratio[0]
+        self._height = prompt.ratio[1]
         self._background_music_file_name = None
         self._duration = None
         self._is_video_built = False
@@ -85,6 +86,7 @@ class Video(ABC):
             height=self._height,
         )
         self._source = None
+        self.prompt = prompt
         self.build_settings: VideoBuildSettings = VideoBuildSettings()
         self.are_build_settings_prepared = False
         self.video_dependencies = (
@@ -308,7 +310,7 @@ class Video(ABC):
         if not self.are_build_settings_prepared:
             self.build_settings = build_settings
             self._source = type(
-                build_settings.get_ml_models_gateway()  # TODO: this is hacky and should be refactored
+                self.prompt.build_settings.get_ml_models_gateway()  # TODO: this is hacky and should be refactored
                 # so that we infer source from the different handlers (initial video generator, interpolation, etc)
             ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
 
