@@ -22,7 +22,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
     def __init__(
         self,
         delete_interim_files: bool = False,
-        test_mode: bool = True,
         target_model_provider: str = None,
         expected_length: float = None,
         include_read_aloud_prompt: bool = False,
@@ -40,7 +39,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
 
         params:
             delete_interim_files: bool : Whether to delete the interim files generated during the video building process
-            test_mode: bool : Whether to run the video building process in test mode
 
             target_model_provider: str : The target model provider, in case you don't want to use the one defined by Vikit for each scene of the video
             Could be vikit, haiper, stabilityai, videocrafter, etc.
@@ -58,7 +56,6 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
 
         super().__init__(
             delete_interim_files=delete_interim_files,
-            test_mode=test_mode,
             target_dir_path=target_dir_path,
             target_file_name=output_video_file_name,
         )

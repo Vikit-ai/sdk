@@ -81,7 +81,6 @@ class TestCompositeVideo:
         prompt = tools.test_prompt_library["tired"]
         build_settings = VideoBuildSettings(
             expected_length=None,
-            test_mode=True,
             prompt=prompt,
         )
 
@@ -181,7 +180,6 @@ class TestCompositeVideo:
                 test_video_gpt.append_video(video)
 
             video_build_settings = VideoBuildSettings(
-                test_mode=False,
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True, generate_background_music=True
                 ),
@@ -350,7 +348,7 @@ class TestCompositeVideo:
         self,
     ):
         with WorkingFolderContext():
-            build_stgs = VideoBuildSettings(test_mode=False)
+            build_stgs = VideoBuildSettings()
             test_prompt = tools.test_prompt_library["moss_stones-train_boy"]
             video = RawTextBasedVideo(test_prompt.text)
             video2 = ImportedVideo(test_media.get_cat_video_path())
@@ -366,14 +364,12 @@ class TestCompositeVideo:
 
         with WorkingFolderContext():
 
-            test_mode = False
 
             final_composite_video = CompositeVideo()
             for subtitle in test_prompt_library["moss_stones-train_boy"].subtitles:
                 video = RawTextBasedVideo(subtitle.text)
                 await video.build(
                     build_settings=VideoBuildSettings(
-                        test_mode=test_mode,
                         music_building_context=MusicBuildingContext(),
                     )
                 )
@@ -384,7 +380,6 @@ class TestCompositeVideo:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True
                     ),
-                    test_mode=test_mode,
                     include_read_aloud_prompt=True,
                     prompt=test_prompt_library["moss_stones-train_boy"],
                 )

@@ -99,7 +99,6 @@ class CompositeVideo(Video, is_composite_video):
                 music_building_context=MusicBuildingContext(
                     apply_background_music=False
                 ),
-                test_mode=self.build_settings.test_mode,
                 target_model_provider=self.build_settings.target_model_provider,
                 vikit_api_key=self.build_settings.vikit_api_key,
             )

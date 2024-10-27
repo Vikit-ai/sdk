@@ -134,7 +134,6 @@ class PromptBasedVideo(CompositeVideo):
             await prompt_fact.get_reengineered_prompt_text_from_raw_text(
                 prompt=sub.text,
                 prompt_build_settings=PromptBuildSettings(
-                    test_mode=build_stgs.test_mode,
                     generate_from_llm_keyword=True,
                     generate_from_llm_prompt=False,
                 ),
@@ -145,7 +144,6 @@ class PromptBasedVideo(CompositeVideo):
             await prompt_fact.get_reengineered_prompt_text_from_raw_text(
                 prompt=sub.text,
                 prompt_build_settings=PromptBuildSettings(
-                    test_mode=build_stgs.test_mode,
                     generate_from_llm_keyword=False,
                     generate_from_llm_prompt=True,
                 ),
@@ -155,7 +153,6 @@ class PromptBasedVideo(CompositeVideo):
         prompt_based_vid = await RawTextBasedVideo(enhanced_prompt_from_prompt_text).prepare_build(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_prompt_text,
-                test_mode=build_stgs.test_mode,
                 target_model_provider=build_stgs.target_model_provider,
                 interpolate=build_stgs.interpolate,
             ),
@@ -166,7 +163,6 @@ class PromptBasedVideo(CompositeVideo):
         prompt_based_vid2 = await RawTextBasedVideo(enhanced_prompt_from_prompt_text).prepare_build(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_prompt_text,
-                test_mode=build_stgs.test_mode,
                 target_model_provider=build_stgs.target_model_provider,
                 interpolate=build_stgs.interpolate,
             ),

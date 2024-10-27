@@ -85,7 +85,6 @@ async def batch_raw_text_based_prompting(
             interpolate=to_interpolate,
             target_model_provider=model_provider,
             output_video_file_name=output_file,
-            test_mode=False,
         )
 
         prompt_obj = await PromptFactory().create_prompt_from_text(prompt_content)
@@ -101,7 +100,6 @@ async def batch_raw_text_based_prompting(
 async def composite_textonly_prompting(
     prompt_file: str, model_provider: str = "stabilityai"
 ):
-    TEST_MODE = False
 
     # It is strongly recommended to activate interpolate for videocrafter model
     to_interpolate = True if model_provider == "videocrafter" else False
@@ -119,7 +117,6 @@ async def composite_textonly_prompting(
 
         video.build_settings = VideoBuildSettings(
             interpolate=to_interpolate,
-            test_mode=TEST_MODE,
             target_model_provider=model_provider,
         )
         # add transitions from time to time
@@ -143,7 +140,6 @@ async def composite_textonly_prompting(
             generate_background_music=True,
             expected_music_length=total_duration * 1.5,
         ),
-        test_mode=TEST_MODE,
         target_model_provider=model_provider,
         output_video_file_name="Composite.mp4",
         expected_length=total_duration,
@@ -160,14 +156,12 @@ async def composite_textonly_prompting(
 async def create_single_image_based_video(
     prompt_content,
     build_settings=None,
-    test_mode: bool = False,
     output_filename: str = None,
     text: str = None,
 ):
     """text: would be basically used for music generation, if applicable"""
     if build_settings is None:
         build_settings = VideoBuildSettings(
-            test_mode=test_mode,
             target_model_provider="stabilityai_image",
             output_video_file_name=output_filename,
         )
@@ -199,7 +193,6 @@ async def batch_image_based_prompting(prompt_file: str):
             target_model_provider="stabilityai_image",
             output_video_file_name=output_file,
             expected_length=4,
-            test_mode=False,
         )
 
         video, _ = await create_single_image_based_video(
@@ -218,13 +211,11 @@ async def batch_image_based_prompting(prompt_file: str):
 
 async def composite_imageonly_prompting(prompt_file: str):
 
-    TEST_MODE = False
     model_provider = "videocrafter"
 
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
 
     single_video_buildsettings = VideoBuildSettings(
-        test_mode=TEST_MODE,
         target_model_provider=model_provider,
     )
 
@@ -256,7 +247,6 @@ async def composite_imageonly_prompting(prompt_file: str):
             generate_background_music=True,
             expected_music_length=total_duration * 1.5,
         ),
-        test_mode=TEST_MODE,
         target_model_provider=model_provider,
         output_video_file_name="Composite.mp4",
         expected_length=total_duration,
@@ -272,14 +262,12 @@ async def composite_mixed_prompting(
     prompt_file: str, text_to_video_model_provider: str = "stabilityai"
 ):
 
-    TEST_MODE = False
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
 
     # It is strongly recommended to activate interpolate for videocrafter model
     to_interpolate = True if text_to_video_model_provider == "videocrafter" else False
 
     text_based_video_buildsettings = VideoBuildSettings(
-        test_mode=TEST_MODE,
         target_model_provider=text_to_video_model_provider,
         interpolate=to_interpolate,
     )
@@ -293,7 +281,6 @@ async def composite_mixed_prompting(
 
         if prompt_type == "image":
             image_based_video_buildsettings = VideoBuildSettings(
-                test_mode=TEST_MODE,
                 target_model_provider="stabilityai_image",
             )
             video, image_based_video_buildsettings = (
@@ -331,7 +318,6 @@ async def composite_mixed_prompting(
             generate_background_music=True,
             expected_music_length=total_duration * 1.5,
         ),
-        test_mode=TEST_MODE,
         output_video_file_name="Composite.mp4",
         expected_length=total_duration,
     )
@@ -356,7 +342,6 @@ async def prompt_based_composite(prompt: str, model_provider="stabilityai"):
         target_model_provider=model_provider,
         output_video_file_name="Composite.mp4",
         interpolate=to_interpolate,
-        test_mode=False,
     )
 
     gw = video_build_settings.get_ml_models_gateway()

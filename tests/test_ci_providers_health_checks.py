@@ -39,7 +39,7 @@ class TestProvidersHealthChecks:
             video = RawTextBasedVideo("This is a fantastic day today")
             await video.build_async(
                 build_settings=VideoBuildSettings(
-                    test_mode=False, target_model_provider="haiper"
+                    target_model_provider="haiper"
                 )
             )
             assert video.media_url is not None
@@ -51,7 +51,7 @@ class TestProvidersHealthChecks:
             video = RawTextBasedVideo("This is a fantastic day today")
             await video.build_async(
                 build_settings=VideoBuildSettings(
-                    test_mode=False, target_model_provider="stabilityai"
+                    target_model_provider="stabilityai"
                 )
             )
             assert video.media_url is not None
@@ -63,7 +63,7 @@ class TestProvidersHealthChecks:
             video = RawTextBasedVideo("This is a fantastic day today")
             await video.build_async(
                 build_settings=VideoBuildSettings(
-                    test_mode=False, target_model_provider="videocrafter"
+                    target_model_provider="videocrafter"
                 )
             )
             assert video.media_url is not None

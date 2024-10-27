@@ -112,7 +112,6 @@ class TestModelProviders:
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True, generate_background_music=True
                 ),
-                test_mode=False,
                 target_model_provider="videocrafter",
                 include_read_aloud_prompt=True,
             )

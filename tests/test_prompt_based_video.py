@@ -144,7 +144,6 @@ class TestPromptBasedVideo:
                     apply_background_music=True,
                     generate_background_music=True,
                 ),
-                test_mode=False,
             )
 
             prompt = await PromptFactory().create_prompt_from_text(TEST_PROMPT)
@@ -213,7 +212,6 @@ class TestPromptBasedVideo:
                     apply_background_music=True
                 ),
                 include_read_aloud_prompt=True,
-                test_mode=False,
             )
             test_prompt = await PromptFactory().create_prompt_from_text(
                 """A travel over Reunion Island, taken from bird-view at 2000meters above 
@@ -238,7 +236,6 @@ class TestPromptBasedVideo:
                     generate_background_music=True,
                 ),
                 include_read_aloud_prompt=True,
-                test_mode=False,
             )
             test_prompt = await PromptFactory().create_prompt_from_text(
                 """A travel over Reunion Island, taken from bird-view at 2000meters above 

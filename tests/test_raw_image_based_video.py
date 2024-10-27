@@ -46,7 +46,7 @@ class TestRawImagePromptBasedVideo:
         with WorkingFolderContext():
             video_title = RawImageBasedVideo(
                 prompt=await PromptFactory(
-                    prompt_build_settings=PromptBuildSettings(test_mode=True)
+                    prompt_build_settings=PromptBuildSettings()
                 )
                 .create_prompt_from_image(
                     image_path=TEST_PROMPT, text="test image prompt"
@@ -61,7 +61,7 @@ class TestRawImagePromptBasedVideo:
     async def test_build_single_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
             image_prompt = await PromptFactory(
-                prompt_build_settings=PromptBuildSettings(test_mode=True)
+                prompt_build_settings=PromptBuildSettings()
             ).create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
             pbvid = RawImageBasedVideo(
                 prompt=image_prompt,
@@ -82,7 +82,7 @@ class TestRawImagePromptBasedVideo:
     async def test_build_single_video_no_bg_music_no_subtitles(self):
         with WorkingFolderContext():
             image_prompt = await PromptFactory(
-                prompt_build_settings=PromptBuildSettings(test_mode=True)
+                prompt_build_settings=PromptBuildSettings()
             ).create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
             pbvid = RawImageBasedVideo(
                 prompt=image_prompt,
@@ -99,7 +99,7 @@ class TestRawImagePromptBasedVideo:
     async def test_build_single_video_with_default_bg_music_no_subtitles(self):
         with WorkingFolderContext():
             image_prompt = await PromptFactory(
-                prompt_build_settings=PromptBuildSettings(test_mode=True)
+                prompt_build_settings=PromptBuildSettings()
             ).create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
             pbvid = RawImageBasedVideo(
                 prompt=image_prompt,
@@ -127,7 +127,6 @@ class TestRawImagePromptBasedVideo:
                     apply_background_music=True,
                     generate_background_music=True,
                 ),
-                test_mode=False,
                 target_model_provider="stabilityai_image",
             )
             image_prompt = await PromptFactory().create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")

@@ -132,7 +132,6 @@ class TestRawMultiModalBasedVideo:
                     apply_background_music=True,
                     generate_background_music=True,
                 ),
-                test_mode=False,
                 target_model_provider="runway",
             )
             multimodal_prompt = await PromptFactory().create_prompt_from_multimodal_async(

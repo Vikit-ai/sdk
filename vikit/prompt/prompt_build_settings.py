@@ -22,7 +22,6 @@ class PromptBuildSettings(GeneralBuildSettings):
     def __init__(
         self,
         delete_interim_files: bool = False,
-        test_mode: bool = False,
         generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt
         generate_from_llm_prompt: bool = True,
         **kwargs
@@ -30,7 +29,6 @@ class PromptBuildSettings(GeneralBuildSettings):
 
         super().__init__(
             delete_interim_files=delete_interim_files,
-            test_mode=test_mode,
         )
 
         self.generate_from_llm_keyword = generate_from_llm_keyword

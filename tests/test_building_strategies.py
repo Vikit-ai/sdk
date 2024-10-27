@@ -40,7 +40,7 @@ class TestVideoBuildingStrategies:
         Test that the video tree is correctly generated, with right order,
         using a simple video tree
         """
-        build_settings = VideoBuildSettings(test_mode=True)
+        build_settings = VideoBuildSettings()
         composite = CompositeVideo()
         rtbv = RawTextBasedVideo("test")
         composite.append_video(rtbv)
@@ -74,7 +74,7 @@ class TestVideoBuildingStrategies:
 
         Using Lazy Dependency chain
         """
-        build_settings = VideoBuildSettings(test_mode=True)
+        build_settings = VideoBuildSettings()
 
         pbv = PromptBasedVideo(
             tools.test_prompt_library["moss_stones-train_boy"]
