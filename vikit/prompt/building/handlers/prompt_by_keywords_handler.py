@@ -24,6 +24,7 @@ class PromptByKeywordsHandler(Handler):
     async def execute_async(
         self,
         text_prompt: str,
+        ml_models_gateway,
         **kwargs,
     ):
         """
@@ -53,7 +54,7 @@ class PromptByKeywordsHandler(Handler):
         (
             enhanced_prompt,
             title,
-        ) = await prompt_build_settings.get_ml_models_gateway().get_keywords_from_prompt_async(
+        ) = await ml_models_gateway.get_keywords_from_prompt_async(
             subtitleText=text_prompt,
         )
         logger.info(

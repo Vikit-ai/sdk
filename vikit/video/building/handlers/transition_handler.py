@@ -19,11 +19,13 @@ from vikit.common.file_tools import url_exists
 from vikit.common.handler import Handler
 from vikit.video.video import Video
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.gateways.ML_models_gateway import MLModelsGateway
+from vikit.video.video import Video
 
 
 class VideoBuildingHandlerTransition(Handler):
 
-    async def execute_async(self, video: Video):
+    async def execute_async(self, video: Video, ml_models_gateway: MLModelsGateway):
         """
         Process the video generation binaries: we actually do ask the video to build itself
         as a video binary (typically an MP4 generated from Gen AI, hosted behind an API),
@@ -52,12 +54,8 @@ class VideoBuildingHandlerTransition(Handler):
             f"Applying transition from {video.source_video.media_url} to {video.target_video.media_url}"
         )
         
-        ml_gateway = video.prompt.build_settings.get_ml_models_gateway()
-        if video.build_settings.test_mode:
-            ml_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
-
         # We generate a transition
-        link_to_transition_video = await ml_gateway.generate_seine_transition_async(
+        link_to_transition_video = await ml_models_gateway.generate_seine_transition_async(
             source_image_path=await video.source_video.get_last_frame_as_image(),
             target_image_path=await video.target_video.get_first_frame_as_image(),
         )

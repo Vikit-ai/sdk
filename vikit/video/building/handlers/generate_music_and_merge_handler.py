@@ -18,6 +18,7 @@ from loguru import logger
 from vikit.common.handler import Handler
 from vikit.wrappers.ffmpeg_wrapper import merge_audio, get_media_duration
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.gateways.ML_models_gateway import MLModelsGateway
 
 
 class GenerateMusicAndMergeHandler(Handler):
@@ -29,7 +30,7 @@ class GenerateMusicAndMergeHandler(Handler):
         self.music_duration = music_duration
         self.bg_music_prompt = bg_music_prompt
 
-    async def execute_async(self, video):
+    async def execute_async(self, video, ml_models_gateway: MLModelsGateway):
         """
         Generate a background music based on the prompt and merge it with the video
 
@@ -54,11 +55,7 @@ class GenerateMusicAndMergeHandler(Handler):
                 f"Using video media duration as music duration: {self.music_duration}"
             )
 
-        ml_gateway = video.prompt.build_settings.get_ml_models_gateway()
-        if video.build_settings.test_mode:
-            ml_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
-
-        bg_music_file = await ml_gateway.generate_background_music_async(
+        bg_music_file = await ml_models_gateway.generate_background_music_async(
             duration=self.music_duration,
             prompt=self.bg_music_prompt,
         )

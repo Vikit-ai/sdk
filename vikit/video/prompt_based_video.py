@@ -26,6 +26,7 @@ from vikit.video.composite_video import CompositeVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video import VideoBuildSettings
 from vikit.video.video_types import VideoType
+from vikit.gateways.ML_models_gateway import MLModelsGateway
 
 
 class PromptBasedVideo(CompositeVideo):
@@ -61,7 +62,7 @@ class PromptBasedVideo(CompositeVideo):
             description=self._prompt.subtitles[0].text
         )
 
-    async def prepare_build(self, build_settings=VideoBuildSettings()):
+    async def prepare_build(self, ml_models_gateway: MLModelsGateway, build_settings=VideoBuildSettings()):
         """
         Generate the actual inner video
 
@@ -72,9 +73,9 @@ class PromptBasedVideo(CompositeVideo):
             The current instance
         """
         await super().prepare_build(build_settings=build_settings)
-        return await self.compose(build_settings=build_settings)
+        return await self.compose(build_settings=build_settings, ml_models_gateway=ml_models_gateway)
 
-    async def compose(self, build_settings: VideoBuildSettings):
+    async def compose(self, build_settings: VideoBuildSettings, ml_models_gateway):
         """
         Compose the inner composite video
 
@@ -96,7 +97,7 @@ class PromptBasedVideo(CompositeVideo):
             (
                 keyword_based_vid,
                 prompt_based_vid,
-            ) = await self._prepare_basic_building_block(sub, build_stgs=build_settings)
+            ) = await self._prepare_basic_building_block(sub, build_stgs=build_settings, ml_models_gateway=ml_models_gateway)
 
             vid_cp_sub.append_video(keyword_based_vid).append_video(
                 prompt_based_vid
@@ -107,7 +108,7 @@ class PromptBasedVideo(CompositeVideo):
         return self
 
     async def _prepare_basic_building_block(
-        self, sub: pysrt.SubRipItem, build_stgs: VideoBuildSettings = None
+        self, sub: pysrt.SubRipItem, ml_models_gateway: MLModelsGateway, build_stgs: VideoBuildSettings = None,
     ):
         """
         build the basic building block of the full video/
@@ -127,7 +128,7 @@ class PromptBasedVideo(CompositeVideo):
         """
 
         prompt_fact = PromptFactory(
-            prompt_build_settings=PromptBuildSettings(test_mode=build_stgs.test_mode)
+            ml_models_gateway=ml_models_gateway
         )
         enhanced_prompt_from_keywords = (
             await prompt_fact.get_reengineered_prompt_text_from_raw_text(
@@ -157,7 +158,8 @@ class PromptBasedVideo(CompositeVideo):
                 test_mode=build_stgs.test_mode,
                 target_model_provider=build_stgs.target_model_provider,
                 interpolate=build_stgs.interpolate,
-            )
+            ),
+            ml_models_gateway=ml_models_gateway,
         )
 
         
@@ -167,7 +169,8 @@ class PromptBasedVideo(CompositeVideo):
                 test_mode=build_stgs.test_mode,
                 target_model_provider=build_stgs.target_model_provider,
                 interpolate=build_stgs.interpolate,
-            )
+            ),
+            ml_models_gateway=ml_models_gateway
         )
         assert prompt_based_vid is not None, "prompt_based_vid cannot be None"
         assert prompt_based_vid2 is not None, "prompt_based_vid2 cannot be None"

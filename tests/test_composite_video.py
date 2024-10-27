@@ -111,10 +111,9 @@ class TestCompositeVideo:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True
                     ),
-                    test_mode=True,
                     include_read_aloud_prompt=True,
                     prompt=tools.test_prompt_library["tired"],
-                )
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert built.media_url is not None
@@ -127,7 +126,7 @@ class TestCompositeVideo:
             video = ImportedVideo(test_media.get_cat_video_path())
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video)
-            await test_video_mixer.build()
+            await test_video_mixer.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
             logger.debug(
                 f"Test video mix with preexisting video bin: {test_video_mixer}"
             )
@@ -149,7 +148,7 @@ class TestCompositeVideo:
             assert (
                 video._needs_video_reencoding
             ), f"Video should need reencoding, type: {type(video)}"
-            await test_video_mixer.build(VideoBuildSettings(test_mode=True))
+            await test_video_mixer.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
             assert test_video_mixer.media_url is not None
 
     @pytest.mark.integration
@@ -207,12 +206,11 @@ class TestCompositeVideo:
             test_video_mixer.append_video(raw_text_video).append_video(raw_text_video)
             await test_video_mixer.build(
                 VideoBuildSettings(
-                    test_mode=True,
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True
                     ),
                     prompt=test_prompt,
-                )
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
             assert (
                 test_video_mixer.media_url is not None
@@ -242,7 +240,7 @@ class TestCompositeVideo:
                     ),
                     include_read_aloud_prompt=False,
                     prompt=test_prompt_library["moss_stones-train_boy"],
-                )
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
             assert final_video.media_url is not None
             assert final_video.background_music is not None
@@ -280,10 +278,9 @@ class TestCompositeVideo:
                     music_building_context=MusicBuildingContext(
                         generate_background_music=False, apply_background_music=True
                     ),
-                    test_mode=True,
                     include_read_aloud_prompt=False,
                     prompt=prompt_with_recording,
-                )
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert final_composite_video.media_url is not None
@@ -312,7 +309,7 @@ class TestCompositeVideo:
                     ),
                     include_read_aloud_prompt=True,
                     prompt=tools.test_prompt_library["tired"],
-                )
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert video_comp.media_url is not None
@@ -343,7 +340,7 @@ class TestCompositeVideo:
                     include_read_aloud_prompt=True,
                     prompt=tools.test_prompt_library["tired"],
                     expected_length=5,
-                )
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
             assert ffmpegwrapper.get_media_duration(video_comp.media_url) == 5
 
@@ -407,7 +404,6 @@ class TestCompositeVideo:
                     apply_background_music=True, generate_background_music=True
                 ),
                 interpolate=True,
-                test_mode=True,
                 include_read_aloud_prompt=True,
                 prompt=test_prompt_library["moss_stones-train_boy"],
             )
@@ -425,7 +421,7 @@ class TestCompositeVideo:
             vid_cp_final.append_video(comp_start).append_video(transition).append_video(
                 comp_end
             )
-            await vid_cp_final.build(build_settings=bld_settings)
+            await vid_cp_final.build(build_settings=bld_settings, ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
             assert vid_cp_final.media_url is not None, "Media URL should not be null"
 
     @pytest.mark.local_integration
@@ -441,7 +437,6 @@ class TestCompositeVideo:
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True, generate_background_music=True
                 ),
-                test_mode=True,
                 include_read_aloud_prompt=True,
             )
 
@@ -464,4 +459,4 @@ class TestCompositeVideo:
                 comp_end
             )
             # with pytest.raises(AssertionError):
-            await vid_cp_final.build(build_settings=bld_settings)
+            await vid_cp_final.build(build_settings=bld_settings, ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))

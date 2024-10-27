@@ -88,9 +88,7 @@ async def batch_raw_text_based_prompting(
             test_mode=False,
         )
 
-        prompt_obj = await PromptFactory(
-            ml_gateway=video_build_settings.get_ml_models_gateway()
-        ).create_prompt_from_text(prompt_content)
+        prompt_obj = await PromptFactory().create_prompt_from_text(prompt_content)
 
         # you can set negative prompt, for the moment it is  effective only for Haiper
         prompt_obj.negative_prompt = negative_prompt
@@ -151,9 +149,7 @@ async def composite_textonly_prompting(
         expected_length=total_duration,
         include_read_aloud_prompt=True,
     )
-    prompt = await PromptFactory(
-        ml_gateway=composite_build_settings.get_ml_models_gateway()
-    ).create_prompt_from_text(subtitle_total)
+    prompt = await PromptFactory().create_prompt_from_text(subtitle_total)
     # you can set negative prompt, for the moment it is  effective only for Haiper
     prompt.negative_prompt = negative_prompt
     composite_build_settings.prompt = prompt
@@ -175,9 +171,7 @@ async def create_single_image_based_video(
             target_model_provider="stabilityai_image",
             output_video_file_name=output_filename,
         )
-    image_prompt = PromptFactory(
-        ml_gateway=build_settings.get_ml_models_gateway()
-    ).create_prompt_from_image(image_path=prompt_content, text=text)
+    image_prompt = PromptFactory().create_prompt_from_image(image_path=prompt_content, text=text)
 
     video = RawImageBasedVideo(
         prompt=image_prompt,
@@ -366,7 +360,7 @@ async def prompt_based_composite(prompt: str, model_provider="stabilityai"):
     )
 
     gw = video_build_settings.get_ml_models_gateway()
-    prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(prompt)
+    prompt = await PromptFactory(ml_models_gateway=gw).create_prompt_from_text(prompt)
     # you can set negative prompt, for the moment it is  effective only for Haiper
     prompt.negative_prompt = negative_prompt
     video = PromptBasedVideo(prompt=prompt)

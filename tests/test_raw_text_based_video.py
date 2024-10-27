@@ -22,6 +22,7 @@ from loguru import logger
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video import VideoBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 logger.add("log_test_raw_text_based_video.txt", rotation="10 MB")
 warnings.simplefilter("ignore", category=ResourceWarning)
@@ -43,7 +44,7 @@ class TestRawTextBasedVideo:
     ):
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a prompt text")
-            built = await video.build(build_settings=VideoBuildSettings())
+            built = await video.build(build_settings=VideoBuildSettings(), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
 
             assert built.media_url is not None
 
@@ -55,7 +56,7 @@ class TestRawTextBasedVideo:
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a prompt text")
             built = await video.build(
-                build_settings=VideoBuildSettings(output_video_file_name="my_video.mp4")
+                build_settings=VideoBuildSettings(output_video_file_name="my_video.mp4"), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert built.media_url is not None
@@ -72,7 +73,7 @@ class TestRawTextBasedVideo:
             video = RawTextBasedVideo("This is a prompt text")
             target_path = os.makedirs("testdir")
             built = await video.build(
-                build_settings=VideoBuildSettings(target_dir_path="testdir")
+                build_settings=VideoBuildSettings(target_dir_path="testdir"), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert built.media_url is not None
@@ -90,7 +91,7 @@ class TestRawTextBasedVideo:
                 build_settings=VideoBuildSettings(
                     target_dir_path="testdir2",
                     output_video_file_name="my_othervideo.mp4",
-                )
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert built.media_url is not None

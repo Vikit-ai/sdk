@@ -19,12 +19,12 @@ import warnings
 import pytest
 from loguru import logger
 
-import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
 from tests.testing_medias import get_test_prompt_image
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 
 # from unittest.mock import patch, MagicMock, Mock
@@ -67,8 +67,8 @@ class TestRawImagePromptBasedVideo:
                 prompt=image_prompt,
                 title="test_image_prompt",
             )
-            pbvid.build_settings = VideoBuildSettings(prompt=image_prompt)
-            await pbvid.build(pbvid.build_settings)
+
+            await pbvid.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
             logger.debug(
                 f"Test build_single_video_no_bg_music_without_subs, media URL: {pbvid.media_url}"
             )
@@ -88,8 +88,7 @@ class TestRawImagePromptBasedVideo:
                 prompt=image_prompt,
                 title="test_image_prompt",
             )
-            pbvid.build_settings = VideoBuildSettings(prompt=image_prompt)
-            await pbvid.build(pbvid.build_settings)
+            await pbvid.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
 
             assert pbvid._background_music_file_name is None
             assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
@@ -112,7 +111,7 @@ class TestRawImagePromptBasedVideo:
                         apply_background_music=True, generate_background_music=False
                     ),
                     prompt=image_prompt,
-                )
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
@@ -131,7 +130,7 @@ class TestRawImagePromptBasedVideo:
                 test_mode=False,
                 target_model_provider="stabilityai_image",
             )
-            image_prompt = PromptFactory().create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
+            image_prompt = await PromptFactory().create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
             build_settings.prompt = image_prompt
 
             video = RawImageBasedVideo(

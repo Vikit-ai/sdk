@@ -36,6 +36,7 @@ from vikit.prompt.recorded_prompt_subtitles_extractor import (
     RecordedPromptSubtitlesExtractor,
 )
 from vikit.wrappers.ffmpeg_wrapper import get_media_duration
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 import uuid
 
@@ -51,14 +52,14 @@ class PromptFactory:
 
     def __init__(
         self,
-        ml_gateway: MLModelsGateway = None,
+        ml_models_gateway: MLModelsGateway = None,
         prompt_build_settings: PromptBuildSettings = PromptBuildSettings(),
     ):
         """
         Constructor of the prompt factory
 
         Args:
-            ml_gateway: The ML Gateway to use to generate the prompt from the audio file
+            ml_models_gateway: The ML Gateway to use to generate the prompt from the audio file
 
         """
         
@@ -67,10 +68,10 @@ class PromptFactory:
 
         print("new uuid " + self.prompt_factory_uuid)
 
-        if ml_gateway:
-            self._ml_gateway = ml_gateway
+        if ml_models_gateway:
+            self.ml_models_gateway = ml_models_gateway
         else:
-            self._ml_gateway = prompt_build_settings.get_ml_models_gateway()
+            self.ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
 
     async def create_prompt_from_text(
         self, prompt_text: str = None, negative_prompt: str = None
@@ -94,7 +95,7 @@ class PromptFactory:
         extractor = None
         logger.debug(f"Creating prompt from text: {prompt_text}")
         # calling a model like Whisper from openAI
-        await self._ml_gateway.generate_mp3_from_text_async(
+        await self.ml_models_gateway.generate_mp3_from_text_async(
             prompt_text=prompt_text,
             target_file=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
         )
@@ -102,7 +103,7 @@ class PromptFactory:
         extractor = RecordedPromptSubtitlesExtractor()
         subs = await extractor.extract_subtitles_async(
             recorded_prompt_file_path=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
-            ml_models_gateway=self._ml_gateway,
+            ml_models_gateway=self.ml_models_gateway,
         )
         merged_subs = (
             extractor.merge_short_subtitles(  # merge short subtitles into larger ones
@@ -172,7 +173,7 @@ class PromptFactory:
         """
         extractor = RecordedPromptSubtitlesExtractor()
         subs = await extractor.extract_subtitles_async(
-            recorded_audio_prompt_path, ml_models_gateway=self._ml_gateway
+            recorded_audio_prompt_path, ml_models_gateway=self.ml_models_gateway
         )
         merged_subs = extractor.merge_short_subtitles(
             subs, min_duration=config.get_subtitles_min_duration()
@@ -206,7 +207,7 @@ class PromptFactory:
         else:
             for handler in handler_chain:
                 text_prompt, video_suggested_title = await handler.execute_async(
-                    text_prompt=prompt, prompt_build_settings=prompt_build_settings
+                    text_prompt=prompt, prompt_build_settings=prompt_build_settings, ml_models_gateway=self.ml_models_gateway
                 )
 
         return text_prompt  # return the last enhanced prompt from handlers chain

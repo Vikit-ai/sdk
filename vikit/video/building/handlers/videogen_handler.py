@@ -27,6 +27,7 @@ from vikit.prompt.image_prompt import ImagePrompt
 from vikit.prompt.multimodal_prompt import MultiModalPrompt
 from vikit.video.video import VideoBuildSettings
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.gateways.ML_models_gateway import MLModelsGateway
 
 class VideoGenHandler(Handler):
     def __init__(self, video_gen_build_settings: VideoBuildSettings = None):
@@ -34,7 +35,7 @@ class VideoGenHandler(Handler):
             raise ValueError("VideoBuildSettings is not set")
         self.video_gen_build_settings = video_gen_build_settings
 
-    async def execute_async(self, video: Video):
+    async def execute_async(self, video, ml_models_gateway: MLModelsGateway):
         """
         Process the video generation binaries: the video binary is generated from Gen AI, hosted behind an API
         which could be distant as well as local. The video binary is then stored in a web storage or locally.
@@ -54,13 +55,10 @@ class VideoGenHandler(Handler):
         logger.debug(
             f"Target Model provider in the handler: {self.video_gen_build_settings.target_model_provider}"
         )
-        ml_gateway = video.prompt.build_settings.get_ml_models_gateway()
-        if self.video_gen_build_settings.test_mode:
-            ml_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
 
         video.media_url = (
             await (  # Should give a link on a web storage
-                ml_gateway.generate_video_async(
+                ml_models_gateway.generate_video_async(
                     prompt=video.prompt,
                     model_provider=self.video_gen_build_settings.target_model_provider,
                     aspect_ratio=self.video_gen_build_settings.aspect_ratio,

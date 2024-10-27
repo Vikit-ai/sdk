@@ -18,22 +18,20 @@ from loguru import logger
 from vikit.common.file_tools import download_or_copy_file
 from vikit.common.handler import Handler
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.gateways.ML_models_gateway import MLModelsGateway
+from vikit.video.video import Video
 
 
 class VideoInterpolationHandler(Handler):
 
-    async def execute_async(self, video):
+    async def execute_async(self, video: Video, ml_models_gateway: MLModelsGateway):
 
         logger.info(
             f"About to interpolate video: id: {video.id}, media: {video.media_url[:50]}"
         )
 
-        ml_gateway = video.prompt.build_settings.get_ml_models_gateway()
-        if video.build_settings.test_mode:
-            ml_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
-
         interpolated_video = (
-            await ml_gateway.interpolate_async(
+            await ml_models_gateway.interpolate_async(
                 video.media_url
             )
         )

@@ -58,7 +58,6 @@ class TestModelProviders:
                 video = RawTextBasedVideo(subtitle.text)
                 await video.prepare_build(
                     build_settings=VideoBuildSettings(
-                        test_mode=False,
                         music_building_context=MusicBuildingContext(),
                         target_model_provider=target_model_provider,
                     )
@@ -70,7 +69,6 @@ class TestModelProviders:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True
                     ),
-                    test_mode=False,
                     include_read_aloud_prompt=True,
                     prompt=test_prompt_library["moss_stones-train_boy"],
                 )
@@ -85,7 +83,6 @@ class TestModelProviders:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True
                     ),
-                    test_mode=True,
                     target_model_provider="a nonexistent model",
                 )
 

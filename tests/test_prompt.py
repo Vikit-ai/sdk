@@ -39,14 +39,14 @@ class TestPrompt:
     async def test_generate_prompt_from_empty_prompt(self):
         with pytest.raises(ValueError):
             _ = await PromptFactory(
-                ml_gateway=replicate_gateway.ReplicateGateway()
+                ml_models_gateway=replicate_gateway.ReplicateGateway()
             ).create_prompt_from_text(prompt_text=None)
 
     @pytest.mark.unit
     def test_generate_prompt_from_empty_audio(self):
         # with pytest.raises(ValueError):
         _ = PromptFactory(
-            ml_gateway=replicate_gateway.ReplicateGateway()
+            ml_models_gateway=replicate_gateway.ReplicateGateway()
         ).create_prompt_from_audio_file(recorded_audio_prompt_path=None)
 
     @pytest.mark.integration
@@ -57,7 +57,7 @@ class TestPrompt:
             here we check a prompt has been created successfully from an mp3 recording
             """
             prompt = await PromptFactory(
-                ml_gateway=vgateway.VikitGateway()
+                ml_models_gateway=vgateway.VikitGateway()
             ).create_prompt_from_audio_file(
                 recorded_audio_prompt_path=get_test_prompt_recording()
             )
@@ -70,18 +70,18 @@ class TestPrompt:
     async def test_build_basic_text_prompt_from_text(self):
         with WorkingFolderContext():  # we work in the temp folder once for all the script
             prompt = await PromptFactory(
-                ml_gateway=vgateway.VikitGateway()
+                ml_models_gateway=vgateway.VikitGateway()
             ).create_prompt_from_text(prompt_text="This is a fake prompt")
             assert (
                 prompt.text == "This is a fake prompt"
             ), "Prompt text is not the one expected"
 
     @pytest.mark.integration
-    def test_build_basic_image_prompt(self):
+    async def test_build_basic_image_prompt(self):
         with WorkingFolderContext():  # we work in the temp folder once for all the script
             prompt_image = get_test_prompt_image()
-            prompt = PromptFactory(
-                ml_gateway=replicate_gateway.ReplicateGateway()
+            prompt = await PromptFactory(
+                ml_models_gateway=replicate_gateway.ReplicateGateway()
             ).create_prompt_from_image(image_path=prompt_image)
 
             assert prompt.image is not None
