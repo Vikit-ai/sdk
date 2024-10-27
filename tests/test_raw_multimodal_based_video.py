@@ -137,7 +137,6 @@ class TestRawMultiModalBasedVideo:
             multimodal_prompt = await PromptFactory().create_prompt_from_multimodal_async(
                 image=TEST_PROMPT_IMAGE, text="test multimodal prompt", audio=TEST_PROMPT_AUDIO, video=TEST_PROMPT_VIDEO
             )
-            build_settings.prompt = multimodal_prompt
 
             video = RawMultiModalBasedVideo(
                 prompt=multimodal_prompt,

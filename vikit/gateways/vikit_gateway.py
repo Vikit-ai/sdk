@@ -815,7 +815,7 @@ class VikitGateway(MLModelsGateway):
         Generate a video from the given image prompt
 
         Args:
-            prompt: Image prompt to generate the video from in base64 format
+            prompt: Prompt containing an image attribe
 
         returns:
                 The link to the generated video
@@ -890,14 +890,19 @@ class VikitGateway(MLModelsGateway):
                 target_size=(1280,768)
             else:
                 target_size=(768, 1280)
-
+            
             #If base64, we resize it. If URL, we cannot resize without downloading it
             if (not prompt.image.startswith("http")):
                 #Base64 image
                 logger.debug("Resizing image for video generator")
-
-                # Convert result to Base64
-                image_data = base64.b64decode(prompt.image)
+                image_data= ""
+                try: 
+                    # Convert result to Base64
+                    image_data = base64.b64decode(prompt.image)
+                except Exception: 
+                    #Read file path and then convert to Base64
+                    with open(prompt.image, "rb") as image_file:
+                        image_data = image_file.read()
 
                 # Convert the image data to a NumPy array
                 np_arr = np.frombuffer(image_data, np.uint8)
