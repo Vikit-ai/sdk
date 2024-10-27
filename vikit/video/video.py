@@ -66,12 +66,9 @@ class Video(ABC):
             ValueError: If the source media URL is not set
 
         """
-        if hasattr(prompt, "ratio"):
-            self._width = prompt.ratio[0]
-            self._height = prompt.ratio[1]
-        else:
-            self._width = None
-            self._height = None
+
+        self._width = None
+        self._height = None
         self._background_music_file_name = None
         self._duration = None
         self._is_video_built = False
@@ -312,6 +309,7 @@ class Video(ABC):
         await self.run_pre_build_actions_hook(build_settings=build_settings)
 
         built_video = None
+        print(ml_models_gateway)
         if not self.are_build_settings_prepared:
             self.build_settings = build_settings
             self._source = type(

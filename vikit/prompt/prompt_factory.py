@@ -274,7 +274,6 @@ class PromptFactory:
         video:str = None, 
         duration:float = None,
         seed: int = None,
-        ratio:tuple = (16,9),
     ):
         """
         Create a prompt object from a prompt image path
@@ -295,5 +294,5 @@ class PromptFactory:
         if reengineer_text:
             text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
 
-        multimodal_prompt = MultiModalPrompt(text=text, negative_text=negative_text, image=image, audio=audio, video=video, duration=duration, seed=seed, ratio= ratio, build_settings=self.prompt_build_settings)
+        multimodal_prompt = MultiModalPrompt(text=text, negative_text=negative_text, image=image, audio=audio, video=video, duration=duration, seed=seed, build_settings=self.prompt_build_settings)
         return multimodal_prompt
