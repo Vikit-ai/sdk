@@ -352,6 +352,26 @@ async def prompt_based_composite(prompt: str, model_provider="stabilityai"):
     await video.build(build_settings=video_build_settings)
 
 
+async def colabCode():
+    working_folder="./examples/inputs/PromptbasedVideo/"
+    with WorkingFolderContext(working_folder):
+        video_build_settings = VideoBuildSettings(
+            music_building_context=MusicBuildingContext(
+                apply_background_music=True,
+                generate_background_music=True,
+            ),
+            include_read_aloud_prompt=True,
+            target_model_provider="videocrafter", #Available models: videocrafter, stabilityai, haiper
+            output_video_file_name="AICosmetics.mp4",
+            interpolate=True,
+        )
+
+        prompt = "Unlock your radiance with AI Cosmetics. Experience the magic of premium ingredients, designed to reveal your natural glow. Discover the perfect blend of science and nature with our advanced formulations, tailored to enhance your unique beauty. Transform your skincare routine with our luxurious, high-performance products that deliver visible results. Embrace your true self with confidence, knowing AI Cosmetics has you covered every step of the way."  # @param {type:"string"}
+
+        prompt = await PromptFactory().create_prompt_from_text(prompt)
+        video = PromptBasedVideo(prompt=prompt)
+        await video.build(build_settings=video_build_settings)
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -417,3 +437,6 @@ if __name__ == "__main__":
             logger.add("log.txt")
             prompt = """Paris, the City of Light, is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere. The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions. Paris is also famous for its charming cafes, chic boutiques, and world-class cuisine, offering visitors a delightful blend of history, elegance, and joie de vivre along the scenic Seine River."""
             asyncio.run(prompt_based_composite(prompt=prompt))
+    
+    elif run_an_example == 7:
+        asyncio.run(colabCode())
