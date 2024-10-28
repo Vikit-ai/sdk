@@ -189,7 +189,7 @@ class PromptFactory:
     async def get_reengineered_prompt_text_from_raw_text(
         self,
         prompt: str,
-        prompt_build_settings: PromptBuildSettings,
+        prompt_build_settings: PromptBuildSettings = PromptBuildSettings(),
     ) -> str:
         """
         Get a reengineered prompt from a raw text , using build settings
