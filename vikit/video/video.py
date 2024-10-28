@@ -309,7 +309,7 @@ class Video(ABC):
         await self.run_pre_build_actions_hook(build_settings=build_settings)
 
         built_video = None
-        print(ml_models_gateway)
+
         if not self.are_build_settings_prepared:
             self.build_settings = build_settings
             self._source = type(

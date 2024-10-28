@@ -359,13 +359,11 @@ class VikitGateway(MLModelsGateway):
                 "input": {
                     "top_k": 50,
                     "top_p": 0.9,
-                    "prompt": """I want you to act as a english keyword generator for a music generation artificial
-                                            intelligence program with the aim of generating a background music for a podcast video.
-                                                Your job is to provide detailed and creative keywords that will inspire unique and interesting music
-                                                from the AI for background music for a video. Keep in mind that the AI is capable of 
-                                                understanding a wide range of language and can interpret abstract concepts, so feel free to be 
-                                                as imaginative.  The more detailed and imaginative your keywords, the more interesting the
-                                                    resulting music will be. Here is your prompt: '"""
+                    "prompt": """I want you to act as a english keyword generator for a music generation artificial intelligence program \ 
+with the aim of generating a background music for a podcast video. Your job is to provide detailed and creative keywords that 
+will inspire unique and interesting music from the AI for background music for a video. Keep in mind that the AI is capable of understanding a wide 
+range of language and can interpret abstract concepts, so feel free to be  as imaginative.  The more detailed and imaginative your keywords, the more 
+interesting the resulting music will be. Here is your prompt: '"""
                     + text
                     + KEYWORDS_FORMAT_PROMPT,
                     "temperature": 0.6,
