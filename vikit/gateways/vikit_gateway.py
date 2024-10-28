@@ -58,7 +58,7 @@ http_timeout = aiohttp.ClientTimeout(
     total=1500, connect=500, sock_read=500, sock_connect=500
 )
 
-mistral_version = "mistralai/mistral-7b-v0.1"
+mistral_version = "meta/meta-llama-3-70b-instruct"
 
 
 class VikitGateway(MLModelsGateway):
@@ -359,18 +359,22 @@ class VikitGateway(MLModelsGateway):
                 "input": {
                     "top_k": 50,
                     "top_p": 0.9,
-                    "prompt": """I want you to act as a english keyword generator for a music generation artificial intelligence program \ 
+                    "prompt": """I want you to act as a english keyword generator for a music generation artificial intelligence program  
 with the aim of generating a background music for a podcast video. Your job is to provide detailed and creative keywords that 
 will inspire unique and interesting music from the AI for background music for a video. Keep in mind that the AI is capable of understanding a wide 
 range of language and can interpret abstract concepts, so feel free to be  as imaginative.  The more detailed and imaginative your keywords, the more 
 interesting the resulting music will be. Here is your prompt: '"""
                     + text
-                    + KEYWORDS_FORMAT_PROMPT,
+                    + KEYWORDS_FORMAT_PROMPT + "Just list the keywords in english language, separated by a coma, do not re-output the prompt. Just give the keywords, nothing else, no introduction, just the keywords.",
+                    "max_tokens": 512,
+                    "min_tokens": 0,
                     "temperature": 0.6,
-                    "max_new_tokens": 1024,
-                    "prompt_template": "<s>[INST] {prompt} [/INST] ",
-                    "presence_penalty": 0,
-                    "frequency_penalty": 0,
+                    "system_prompt": "You are a helpful assistant",
+                    "length_penalty": 1,
+                    "stop_sequences": "<|end_of_text|>,<|eot_id|>",
+                    "prompt_template": "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a helpful assistant<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+                    "presence_penalty": 1.15,
+                    "log_performance_metrics": False
                 },
             }
             async with session.post(vikit_backend_url, json=payload) as response:
@@ -455,18 +459,22 @@ interesting the resulting music will be. Here is your prompt: '"""
                         + "which to extract keywords: '"
                         ""
                         + subtitleText
-                        + "'. Just list the keywords in english language, separated by a coma, do not re-output the prompt. "
+                        + "'. Just list the keywords in english language, separated by a coma, do not re-output the prompt. Just give the keywords, nothing else, no introduction, just the keywords. "
                         + (
                             f" . Please avoid using these keywords: {excluded_words}"
                             if excluded_words
                             else ""
                         )
                         + KEYWORDS_FORMAT_PROMPT,
+                        "max_tokens": 512,
+                        "min_tokens": 0,
                         "temperature": 0.6,
-                        "max_new_tokens": 32,
-                        "prompt_template": "<s>[INST] {prompt} [/INST] ",
-                        "presence_penalty": 0,
-                        "frequency_penalty": 0,
+                        "system_prompt": "You are a helpful assistant",
+                        "length_penalty": 1,
+                        "stop_sequences": "<|end_of_text|>,<|eot_id|>",
+                        "prompt_template": "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a helpful assistant<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+                        "presence_penalty": 1.15,
+                        "log_performance_metrics": False
                     },
                 },
             )
@@ -502,12 +510,16 @@ interesting the resulting music will be. Here is your prompt: '"""
                     "prompt": "I want you to act as a one sentence prompt creator for Midjourney's artificial intelligence program. Your job is to provide one detailed and creative sentence that will inspire unique and interesting video from the AI to create. Keep in mind that the AI is capable of understanding a wide range of language and can interpret abstract concepts, so feel free to be as imaginative and descriptive as possible.  The more detailed and imaginative your description, the more interesting the resulting image will be. Here is the paragraph to summarize in one sentence that describes a scenario for a video: '"
                     + subtitleText
                     + "'. Just give me a short summary of what is said in a way that would make a good video. Please avoid speaking about anything related to text."
-                    + "The last 3 words of your answer should be a summary of all the other keywords so I can generate a file name out of it",
+                    + "The last 3 words of your answer should be a summary of all the other keywords so I can generate a file name out of it. Just list the sentence in english language, separated by a coma, do not re-output the prompt. Just give the sentence, nothing else, no introduction, just the sentence.",
+                    "max_tokens": 512,
+                    "min_tokens": 0,
                     "temperature": 0.6,
-                    "max_new_tokens": 24,
-                    "prompt_template": "<s>[INST] {prompt} [/INST] ",
-                    "presence_penalty": 0,
-                    "frequency_penalty": 0,
+                    "system_prompt": "You are a helpful assistant",
+                    "length_penalty": 1,
+                    "stop_sequences": "<|end_of_text|>,<|eot_id|>",
+                    "prompt_template": "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a helpful assistant<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+                    "presence_penalty": 1.15,
+                    "log_performance_metrics": False
                 },
             }
 
