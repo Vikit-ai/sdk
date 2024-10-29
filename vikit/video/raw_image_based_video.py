@@ -43,7 +43,7 @@ class RawImageBasedVideo(Video):
             ValueError: If the source media URL is not set
         """
         if prompt is None:
-            raise ValueError("raw_image_prompt cannot be None")
+            raise ValueError("prompt cannot be None")
 
         super().__init__(prompt)
 

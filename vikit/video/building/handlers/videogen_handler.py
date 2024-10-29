@@ -56,11 +56,17 @@ class VideoGenHandler(Handler):
             f"Target Model provider in the handler: {self.video_gen_build_settings.target_model_provider}"
         )
 
+        
+        if video.prompt.build_settings.model_provider is None:
+            model_provider=self.video_gen_build_settings.target_model_provider
+        else:
+            model_provider=self.video_gen_build_settings.target_model_provider
+
         video.media_url = (
             await (  # Should give a link on a web storage
                 ml_models_gateway.generate_video_async(
                     prompt=video.prompt,
-                    model_provider=self.video_gen_build_settings.target_model_provider,
+                    model_provider=model_provider,
                     aspect_ratio=self.video_gen_build_settings.aspect_ratio,
                 )
             )

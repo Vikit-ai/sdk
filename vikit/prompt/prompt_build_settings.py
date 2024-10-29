@@ -24,13 +24,14 @@ class PromptBuildSettings(GeneralBuildSettings):
         delete_interim_files: bool = False,
         generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt
         generate_from_llm_prompt: bool = True,
+        model_provider: str = None,
         **kwargs
     ):
 
         super().__init__(
             delete_interim_files=delete_interim_files,
         )
-
+        self.model_provider=model_provider
         self.generate_from_llm_keyword = generate_from_llm_keyword
         self.generate_from_llm_prompt = generate_from_llm_prompt
         # self.excluded_words = ""

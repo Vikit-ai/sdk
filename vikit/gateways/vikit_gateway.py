@@ -891,6 +891,9 @@ interesting the resulting music will be. Here is your prompt: '"""
         returns:
                 The link to the generated video
         """
+        
+        if prompt.image is None:
+            ValueError(f'Image needs to be provided for Runway model')
         try:
             output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
             logger.debug(f"Generating video from image prompt {prompt.image[:50]} and text {prompt.text}")

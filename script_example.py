@@ -361,12 +361,12 @@ async def colabCode():
                 generate_background_music=True,
             ),
             include_read_aloud_prompt=True,
-            target_model_provider="videocrafter", #Available models: videocrafter, stabilityai, haiper
+            target_model_provider="runway", #Available models: videocrafter, stabilityai, haiper
             output_video_file_name="AICosmetics.mp4",
             interpolate=True,
         )
 
-        prompt = "Unlock your radiance with AI Cosmetics. Experience the magic of premium ingredients, designed to reveal your natural glow. Discover the perfect blend of science and nature with our advanced formulations, tailored to enhance your unique beauty. Transform your skincare routine with our luxurious, high-performance products that deliver visible results. Embrace your true self with confidence, knowing AI Cosmetics has you covered every step of the way."  # @param {type:"string"}
+        prompt = "Unlock your radiance with AI Cosmetics."  # @param {type:"string"}
 
         prompt = await PromptFactory().create_prompt_from_text(prompt)
         video = PromptBasedVideo(prompt=prompt)

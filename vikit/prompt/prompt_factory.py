@@ -237,9 +237,10 @@ class PromptFactory:
     @log_function_params
     async def create_prompt_from_image(
         self,
-        image_path: str = None,
+        image: str = None,
         text: str = None,
         reengineer_text:bool = False,
+        model_provider: str= None,
     ):
         """
         Create a prompt object from a prompt image path
@@ -252,16 +253,19 @@ class PromptFactory:
         """
         if image_path is None:
             raise ValueError("The prompt image is not provided")
-        if not os.path.exists(image_path):
-            raise ValueError(f"The prompt image file {image_path} does not exist")
+        
+        #We now support any type of image, path base64 or URL
+        #if not os.path.exists(image_path) and :
+        #    raise ValueError(f"The prompt image file {image_path} does not exist")
 
-        with open(image_path, "rb") as image_file:
-            input_prompt_image = base64.b64encode(image_file.read()).decode("utf-8")
+        #Encoding and decoding is done at the gateway level
+        #with open(image_path, "rb") as image_file:
+        #    input_prompt_image = base64.b64encode(image_file.read()).decode("utf-8")
         
         if reengineer_text:
             text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
 
-        img_prompt = MultiModalPrompt(image=input_prompt_image, text=text, build_settings=self.prompt_build_settings)
+        img_prompt = MultiModalPrompt(image=input_prompt_image, text=text, model_provider=model_provider, build_settings=self.prompt_build_settings)
         return img_prompt
 
     async def create_prompt_from_multimodal_async(
@@ -274,6 +278,7 @@ class PromptFactory:
         video:str = None, 
         duration:float = None,
         seed: int = None,
+        model_provider: str= None,
     ):
         """
         Create a prompt object from a prompt image path
@@ -294,5 +299,5 @@ class PromptFactory:
         if reengineer_text:
             text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
 
-        multimodal_prompt = MultiModalPrompt(text=text, negative_text=negative_text, image=image, audio=audio, video=video, duration=duration, seed=seed, build_settings=self.prompt_build_settings)
+        multimodal_prompt = MultiModalPrompt(text=text, negative_text=negative_text, image=image, audio=audio, video=video, duration=duration, seed=seed, model_provider=model_provider, build_settings=self.prompt_build_settings)
         return multimodal_prompt
