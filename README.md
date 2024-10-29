@@ -1,7 +1,7 @@
 <div align="center">
 <img src='./medias/vikit_logo.jpg' style="height:150px"></img>
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1yZ-GC0GxRP6zKZD2lJfi9Rz16nRezLaa#scrollTo=72LXhJCils2Q)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1SltMsYv4ExYJLSagLKsZqazmCludo8vC)
 
 </div>
 
@@ -18,7 +18,7 @@ To see the video in full resolution, click on the GIF.
 
 You need a personal access token, which you can easily obtain from [here](https://www.vikit.ai/#/platform).  
 
-- Vikit.ai SDK is easy to test standalone using [Google Colab](https://colab.research.google.com/drive/1yZ-GC0GxRP6zKZD2lJfi9Rz16nRezLaa#scrollTo=72LXhJCils2Q).
+- Vikit.ai SDK is easy to test standalone using [Google Colab](https://colab.research.google.com/drive/1SltMsYv4ExYJLSagLKsZqazmCludo8vC).
 
 - It is easy to develop through Dev Containers. Dev container file and instructions are available [here](dev_containers.md)
 
@@ -52,9 +52,9 @@ video_build_settings = VideoBuildSettings(
     include_read_aloud_prompt=True,
 )
 
-gw = video_build_settings.get_ml_models_gateway()
-prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(prompt)
+prompt = await PromptFactory().create_prompt_from_text(prompt)
 video = PromptBasedVideo(prompt=prompt)
+
 await video.build(build_settings=video_build_settings)
 
 ```
@@ -65,7 +65,6 @@ You can orchestrate several videos, using ```CompositeVideo()```. Here is an exa
 
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
-from vikit.video.seine_transition import SeineTransition
 from vikit.video.video_build_settings import VideoBuildSettings
 
 prompt1 = "Paris, the City of Light, is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere."
@@ -75,13 +74,8 @@ video_composite = CompositeVideo()
 
 video1 = RawTextBasedVideo(prompt1)
 video2 = RawTextBasedVideo(prompt2)
-# Generate the transition to pass from the first to the second video
-transit = SeineTransition(
-    source_video=video1,
-    target_video=video2,
-)
 
-video_composite.append_video(video1).append_video(transit).append_video(video2)
+video_composite.append_video(video1).append_video(video2)
 
 await video_composite.build(
     build_settings=VideoBuildSettings(
