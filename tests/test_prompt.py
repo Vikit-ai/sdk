@@ -82,6 +82,6 @@ class TestPrompt:
             prompt_image = get_test_prompt_image()
             prompt = await PromptFactory(
                 ml_models_gateway=replicate_gateway.ReplicateGateway()
-            ).create_prompt_from_image(image_path=prompt_image)
+            ).create_prompt_from_image(image=prompt_image)
 
             assert prompt.image is not None

@@ -49,7 +49,7 @@ class TestRawImagePromptBasedVideo:
                     prompt_build_settings=PromptBuildSettings()
                 )
                 .create_prompt_from_image(
-                    image_path=TEST_PROMPT, text="test image prompt"
+                    image=TEST_PROMPT, text="test image prompt"
                 ),
                 title="test_image_prompt",
             ).get_title()
@@ -62,7 +62,7 @@ class TestRawImagePromptBasedVideo:
         with WorkingFolderContext():
             image_prompt = await PromptFactory(
                 prompt_build_settings=PromptBuildSettings()
-            ).create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
+            ).create_prompt_from_image(image=TEST_PROMPT, text="test image prompt")
             pbvid = RawImageBasedVideo(
                 prompt=image_prompt,
                 title="test_image_prompt",
@@ -83,7 +83,7 @@ class TestRawImagePromptBasedVideo:
         with WorkingFolderContext():
             image_prompt = await PromptFactory(
                 prompt_build_settings=PromptBuildSettings()
-            ).create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
+            ).create_prompt_from_image(image=TEST_PROMPT, text="test image prompt")
             pbvid = RawImageBasedVideo(
                 prompt=image_prompt,
                 title="test_image_prompt",
@@ -100,7 +100,7 @@ class TestRawImagePromptBasedVideo:
         with WorkingFolderContext():
             image_prompt = await PromptFactory(
                 prompt_build_settings=PromptBuildSettings()
-            ).create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
+            ).create_prompt_from_image(image=TEST_PROMPT, text="test image prompt")
             pbvid = RawImageBasedVideo(
                 prompt=image_prompt,
                 title="test_image_prompt",
@@ -129,7 +129,7 @@ class TestRawImagePromptBasedVideo:
                 ),
                 target_model_provider="stabilityai_image",
             )
-            image_prompt = await PromptFactory().create_prompt_from_image(image_path=TEST_PROMPT, text="test image prompt")
+            image_prompt = await PromptFactory().create_prompt_from_image(image=TEST_PROMPT, text="test image prompt")
             build_settings.prompt = image_prompt
 
             video = RawImageBasedVideo(

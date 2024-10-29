@@ -165,7 +165,7 @@ async def create_single_image_based_video(
             target_model_provider="stabilityai_image",
             output_video_file_name=output_filename,
         )
-    image_prompt = PromptFactory().create_prompt_from_image(image_path=prompt_content, text=text)
+    image_prompt = PromptFactory().create_prompt_from_image(image=prompt_content, text=text)
 
     video = RawImageBasedVideo(
         prompt=image_prompt,

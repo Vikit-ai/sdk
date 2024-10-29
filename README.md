@@ -50,7 +50,6 @@ video_build_settings = VideoBuildSettings(
         generate_background_music=True,
     ),
     include_read_aloud_prompt=True,
-    test_mode=False,
 )
 
 gw = video_build_settings.get_ml_models_gateway()
@@ -86,7 +85,6 @@ video_composite.append_video(video1).append_video(transit).append_video(video2)
 
 await video_composite.build(
     build_settings=VideoBuildSettings(
-        test_mode=False,
         output_video_file_name="Composite.mp4",
     )
 )
