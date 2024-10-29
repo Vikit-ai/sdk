@@ -60,7 +60,7 @@ class VideoGenHandler(Handler):
         if video.prompt.build_settings.model_provider is None:
             model_provider=self.video_gen_build_settings.target_model_provider
         else:
-            model_provider=self.video_gen_build_settings.target_model_provider
+            model_provider=video.prompt.build_settings.model_provider
 
         video.media_url = (
             await (  # Should give a link on a web storage
