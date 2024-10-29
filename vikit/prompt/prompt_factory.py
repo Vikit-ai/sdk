@@ -246,12 +246,12 @@ class PromptFactory:
         Create a prompt object from a prompt image path
 
         args:
-            - image_path: the path of the image of the prompt
+            - image: the path of the image of the prompt
 
         returns:
             self
         """
-        if image_path is None:
+        if image is None:
             raise ValueError("The prompt image is not provided")
         
         #We now support any type of image, path base64 or URL
@@ -265,7 +265,7 @@ class PromptFactory:
         if reengineer_text:
             text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
 
-        img_prompt = MultiModalPrompt(image=input_prompt_image, text=text, model_provider=model_provider, build_settings=self.prompt_build_settings)
+        img_prompt = MultiModalPrompt(image=image, text=text, model_provider=model_provider, build_settings=self.prompt_build_settings)
         return img_prompt
 
     async def create_prompt_from_multimodal_async(

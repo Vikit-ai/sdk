@@ -15,6 +15,7 @@
 
 from vikit.prompt.prompt import Prompt
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
+import copy
 
 
 class MultiModalPrompt(Prompt):
@@ -24,10 +25,12 @@ class MultiModalPrompt(Prompt):
 
     def __init__(self, text: str = None, negative_text:str = None, image: str = None, audio: str = None, video:str = None, duration:float = None, seed:int=None, model_provider: str=None, build_settings: PromptBuildSettings = None):
         
-        if build_settings is None:
-            super().__init__(build_settings = PromptBuildSettings(model_provider=model_provider))
+        if model_provider is None:
+            super().__init__(build_settings = build_settings)    
         else:
-            super().__init__(build_settings = build_settings)
+            new_build_settings = copy.deepcopy(build_settings)
+            new_build_settings.model_provider = model_provider
+            super().__init__(new_build_settings)
         if text is None and image is None and audio is None and video is None:
             raise ValueError("No prompt data is provided")
         self.image = image
