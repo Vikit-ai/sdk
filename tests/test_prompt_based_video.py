@@ -131,6 +131,7 @@ class TestPromptBasedVideo:
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
 
     @pytest.mark.integration
+    @pytest.mark.core_local_integration
     @pytest.mark.asyncio
     @pytest.mark.skip("duplicate?")
     async def test_build_prompt_based_video_with_generated_bg_music_read_aloud_prompt(

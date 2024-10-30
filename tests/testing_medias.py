@@ -73,12 +73,17 @@ def get_dynamicrafter_image_video_path(prompt):
 def get_runway_image_video_path(prompt, aspect_ratio):
     return os.path.join(_media_dir, SMALL_RUNWAY_VIDEO_FILE_NAME)
 
+
 def get_stabilityai_image_video_path():
     return os.path.join(_media_dir, SMALL_STABILITY_VIDEO_FILE_NAME)
 
 
 def get_haiper_video_path():
     return os.path.join(_media_dir, SMALL_HAIPER_VIDEO_FILE_NAME)
+
+
+def get_luma_video_path():
+    return os.path.join(_media_dir, SMALL_LUMA_VIDEO_FILE_NAME)
 
 
 def get_videocrafter_video_path():

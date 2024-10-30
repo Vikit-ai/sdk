@@ -57,6 +57,7 @@ class TestRawImagePromptBasedVideo:
             assert len(video_title) > 0  # we should have a file of at least 1 character
 
     @pytest.mark.local_integration
+    @pytest.mark.core_local_integration
     @pytest.mark.asyncio
     async def test_build_single_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():

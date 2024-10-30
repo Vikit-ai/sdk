@@ -97,6 +97,7 @@ class TestCompositeVideo:
         ), f"Ratio should be {cp_vid_duration / prompt.duration} but is {ratio}"
 
     @pytest.mark.local_integration
+    @pytest.mark.core_local_integration
     @pytest.mark.asyncio
     async def test_create_video_mix_with_preexisting_video_bin_default_bkg_music_subtitles_tired_life(
         self,
@@ -134,6 +135,7 @@ class TestCompositeVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
+    @pytest.mark.core_local_integration
     async def test_combine_generated_and_preexisting_video_based_video(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo("Some text")
@@ -219,6 +221,7 @@ class TestCompositeVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
+    @pytest.mark.core_local_integration
     async def test_build_video_composite_with_default_bkg_music_and_audio_subtitle(
         self,
     ):
@@ -287,7 +290,7 @@ class TestCompositeVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_use_recording_ratio_on_existing_gen_default_bg_music_include_subs_loseFaitprompt(
+    async def test_from_existing_gen_default_bg_music_include_subs_loseFaitprompt(
         self,
     ):
         """
