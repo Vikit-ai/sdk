@@ -20,7 +20,7 @@ import copy
 
 class MultiModalPrompt(Prompt):
     """
-    A class to represent an image prompt
+    A class to represent an multimodal prompt
     """
 
     def __init__(self, text: str = None, negative_text:str = None, image: str = None, audio: str = None, video:str = None, duration:float = None, seed:int=None, model_provider: str=None, build_settings: PromptBuildSettings = PromptBuildSettings()):

@@ -207,12 +207,23 @@ class Video(ABC):
 
         return self.metadata.title
 
-    @abstractmethod
+    @log_function_params
     def get_title(self):
         """
         Returns the title of the video.
         """
-        return "no-title-yet" if self.metadata.title is None else self.metadata.title
+        if self.metadata.title:
+            summarised_title = self.get_title_from_description(
+                description=self.metadata.title
+            )
+        elif self.prompt and self.prompt.text:
+            summarised_title = self.get_title_from_description(
+                description=self.text
+            )
+        else:
+            summarised_title = "Video"
+        self.metadata.title = summarised_title
+        return self.metadata.title
 
     async def get_first_frame_as_image(self):
         """
