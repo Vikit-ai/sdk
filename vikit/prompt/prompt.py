@@ -43,8 +43,8 @@ class Prompt(ABC):
     they are accepted by LLM's, like a video, or an embedding...
     """
 
-    def __init__(self):
-        self.build_settings: PromptBuildSettings = PromptBuildSettings()
+    def __init__(self, build_settings: PromptBuildSettings = PromptBuildSettings()):
+        self.build_settings = build_settings
         self.title = "NoTitle"
         self._extended_fields: dict[str, Any] = {}
         self.negative_prompt = None

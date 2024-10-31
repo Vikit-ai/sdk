@@ -27,6 +27,8 @@ from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.video import VideoBuildSettings
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 TEST_PROMPT = "A group of stones in a forest, with symbols"
 logger.add("log_test_prompt_based_video.txt", rotation="10 MB")
@@ -46,9 +48,7 @@ class TestPromptBasedVideo:
     async def test_get_title(self):
         with WorkingFolderContext():
             build_settings = VideoBuildSettings()
-            prompt = await PromptFactory(
-                ml_gateway=build_settings.get_ml_models_gateway(),
-            ).create_prompt_from_text(
+            prompt = await PromptFactory(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)).create_prompt_from_text(
                 "A group of stones",
             )
 
@@ -60,11 +60,11 @@ class TestPromptBasedVideo:
     async def test_build_prompt_based_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(
-                await PromptFactory().create_prompt_from_text(
+                await PromptFactory(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)).create_prompt_from_text(
                     prompt_text=TEST_PROMPT,
                 )
             )
-            await pbvid.build()
+            await pbvid.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
 
             assert pbvid.media_url, "media URL is None, was not updated"
             assert pbvid._background_music_file_name is None
@@ -76,7 +76,8 @@ class TestPromptBasedVideo:
         with WorkingFolderContext():
             pbvid = PromptBasedVideo(tools.test_prompt_library["moss_stones-train_boy"])
             await pbvid.build(
-                build_settings=VideoBuildSettings(include_read_aloud_prompt=True)
+                build_settings=VideoBuildSettings(include_read_aloud_prompt=True), 
+                ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert pbvid._background_music_file_name is None
@@ -96,7 +97,7 @@ class TestPromptBasedVideo:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=False
                     ),
-                )
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert pbvid.media_url, "media URL was not updated"
@@ -113,12 +114,9 @@ class TestPromptBasedVideo:
                     apply_background_music=True,
                     generate_background_music=True,
                 ),
-                test_mode=False,
             )
 
-            prompt = await PromptFactory(
-                ml_gateway=bld_settings.get_ml_models_gateway()
-            ).create_prompt_from_text(
+            prompt = await PromptFactory().create_prompt_from_text(
                 """Tom Cruise's face reflects focus, his eyes filled with purpose and drive. He drives a moto very fast on a 
                 skyscraper rooftop, jumps from the moto to an 
                 helicopter, this last 3 seconds, then Tom Cruse dives into a swimming pool from the helicopter while the helicopter without pilot crashes 
@@ -127,7 +125,7 @@ class TestPromptBasedVideo:
             pbvid = PromptBasedVideo(prompt=prompt)
 
             pbvid = await pbvid.build(
-                build_settings=bld_settings,
+                build_settings=bld_settings
             )
             assert pbvid.media_url, "media URL was not updated"
             assert os.path.exists(pbvid.media_url), "The generated video does not exist"
@@ -147,12 +145,9 @@ class TestPromptBasedVideo:
                     apply_background_music=True,
                     generate_background_music=True,
                 ),
-                test_mode=False,
             )
 
-            prompt = await PromptFactory(
-                ml_gateway=bld_settings.get_ml_models_gateway()
-            ).create_prompt_from_text(TEST_PROMPT)
+            prompt = await PromptFactory().create_prompt_from_text(TEST_PROMPT)
             pbvid = PromptBasedVideo(prompt=prompt)
 
             pbvid = await pbvid.build(
@@ -166,11 +161,11 @@ class TestPromptBasedVideo:
     async def test_generate_prompt_based_video_single_sentence_sub(self):
         with WorkingFolderContext():
 
-            prompt = await PromptFactory().create_prompt_from_text(
+            prompt = await PromptFactory(ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)).create_prompt_from_text(
                 "A group of stones in a forest",
             )
             pbv = PromptBasedVideo(prompt=prompt)
-            result = await pbv.build(build_settings=VideoBuildSettings(prompt=prompt))
+            result = await pbv.build(build_settings=VideoBuildSettings(prompt=prompt), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
             assert result is not None
             assert os.path.exists(result.media_url)
 
@@ -194,12 +189,9 @@ class TestPromptBasedVideo:
                     apply_background_music=True,
                     use_recorded_prompt_as_audio=True,
                 ),
-                test_mode=False,
             )
 
-            test_prompt = await PromptFactory(
-                bld_settings.get_ml_models_gateway()
-            ).create_prompt_from_text(
+            test_prompt = await PromptFactory().create_prompt_from_text(
                 test_media.sof,
             )
             bld_settings.prompt = test_prompt
@@ -221,11 +213,8 @@ class TestPromptBasedVideo:
                     apply_background_music=True
                 ),
                 include_read_aloud_prompt=True,
-                test_mode=False,
             )
-            test_prompt = await PromptFactory(
-                bld_sett.get_ml_models_gateway()
-            ).create_prompt_from_text(
+            test_prompt = await PromptFactory().create_prompt_from_text(
                 """A travel over Reunion Island, taken from bird-view at 2000meters above 
                 the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
                 , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",
@@ -248,11 +237,8 @@ class TestPromptBasedVideo:
                     generate_background_music=True,
                 ),
                 include_read_aloud_prompt=True,
-                test_mode=False,
             )
-            test_prompt = await PromptFactory(
-                bld_sett.get_ml_models_gateway()
-            ).create_prompt_from_text(
+            test_prompt = await PromptFactory().create_prompt_from_text(
                 """A travel over Reunion Island, taken from bird-view at 2000meters above 
                 the ocean, flying over the volcano, the forest, the coast and the city of Saint Denis
                 , then flying just over the roads in curvy mountain areas, and finally landing on the beach""",

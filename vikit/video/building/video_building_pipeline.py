@@ -45,8 +45,8 @@ class VideoBuildingPipeline:
         handlers = []
 
         # Special case here: the video used for testing should always be reencoded as coming from heterogenous sources
-        if video.build_settings.test_mode:
-            video._needs_video_reencoding = True
+        #if video.build_settings.test_mode:
+        video._needs_video_reencoding = True
 
         if video._needs_video_reencoding:
             handlers.append(VideoReencodingHandler())

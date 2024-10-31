@@ -133,14 +133,7 @@ class FakeMLModelsGateway(MLModelsGateway):
             subs = f.read()
         return {"transcription": subs}
 
-    async def generate_video_async(
-        self,
-        prompt_text: str = None,
-        sleep_time: int = 0,
-        model_provider: str = None,
-        prompt_image: str = "",
-        aspect_ratio=(16, 9),
-    ):
+    async def generate_video_async(self, prompt, model_provider: str, aspect_ratio=(16,9), sleep_time: int = 0):
         await asyncio.sleep(sleep_time)
 
         if model_provider == "vikit":
@@ -158,18 +151,18 @@ class FakeMLModelsGateway(MLModelsGateway):
         elif model_provider == "dynamicrafter":
             test_file = tests_medias.get_dynamicrafter_image_video_path(prompt)
         elif model_provider == "runway":
-            test_file = tests_medias.get_runway_image_video_path(prompt)
+            test_file = tests_medias.get_runway_image_video_path(prompt, aspect_ratio)
         else:
             raise ValueError(f"Unknown model provider: {model_provider}")
 
-        if isinstance(prompt_text, str):
+        if isinstance(prompt.text, str):
             logger.debug(
-                f"Generating video from prompt: {prompt_text[:5]}, return a link: {test_file}"
+                f"Generating video from prompt: {prompt.text[:5]}, return a link: {test_file}"
             )
         # image-based prompt
         else:
             logger.debug(
-                f"Generating video from prompt: {prompt.text:5]}, return a link: {test_file}"
+                f"Generating video from prompt: {prompt.image[:5]}, return a link: {test_file}"
             )
 
         return test_file

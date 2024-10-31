@@ -29,12 +29,14 @@ from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
     PromptByRawUserTextHandler,
 )
 from vikit.prompt.image_prompt import ImagePrompt
+from vikit.prompt.multimodal_prompt import MultiModalPrompt
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.prompt.recorded_prompt import RecordedPrompt
 from vikit.prompt.recorded_prompt_subtitles_extractor import (
     RecordedPromptSubtitlesExtractor,
 )
 from vikit.wrappers.ffmpeg_wrapper import get_media_duration
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 import uuid
 
@@ -50,26 +52,26 @@ class PromptFactory:
 
     def __init__(
         self,
-        ml_gateway: MLModelsGateway = None,
-        prompt_build_settings: PromptBuildSettings = None,
+        ml_models_gateway: MLModelsGateway = None,
+        prompt_build_settings: PromptBuildSettings = PromptBuildSettings(),
     ):
         """
         Constructor of the prompt factory
 
         Args:
-            ml_gateway: The ML Gateway to use to generate the prompt from the audio file
+            ml_models_gateway: The ML Gateway to use to generate the prompt from the audio file
 
         """
         
         self.prompt_factory_uuid = str(uuid.uuid4())
+        self.prompt_build_settings = prompt_build_settings
+
         print("new uuid " + self.prompt_factory_uuid)
-        prompt_build_settings = (
-            prompt_build_settings if prompt_build_settings else PromptBuildSettings()
-        )
-        if ml_gateway:
-            self._ml_gateway = ml_gateway
+
+        if ml_models_gateway:
+            self.ml_models_gateway = ml_models_gateway
         else:
-            self._ml_gateway = prompt_build_settings.get_ml_models_gateway()
+            self.ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
 
     async def create_prompt_from_text(
         self, prompt_text: str = None, negative_prompt: str = None
@@ -93,7 +95,7 @@ class PromptFactory:
         extractor = None
         logger.debug(f"Creating prompt from text: {prompt_text}")
         # calling a model like Whisper from openAI
-        await self._ml_gateway.generate_mp3_from_text_async(
+        await self.ml_models_gateway.generate_mp3_from_text_async(
             prompt_text=prompt_text,
             target_file=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
         )
@@ -101,7 +103,7 @@ class PromptFactory:
         extractor = RecordedPromptSubtitlesExtractor()
         subs = await extractor.extract_subtitles_async(
             recorded_prompt_file_path=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
-            ml_models_gateway=self._ml_gateway,
+            ml_models_gateway=self.ml_models_gateway,
         )
         merged_subs = (
             extractor.merge_short_subtitles(  # merge short subtitles into larger ones
@@ -114,6 +116,7 @@ class PromptFactory:
             subtitles=merged_subs,
             audio_recording=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
             duration=get_media_duration(config.get_prompt_mp3_file_name(self.prompt_factory_uuid)),
+            build_settings=self.prompt_build_settings,
         )
         prompt.negative_prompt = negative_prompt
         return prompt
@@ -170,13 +173,13 @@ class PromptFactory:
         """
         extractor = RecordedPromptSubtitlesExtractor()
         subs = await extractor.extract_subtitles_async(
-            recorded_audio_prompt_path, ml_models_gateway=self._ml_gateway
+            recorded_audio_prompt_path, ml_models_gateway=self.ml_models_gateway
         )
         merged_subs = extractor.merge_short_subtitles(
             subs, min_duration=config.get_subtitles_min_duration()
         )
         text = extractor.build_subtitles_as_text_tokens(merged_subs)
-        prompt = RecordedPrompt(subtitles=merged_subs, text=text)
+        prompt = RecordedPrompt(subtitles=merged_subs, text=text, build_settings=self.prompt_build_settings)
         await prompt.convert_recorded_audio_prompt_path_to_mp3(
             recorded_audio_prompt_path
         )
@@ -186,7 +189,7 @@ class PromptFactory:
     async def get_reengineered_prompt_text_from_raw_text(
         self,
         prompt: str,
-        prompt_build_settings: PromptBuildSettings,
+        prompt_build_settings: PromptBuildSettings = PromptBuildSettings(),
     ) -> str:
         """
         Get a reengineered prompt from a raw text , using build settings
@@ -204,7 +207,7 @@ class PromptFactory:
         else:
             for handler in handler_chain:
                 text_prompt, video_suggested_title = await handler.execute_async(
-                    text_prompt=prompt, prompt_build_settings=prompt_build_settings
+                    text_prompt=prompt, prompt_build_settings=prompt_build_settings, ml_models_gateway=self.ml_models_gateway
                 )
 
         return text_prompt  # return the last enhanced prompt from handlers chain
@@ -232,26 +235,61 @@ class PromptFactory:
         return handlers
 
     @log_function_params
-    def create_prompt_from_image(
+    async def create_prompt_from_image(
         self,
-        image_path: str = None,
+        image: str = None,
         text: str = None,
+        reengineer_text:bool = False,
+        model_provider: str= None,
     ):
         """
         Create a prompt object from a prompt image path
 
         args:
-            - prompt_image: the image of the prompt
+            - image: the path of the image of the prompt
 
         returns:
             self
         """
-        if image_path is None:
+        if image is None:
             raise ValueError("The prompt image is not provided")
-        if not os.path.exists(image_path):
-            raise ValueError(f"The prompt image file {image_path} does not exist")
+        
+        if reengineer_text:
+            text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
 
-        with open(image_path, "rb") as image_file:
-            input_prompt_image = base64.b64encode(image_file.read()).decode("utf-8")
-        img_prompt = ImagePrompt(prompt_image=input_prompt_image, text=text)
+        img_prompt = MultiModalPrompt(image=image, text=text, model_provider=model_provider, build_settings=self.prompt_build_settings)
         return img_prompt
+
+    async def create_prompt_from_multimodal_async(
+        self,
+        text: str = None, 
+        reengineer_text:bool = False,
+        negative_text: str = None,
+        image: str = None, 
+        audio: str = None, 
+        video:str = None, 
+        duration:float = None,
+        seed: int = None,
+        model_provider: str= None,
+    ):
+        """
+        Create a prompt object from a prompt image path
+
+        args:
+            - text: the text of the prompt
+            - image: the image base64, URL or URI of the prompt
+            - audio: the audio base64, URL or URI of the prompt
+            - video: the video base64, URL or URI of the prompt
+            - duration: expected duration of output
+
+        returns:
+            self
+        """
+        if text is None and image is None and audio is None and video is None:
+            raise ValueError("No prompt data is provided")
+        
+        if reengineer_text:
+            text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
+
+        multimodal_prompt = MultiModalPrompt(text=text, negative_text=negative_text, image=image, audio=audio, video=video, duration=duration, seed=seed, model_provider=model_provider, build_settings=self.prompt_build_settings)
+        return multimodal_prompt

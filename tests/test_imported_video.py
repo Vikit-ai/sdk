@@ -26,6 +26,7 @@ from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.imported_video import ImportedVideo
 from vikit.video.video import VideoBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 
 class TestImportedVideo:
@@ -50,7 +51,7 @@ class TestImportedVideo:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=False
                     )
-                )
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert vid_result, "The video mixing should have worked"

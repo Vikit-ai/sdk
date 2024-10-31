@@ -20,6 +20,9 @@ from loguru import logger
 
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.prompt.prompt_factory import PromptFactory
+from tests.testing_medias import get_test_prompt_image
+
+TEST_PROMPT = get_test_prompt_image()
 
 
 class TestPromptFactory:
@@ -28,6 +31,13 @@ class TestPromptFactory:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
         logger.add("log_test_prompt_building_handlers.txt", rotation="10 MB")
+
+    @pytest.mark.local_integration
+    async def test_override_model_provider(self):
+        image_prompt = await PromptFactory(
+                prompt_build_settings=PromptBuildSettings()
+            ).create_prompt_from_image(image=TEST_PROMPT, text="test image prompt", model_provider="fake model")
+        assert image_prompt.build_settings.model_provider == "fake model", "The prompt model should be overrided when model_provider is not None"
 
     @pytest.mark.unit
     @pytest.mark.asyncio

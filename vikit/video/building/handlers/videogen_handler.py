@@ -24,14 +24,18 @@ from vikit.common.file_tools import (
 )
 from vikit.prompt.prompt import Prompt
 from vikit.prompt.image_prompt import ImagePrompt
+from vikit.prompt.multimodal_prompt import MultiModalPrompt
+from vikit.video.video import VideoBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.gateways.ML_models_gateway import MLModelsGateway
 
 class VideoGenHandler(Handler):
-    def __init__(self, video_gen_prompt: Prompt = None):
-        if not video_gen_prompt:
-            raise ValueError("Prompt is not set")
-        self.video_gen_prompt = video_gen_prompt
+    def __init__(self, video_gen_build_settings: VideoBuildSettings = None):
+        if not video_gen_build_settings:
+            raise ValueError("VideoBuildSettings is not set")
+        self.video_gen_build_settings = video_gen_build_settings
 
-    async def execute_async(self, video: Video):
+    async def execute_async(self, video, ml_models_gateway: MLModelsGateway):
         """
         Process the video generation binaries: the video binary is generated from Gen AI, hosted behind an API
         which could be distant as well as local. The video binary is then stored in a web storage or locally.
@@ -47,21 +51,23 @@ class VideoGenHandler(Handler):
         Returns:
             The video with the media URL set to the generated video
         """
-        logger.info(f"About to generate video: {video.id}, title: {video.get_title()}, prompt: {self.video_gen_prompt}")
+        logger.info(f"About to generate video: {video.id}, title: {video.get_title()}, prompt: {video.prompt}")
         logger.debug(
-            f"Target Model provider in the handler: {video.build_settings.target_model_provider}"
+            f"Target Model provider in the handler: {self.video_gen_build_settings.target_model_provider}"
         )
-        prompt_image = None
-        if isinstance(self.video_gen_prompt, ImagePrompt): 
-            prompt_image = self.video_gen_prompt.image
+
+        
+        if video.prompt.build_settings.model_provider is None:
+            model_provider=self.video_gen_build_settings.target_model_provider
+        else:
+            model_provider=video.prompt.build_settings.model_provider
 
         video.media_url = (
             await (  # Should give a link on a web storage
-                video.build_settings.get_ml_models_gateway().generate_video_async(
-                    prompt_text=self.video_gen_prompt.text,
-                    model_provider=video.build_settings.target_model_provider,
-                    prompt_image = prompt_image, 
-                    aspect_ratio=video.build_settings.aspect_ratio,
+                ml_models_gateway.generate_video_async(
+                    prompt=video.prompt,
+                    model_provider=model_provider,
+                    aspect_ratio=self.video_gen_build_settings.aspect_ratio,
                 )
             )
         )

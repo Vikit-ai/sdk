@@ -29,6 +29,7 @@ from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video_build_settings import VideoBuildSettings
 
 from vikit.prompt.prompt_factory import PromptFactory
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 warnings.simplefilter("ignore", category=ResourceWarning)
 warnings.simplefilter("ignore", category=UserWarning)
@@ -43,9 +44,12 @@ class TestVideoBuildingHandlers:
         with WorkingFolderContext():
             vid = RawTextBasedVideo(raw_text_prompt="test")
             vid.build_settings = VideoBuildSettings()
-            prompt = await PromptFactory().create_prompt_from_text("test")
-            api_handler = VideoGenHandler(video_gen_prompt=prompt)
-            video_built = await api_handler.execute_async(video=vid)
+
+            test_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
+
+            prompt = await PromptFactory(test_gateway).create_prompt_from_text("test")
+            api_handler = VideoGenHandler(video_gen_build_settings=vid.build_settings)
+            video_built = await api_handler.execute_async(video=vid, ml_models_gateway=test_gateway)
             assert video_built is not None, "Video built should not be None"
             logger.debug(f"Video built media: {video_built.media_url}")
             assert (
@@ -59,7 +63,7 @@ class TestVideoBuildingHandlers:
             vid = RawTextBasedVideo(raw_text_prompt="test")
             prompt = RecordedPrompt()
             prompt.audio_recording = get_test_prompt_recording_trainboy()
-            await vid.build(build_settings=VideoBuildSettings(prompt=prompt))
+            await vid.build(build_settings=VideoBuildSettings(prompt=prompt), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
             assert vid is not None, "Video built should not be None"
             assert vid.media_url is not None, "Video built should have a media url"
 

@@ -19,22 +19,22 @@ import warnings
 import pytest
 from loguru import logger
 
-from tests.testing_medias import get_test_prompt_image
+from tests.testing_medias import get_test_prompt_image, get_test_prompt_recording, get_cat_video_path
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
-from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
-
 # from unittest.mock import patch, MagicMock, Mock
-from vikit.video.raw_image_based_video import RawImageBasedVideo
+from vikit.video.raw_multimodal_based_video import RawMultiModalBasedVideo
 from vikit.video.video import VideoBuildSettings
 
-TEST_PROMPT = get_test_prompt_image()
+TEST_PROMPT_IMAGE = get_test_prompt_image()
+TEST_PROMPT_AUDIO = get_test_prompt_recording()
+TEST_PROMPT_VIDEO = get_cat_video_path()
 
 
-class TestRawImagePromptBasedVideo:
+class TestRawMultiModalBasedVideo:
 
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
@@ -44,31 +44,31 @@ class TestRawImagePromptBasedVideo:
     @pytest.mark.local_integration
     async def test_get_title(self):
         with WorkingFolderContext():
-            video_title = RawImageBasedVideo(
+            video_title = RawMultiModalBasedVideo(
                 prompt=await PromptFactory(
-                    prompt_build_settings=PromptBuildSettings()
-                )
-                .create_prompt_from_image(
-                    image=TEST_PROMPT, text="test image prompt"
+                    ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
+                ).create_prompt_from_multimodal_async(
+                    image=TEST_PROMPT_IMAGE, text="test multimodal prompt", audio=TEST_PROMPT_AUDIO, video=TEST_PROMPT_VIDEO
                 ),
-                title="test_image_prompt",
+                title="test_multimodal_prompt",
             ).get_title()
             logger.debug(f"Test get_title, video title: {video_title}")
             assert len(video_title) > 0  # we should have a file of at least 1 character
 
     @pytest.mark.local_integration
-    @pytest.mark.core_local_integration
     @pytest.mark.asyncio
     async def test_build_single_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
-            image_prompt = await PromptFactory(
-                prompt_build_settings=PromptBuildSettings()
-            ).create_prompt_from_image(image=TEST_PROMPT, text="test image prompt")
-            pbvid = RawImageBasedVideo(
-                prompt=image_prompt,
-                title="test_image_prompt",
+            multimodal_prompt = await PromptFactory(
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
+            ).create_prompt_from_multimodal_async(
+                image=TEST_PROMPT_IMAGE, text="test multimodal prompt", audio=TEST_PROMPT_AUDIO, video=TEST_PROMPT_VIDEO
             )
-
+            pbvid = RawMultiModalBasedVideo(
+                prompt=multimodal_prompt,
+                title="test_multimodal_prompt",
+            )
+            
             await pbvid.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
             logger.debug(
                 f"Test build_single_video_no_bg_music_without_subs, media URL: {pbvid.media_url}"
@@ -82,13 +82,16 @@ class TestRawImagePromptBasedVideo:
     @pytest.mark.asyncio
     async def test_build_single_video_no_bg_music_no_subtitles(self):
         with WorkingFolderContext():
-            image_prompt = await PromptFactory(
-                prompt_build_settings=PromptBuildSettings()
-            ).create_prompt_from_image(image=TEST_PROMPT, text="test image prompt")
-            pbvid = RawImageBasedVideo(
-                prompt=image_prompt,
-                title="test_image_prompt",
+            multimodal_prompt = await PromptFactory(
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
+            ).create_prompt_from_multimodal_async(
+                image=TEST_PROMPT_IMAGE, text="test multimodal prompt", audio=TEST_PROMPT_AUDIO, video=TEST_PROMPT_VIDEO
             )
+            pbvid = RawMultiModalBasedVideo(
+                prompt=multimodal_prompt,
+                title="test_multimodal_prompt",
+            )
+
             await pbvid.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
 
             assert pbvid._background_music_file_name is None
@@ -99,19 +102,20 @@ class TestRawImagePromptBasedVideo:
     @pytest.mark.asyncio
     async def test_build_single_video_with_default_bg_music_no_subtitles(self):
         with WorkingFolderContext():
-            image_prompt = await PromptFactory(
-                prompt_build_settings=PromptBuildSettings()
-            ).create_prompt_from_image(image=TEST_PROMPT, text="test image prompt")
-            pbvid = RawImageBasedVideo(
-                prompt=image_prompt,
-                title="test_image_prompt",
+            multimodal_prompt = await PromptFactory(
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
+            ).create_prompt_from_multimodal_async(
+                image=TEST_PROMPT_IMAGE, text="test multimodal prompt", audio=TEST_PROMPT_AUDIO, video=TEST_PROMPT_VIDEO
+            )
+            pbvid = RawMultiModalBasedVideo(
+                prompt=multimodal_prompt,
+                title="test_multimodal_prompt",
             )
             await pbvid.build(
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=False
-                    ),
-                    prompt=image_prompt,
+                    )
                 ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
@@ -128,14 +132,15 @@ class TestRawImagePromptBasedVideo:
                     apply_background_music=True,
                     generate_background_music=True,
                 ),
-                target_model_provider="stabilityai_image",
+                target_model_provider="runway",
             )
-            image_prompt = await PromptFactory().create_prompt_from_image(image=TEST_PROMPT, text="test image prompt")
-            build_settings.prompt = image_prompt
+            multimodal_prompt = await PromptFactory().create_prompt_from_multimodal_async(
+                image=TEST_PROMPT_IMAGE, text="test multimodal prompt", audio=TEST_PROMPT_AUDIO, video=TEST_PROMPT_VIDEO
+            )
 
-            video = RawImageBasedVideo(
-                prompt=image_prompt,
-                title="test_image_prompt",
+            video = RawMultiModalBasedVideo(
+                prompt=multimodal_prompt,
+                title="test_multimodal_prompt",
             )
 
             await video.build(build_settings=build_settings)

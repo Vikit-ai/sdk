@@ -23,6 +23,7 @@ from vikit.video.composite_video import CompositeVideo
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video_build_settings import VideoBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 
 class TestVideoBuildingStrategies:
@@ -38,7 +39,7 @@ class TestVideoBuildingStrategies:
         Test that the video tree is correctly generated, with right order,
         using a simple video tree
         """
-        build_settings = VideoBuildSettings(test_mode=True)
+        build_settings = VideoBuildSettings()
         composite = CompositeVideo()
         rtbv = RawTextBasedVideo("test")
         composite.append_video(rtbv)
@@ -72,12 +73,12 @@ class TestVideoBuildingStrategies:
 
         Using Lazy Dependency chain
         """
-        build_settings = VideoBuildSettings(test_mode=True)
-        build_settings._ml_models_gateway = build_settings.get_ml_models_gateway()
+        build_settings = VideoBuildSettings()
+
         pbv = PromptBasedVideo(
             tools.test_prompt_library["moss_stones-train_boy"]
         )  # 4 subtitles -> 4 composite videos of 2 vids each
-        await pbv.compose(build_settings=build_settings)
+        await pbv.compose(build_settings=build_settings, ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway())
 
         assert pbv is not None, "Inner composite should be generated"
 
