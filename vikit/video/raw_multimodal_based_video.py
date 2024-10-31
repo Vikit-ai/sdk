@@ -64,24 +64,6 @@ class RawMultiModalBasedVideo(Video):
         """
         return str(VideoType.RAWMULTIMODAL)
 
-    @log_function_params
-    def get_title(self):
-        if self.metadata.title:
-            summarised_title = self.get_title_from_description(
-                description=self.metadata.title
-            )
-        elif self.prompt and self.prompt.text:
-            summarised_title = self.get_title_from_description(
-                description=self.text
-            )
-        else:
-            summarised_title = "MultiModalPrompt"
-        self.metadata.title = summarised_title
-        return self.metadata.title
-
-    def get_duration(self):
-        return self.duration
-
     def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway):
         return super().run_build_core_logic_hook(build_settings, ml_models_gateway)
 

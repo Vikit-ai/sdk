@@ -254,14 +254,6 @@ class PromptFactory:
         if image is None:
             raise ValueError("The prompt image is not provided")
         
-        #We now support any type of image, path base64 or URL
-        #if not os.path.exists(image_path) and :
-        #    raise ValueError(f"The prompt image file {image_path} does not exist")
-
-        #Encoding and decoding is done at the gateway level
-        #with open(image_path, "rb") as image_file:
-        #    input_prompt_image = base64.b64encode(image_file.read()).decode("utf-8")
-        
         if reengineer_text:
             text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
 
