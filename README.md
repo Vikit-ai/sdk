@@ -37,6 +37,7 @@ Generating a video from simple text prompt, with background music and voice over
 
 ```python
 
+import asyncio
 from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.prompt_based_video import PromptBasedVideo
@@ -52,10 +53,13 @@ video_build_settings = VideoBuildSettings(
     include_read_aloud_prompt=True,
 )
 
-prompt = await PromptFactory().create_prompt_from_text(prompt)
-video = PromptBasedVideo(prompt=prompt)
+async def create_video():
+    prompt = await PromptFactory().create_prompt_from_text(prompt_text)
+    video = PromptBasedVideo(prompt=prompt)
+    await video.build(build_settings=video_build_settings)
 
-await video.build(build_settings=video_build_settings)
+if __name__ == "__main__":
+    asyncio.run(create_video())
 
 ```
 
@@ -63,14 +67,15 @@ You can orchestrate several videos, using ```CompositeVideo()```. Here is an exa
 
 ```python
 
+import asyncio
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video_build_settings import VideoBuildSettings
 
-prompt1 = "Paris, the City of Light, is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere."
-prompt2 = "The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions."
 
-video_composite = CompositeVideo()
+async def create_composite_video():
+    prompt1 = "Paris, the City of Light, is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere."
+    prompt2 = "The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions."
 
 video1 = RawTextBasedVideo(prompt1)
 video2 = RawTextBasedVideo(prompt2)
@@ -81,7 +86,18 @@ await video_composite.build(
     build_settings=VideoBuildSettings(
         output_video_file_name="Composite.mp4",
     )
-)
+
+    video_composite.append_video(video1).append_video(transit).append_video(video2)
+
+    await video_composite.build(
+        build_settings=VideoBuildSettings(
+            test_mode=False,
+            output_video_file_name="Composite.mp4",
+        )
+    )
+
+if __name__ == "__main__":
+    asyncio.run(create_composite_video())
 
 ```
 

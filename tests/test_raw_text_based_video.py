@@ -39,7 +39,7 @@ class TestRawTextBasedVideo:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_create_video_mix_with_preexsiting_video_bin_default_bkg_music_subtitles_tired_life(
+    async def test_create_video_from_basic_text_prompt(
         self,
     ):
         with WorkingFolderContext():
@@ -49,6 +49,7 @@ class TestRawTextBasedVideo:
             assert built.media_url is not None
 
     @pytest.mark.local_integration
+    @pytest.mark.core_local_integration
     @pytest.mark.asyncio
     async def test_output_video_file_name(
         self,

@@ -121,7 +121,19 @@ class VikitGateway(MLModelsGateway):
                         },
                     },
                 )
+
                 async with session.post(vikit_backend_url, json=payload) as response:
+
+                    if response.status == 403:
+                        raise PermissionError(
+                            "Access to the Vikit API was forbidden (403). Please check your API credentials."
+                        )
+
+                    if response.status != 200:
+                        raise RuntimeError(
+                            f"We failed to connect to Vikit API. Returned Error: {response.status}, {response.reason}"
+                        )
+
                     response = await response.text()
                     if not response.startswith("http"):
                         raise AttributeError("The result audio link is not a link")
@@ -220,6 +232,8 @@ class VikitGateway(MLModelsGateway):
         # Open the images using OpenCV
         src_img = cv2.imread(source_image_path)
         trg_img = cv2.imread(target_image_path)
+
+        target_size = (src_img.shape[1], src_img.shape[0])
 
         # Check if the sizes are different
         if src_img.shape[:2] != trg_img.shape[:2]:
@@ -324,6 +338,12 @@ class VikitGateway(MLModelsGateway):
             raise AttributeError("The result music link is None")
         if len(result_music_link) < 1:
             raise AttributeError("The result music link is empty")
+
+        response_json = json.loads(result_music_link)
+
+        if "output" in response_json:
+            result_music_link = response_json["output"]
+
         if not result_music_link.startswith("http"):
             raise AttributeError("The result music link is not a link")
 
@@ -421,6 +441,11 @@ interesting the resulting music will be. Here is your prompt: '"""
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
 
+        response_json = json.loads(output)
+
+        if "output" in response_json:
+            output = response_json["output"]
+
         if not output.startswith("http"):
             raise AttributeError("The result interpolated link is not a link")
 
@@ -453,9 +478,9 @@ interesting the resulting music will be. Here is your prompt: '"""
                         "top_p": 0.9,
                         "prompt": "I want you to act as a english keyword generator for Midjourney's artificial intelligence program."
                         + "Your job is to provide detailed and creative descriptions that will inspire unique and interesting images from "
-                        + "the AI for a video. Keep in mind that the AI is capable of understanding a wide range of language and can "
+                        + "the AI for a video in less than 100 characters. Keep in mind that the AI is capable of understanding a wide range of language and can "
                         + "interpret abstract concepts, so feel free to be as imaginative and descriptive as possible. Don't repeat keywords. The more detailed "
-                        + "and imaginative your keywords, the more interesting the resulting image will be. Here is the sentence from "
+                        + "and imaginative your keywords, the more interesting the resulting image will be. Do not use more than 100 characters. Here is the sentence from "
                         + "which to extract keywords: '"
                         ""
                         + subtitleText
@@ -507,7 +532,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 "input": {
                     "top_k": 50,
                     "top_p": 0.9,
-                    "prompt": "I want you to act as a one sentence prompt creator for Midjourney's artificial intelligence program. Your job is to provide one detailed and creative sentence that will inspire unique and interesting video from the AI to create. Keep in mind that the AI is capable of understanding a wide range of language and can interpret abstract concepts, so feel free to be as imaginative and descriptive as possible.  The more detailed and imaginative your description, the more interesting the resulting image will be. Here is the paragraph to summarize in one sentence that describes a scenario for a video: '"
+                    "prompt": "I want you to act as a one sentence prompt creator for Midjourney's artificial intelligence program. Your job is to provide one detailed and creative sentence that will inspire unique and interesting video from the AI to create with no more than 100 characters. Keep in mind that the AI is capable of understanding a wide range of language and can interpret abstract concepts, so feel free to be as imaginative and descriptive as possible.  The more detailed and imaginative your description, the more interesting the resulting image will be. Do not use more than 100 characters. Here is the paragraph to summarize in one sentence that describes a scenario for a video: '"
                     + subtitleText
                     + "'. Just give me a short summary of what is said in a way that would make a good video. Please avoid speaking about anything related to text."
                     + "The last 3 words of your answer should be a summary of all the other keywords so I can generate a file name out of it. Just list the sentence in english language, separated by a coma, do not re-output the prompt. Just give the sentence, nothing else, no introduction, just the sentence.",
@@ -782,6 +807,12 @@ interesting the resulting music will be. Here is your prompt: '"""
             }
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
+
+        response_json = json.loads(output)
+
+        if "output" in response_json:
+            output = response_json["output"]
+
         if not output.startswith("http"):
             raise AttributeError("The result Videocrafter video link is not a link")
         return output
@@ -924,7 +955,9 @@ interesting the resulting music will be. Here is your prompt: '"""
                 image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
                 # Resize the image using OpenCV
-                resized_image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
+                resized_image = cv2.resize(
+                    image, target_size, interpolation=cv2.INTER_AREA
+                )
 
                 # Encode the resized image back to base64
                 _, buffer = cv2.imencode(".png", resized_image)
@@ -934,10 +967,10 @@ interesting the resulting music will be. Here is your prompt: '"""
                     "utf-8"
                 )
                 image_prompt = img_b64
-            
+
             logger.debug(f"Generating video from resized image {image_prompt[:50]}")
 
-            ratio = str(aspect_ratio[0]) + ':' + str(aspect_ratio[1])
+            ratio = str(aspect_ratio[0]) + ":" + str(aspect_ratio[1])
 
             # Ask for a video
             async with aiohttp.ClientSession() as session:
@@ -956,10 +989,8 @@ interesting the resulting music will be. Here is your prompt: '"""
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
-                    if not output: 
-                        raise AttributeError(
-                            "Backend result is empty"
-                        )
+                    if not output:
+                        raise AttributeError("Backend result is empty")
                     logger.debug(f"{output}")
                     output = json.loads(output)
                     if not output["video_url"].startswith("http"):

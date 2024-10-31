@@ -67,3 +67,15 @@ class TestProvidersHealthChecks:
                 )
             )
             assert video.media_url is not None
+
+    @pytest.mark.integration
+    @pytest.mark.asyncio
+    async def test_luma_provider_and_generate(self):
+        with WorkingFolderContext():
+            video = RawTextBasedVideo("This is a fantastic day today")
+            await video.build_async(
+                build_settings=VideoBuildSettings(
+                    test_mode=False, target_model_provider="luma"
+                )
+            )
+            assert video.media_url is not None

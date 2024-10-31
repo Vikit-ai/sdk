@@ -58,7 +58,7 @@ jobs:
         DEFAULT_BACKGROUND_MUSIC :  ${{ vars.DEFAULT_BACKGROUND_MUSIC }}        
       run: |
         pytest -s --cov=. --cov-report=xml -m "unit"
-        pytest -s --cov=. --cov-report=xml -n 2 -m "local_integration" tests/test_composite_video.py
+        pytest -s --cov=. --cov-report=xml -n 4 -m "core_local_integration"
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
