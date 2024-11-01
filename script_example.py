@@ -31,6 +31,7 @@ from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.seine_transition import SeineTransition
 from vikit.video.transition import Transition
 from vikit.video.video import VideoBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 negative_prompt = """bad anatomy, bad hands, missing fingers, extra fingers, three hands, 
 three legs, bad arms, missing legs, missing arms, poorly drawn face, bad face, fused face, 
@@ -372,6 +373,13 @@ async def colabCode():
         video = PromptBasedVideo(prompt=prompt)
         await video.build(build_settings=video_build_settings)
 
+async def call_gemini():
+    working_folder="./examples/inputs/PromptbasedVideo/"
+    with WorkingFolderContext(working_folder):
+        prompt = await PromptFactory().create_prompt_from_multimodal_async(text="How could this person look better",  image="/home/leclem/Downloads/cropped-2024-10-28-133937.jpg")
+        gateway = MLModelsGatewayFactory().get_ml_models_gateway()
+        print(await gateway.ask_gemini(prompt))
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -440,3 +448,5 @@ if __name__ == "__main__":
     
     elif run_an_example == 7:
         asyncio.run(colabCode())
+    elif run_an_example == 8:
+        asyncio.run(call_gemini())

@@ -1001,3 +1001,90 @@ interesting the resulting music will be. Here is your prompt: '"""
         except Exception as e:
             logger.error(f"Error generating video from prompt: {e}")
             raise
+    
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    async def ask_gemini(self, prompt):
+
+        partsArray=[]
+        
+
+        
+        if prompt.image is not None and prompt.image.startswith("http"): 
+            part={}
+            part["fileData"] = {
+                "fileUri": prompt.image, 
+                "mimeType": "image/" + prompt.image.split(".")[-1]
+            }
+
+            partsArray.append(part)
+        elif prompt.image is not None:
+            part={}
+            try: 
+                # Convert result to Base64
+                image_data = base64.b64decode(prompt.image)
+            except Exception: 
+                #Read file path and then convert to Base64
+                with open(prompt.image, "rb") as image_file:
+                    image_data = image_file.read()
+
+            # Convert the image data to a NumPy array
+            np_arr = np.frombuffer(image_data, np.uint8)
+
+            # Decode the image using OpenCV
+            image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+            # Encode the resized image back to base64
+            _, buffer = cv2.imencode(".png", image)
+
+            # Encode the image as base64
+            img_b64 = base64.b64encode(buffer).decode(
+                "utf-8"
+            )
+
+            part["inline_data"] = {
+                "data": img_b64, 
+                "mimeType": "image/png"
+            }
+            partsArray.append(part)
+        
+        if prompt.video is not None and prompt.video.startswith("http"):
+            part={}
+            part["fileData"] = {
+                "fileUri": prompt.video,
+                "mimeType": "video/mp4"
+            }
+
+            partsArray.append(part)
+        elif prompt.video is not None:
+            part={}
+            part["fileData"] = {
+                "fileUri": prompt.video,
+                "mimeType": "video/" + prompt.video.split(".")[-1]
+            }
+
+            partsArray.append(part)
+        if prompt.text is not None:
+            part={}
+            part["text"] = prompt.text
+            partsArray.append(part)
+        
+        try:
+            async with aiohttp.ClientSession() as session:
+                payload = (
+                        {
+                            "key": self.vikit_api_key,
+                            "model": "gemini",
+                            "input": {
+                            "contents": {
+                                    "role": "USER",
+                                    "parts": partsArray
+                                }
+                            },
+                        },
+                    )
+                async with session.post(vikit_backend_url, json=payload) as response:
+                    output = await response.text()
+                    return output
+        except Exception as e:
+            logger.error(f"Error calling gemini from prompt: {e}")
+            raise
