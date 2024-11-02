@@ -21,6 +21,7 @@ from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
 from vikit.prompt.prompt import Prompt
 from vikit.prompt.multimodal_prompt import MultiModalPrompt
+from vikit.prompt.prompt_factory import PromptFactory
 
 class RawMultiModalBasedVideo(Video):
     """
@@ -83,3 +84,8 @@ class RawMultiModalBasedVideo(Video):
             VideoGenHandler(video_gen_build_settings=build_settings)
         )
         return handlers
+
+    async def is_qualitative(self, media_url, ml_models_gateway): 
+        prompt = await PromptFactory().create_prompt_from_multimodal_async(text="Is the camera revealing more of the scene not present at the begining, or showing blurry things ? If it does, respond True else False. Just respond True or False nothing else. Do not get wrong. Most of the time, camera zooming in is True and else False.",  video=media_url)
+        response = await ml_models_gateway.ask_gemini(prompt)
+        return ("false" in response or "False" in response)

@@ -268,7 +268,7 @@ class Video(ABC):
                 )
                 return False
 
-    def build(self, build_settings: VideoBuildSettings = VideoBuildSettings(), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)):
+    def build(self, build_settings: VideoBuildSettings = VideoBuildSettings(), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False), quality_check=None):
         """
         Build in async but expose a sync interface
         """
@@ -281,13 +281,13 @@ class Video(ABC):
 
         if loop and loop.is_running():
             # If there's already a running loop, create a new task and wait for it
-            return loop.create_task(self.build_async(build_settings, ml_models_gateway))
+            return loop.create_task(self.build_async(build_settings, ml_models_gateway, quality_check))
         else:
             # If no loop is running, use asyncio.run
-            return asyncio.run(self.build_async(build_settings, ml_models_gateway))
+            return asyncio.run(self.build_async(build_settings, ml_models_gateway, quality_check))
 
     async def build_async(
-        self, build_settings: VideoBuildSettings = VideoBuildSettings(), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
+        self, build_settings: VideoBuildSettings = VideoBuildSettings(), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False), quality_check=None
     ):
         """
         Build the video in the child classes, unless the video is already built, in  which case
@@ -337,7 +337,12 @@ class Video(ABC):
             build_settings=build_settings,
             ml_models_gateway=ml_models_gateway
         )  # logic from the child classes if any
+        used_quality_check = self.is_qualitative
+
         built_video = await self.gather_and_run_handlers(ml_models_gateway)
+        if quality_check is not None:
+            while not await quality_check(built_video.media_url, ml_models_gateway):
+                built_video = await self.gather_and_run_handlers(ml_models_gateway)
 
         logger.debug(f"Starting the post build hook for Video {self.id} ")
         await self.run_post_build_actions_hook(build_settings=build_settings)
@@ -531,3 +536,6 @@ class Video(ABC):
         Get the core handlers for the video
         """
         return []
+
+    async def is_qualitative(media_url, ml_models_gateway): 
+        return True

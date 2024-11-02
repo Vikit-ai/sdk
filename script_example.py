@@ -376,9 +376,13 @@ async def colabCode():
 async def call_gemini():
     working_folder="./examples/inputs/PromptbasedVideo/"
     with WorkingFolderContext(working_folder):
-        prompt = await PromptFactory().create_prompt_from_multimodal_async(text="How could this person look better",  image="/home/leclem/Downloads/cropped-2024-10-28-133937.jpg")
+
+        
+        prompt = await PromptFactory().create_prompt_from_multimodal_async(text="Is the camera revealing more of the scene not present at the begining, or showing blurry things ? If it does, respond True else False. Just respond True or False nothing else. Do not get wrong. Most of the time, camera zooming in is True and else False. Explain you answer.",  video="https://dnznrvs05pmza.cloudfront.net/ec689c70-2572-4d63-bb41-6c797c77259a.mp4?_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlIYXNoIjoiNzYyMGI3Y2MxZjczZjA5ZCIsImJ1Y2tldCI6InJ1bndheS10YXNrLWFydGlmYWN0cyIsInN0YWdlIjoicHJvZCIsImV4cCI6MTczMDUwNTYwMH0.RMpLWTkTVS_6RJDv8tved2oahTOt8CtgIMt9GCl6gJ4")
         gateway = MLModelsGatewayFactory().get_ml_models_gateway()
         print(await gateway.ask_gemini(prompt))
+
+
 
 if __name__ == "__main__":
 

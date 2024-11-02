@@ -418,6 +418,18 @@ async def _merge_audio_and_video_with_existing_audio(
         str: The merged audio file
 
     """
+    
+    media_url_to_use = media_url
+    #Special case 
+    if target_file_name == media_url:
+        new_media_name = media_url.split(".")[0] + "_." + media_url.split(".")[1]
+        print("mv " + media_url + " " + new_media_name)
+        process = await asyncio.create_subprocess_exec(
+            "mv", 
+            media_url, 
+            new_media_name
+        )
+        media_url_to_use = media_url.split(".")[0] + "_." + media_url.split(".")[1]
 
     logger.debug(
         "Merge audio and video with ffmpeg command: ffmpeg"
@@ -426,15 +438,15 @@ async def _merge_audio_and_video_with_existing_audio(
         + " "
         + "-i"
         + " "
-        + audio_file_path
+        + "'" + audio_file_path + "'"
         + " "
         + "-i"
         + " "
-        + media_url
+        + "'" + media_url_to_use + "'"
         + " "
         + "-filter_complex"
         + " "
-        + f"[0:a]apad,loudnorm,volume={audio_file_relative_volume},aformat=sample_fmts=u8|s16:channel_layouts=stereo[A];[1:a][A]amerge[out]"
+        + f"'[0:a]apad,loudnorm,volume={audio_file_relative_volume},aformat=sample_fmts=u8|s16:channel_layouts=stereo[A];[1:a][A]amerge[out]'"
         + " "
         + "-map"
         + " "
@@ -481,7 +493,7 @@ async def _merge_audio_and_video_with_existing_audio(
         "-i",
         audio_file_path,
         "-i",
-        media_url,
+        media_url_to_use,
         "-filter_complex",
         f"[0:a]apad,loudnorm,volume={audio_file_relative_volume},aformat=sample_fmts=u8|s16:channel_layouts=stereo[A];[1:a][A]amerge[out]",
         "-map",

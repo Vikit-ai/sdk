@@ -1068,6 +1068,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             part["text"] = prompt.text
             partsArray.append(part)
         
+        print(prompt)
         try:
             async with aiohttp.ClientSession() as session:
                 payload = (
@@ -1084,7 +1085,8 @@ interesting the resulting music will be. Here is your prompt: '"""
                     )
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
-                    return output
+                    print(json.loads(output)['text'])
+                    return json.loads(output)['text']
         except Exception as e:
             logger.error(f"Error calling gemini from prompt: {e}")
             raise
