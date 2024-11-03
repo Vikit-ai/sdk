@@ -37,6 +37,7 @@ from vikit.wrappers.ffmpeg_wrapper import (
     get_first_frame_as_image_ffmpeg,
     get_last_frame_as_image_ffmpeg,
     get_media_duration,
+    cut_video,
 )
 from vikit.prompt.prompt import Prompt
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
@@ -339,14 +340,18 @@ class Video(ABC):
             ml_models_gateway=ml_models_gateway,
             quality_check=quality_check,
         )  # logic from the child classes if any
-        used_quality_check = self.is_qualitative
 
         built_video = await self.gather_and_run_handlers(ml_models_gateway)
-        print(quality_check)
-        if quality_check is not None:
-            while not self.is_composite_video() and not await self.is_qualitative(built_video.media_url_http, ml_models_gateway):
+
+        if quality_check is not None and not self.is_composite_video():
+            is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
+            while is_qualitative_until != -1 and is_qualitative_until < 3 :
                 logger.info(f"Quality check was negative, rebuilding Video {self.id} ")
                 built_video = await self.gather_and_run_handlers(ml_models_gateway)
+            
+            if is_qualitative_until != -1:
+                logger.debug(f"Video {self.id} is only qualitative until {is_qualitative_until}, reducing it")
+                built_video.media_url = await cut_video(built_video.media_url, 0, is_qualitative_until)
 
         logger.debug(f"Starting the post build hook for Video {self.id} ")
         await self.run_post_build_actions_hook(build_settings=build_settings)
@@ -550,7 +555,7 @@ class Video(ABC):
         return True
 
     async def is_qualitative_until(self, media_url, ml_models_gateway): 
-        return get_media_duration(media_url)
+        return 2
 
     def is_composite_video(self):
         return False
