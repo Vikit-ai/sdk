@@ -51,7 +51,7 @@ def get_estimated_duration(composite: CompositeVideo) -> float:
         "dynamicrafter": 2.0,
         "haiper": 4.0,
         "transition": 2.0,
-        "runway": 10.0,
+        "runway": 5.0,
     }
     duration = 0
     for video in composite.video_list:
@@ -376,11 +376,44 @@ async def colabCode():
 async def call_gemini():
     working_folder="./examples/inputs/PromptbasedVideo/"
     with WorkingFolderContext(working_folder):
+        geminiPrompt="""
+            **Instruction:**  You are a prompt generator specializing in creating text prompts for Runway Gen-3 Alpha, an AI video generation model.  Given an input image and a desired camera movement, you will output a concise and effective prompt that achieves the desired effect.  The prompt should adhere to Runway's best practices for optimal results.
 
+            **Input Image:** [Insert Image Here]
+
+            **Desired Camera Movement:** Analyze the provided image and determine the most effective camera movement to transform it into a compelling real estate video.  Choose from the following options: slowly zoom in. The camera movement must be smooth and stable, and no elements should be added to the image.  The goal is to showcase the space in the most appealing way.
+
+            **Output:** A single, concise text prompt designed for Runway Gen-3 Alpha that will animate the input image using the chosen camera movement.  The prompt should be less than 20 words if possible, and prioritize clarity and precision. Do not include any explanation or commentary, only the prompt itself.
+            """
+
+        ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
+
+        video_build_settings = VideoBuildSettings(
+            output_video_file_name="Immo.mp4",
+            target_model_provider="runway",
+        )
+
+        vid_cp_final = CompositeVideo()
+        vid_cp_final._is_root_video_composite = True
+        for i in range(7, 9):
+            current_image = "/home/leclem/sdk/immo/" + str(i) + ".jpg"
+            prompt = await PromptFactory().create_prompt_from_multimodal_async(text=geminiPrompt,  image=current_image)
+            
+            # Query Gemini to get an appropriate prompt
+            response = await ml_models_gateway.ask_gemini(prompt)
+            
+            #Then we create an image based video for the last video, for example to showcase a product
+            image_prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_image(
+                    image=current_image,
+                    text=response.strip() + ". Slow motion.",
+                    model_provider="runway",
+                )
+
+            imageBasedVideo = RawImageBasedVideo(prompt=image_prompt)
+            vid_cp_final.append_video(imageBasedVideo)
         
-        prompt = await PromptFactory().create_prompt_from_multimodal_async(text="Is the camera revealing more of the scene not present at the begining, or showing blurry things ? If it does, respond True else False. Just respond True or False nothing else. Do not get wrong. Most of the time, camera zooming in is True and else False. Explain you answer.",  video="https://dnznrvs05pmza.cloudfront.net/ec689c70-2572-4d63-bb41-6c797c77259a.mp4?_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlIYXNoIjoiNzYyMGI3Y2MxZjczZjA5ZCIsImJ1Y2tldCI6InJ1bndheS10YXNrLWFydGlmYWN0cyIsInN0YWdlIjoicHJvZCIsImV4cCI6MTczMDUwNTYwMH0.RMpLWTkTVS_6RJDv8tved2oahTOt8CtgIMt9GCl6gJ4")
-        gateway = MLModelsGatewayFactory().get_ml_models_gateway()
-        print(await gateway.ask_gemini(prompt))
+        await vid_cp_final.build(ml_models_gateway=ml_models_gateway, build_settings=video_build_settings, quality_check=imageBasedVideo.is_qualitative)
+        print(f"Saved video {vid_cp_final.media_url}")
 
 
 

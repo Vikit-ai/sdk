@@ -89,6 +89,7 @@ class Video(ABC):
         )
         self._source = None
         self.prompt = prompt
+        self.media_url_http = None
         self.build_settings: VideoBuildSettings = VideoBuildSettings()
         self.are_build_settings_prepared = False
         self.video_dependencies = (
@@ -335,13 +336,16 @@ class Video(ABC):
 
         built_video = await self.run_build_core_logic_hook(
             build_settings=build_settings,
-            ml_models_gateway=ml_models_gateway
+            ml_models_gateway=ml_models_gateway,
+            quality_check=quality_check,
         )  # logic from the child classes if any
         used_quality_check = self.is_qualitative
 
         built_video = await self.gather_and_run_handlers(ml_models_gateway)
+        print(quality_check)
         if quality_check is not None:
-            while not await quality_check(built_video.media_url, ml_models_gateway):
+            while not self.is_composite_video() and not await self.is_qualitative(built_video.media_url_http, ml_models_gateway):
+                logger.info(f"Quality check was negative, rebuilding Video {self.id} ")
                 built_video = await self.gather_and_run_handlers(ml_models_gateway)
 
         logger.debug(f"Starting the post build hook for Video {self.id} ")
@@ -386,6 +390,11 @@ class Video(ABC):
                 assert built_video.media_url, "The video media URL is not set"
 
         self.metadata.title = self.get_title()
+
+        if self.media_url.startswith("http"):
+            self.media_url_http = self.media_url #We keep the external video URL for further reuse
+            print("video " + self.media_url_http)
+
         self.media_url = await download_or_copy_file(
             url=self.media_url,
             local_path=self.get_file_name_by_state(self.build_settings),
@@ -396,7 +405,7 @@ class Video(ABC):
 
         return built_video
 
-    async def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway):
+    async def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway, quality_check=None):
         """
         Run the core logic of the video building
 
@@ -537,5 +546,11 @@ class Video(ABC):
         """
         return []
 
-    async def is_qualitative(media_url, ml_models_gateway): 
+    async def is_qualitative(self, media_url, ml_models_gateway): 
         return True
+
+    async def is_qualitative_until(self, media_url, ml_models_gateway): 
+        return get_media_duration(media_url)
+
+    def is_composite_video(self):
+        return False

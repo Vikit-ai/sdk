@@ -676,6 +676,66 @@ async def reencode_video(video_url, target_video_name=None):
 
     return target_video_name
 
+async def cut_video(video_url, start_time, end_time, target_video_name=None):
+    """
+    Cuts the video starting at start_time and ending at end_time
+    Args:
+        video_url (str): The video url to cut
+        start_time (float): The begining time of the video 
+        end_time (float): The end time of the video
+
+    Returns:
+        Video: The reencoded video
+    """
+
+    assert video_url, "no media URL provided"
+
+    if not target_video_name:
+        target_video_name = "cutted_" + get_canonical_name(video_url) + ".mp4"
+
+    logger.debug("ffmpeg " +
+        "-i " +
+        video_url + " " + 
+        "-ss " +
+        str(start_time) + " " +
+        "-to " +
+        str(end_time) + " " +
+        target_video_name
+    )
+
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-i", 
+        video_url,
+        "-ss",
+        str(start_time),
+        "-to",
+        str(end_time),
+        target_video_name,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+
+    stdout, stderr = await process.communicate()
+    print(stdout)
+    if process.returncode != 0:
+        error_messages = []
+        if stdout:
+            error_messages.append(f"stdout: {stdout.decode()}")
+        if stderr:
+            error_messages.append(f"stderr: {stderr.decode()}")
+
+        if error_messages:
+            error_message = "ffmpeg command failed with: " + " and ".join(
+                error_messages
+            )
+        else:
+            error_message = "ffmpeg command failed without error output"
+
+        logger.error(error_message)
+        raise Exception(error_message)
+
+    return target_video_name
 
 async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
     """

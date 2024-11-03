@@ -176,4 +176,4 @@ class FakeMLModelsGateway(MLModelsGateway):
         return tests_medias.get_test_prompt_recording_trainboy()
 
     async def ask_gemini(self, prompt):
-        return "False"
+        return "-1"

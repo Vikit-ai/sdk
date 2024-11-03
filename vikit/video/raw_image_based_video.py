@@ -20,6 +20,7 @@ from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
 from vikit.prompt.prompt import Prompt
+from vikit.prompt.prompt_factory import PromptFactory
 
 
 class RawImageBasedVideo(Video):
@@ -77,8 +78,8 @@ class RawImageBasedVideo(Video):
     def get_duration(self):
         return self.duration
 
-    def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway):
-        return super().run_build_core_logic_hook(build_settings, ml_models_gateway)
+    def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway, quality_check=None):
+        return super().run_build_core_logic_hook(build_settings, ml_models_gateway, quality_check)
 
     def get_core_handlers(self, build_settings) -> list[Handler]:
         """
@@ -96,3 +97,13 @@ class RawImageBasedVideo(Video):
             VideoGenHandler(video_gen_build_settings=build_settings)
         )
         return handlers
+
+    async def is_qualitative(self, media_url, ml_models_gateway): 
+        prompt = await PromptFactory().create_prompt_from_multimodal_async(text="At what second is the camera revealing more of the scene not present at the begining (except object details), or showing blurry things ? If it does, respond the second else -1. Just respond the second or -1 nothing else. Do not get wrong. Most of the time, camera zooming in is -1 and else the second.",  video=media_url)
+        response = await ml_models_gateway.ask_gemini(prompt)
+        return ("-1" in response)
+
+    async def is_qualitative_until(self, media_url, ml_models_gateway): 
+        prompt = await PromptFactory().create_prompt_from_multimodal_async(text="At what second is the camera revealing more of the scene not present at the begining (except object details), or showing blurry things, or any change in the state of something ? If it does, respond the second else -1. Just respond the second or -1 nothing else. Do not get wrong. Most of the time, camera zooming in is -1 and else the second.",  video=media_url)
+        response = await ml_models_gateway.ask_gemini(prompt)
+        return int(response)

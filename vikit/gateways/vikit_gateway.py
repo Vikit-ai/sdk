@@ -1004,10 +1004,14 @@ interesting the resulting music will be. Here is your prompt: '"""
     
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     async def ask_gemini(self, prompt):
+        logger.debug(f"Galling Gemini with prompt {prompt} text {prompt.text}")
+
+        if prompt.image is not None:
+            logger.debug(f"Image {prompt.image[:50]}")
+        if prompt.video is not None:
+            logger.debug(f"Video {prompt.video[:50]}")
 
         partsArray=[]
-        
-
         
         if prompt.image is not None and prompt.image.startswith("http"): 
             part={}
@@ -1068,7 +1072,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             part["text"] = prompt.text
             partsArray.append(part)
         
-        print(prompt)
+
         try:
             async with aiohttp.ClientSession() as session:
                 payload = (
@@ -1085,7 +1089,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                     )
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
-                    print(json.loads(output)['text'])
+                    logger.debug(f"Response from Gemini: {json.loads(output)['text']}")
                     return json.loads(output)['text']
         except Exception as e:
             logger.error(f"Error calling gemini from prompt: {e}")

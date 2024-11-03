@@ -21,7 +21,7 @@ from loguru import logger
 
 import tests.testing_medias as tests_medias
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.wrappers.ffmpeg_wrapper import concatenate_videos, reencode_video
+from vikit.wrappers.ffmpeg_wrapper import concatenate_videos, reencode_video, cut_video, get_media_duration
 
 
 class TestFFMPEGWrapper:
@@ -97,3 +97,31 @@ class TestFFMPEGWrapper:
             assert generated_vid_file != ""
             assert os.path.exists(generated_vid_file)
             assert os.path.getsize(generated_vid_file) > 0
+
+    @pytest.mark.local_integration
+    @pytest.mark.asyncio
+    async def test_cut_video(
+        self,
+    ):
+        """
+        Test the capacity to cut video
+        """
+        with WorkingFolderContext():
+            cutted_video = await cut_video(
+                video_url=tests_medias.get_cat_video_path(),
+                start_time=1, 
+                end_time=2, 
+            )
+            print(get_media_duration(cutted_video))
+
+            assert int(get_media_duration(cutted_video)) == 1
+
+            cutted_video = await cut_video(
+                video_url=tests_medias.get_haiper_video_path(),
+                start_time=1, 
+                end_time=3, 
+            )
+
+            print(get_media_duration(cutted_video))
+            assert int(get_media_duration(cutted_video)) == 2
+    
