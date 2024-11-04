@@ -940,13 +940,14 @@ interesting the resulting music will be. Here is your prompt: '"""
                 #Base64 image
                 logger.debug("Resizing image for video generator")
                 image_data= ""
-                try: 
-                    # Convert result to Base64
-                    image_data = base64.b64decode(prompt.image)
-                except Exception: 
+                print(prompt.image.split('.')[-1] )
+                if prompt.image.split('.') is not None and prompt.image.split('.')[-1] in ["jpg", "png", "jpeg", "bmp", "tiff"]:
                     #Read file path and then convert to Base64
                     with open(prompt.image, "rb") as image_file:
                         image_data = image_file.read()
+                else: 
+                    # Convert result to Base64
+                    image_data = base64.b64decode(prompt.image)
 
                 # Convert the image data to a NumPy array
                 np_arr = np.frombuffer(image_data, np.uint8)
@@ -1003,7 +1004,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             raise
     
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def ask_gemini(self, prompt):
+    async def ask_gemini(self, prompt, moreContents = None):
         logger.debug(f"Galling Gemini with prompt {prompt} text {prompt.text}")
 
         if prompt.image is not None:
@@ -1023,13 +1024,14 @@ interesting the resulting music will be. Here is your prompt: '"""
             partsArray.append(part)
         elif prompt.image is not None:
             part={}
-            try: 
-                # Convert result to Base64
-                image_data = base64.b64decode(prompt.image)
-            except Exception: 
+            print(prompt.image.split('.')[-1] )
+            if prompt.image.split('.') is not None and prompt.image.split('.')[-1] in ["jpg", "png", "jpeg", "bmp", "tiff"]:
                 #Read file path and then convert to Base64
                 with open(prompt.image, "rb") as image_file:
                     image_data = image_file.read()
+            else: 
+                # Convert result to Base64
+                image_data = base64.b64decode(prompt.image)
 
             # Convert the image data to a NumPy array
             np_arr = np.frombuffer(image_data, np.uint8)
@@ -1072,18 +1074,30 @@ interesting the resulting music will be. Here is your prompt: '"""
             part["text"] = prompt.text
             partsArray.append(part)
         
+        
 
         try:
             async with aiohttp.ClientSession() as session:
+                
+                contentsArray = [{
+                                    "role": "USER",
+                                    "parts": partsArray
+                                }]
+                
+                if moreContents is not None:
+                    contentsArray = contentsArray + moreContents
+
                 payload = (
                         {
                             "key": self.vikit_api_key,
                             "model": "gemini",
                             "input": {
-                            "contents": {
-                                    "role": "USER",
-                                    "parts": partsArray
-                                }
+                                "contents": contentsArray,
+                                "generationConfig": {
+                                    "temperature": 0,
+                                    "maxOutputTokens": 800,
+                                    "topP": 0.95
+                                },
                             },
                         },
                     )

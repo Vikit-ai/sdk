@@ -104,14 +104,5 @@ class RawImageBasedVideo(Video):
         return ("-1" in response)
 
     async def is_qualitative_until(self, media_url, ml_models_gateway): 
-        prompt = await PromptFactory().create_prompt_from_multimodal_async(text="""
-You are an part of a program that will determine if a video will be trimmed if yes you will output the second and if not -1.
-    
-Perform a frame-by-frame analysis of the provided video. For each frame, define the visible structural elements that are visible in the image (but do not oupput them). These elements could be seen also through the mirrors as well. You should name the elements only and only based on what you see in the image. Examples of structural elements could be furniture, doors, windows, walls, portions of walls, radiator, plants, objects or openings, if and only if they are visible in the given image.
 
-Then, identify the second at which any new structural element or any new portion of a structural element or any change in visibility of a structural element or any differences in the spatial extent of the structural elements shown or any new part of the scene or any blurry thing first appears. If nothing of this happens, respond with -1.
-
-Output ONLY the second or -1 nothing else. No other text or characters are allowed. Do not get wrong. Do not output any text.
-        """,  video=media_url)
-        response = await ml_models_gateway.ask_gemini(prompt)
-        return int(response)
+        return -1

@@ -343,9 +343,11 @@ class Video(ABC):
 
         built_video = await self.gather_and_run_handlers(ml_models_gateway)
 
+        #If the user provided a custom-purposed quality check function
         if quality_check is not None and not self.is_composite_video():
             is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
-            while is_qualitative_until != -1 and is_qualitative_until < 3 :
+            print(str(is_qualitative_until) + "eeeeee")
+            while is_qualitative_until != -1 and is_qualitative_until < 2 :
                 logger.info(f"Quality check was negative, rebuilding Video {self.id} ")
                 built_video = await self.gather_and_run_handlers(ml_models_gateway)
             
@@ -555,7 +557,7 @@ class Video(ABC):
         return True
 
     async def is_qualitative_until(self, media_url, ml_models_gateway): 
-        return 2
+        return -1
 
     def is_composite_video(self):
         return False

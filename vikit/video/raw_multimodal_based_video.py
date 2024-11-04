@@ -89,3 +89,6 @@ class RawMultiModalBasedVideo(Video):
         prompt = await PromptFactory().create_prompt_from_multimodal_async(text="Is the camera revealing more of the scene not present at the begining, or showing blurry things ? If it does, respond True else False. Just respond True or False nothing else. Do not get wrong. Most of the time, camera zooming in is True and else False.",  video=media_url)
         response = await ml_models_gateway.ask_gemini(prompt)
         return ("false" in response or "False" in response)
+
+    async def is_qualitative_until(self, media_url, ml_models_gateway): 
+        -1

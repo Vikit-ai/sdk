@@ -140,7 +140,7 @@ class TestRawMultiModalBasedVideo:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=False
                     )
-                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True), quality_check=pbvid.is_qualitative
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True), quality_check=pbvid.is_qualitative_until
             )
 
             assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
