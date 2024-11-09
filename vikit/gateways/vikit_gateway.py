@@ -1011,9 +1011,14 @@ interesting the resulting music will be. Here is your prompt: '"""
             logger.debug(f"Image {prompt.image[:50]}")
         if prompt.video is not None:
             logger.debug(f"Video {prompt.video[:50]}")
-
+        print(moreContents)
         partsArray=[]
         
+        if prompt.text is not None:
+            part={}
+            part["text"] = prompt.text
+            partsArray.append(part)
+
         if prompt.image is not None and prompt.image.startswith("http"): 
             part={}
             part["fileData"] = {
@@ -1069,11 +1074,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             }
 
             partsArray.append(part)
-        if prompt.text is not None:
-            part={}
-            part["text"] = prompt.text
-            partsArray.append(part)
-        
+
         
 
         try:
@@ -1092,17 +1093,18 @@ interesting the resulting music will be. Here is your prompt: '"""
                             "key": self.vikit_api_key,
                             "model": "gemini",
                             "input": {
-                                "contents": contentsArray,
+                                "contents": contentsArray, 
                                 "generationConfig": {
-                                    "temperature": 0,
-                                    "maxOutputTokens": 800,
-                                    "topP": 0.95
+                                    "temperature": 0
+                                    ,"maxOutputTokens": 8192
                                 },
                             },
                         },
                     )
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
+                    print(output)
+                    print(response)
                     logger.debug(f"Response from Gemini: {json.loads(output)['text']}")
                     return json.loads(output)['text']
         except Exception as e:

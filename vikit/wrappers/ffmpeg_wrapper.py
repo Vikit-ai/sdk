@@ -676,13 +676,15 @@ async def reencode_video(video_url, target_video_name=None):
 
     return target_video_name
 
-async def cut_video(video_url, start_time, end_time, target_video_name=None):
+async def cut_video(video_url, start_time, end_time, target_duration=None, target_video_name=None):
     """
     Cuts the video starting at start_time and ending at end_time
     Args:
         video_url (str): The video url to cut
         start_time (float): The begining time of the video 
         end_time (float): The end time of the video
+        target_video_name (string) : Optional, the name of the output video
+        target_duration (float) : Optional, the duration of the output video
 
     Returns:
         Video: The reencoded video
@@ -734,7 +736,7 @@ async def cut_video(video_url, start_time, end_time, target_video_name=None):
 
         logger.error(error_message)
         raise Exception(error_message)
-
+        
     return target_video_name
 
 async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):

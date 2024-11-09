@@ -24,10 +24,13 @@ from vikit.common.file_tools import (
 )
 from vikit.prompt.prompt import Prompt
 from vikit.prompt.image_prompt import ImagePrompt
+from vikit.prompt.prompt_factory import PromptFactory
 from vikit.prompt.multimodal_prompt import MultiModalPrompt
 from vikit.video.video import VideoBuildSettings
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.gateways.ML_models_gateway import MLModelsGateway
+import copy
+
 
 class VideoGenHandler(Handler):
     def __init__(self, video_gen_build_settings: VideoBuildSettings = None):
@@ -61,11 +64,20 @@ class VideoGenHandler(Handler):
             model_provider=self.video_gen_build_settings.target_model_provider
         else:
             model_provider=video.prompt.build_settings.model_provider
+        
+        prompt_to_use = video.prompt
+        if video.prompt.reengineer_text_prompt_from_image_and_text:
+            new_prompt = copy.deepcopy(prompt_to_use)
+
+            prompt = await PromptFactory().create_prompt_from_multimodal_async(text=new_prompt.text,  image=new_prompt.image)
+            # Query Gemini to get an appropriate prompt
+            new_prompt.text = await ml_models_gateway.ask_gemini(prompt)
+            prompt_to_use = new_prompt
 
         video.media_url = (
             await (  # Should give a link on a web storage
                 ml_models_gateway.generate_video_async(
-                    prompt=video.prompt,
+                    prompt=prompt_to_use,
                     model_provider=model_provider,
                     aspect_ratio=self.video_gen_build_settings.aspect_ratio,
                 )

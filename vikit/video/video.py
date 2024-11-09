@@ -347,13 +347,15 @@ class Video(ABC):
         if quality_check is not None and not self.is_composite_video():
             is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
             print(str(is_qualitative_until) + "eeeeee")
-            while is_qualitative_until != -1 and is_qualitative_until < 2 :
+            while is_qualitative_until != -1 and is_qualitative_until < 3 :
                 logger.info(f"Quality check was negative, rebuilding Video {self.id} ")
                 built_video = await self.gather_and_run_handlers(ml_models_gateway)
+                is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
+                print(str(is_qualitative_until) + "hi hi ")
             
             if is_qualitative_until != -1:
                 logger.debug(f"Video {self.id} is only qualitative until {is_qualitative_until}, reducing it")
-                built_video.media_url = await cut_video(built_video.media_url, 0, is_qualitative_until)
+                built_video.media_url = await cut_video(built_video.media_url, 0, is_qualitative_until-1, 5)
 
         logger.debug(f"Starting the post build hook for Video {self.id} ")
         await self.run_post_build_actions_hook(build_settings=build_settings)

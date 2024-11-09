@@ -241,6 +241,7 @@ class PromptFactory:
         text: str = None,
         reengineer_text:bool = False,
         model_provider: str= None,
+        reengineer_text_prompt_from_image_and_text=False,
     ):
         """
         Create a prompt object from a prompt image path
@@ -257,7 +258,7 @@ class PromptFactory:
         if reengineer_text:
             text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
 
-        img_prompt = MultiModalPrompt(image=image, text=text, model_provider=model_provider, build_settings=self.prompt_build_settings)
+        img_prompt = MultiModalPrompt(image=image, text=text, model_provider=model_provider, build_settings=self.prompt_build_settings, reengineer_text_prompt_from_image_and_text=reengineer_text_prompt_from_image_and_text)
         return img_prompt
 
     async def create_prompt_from_multimodal_async(
