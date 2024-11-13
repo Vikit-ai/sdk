@@ -423,8 +423,8 @@ async def _merge_audio_and_video_with_existing_audio(
     #Special case 
     if target_file_name == media_url:
         new_media_name = media_url.split(".")[0] + "_." + media_url.split(".")[1]
-        print("mv " + media_url + " " + new_media_name)
-        process = await asyncio.create_subprocess_exec(
+        logger.debug("Renaming file : ffmpeg mv " + media_url + " " + new_media_name)
+        await asyncio.create_subprocess_exec(
             "mv", 
             media_url, 
             new_media_name

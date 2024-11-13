@@ -375,8 +375,6 @@ async def colabCode():
 
 async def is_qualitative_until(media_url, ml_models_gateway, gemini_version="gemini-1.5-pro-002"):
 
-    response_mirror_window = "-1"
-
     prompt_is_outside = await PromptFactory().create_prompt_from_multimodal_async(text="""
 You are an part of a program that will determine if a video should be processed further.
 
@@ -389,7 +387,6 @@ Output ONLY True or False nothing else. No other text or characters are allowed.
     """,  video=media_url)
     is_outside = await ml_models_gateway.ask_gemini(prompt_is_outside, gemini_version)
 
-    response="-1"
     if ("True" in is_outside): 
         print("Outside")
 

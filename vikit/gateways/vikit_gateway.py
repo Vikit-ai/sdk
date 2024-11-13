@@ -1012,12 +1012,12 @@ interesting the resulting music will be. Here is your prompt: '"""
         if prompt.video is not None:
             logger.debug(f"Video {prompt.video[:50]}")
         
-        partsArray=[]
+        parts_array=[]
         
         if prompt.text is not None:
             part={}
             part["text"] = prompt.text
-            partsArray.append(part)
+            parts_array.append(part)
 
         if prompt.image is not None and prompt.image.startswith("http"): 
             part={}
@@ -1026,7 +1026,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 "mimeType": "image/" + prompt.image.split(".")[-1]
             }
 
-            partsArray.append(part)
+            parts_array.append(part)
         elif prompt.image is not None:
             part={}
             print(prompt.image.split('.')[-1] )
@@ -1056,7 +1056,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 "data": img_b64, 
                 "mimeType": "image/png"
             }
-            partsArray.append(part)
+            parts_array.append(part)
         
         if prompt.video is not None and prompt.video.startswith("http"):
             part={}
@@ -1065,7 +1065,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 "mimeType": "video/mp4"
             }
 
-            partsArray.append(part)
+            parts_array.append(part)
         elif prompt.video is not None:
             part={}
             video_data = ""
@@ -1089,14 +1089,14 @@ interesting the resulting music will be. Here is your prompt: '"""
                 "data": video_data
             }
 
-            partsArray.append(part)
+            parts_array.append(part)
 
         try:
             async with aiohttp.ClientSession() as session:
                 
                 contentsArray = [{
                                     "role": "USER",
-                                    "parts": partsArray
+                                    "parts": parts_array
                                 }]
                 
                 if more_contents is not None:
