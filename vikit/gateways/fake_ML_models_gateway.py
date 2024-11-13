@@ -175,5 +175,5 @@ class FakeMLModelsGateway(MLModelsGateway):
     def extract_audio_slice(self, i, end, audiofile_path, target_file_name: str = None):
         return tests_medias.get_test_prompt_recording_trainboy()
 
-    async def ask_gemini(self, prompt, contentMore= None):
+    async def ask_gemini(self, prompt, more_contents= None):
         return "-1"

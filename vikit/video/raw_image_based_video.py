@@ -97,12 +97,3 @@ class RawImageBasedVideo(Video):
             VideoGenHandler(video_gen_build_settings=build_settings)
         )
         return handlers
-
-    async def is_qualitative(self, media_url, ml_models_gateway): 
-        prompt = await PromptFactory().create_prompt_from_multimodal_async(text="At what second is the camera revealing more of the scene not present at the begining (except object details), or showing blurry things ? If it does, respond the second else -1. Just respond the second or -1 nothing else. Do not get wrong. Most of the time, camera zooming in is -1 and else the second.",  video=media_url)
-        response = await ml_models_gateway.ask_gemini(prompt)
-        return ("-1" in response)
-
-    async def is_qualitative_until(self, media_url, ml_models_gateway): 
-
-        return -1

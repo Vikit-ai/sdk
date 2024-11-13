@@ -1004,14 +1004,14 @@ interesting the resulting music will be. Here is your prompt: '"""
             raise
     
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def ask_gemini(self, prompt, gemini_version="gemini-1.5-pro-002", moreContents = None):
+    async def ask_gemini(self, prompt, gemini_version="gemini-1.5-pro-002", more_contents = None):
         logger.debug(f"Galling Gemini model {gemini_version} with prompt {prompt} text {prompt.text}")
 
         if prompt.image is not None:
             logger.debug(f"Image {prompt.image[:50]}")
         if prompt.video is not None:
             logger.debug(f"Video {prompt.video[:50]}")
-        print(moreContents)
+        
         partsArray=[]
         
         if prompt.text is not None:
@@ -1099,8 +1099,8 @@ interesting the resulting music will be. Here is your prompt: '"""
                                     "parts": partsArray
                                 }]
                 
-                if moreContents is not None:
-                    contentsArray = contentsArray + moreContents
+                if more_contents is not None:
+                    contentsArray = contentsArray + more_contents
 
                 payload = (
                         {
