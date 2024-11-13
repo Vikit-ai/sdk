@@ -71,7 +71,7 @@ class VideoGenHandler(Handler):
 
             prompt = await PromptFactory().create_prompt_from_multimodal_async(text=new_prompt.text,  image=new_prompt.image)
             # Query Gemini to get an appropriate prompt
-            new_prompt.text = await ml_models_gateway.ask_gemini(prompt)
+            new_prompt.text = (await ml_models_gateway.ask_gemini(prompt)).replace('"', '').replace("'", "")
             prompt_to_use = new_prompt
 
         video.media_url = (

@@ -1004,8 +1004,8 @@ interesting the resulting music will be. Here is your prompt: '"""
             raise
     
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def ask_gemini(self, prompt, moreContents = None):
-        logger.debug(f"Galling Gemini with prompt {prompt} text {prompt.text}")
+    async def ask_gemini(self, prompt, gemini_version="gemini-1.5-pro-002", moreContents = None):
+        logger.debug(f"Galling Gemini model {gemini_version} with prompt {prompt} text {prompt.text}")
 
         if prompt.image is not None:
             logger.debug(f"Image {prompt.image[:50]}")
@@ -1068,14 +1068,28 @@ interesting the resulting music will be. Here is your prompt: '"""
             partsArray.append(part)
         elif prompt.video is not None:
             part={}
-            part["fileData"] = {
-                "fileUri": prompt.video,
-                "mimeType": "video/" + prompt.video.split(".")[-1]
+            video_data = ""
+            mimetype = "video/mp4"
+            print(prompt.video.split('.')[-1].lower())
+            if prompt.video.split('.') is not None and prompt.video.split('.')[-1].lower() in ["mp4", "mov", "avi", "wmv", "webm"]:
+                #Read file path and then convert to Base64
+                with open(prompt.video, "rb") as video_file:
+                    video_data = base64.b64encode(video_file.read()).decode(
+                        "utf-8"
+                    )
+                    mimetype = "video/" + prompt.video.split(".")[-1].lower()
+            else: 
+                # Convert result to Base64
+                video_data = prompt.video
+
+
+
+            part["inlineData"] = {
+                "mimeType": mimetype,
+                "data": video_data
             }
 
             partsArray.append(part)
-
-        
 
         try:
             async with aiohttp.ClientSession() as session:
@@ -1091,7 +1105,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 payload = (
                         {
                             "key": self.vikit_api_key,
-                            "model": "gemini",
+                            "model": gemini_version,
                             "input": {
                                 "contents": contentsArray, 
                                 "generationConfig": {

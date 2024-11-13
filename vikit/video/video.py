@@ -93,6 +93,7 @@ class Video(ABC):
         self.media_url_http = None
         self.build_settings: VideoBuildSettings = VideoBuildSettings()
         self.are_build_settings_prepared = False
+        self.discarded = False
         self.video_dependencies = (
             []
         )  # Define video dependencies, i.e. the videos that are needed to build the current video
@@ -347,13 +348,18 @@ class Video(ABC):
         if quality_check is not None and not self.is_composite_video():
             is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
             print(str(is_qualitative_until) + "eeeeee")
-            while is_qualitative_until != -1 and is_qualitative_until < 3 :
+            regeneration_number = 0
+            while is_qualitative_until != -1 and is_qualitative_until < 3 and regeneration_number < 4 :
                 logger.info(f"Quality check was negative, rebuilding Video {self.id} ")
                 built_video = await self.gather_and_run_handlers(ml_models_gateway)
                 is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
                 print(str(is_qualitative_until) + "hi hi ")
+                regeneration_number = regeneration_number + 1
             
-            if is_qualitative_until != -1:
+            if regeneration_number >= 4:
+                logger.debug(f"We did not manage to generate a qualitative video {self.id}, discarding it")
+                built_video.discarded = True
+            elif is_qualitative_until != -1:
                 logger.debug(f"Video {self.id} is only qualitative until {is_qualitative_until}, reducing it")
                 built_video.media_url = await cut_video(built_video.media_url, 0, is_qualitative_until-1, 5)
 
