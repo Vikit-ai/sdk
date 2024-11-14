@@ -147,7 +147,6 @@ class TestVideoFileNames:
 
     def get_test_build_settings(self):
         bld_set = VideoBuildSettings()
-        bld_set.test_mode = True
         bld_set.id = "1234567890"
         bld_set.build_date = datetime.date(2024, 7, 1)
         bld_set.build_time = datetime.time(23, 4, 42)

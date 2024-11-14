@@ -38,6 +38,8 @@ from vikit.wrappers.ffmpeg_wrapper import (
     get_last_frame_as_image_ffmpeg,
     get_media_duration,
 )
+from vikit.prompt.prompt import Prompt
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 DEFAULT_VIDEO_TITLE = "no-title-yet"
 
@@ -51,7 +53,7 @@ class Video(ABC):
 
     """
 
-    def __init__(self, width: int = 512, height: int = 320):
+    def __init__(self, prompt: Prompt = Prompt()):
         """
         Initialize the video
 
@@ -64,8 +66,9 @@ class Video(ABC):
             ValueError: If the source media URL is not set
 
         """
-        self._width = width
-        self._height = height
+
+        self._width = None
+        self._height = None
         self._background_music_file_name = None
         self._duration = None
         self._is_video_built = False
@@ -85,6 +88,7 @@ class Video(ABC):
             height=self._height,
         )
         self._source = None
+        self.prompt = prompt
         self.build_settings: VideoBuildSettings = VideoBuildSettings()
         self.are_build_settings_prepared = False
         self.video_dependencies = (
@@ -203,12 +207,23 @@ class Video(ABC):
 
         return self.metadata.title
 
-    @abstractmethod
+    @log_function_params
     def get_title(self):
         """
         Returns the title of the video.
         """
-        return "no-title-yet" if self.metadata.title is None else self.metadata.title
+        if self.metadata.title:
+            summarised_title = self.get_title_from_description(
+                description=self.metadata.title
+            )
+        elif self.prompt and self.prompt.text:
+            summarised_title = self.get_title_from_description(
+                description=self.text
+            )
+        else:
+            summarised_title = "Video"
+        self.metadata.title = summarised_title
+        return self.metadata.title
 
     async def get_first_frame_as_image(self):
         """
@@ -253,7 +268,7 @@ class Video(ABC):
                 )
                 return False
 
-    def build(self, build_settings: VideoBuildSettings = VideoBuildSettings()):
+    def build(self, build_settings: VideoBuildSettings = VideoBuildSettings(), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)):
         """
         Build in async but expose a sync interface
         """
@@ -266,13 +281,13 @@ class Video(ABC):
 
         if loop and loop.is_running():
             # If there's already a running loop, create a new task and wait for it
-            return loop.create_task(self.build_async(build_settings))
+            return loop.create_task(self.build_async(build_settings, ml_models_gateway))
         else:
             # If no loop is running, use asyncio.run
-            return asyncio.run(self.build_async(build_settings))
+            return asyncio.run(self.build_async(build_settings, ml_models_gateway))
 
     async def build_async(
-        self, build_settings: VideoBuildSettings = VideoBuildSettings()
+        self, build_settings: VideoBuildSettings = VideoBuildSettings(), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
     ):
         """
         Build the video in the child classes, unless the video is already built, in  which case
@@ -305,22 +320,24 @@ class Video(ABC):
         await self.run_pre_build_actions_hook(build_settings=build_settings)
 
         built_video = None
+
         if not self.are_build_settings_prepared:
             self.build_settings = build_settings
             self._source = type(
-                build_settings.get_ml_models_gateway()  # TODO: this is hacky and should be refactored
+                ml_models_gateway  # TODO: this is hacky and should be refactored
                 # so that we infer source from the different handlers (initial video generator, interpolation, etc)
             ).__name__  # as the source(s) of the video is used later to decide if we need to reencode the video
 
-            await self.prepare_build(build_settings=build_settings)
+            await self.prepare_build(build_settings=build_settings, ml_models_gateway=ml_models_gateway)
             self.are_build_settings_prepared = True
 
         logger.info(f"Starting the building of Video {self.id} ")
 
         built_video = await self.run_build_core_logic_hook(
-            build_settings=build_settings
+            build_settings=build_settings,
+            ml_models_gateway=ml_models_gateway
         )  # logic from the child classes if any
-        built_video = await self.gather_and_run_handlers()
+        built_video = await self.gather_and_run_handlers(ml_models_gateway)
 
         logger.debug(f"Starting the post build hook for Video {self.id} ")
         await self.run_post_build_actions_hook(build_settings=build_settings)
@@ -339,7 +356,7 @@ class Video(ABC):
 
         return built_video
 
-    async def gather_and_run_handlers(self):
+    async def gather_and_run_handlers(self, ml_models_gateway):
         """
         Gather the handler chain and run it
         """
@@ -358,7 +375,7 @@ class Video(ABC):
                 f"about to run {len(handler_chain)} handlers for video {self.id} of type {self.short_type_name} / {type(self)}"
             )
             for handler in handler_chain:
-                built_video = await handler.execute_async(video=self)
+                built_video = await handler.execute_async(video=self, ml_models_gateway=ml_models_gateway)
                 built_video.is_video_built = True
 
                 assert built_video.media_url, "The video media URL is not set"
@@ -374,7 +391,7 @@ class Video(ABC):
 
         return built_video
 
-    async def run_build_core_logic_hook(self, build_settings: VideoBuildSettings):
+    async def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway):
         """
         Run the core logic of the video building
 
@@ -395,7 +412,7 @@ class Video(ABC):
         Post build actions hook
         """
 
-    async def prepare_build(self, build_settings: VideoBuildSettings) -> "Video":
+    async def prepare_build(self, build_settings: VideoBuildSettings, ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)) -> "Video":
         """
         Prepare the video for building, may be used to inject build settings for individual videos
         that we don't want to share with global buildsettings. For instance to generate a video

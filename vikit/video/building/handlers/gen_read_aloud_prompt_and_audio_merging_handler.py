@@ -29,7 +29,7 @@ class ReadAloudPromptAudioMergingHandler(Handler):
             raise ValueError("Recorded prompt is required")
         self.recorded_prompt = recorded_prompt
 
-    async def execute_async(self, video):
+    async def execute_async(self, video, ml_models_gateway):
         """
         Merge prompt generated recording with video  as a single media file
 

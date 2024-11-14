@@ -19,7 +19,7 @@ import warnings
 import pytest
 from loguru import logger
 
-import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.gateways.vikit_gateway import VikitGateway
 
@@ -37,7 +37,7 @@ class TestBackgroundMusic:
     @pytest.mark.asyncio
     async def test_generate_background_music_from_empty_prompt(self):
         with WorkingFolderContext():
-            ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
+            ml_gw = MLModelsGatewayFactory().get_ml_models_gateway(
                 test_mode=False
             )
 
@@ -47,7 +47,7 @@ class TestBackgroundMusic:
     @pytest.mark.asyncio
     async def test_generate_background_music_from_prompt(self):
         with WorkingFolderContext():
-            ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
+            ml_gw = MLModelsGatewayFactory().get_ml_models_gateway(
                 test_mode=False
             )
             music_path = await ml_gw.generate_background_music_async(

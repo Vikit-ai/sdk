@@ -68,6 +68,7 @@ def get_media_duration(input_video_path):
         float: The duration of the media file in seconds.
     """
     assert os.path.exists(input_video_path), f"File {input_video_path} does not exist"
+
     result = subprocess.run(
         [
             "ffprobe",
@@ -417,6 +418,62 @@ async def _merge_audio_and_video_with_existing_audio(
         str: The merged audio file
 
     """
+
+    logger.debug(
+        "Merge audio and video with ffmpeg command: ffmpeg"
+        + " "
+        + "-y"
+        + " "
+        + "-i"
+        + " "
+        + audio_file_path
+        + " "
+        + "-i"
+        + " "
+        + media_url
+        + " "
+        + "-filter_complex"
+        + " "
+        + f"[0:a]apad,loudnorm,volume={audio_file_relative_volume},aformat=sample_fmts=u8|s16:channel_layouts=stereo[A];[1:a][A]amerge[out]"
+        + " "
+        + "-map"
+        + " "
+        + "1:v"
+        + " "
+        + "-c:v"
+        + " "
+        + "libx264"
+        + " "
+        + "-profile:v"
+        + " "
+        + "baseline"
+        + " "
+        + "-level"
+        + " "
+        + "3.0"  # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
+        + " "
+        + "-pix_fmt"
+        + " "
+        + "yuv420p"  # This tells FFmpeg to use the yuv420p pixel format.
+        + " "
+        + "-map"
+        + " "
+        + "[out]"
+        + " "
+        + "-acodec"
+        + " "
+        + "aac"
+        + " "
+        + "-ar"
+        + " "
+        + "44100"  # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
+        + " "
+        + "-ac"
+        + " "
+        + "2"  # This tells FFmpeg to use 2 audio channels.
+        + " "
+        + target_file_name
+    )
 
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",

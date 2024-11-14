@@ -55,6 +55,12 @@ def get_elevenLabs_url() -> str:
         raise Exception("ELEVEN_LABS_API_URI is not set")
     return elevenLabs_url
 
+def get_vikit_backend_url() -> str:
+    vikitBackend_url = os.getenv("VIKIT_BACKEND_URI", None)
+    if vikitBackend_url is None:
+        return "https://videho.replit.app/models"
+    return vikitBackend_url
+
 
 def get_videho_email_contact() -> str:
     videho_email = os.getenv("VIDEHO_EMAIL_CONTACT", None)

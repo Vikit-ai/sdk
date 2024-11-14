@@ -20,18 +20,20 @@ from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
 from vikit.prompt.prompt import Prompt
+from vikit.prompt.multimodal_prompt import MultiModalPrompt
 
-
-class RawImageBasedVideo(Video):
+class RawMultiModalBasedVideo(Video):
     """
-    Generates a video from raw image prompt
+    Generates a video from raw multimodal prompt, i.e. very similar to calling a mainstream video generation platform.
+    This is currently a small building block available in the SDK, aimed to be used when you want more control
+    over the video generation process.
     """
 
     def __init__(
         self,
         title: str = None,
-        prompt: Prompt = None,
-    ):
+        prompt: MultiModalPrompt = None,
+    ): 
         """
         Initialize the video
 
@@ -43,39 +45,24 @@ class RawImageBasedVideo(Video):
             ValueError: If the source media URL is not set
         """
         if prompt is None:
-            raise ValueError("prompt cannot be None")
+            raise ValueError("raw_image_prompt cannot be None")
 
         super().__init__(prompt)
 
         self._needs_reencoding = False
         if title:
             self.metadata.title = title
-        self.duration = 4.0  # Currently generated videos are 4 seconds long; this will be variable per model later
+        if prompt.duration is None:
+            self.duration = 5.0
+        else:
+            self.duration = prompt.duration
 
     @property
     def short_type_name(self):
         """
         Get the short type name of the video
         """
-        return str(VideoType.RAWIMAGE)
-
-    @log_function_params
-    def get_title(self):
-        if self.metadata.title:
-            summarised_title = self.get_title_from_description(
-                description=self.metadata.title
-            )
-        elif self.prompt and self.prompt.text:
-            summarised_title = self.get_title_from_description(
-                description=self.text
-            )
-        else:
-            summarised_title = "ImagePrompt"
-        self.metadata.title = summarised_title
-        return self.metadata.title
-
-    def get_duration(self):
-        return self.duration
+        return str(VideoType.RAWMULTIMODAL)
 
     def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway):
         return super().run_build_core_logic_hook(build_settings, ml_models_gateway)

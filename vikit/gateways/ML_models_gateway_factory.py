@@ -23,7 +23,7 @@ class MLModelsGatewayFactory:
     the input provided.
     """
 
-    def get_ml_models_gateway(self, test_mode: bool = True, vikit_api_key: str=None):
+    def get_ml_models_gateway(self, test_mode: bool = False, vikit_api_key: str=None):
         if test_mode:
             return FakeMLModelsGateway()
         else:

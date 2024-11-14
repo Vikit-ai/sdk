@@ -34,7 +34,7 @@ class DefaultBGMusicAndAudioMergingHandler(Handler):
         """
         self.duration = music_duration
 
-    async def execute_async(self, video):
+    async def execute_async(self, video, ml_models_gateway):
         """
         Merge background music and video  as a single media file
 

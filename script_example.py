@@ -50,6 +50,7 @@ def get_estimated_duration(composite: CompositeVideo) -> float:
         "dynamicrafter": 2.0,
         "haiper": 4.0,
         "transition": 2.0,
+        "runway": 10.0,
     }
     duration = 0
     for video in composite.video_list:
@@ -84,12 +85,9 @@ async def batch_raw_text_based_prompting(
             interpolate=to_interpolate,
             target_model_provider=model_provider,
             output_video_file_name=output_file,
-            test_mode=False,
         )
 
-        prompt_obj = await PromptFactory(
-            ml_gateway=video_build_settings.get_ml_models_gateway()
-        ).create_prompt_from_text(prompt_content)
+        prompt_obj = await PromptFactory().create_prompt_from_text(prompt_content)
 
         # you can set negative prompt, for the moment it is  effective only for Haiper
         prompt_obj.negative_prompt = negative_prompt
@@ -102,7 +100,6 @@ async def batch_raw_text_based_prompting(
 async def composite_textonly_prompting(
     prompt_file: str, model_provider: str = "stabilityai"
 ):
-    TEST_MODE = False
 
     # It is strongly recommended to activate interpolate for videocrafter model
     to_interpolate = True if model_provider == "videocrafter" else False
@@ -120,7 +117,6 @@ async def composite_textonly_prompting(
 
         video.build_settings = VideoBuildSettings(
             interpolate=to_interpolate,
-            test_mode=TEST_MODE,
             target_model_provider=model_provider,
         )
         # add transitions from time to time
@@ -144,15 +140,12 @@ async def composite_textonly_prompting(
             generate_background_music=True,
             expected_music_length=total_duration * 1.5,
         ),
-        test_mode=TEST_MODE,
         target_model_provider=model_provider,
         output_video_file_name="Composite.mp4",
         expected_length=total_duration,
         include_read_aloud_prompt=True,
     )
-    prompt = await PromptFactory(
-        ml_gateway=composite_build_settings.get_ml_models_gateway()
-    ).create_prompt_from_text(subtitle_total)
+    prompt = await PromptFactory().create_prompt_from_text(subtitle_total)
     # you can set negative prompt, for the moment it is  effective only for Haiper
     prompt.negative_prompt = negative_prompt
     composite_build_settings.prompt = prompt
@@ -163,23 +156,19 @@ async def composite_textonly_prompting(
 async def create_single_image_based_video(
     prompt_content,
     build_settings=None,
-    test_mode: bool = False,
     output_filename: str = None,
     text: str = None,
 ):
     """text: would be basically used for music generation, if applicable"""
     if build_settings is None:
         build_settings = VideoBuildSettings(
-            test_mode=test_mode,
             target_model_provider="stabilityai_image",
             output_video_file_name=output_filename,
         )
-    image_prompt = PromptFactory(
-        ml_gateway=build_settings.get_ml_models_gateway()
-    ).create_prompt_from_image(image_path=prompt_content, text=text)
+    image_prompt = PromptFactory().create_prompt_from_image(image=prompt_content, text=text)
 
     video = RawImageBasedVideo(
-        raw_image_prompt=image_prompt.image,
+        prompt=image_prompt,
     )
     video.build_settings = build_settings
     build_settings.prompt = image_prompt
@@ -204,7 +193,6 @@ async def batch_image_based_prompting(prompt_file: str):
             target_model_provider="stabilityai_image",
             output_video_file_name=output_file,
             expected_length=4,
-            test_mode=False,
         )
 
         video, _ = await create_single_image_based_video(
@@ -223,13 +211,11 @@ async def batch_image_based_prompting(prompt_file: str):
 
 async def composite_imageonly_prompting(prompt_file: str):
 
-    TEST_MODE = False
-    model_provider = "stabilityai_image"
+    model_provider = "videocrafter"
 
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
 
     single_video_buildsettings = VideoBuildSettings(
-        test_mode=TEST_MODE,
         target_model_provider=model_provider,
     )
 
@@ -241,6 +227,7 @@ async def composite_imageonly_prompting(prompt_file: str):
         video, _ = await create_single_image_based_video(
             prompt_content=prompt_content,
             build_settings=single_video_buildsettings,
+            text="Moving fast"
         )
         # Add transitions from time to time
         if i >= 1 and i % 2 == 0:
@@ -260,7 +247,6 @@ async def composite_imageonly_prompting(prompt_file: str):
             generate_background_music=True,
             expected_music_length=total_duration * 1.5,
         ),
-        test_mode=TEST_MODE,
         target_model_provider=model_provider,
         output_video_file_name="Composite.mp4",
         expected_length=total_duration,
@@ -276,14 +262,12 @@ async def composite_mixed_prompting(
     prompt_file: str, text_to_video_model_provider: str = "stabilityai"
 ):
 
-    TEST_MODE = False
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
 
     # It is strongly recommended to activate interpolate for videocrafter model
     to_interpolate = True if text_to_video_model_provider == "videocrafter" else False
 
     text_based_video_buildsettings = VideoBuildSettings(
-        test_mode=TEST_MODE,
         target_model_provider=text_to_video_model_provider,
         interpolate=to_interpolate,
     )
@@ -297,13 +281,13 @@ async def composite_mixed_prompting(
 
         if prompt_type == "image":
             image_based_video_buildsettings = VideoBuildSettings(
-                test_mode=TEST_MODE,
                 target_model_provider="stabilityai_image",
             )
             video, image_based_video_buildsettings = (
                 await create_single_image_based_video(
                     prompt_content=prompt_content,
                     build_settings=image_based_video_buildsettings,
+                    text="Moving fast"
                 )
             )
 
@@ -334,7 +318,6 @@ async def composite_mixed_prompting(
             generate_background_music=True,
             expected_music_length=total_duration * 1.5,
         ),
-        test_mode=TEST_MODE,
         output_video_file_name="Composite.mp4",
         expected_length=total_duration,
     )
@@ -359,16 +342,35 @@ async def prompt_based_composite(prompt: str, model_provider="stabilityai"):
         target_model_provider=model_provider,
         output_video_file_name="Composite.mp4",
         interpolate=to_interpolate,
-        test_mode=False,
     )
 
     gw = video_build_settings.get_ml_models_gateway()
-    prompt = await PromptFactory(ml_gateway=gw).create_prompt_from_text(prompt)
+    prompt = await PromptFactory(ml_models_gateway=gw).create_prompt_from_text(prompt)
     # you can set negative prompt, for the moment it is  effective only for Haiper
     prompt.negative_prompt = negative_prompt
     video = PromptBasedVideo(prompt=prompt)
     await video.build(build_settings=video_build_settings)
 
+
+async def colabCode():
+    working_folder="./examples/inputs/PromptbasedVideo/"
+    with WorkingFolderContext(working_folder):
+        video_build_settings = VideoBuildSettings(
+            music_building_context=MusicBuildingContext(
+                apply_background_music=True,
+                generate_background_music=True,
+            ),
+            include_read_aloud_prompt=True,
+            target_model_provider="runway", #Available models: videocrafter, stabilityai, haiper
+            output_video_file_name="AICosmetics.mp4",
+            interpolate=True,
+        )
+
+        prompt = "Unlock your radiance with AI Cosmetics."  # @param {type:"string"}
+
+        prompt = await PromptFactory().create_prompt_from_text(prompt)
+        video = PromptBasedVideo(prompt=prompt)
+        await video.build(build_settings=video_build_settings)
 
 if __name__ == "__main__":
 
@@ -435,3 +437,6 @@ if __name__ == "__main__":
             logger.add("log.txt")
             prompt = """Paris, the City of Light, is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere. The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions. Paris is also famous for its charming cafes, chic boutiques, and world-class cuisine, offering visitors a delightful blend of history, elegance, and joie de vivre along the scenic Seine River."""
             asyncio.run(prompt_based_composite(prompt=prompt))
+    
+    elif run_an_example == 7:
+        asyncio.run(colabCode())

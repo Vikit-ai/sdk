@@ -24,6 +24,7 @@ class PromptByRawUserTextHandler(Handler):
     async def execute_async(
         self,
         text_prompt: str,
+        ml_models_gateway,
         **kwargs,
     ):
         """
@@ -47,7 +48,7 @@ class PromptByRawUserTextHandler(Handler):
         (
             enhanced_prompt,
             title,
-        ) = await prompt_build_settings.get_ml_models_gateway().get_enhanced_prompt_async(
+        ) = await ml_models_gateway.get_enhanced_prompt_async(
             text_prompt
         )
         logger.info(

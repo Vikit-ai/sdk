@@ -21,6 +21,8 @@ import vikit.common.config as config
 from vikit.prompt.prompt import Prompt
 from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
 
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
+
 
 class RecordedPrompt(Prompt):
     """
@@ -28,10 +30,12 @@ class RecordedPrompt(Prompt):
     to generate a prompt from a recorded audio file, like a podcast or a video soundtrack (e.g. a musical video clip)
     """
 
-    def __init__(self, audio_recording=None, subtitles=None, duration=None, text=None):
+    def __init__(self, audio_recording=None, subtitles=None, duration=None, text=None, build_settings: PromptBuildSettings = PromptBuildSettings()):
         """
         Initialize the prompt with the path to the recorded audio prompt
         """
+        super().__init__(build_settings = build_settings)
+        
         self.audio_recording = audio_recording
         self.subtitles: list[pysrt.SubRipItem] = subtitles
         self.duration = duration

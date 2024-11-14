@@ -20,6 +20,10 @@ from loguru import logger
 
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.prompt.prompt_factory import PromptFactory
+from tests.testing_medias import get_test_prompt_image
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+
+TEST_PROMPT = get_test_prompt_image()
 
 
 class TestPromptFactory:
@@ -29,6 +33,13 @@ class TestPromptFactory:
         warnings.simplefilter("ignore", category=UserWarning)
         logger.add("log_test_prompt_building_handlers.txt", rotation="10 MB")
 
+    @pytest.mark.local_integration
+    async def test_override_model_provider(self):
+        image_prompt = await PromptFactory(
+                prompt_build_settings=PromptBuildSettings()
+            ).create_prompt_from_image(image=TEST_PROMPT, text="test image prompt", model_provider="fake model")
+        assert image_prompt.build_settings.model_provider == "fake model", "The prompt model should be overrided when model_provider is not None"
+
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_reengineer_prompt_from_text(self):
@@ -37,7 +48,7 @@ class TestPromptFactory:
             generate_from_llm_keyword=True, generate_from_llm_prompt=False
         )
 
-        text_prompt = await PromptFactory().get_reengineered_prompt_text_from_raw_text(
+        text_prompt = await PromptFactory(ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)).get_reengineered_prompt_text_from_raw_text(
             prompt="this is a test prompt", prompt_build_settings=pt_build_settings
         )
         assert isinstance(text_prompt, str), "Prompt should be a TextPrompt"
@@ -47,6 +58,6 @@ class TestPromptFactory:
     @pytest.mark.asyncio
     async def test_reengineer_prompt_from_text_noinputs(self):
         with pytest.raises(AttributeError):
-            _ = await PromptFactory().get_reengineered_prompt_text_from_raw_text(
+            _ = await PromptFactory(ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)).get_reengineered_prompt_text_from_raw_text(
                 prompt=None, prompt_build_settings=None
             )

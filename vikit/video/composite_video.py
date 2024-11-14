@@ -99,7 +99,6 @@ class CompositeVideo(Video, is_composite_video):
                 music_building_context=MusicBuildingContext(
                     apply_background_music=False
                 ),
-                test_mode=self.build_settings.test_mode,
                 target_model_provider=self.build_settings.target_model_provider,
                 vikit_api_key=self.build_settings.vikit_api_key,
             )
@@ -194,6 +193,7 @@ class CompositeVideo(Video, is_composite_video):
 
     async def run_build_core_logic_hook(
         self,
+        ml_models_gateway,
         build_settings=VideoBuildSettings(),
     ):
         """
@@ -226,7 +226,7 @@ class CompositeVideo(Video, is_composite_video):
             ]
             await asyncio.gather(
                 *(
-                    v.build(self.get_children_build_settings())
+                    v.build(self.get_children_build_settings(), ml_models_gateway=ml_models_gateway)
                     for v in no_dependency_videos
                 )
             )
@@ -243,7 +243,8 @@ class CompositeVideo(Video, is_composite_video):
                     if dependencies_processed:
                         tasks.append(
                             video.build(
-                                build_settings=self.get_children_build_settings()
+                                build_settings=self.get_children_build_settings(),
+                                ml_models_gateway=ml_models_gateway,
                             )
                         )
                         with_dependency_videos.remove(video)

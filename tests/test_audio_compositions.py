@@ -34,6 +34,7 @@ from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handl
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.imported_video import ImportedVideo
 from vikit.video.video import VideoBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 
 class TestAudioCompositions:
@@ -60,7 +61,7 @@ class TestAudioCompositions:
             handler = ReadAloudPromptAudioMergingHandler(
                 recorded_prompt=test_prompt_library["moss_stones-train_boy"]
             )
-            res_vid = await handler.execute_async(video=video)
+            res_vid = await handler.execute_async(video=video, ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
 
             assert res_vid is not None, "Video was not generated properly"
             assert res_vid.media_url is not None, "Media URL was not generated properly"
@@ -82,7 +83,6 @@ class TestAudioCompositions:
                     ),
                     include_read_aloud_prompt=True,
                     prompt=test_prompt_library["moss_stones-train_boy"],
-                    test_mode=False,
                 )
             )
             assert final_video.media_url is not None
@@ -105,7 +105,6 @@ class TestAudioCompositions:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True
                     ),
-                    test_mode=True,
                 )
             )
 

@@ -86,10 +86,12 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
                         "Error: 'transcription' key exists but has no content."
                     )
             else:
-                raise ValueError(
-                    "Error: 'transcription' key exists but has no content."
-                )
-
+                if "transcription" in subs:
+                    transcription = subs["transcription"]
+                else:
+                    raise ValueError(
+                        "Error: 'transcription' key exists but has no content."
+                    )
             with open(subtitle_file_path, "w") as f:
                 f.write(transcription)
 

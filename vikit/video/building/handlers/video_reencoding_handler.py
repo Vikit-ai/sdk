@@ -21,7 +21,7 @@ from vikit.wrappers.ffmpeg_wrapper import reencode_video
 
 class VideoReencodingHandler(Handler):
 
-    async def execute_async(self, video):
+    async def execute_async(self, video, ml_models_gateway):
         """
         Process the video to reencode and normalize binaries, i.e. make it so the
         different video composing a composite have the same format

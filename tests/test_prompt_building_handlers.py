@@ -17,6 +17,7 @@ import warnings
 
 import pytest
 from loguru import logger
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 from vikit.prompt.building.handlers.prompt_by_keywords_handler import \
     PromptByKeywordsHandler
@@ -37,7 +38,7 @@ class TestPromptBuildingHandlers:
         prompt_handler = PromptByKeywordsHandler()
         text_prompt = str("test")
         prompt_built = await prompt_handler.execute_async(
-            text_prompt=text_prompt, prompt_build_settings=PromptBuildSettings()
+            text_prompt=text_prompt, prompt_build_settings=PromptBuildSettings(), ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
         )
         assert prompt_built is not None, "Prompt built should not be None"
 
@@ -47,6 +48,6 @@ class TestPromptBuildingHandlers:
         prompt_handler = PromptByRawUserTextHandler()
         text_prompt = str("test")
         prompt_built = await prompt_handler.execute_async(
-            text_prompt=text_prompt, prompt_build_settings=PromptBuildSettings()
+            text_prompt=text_prompt, prompt_build_settings=PromptBuildSettings(), ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
         )
         assert prompt_built is not None, "Prompt built should not be None"
