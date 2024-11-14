@@ -112,7 +112,7 @@ class TestFFMPEGWrapper:
                 start_time=1, 
                 end_time=2, 
             )
-            print(get_media_duration(cutted_video))
+            logger.debug("Cutting video, initial video size : " + get_media_duration(cutted_video))
 
             assert int(get_media_duration(cutted_video)) == 1
 
@@ -122,6 +122,5 @@ class TestFFMPEGWrapper:
                 end_time=3, 
             )
 
-            print(get_media_duration(cutted_video))
             assert int(get_media_duration(cutted_video)) == 2
     

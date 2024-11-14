@@ -347,16 +347,16 @@ class Video(ABC):
         #If the user provided a custom-purposed quality check function
         if quality_check is not None and not self.is_composite_video():
             is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
-            print(str(is_qualitative_until) + "eeeeee")
+            logger.debug("After checking, video is qualitative until " + str(is_qualitative_until) + " seconds")
             regeneration_number = 0
             while is_qualitative_until != -1 and is_qualitative_until < 3 and regeneration_number < 4 :
                 logger.info(f"Quality check was negative, rebuilding Video {self.id} ")
                 built_video = await self.gather_and_run_handlers(ml_models_gateway)
                 is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
-                print(str(is_qualitative_until) + "hi hi ")
+                logger.debug("After another checking, video is qualitative until " + str(is_qualitative_until) + " seconds.")
                 regeneration_number = regeneration_number + 1
             
-            if regeneration_number >= 4:
+            if is_qualitative_until < 3 and regeneration_number >= 4:
                 logger.debug(f"We did not manage to generate a qualitative video {self.id}, discarding it")
                 built_video.discarded = True
             elif is_qualitative_until != -1:
@@ -408,7 +408,7 @@ class Video(ABC):
 
         if self.media_url.startswith("http"):
             self.media_url_http = self.media_url #We keep the external video URL for further reuse
-            print("video " + self.media_url_http)
+            logger.debug("Video is a link, storing the link for future online usage : " + self.media_url_http)
 
         self.media_url = await download_or_copy_file(
             url=self.media_url,

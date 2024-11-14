@@ -940,7 +940,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 #Base64 image
                 logger.debug("Resizing image for video generator")
                 image_data= ""
-                print(prompt.image.split('.')[-1] )
+                
                 if prompt.image.split('.') is not None and prompt.image.split('.')[-1] in ["jpg", "png", "jpeg", "bmp", "tiff"]:
                     #Read file path and then convert to Base64
                     with open(prompt.image, "rb") as image_file:
@@ -1029,7 +1029,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             parts_array.append(part)
         elif prompt.image is not None:
             part={}
-            print(prompt.image.split('.')[-1] )
+            
             if prompt.image.split('.') is not None and prompt.image.split('.')[-1] in ["jpg", "png", "jpeg", "bmp", "tiff"]:
                 #Read file path and then convert to Base64
                 with open(prompt.image, "rb") as image_file:
@@ -1070,7 +1070,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             part={}
             video_data = ""
             mimetype = "video/mp4"
-            print(prompt.video.split('.')[-1].lower())
+            
             if prompt.video.split('.') is not None and prompt.video.split('.')[-1].lower() in ["mp4", "mov", "avi", "wmv", "webm"]:
                 #Read file path and then convert to Base64
                 with open(prompt.video, "rb") as video_file:
@@ -1094,20 +1094,20 @@ interesting the resulting music will be. Here is your prompt: '"""
         try:
             async with aiohttp.ClientSession() as session:
                 
-                contentsArray = [{
+                contents_array = [{
                                     "role": "USER",
                                     "parts": parts_array
                                 }]
                 
                 if more_contents is not None:
-                    contentsArray = contentsArray + more_contents
+                    contents_array = contents_array + more_contents
 
                 payload = (
                         {
                             "key": self.vikit_api_key,
                             "model": gemini_version,
                             "input": {
-                                "contents": contentsArray, 
+                                "contents": contents_array, 
                                 "generationConfig": {
                                     "temperature": 0
                                     ,"maxOutputTokens": 8192
@@ -1117,8 +1117,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                     )
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
-                    print(output)
-                    print(response)
+                    
                     logger.debug(f"Response from Gemini: {json.loads(output)['text']}")
                     return json.loads(output)['text']
         except Exception as e:

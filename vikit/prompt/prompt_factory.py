@@ -66,7 +66,7 @@ class PromptFactory:
         self.prompt_factory_uuid = str(uuid.uuid4())
         self.prompt_build_settings = prompt_build_settings
 
-        print("new uuid " + self.prompt_factory_uuid)
+        logger.debug("New PromptFactory uuid " + self.prompt_factory_uuid)
 
         if ml_models_gateway:
             self.ml_models_gateway = ml_models_gateway
