@@ -346,13 +346,20 @@ class Video(ABC):
 
         #If the user provided a custom-purposed quality check function
         if quality_check is not None and not self.is_composite_video():
-            is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
+            is_qualitative_until = -1
+            if (os.path.getsize(built_video.media_url) < 6500000): 
+                is_qualitative_until = await quality_check(built_video.media_url, ml_models_gateway)
+            else:
+                is_qualitative_until = await quality_check(built_video.media_url, ml_models_gateway)
             logger.debug("After checking, video is qualitative until " + str(is_qualitative_until) + " seconds")
             regeneration_number = 0
             while is_qualitative_until != -1 and is_qualitative_until < 3 and regeneration_number < 4 :
                 logger.info(f"Quality check was negative, rebuilding Video {self.id} ")
                 built_video = await self.gather_and_run_handlers(ml_models_gateway)
-                is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
+                if (os.path.getsize(built_video.media_url) < 6500000): 
+                    is_qualitative_until = await quality_check(built_video.media_url, ml_models_gateway)
+                else:
+                    is_qualitative_until = await quality_check(built_video.media_url, ml_models_gateway)
                 logger.debug("After another checking, video is qualitative until " + str(is_qualitative_until) + " seconds.")
                 regeneration_number = regeneration_number + 1
             
