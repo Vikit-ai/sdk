@@ -630,6 +630,29 @@ async def reencode_video(video_url, target_video_name=None):
     if not target_video_name:
         target_video_name = "reencoded_" + get_canonical_name(video_url) + ".mp4"
 
+    logger.debug("Re-encoding video " + video_url + " with name " + target_video_name)
+    logger.debug("ffmpeg " + 
+        "-y " + 
+        "-i " + 
+        video_url + " " + 
+        "-filter:v " + 
+        "fps=24 " + 
+        "-c:v " + 
+        "libx264 " + 
+        "-profile:v " + 
+        "baseline " + 
+        "-level " + 
+        "3.0 " +   # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
+        "-pix_fmt " + 
+        "yuv420p " +   # This tells FFmpeg to use the yuv420p pixel format.
+        "-acodec " + 
+        "aac " + 
+        "-ar " + 
+        "44100 " +   # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
+        "-ac " + 
+        "2 " +   # This tells FFmpeg to use 2 audio channels.
+        target_video_name)
+
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
         "-y",
@@ -696,23 +719,29 @@ async def cut_video(video_url, start_time, end_time, target_duration=None, targe
         target_video_name = "cutted_" + get_canonical_name(video_url) + ".mp4"
 
     logger.debug("ffmpeg " +
+        "-y " + 
         "-i " +
         video_url + " " + 
         "-ss " +
         str(start_time) + " " +
         "-to " +
         str(end_time) + " " +
+        "-c:v " + 
+        "libx264 " +
         target_video_name
     )
 
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
+        "-y",
         "-i", 
         video_url,
         "-ss",
         str(start_time),
         "-to",
         str(end_time),
+        "-c:v",
+        "libx264",
         target_video_name,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
@@ -747,6 +776,7 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
 
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
+        "-y",
         "-i",
         media_url,
         "-vf",
@@ -779,6 +809,80 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
 
     return target_path
 
+
+async def create_zoom_video(image_url, target_duration=3, target_video_name=None, ):
+    """
+    Cuts the video starting at start_time and ending at end_time
+    Args:
+        image_url (str): The image url to zoom in
+        target_duration (float) : Optional, the duration of the output video
+        target_video_name (string) : Optional, the name of the output video
+
+    Returns:
+        Video: The reencoded video
+    """
+
+    assert image_url, "no media URL provided"
+
+    if not target_video_name:
+        target_video_name = "zoom_" + get_canonical_name(image_url) + ".mp4"
+
+    logger.debug("ffmpeg" + " " + 
+        "-y" + " " + 
+        "-framerate" + " " + 
+        "24" + " " + 
+        "-loop" + " " + 
+        "1" + " " + 
+        "-i" + " " + 
+        image_url + " " + 
+        "-vf" + " " + 
+        "\"scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24\"" + " " + 
+        "-c:v" + " " + 
+        "libx264" + " " + 
+        "-t" + " " + 
+        str(target_duration) + " " + 
+        target_video_name)
+
+#ffmpeg -framerate 25 -loop 1 -i 07.jpg -filter_complex "[0:v]scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,trim=duration=5[v]" -map "[v]" -y out.mp4
+
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-y",
+        "-loop",
+        "1",
+        "-i", 
+        image_url,
+        "-vf",
+        "scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24",
+        "-c:v",
+        "libx264",
+        "-t",
+        str(target_duration),
+        target_video_name,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+
+    stdout, stderr = await process.communicate()
+    print(stdout)
+    if process.returncode != 0:
+        error_messages = []
+        if stdout:
+            error_messages.append(f"stdout: {stdout.decode()}")
+        if stderr:
+            error_messages.append(f"stderr: {stderr.decode()}")
+
+        if error_messages:
+            error_message = "ffmpeg command failed with: " + " and ".join(
+                error_messages
+            )
+        else:
+            error_message = "ffmpeg command failed without error output"
+
+        logger.error(error_message)
+        raise Exception(error_message)
+        
+    return target_video_name
 
 async def get_last_frame_as_image_ffmpeg(media_url, target_path=None):
     """

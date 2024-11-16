@@ -36,6 +36,9 @@ TEST_PROMPT_VIDEO = get_cat_video_path()
 async def dummy_quality_check(media_url, ml_models_gateway):
     return -1
 
+async def dummy_quality_check_negative(media_url, ml_models_gateway):
+    return 0
+
 class TestRawMultiModalBasedVideo:
 
     def setUp(self) -> None:
@@ -62,6 +65,30 @@ class TestRawMultiModalBasedVideo:
                         apply_background_music=True, generate_background_music=False
                     )
                 ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True), quality_check=dummy_quality_check
+            )
+
+            assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
+            assert os.path.exists(pbvid.media_url), "The generated video does not exist"
+
+    @pytest.mark.local_integration
+    @pytest.mark.asyncio
+    async def test_quality_check_multimodal_negative(self):
+        with WorkingFolderContext():
+            multimodal_prompt = await PromptFactory(
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
+            ).create_prompt_from_multimodal_async(
+                image=TEST_PROMPT_IMAGE, text="test multimodal prompt", audio=TEST_PROMPT_AUDIO, video=TEST_PROMPT_VIDEO
+            )
+            pbvid = RawMultiModalBasedVideo(
+                prompt=multimodal_prompt,
+                title="test_multimodal_prompt",
+            )
+            await pbvid.build(
+                build_settings=VideoBuildSettings(
+                    music_building_context=MusicBuildingContext(
+                        apply_background_music=True, generate_background_music=False
+                    )
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True), quality_check=dummy_quality_check_negative
             )
 
             assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"

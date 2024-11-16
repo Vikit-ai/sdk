@@ -1123,4 +1123,5 @@ interesting the resulting music will be. Here is your prompt: '"""
                     return json.loads(output)['text']
         except Exception as e:
             logger.error(f"Error calling gemini from prompt: {e}")
+            logger.error(f"Returned by gemini : {output}")
             raise

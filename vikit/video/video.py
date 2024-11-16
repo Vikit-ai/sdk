@@ -38,6 +38,7 @@ from vikit.wrappers.ffmpeg_wrapper import (
     get_last_frame_as_image_ffmpeg,
     get_media_duration,
     cut_video,
+    create_zoom_video,
 )
 from vikit.prompt.prompt import Prompt
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
@@ -347,8 +348,9 @@ class Video(ABC):
         #If the user provided a custom-purposed quality check function
         if quality_check is not None and not self.is_composite_video():
             is_qualitative_until = -1
-            if (os.path.getsize(built_video.media_url) < 6500000): 
-                is_qualitative_until = await quality_check(built_video.media_url, ml_models_gateway)
+            
+            if (os.path.getsize(built_video.media_url) < 6500000 and built_video.media_url_http): #Gemini does not support providing a link to a video if the size is superior to 7mb
+                is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
             else:
                 is_qualitative_until = await quality_check(built_video.media_url, ml_models_gateway)
             logger.debug("After checking, video is qualitative until " + str(is_qualitative_until) + " seconds")
@@ -356,16 +358,22 @@ class Video(ABC):
             while is_qualitative_until != -1 and is_qualitative_until < 3 and regeneration_number < 4 :
                 logger.info(f"Quality check was negative, rebuilding Video {self.id} ")
                 built_video = await self.gather_and_run_handlers(ml_models_gateway)
-                if (os.path.getsize(built_video.media_url) < 6500000): 
-                    is_qualitative_until = await quality_check(built_video.media_url, ml_models_gateway)
+                
+                if (os.path.getsize(built_video.media_url) < 6500000 and built_video.media_url_http): 
+                    is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
                 else:
                     is_qualitative_until = await quality_check(built_video.media_url, ml_models_gateway)
                 logger.debug("After another checking, video is qualitative until " + str(is_qualitative_until) + " seconds.")
                 regeneration_number = regeneration_number + 1
             
             if is_qualitative_until < 3 and regeneration_number >= 4:
-                logger.debug(f"We did not manage to generate a qualitative video {self.id}, discarding it")
-                built_video.discarded = True
+                logger.debug(f"We did not manage to generate a qualitative video {self.id} with AI")
+                if (hasattr(self.prompt, 'image') and self.prompt.image is not None):
+                    logger.debug(f"Generating video {self.id} with ffmpeg by zooming in")
+                    self.media_url = await create_zoom_video(self.prompt.image)
+                else:
+                    logger.debug(f"Discarding video {self.id}")
+                    built_video.discarded = True
             elif is_qualitative_until != -1:
                 logger.debug(f"Video {self.id} is only qualitative until {is_qualitative_until}, reducing it")
                 built_video.media_url = await cut_video(built_video.media_url, 0, is_qualitative_until-1, 5)
