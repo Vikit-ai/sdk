@@ -1030,7 +1030,7 @@ interesting the resulting music will be. Here is your prompt: '"""
         elif prompt.image is not None:
             part={}
             
-            if prompt.image.split('.') is not None and prompt.image.split('.')[-1] in ["jpg", "png", "jpeg", "bmp", "tiff"]:
+            if prompt.image.split('.') is not None and prompt.image.split('.')[-1].lower() in ["jpg", "png", "jpeg", "bmp", "tiff"]:
                 #Read file path and then convert to Base64
                 with open(prompt.image, "rb") as image_file:
                     image_data = image_file.read()
