@@ -940,13 +940,14 @@ interesting the resulting music will be. Here is your prompt: '"""
                 #Base64 image
                 logger.debug("Resizing image for video generator")
                 image_data= ""
-                try: 
-                    # Convert result to Base64
-                    image_data = base64.b64decode(prompt.image)
-                except Exception: 
+                
+                if prompt.image.split('.') is not None and prompt.image.split('.')[-1].lower() in ["jpg", "png", "jpeg", "bmp", "tiff", "webp"]:
                     #Read file path and then convert to Base64
                     with open(prompt.image, "rb") as image_file:
                         image_data = image_file.read()
+                else: 
+                    # Convert result to Base64
+                    image_data = base64.b64decode(prompt.image)
 
                 # Convert the image data to a NumPy array
                 np_arr = np.frombuffer(image_data, np.uint8)
@@ -1000,4 +1001,127 @@ interesting the resulting music will be. Here is your prompt: '"""
                     return output["video_url"]
         except Exception as e:
             logger.error(f"Error generating video from prompt: {e}")
+            raise
+    
+    @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+    async def ask_gemini(self, prompt, gemini_version="gemini-1.5-pro-002", more_contents = None):
+        logger.debug(f"Galling Gemini model {gemini_version} with prompt {prompt} text {prompt.text}")
+
+        if prompt.image is not None:
+            logger.debug(f"Image {prompt.image[:50]}")
+        if prompt.video is not None:
+            logger.debug(f"Video {prompt.video[:50]}")
+        
+        parts_array=[]
+        
+        if prompt.text is not None:
+            part={}
+            part["text"] = prompt.text
+            parts_array.append(part)
+
+        if prompt.image is not None and prompt.image.startswith("http"): 
+            part={}
+            part["fileData"] = {
+                "fileUri": prompt.image, 
+                "mimeType": "image/" + prompt.image.split(".")[-1]
+            }
+
+            parts_array.append(part)
+        elif prompt.image is not None:
+            part={}
+            
+            if prompt.image.split('.') is not None and prompt.image.split('.')[-1].lower() in ["jpg", "png", "jpeg", "bmp", "tiff", "webp"]:
+                #Read file path and then convert to Base64
+                with open(prompt.image, "rb") as image_file:
+                    image_data = image_file.read()
+            else: 
+                # Convert result to Base64
+                image_data = base64.b64decode(prompt.image)
+
+            # Convert the image data to a NumPy array
+            np_arr = np.frombuffer(image_data, np.uint8)
+
+            # Decode the image using OpenCV
+            image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+            # Encode the resized image back to base64
+            _, buffer = cv2.imencode(".png", image)
+
+            # Encode the image as base64
+            img_b64 = base64.b64encode(buffer).decode(
+                "utf-8"
+            )
+
+            part["inline_data"] = {
+                "data": img_b64, 
+                "mimeType": "image/png"
+            }
+            parts_array.append(part)
+        
+        if prompt.video is not None and prompt.video.startswith("http"):
+            part={}
+            part["fileData"] = {
+                "fileUri": prompt.video,
+                "mimeType": "video/mp4"
+            }
+
+            parts_array.append(part)
+        elif prompt.video is not None:
+            part={}
+            video_data = ""
+            mimetype = "video/mp4"
+            
+            #We check if the video is a local path
+            if prompt.video.split('.') is not None and prompt.video.split('.')[-1].lower() in ["mp4", "mov", "avi", "wmv", "webm"]:
+                #Read file path and then convert to Base64
+                with open(prompt.video, "rb") as video_file:
+                    video_data = base64.b64encode(video_file.read()).decode(
+                        "utf-8"
+                    )
+                    mimetype = "video/" + prompt.video.split(".")[-1].lower()
+            else: 
+                # Convert result to Base64
+                video_data = prompt.video
+
+
+
+            part["inlineData"] = {
+                "mimeType": mimetype,
+                "data": video_data
+            }
+
+            parts_array.append(part)
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                
+                contents_array = [{
+                                    "role": "USER",
+                                    "parts": parts_array
+                                }]
+                
+                if more_contents is not None:
+                    contents_array = contents_array + more_contents
+
+                payload = (
+                        {
+                            "key": self.vikit_api_key,
+                            "model": gemini_version,
+                            "input": {
+                                "contents": contents_array, 
+                                "generationConfig": {
+                                    "temperature": 0
+                                    ,"maxOutputTokens": 8192
+                                },
+                            },
+                        },
+                    )
+                async with session.post(vikit_backend_url, json=payload) as response:
+                    output = await response.text()
+                    
+                    logger.debug(f"Response from Gemini: {json.loads(output)['text']}")
+                    return json.loads(output)['text']
+        except Exception as e:
+            logger.error(f"Error calling gemini from prompt: {e}")
+            logger.error(f"Returned by gemini : {output}")
             raise
