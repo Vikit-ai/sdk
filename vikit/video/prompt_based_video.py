@@ -14,7 +14,6 @@
 # ==============================================================================
 
 import os
-import re
 
 import pysrt
 from loguru import logger
@@ -150,7 +149,7 @@ class PromptBasedVideo(CompositeVideo):
             )
         )
         
-        prompt_based_vid = await RawTextBasedVideo(enhanced_prompt_from_prompt_text).prepare_build(
+        prompt_based_vid = await RawTextBasedVideo(enhanced_prompt_from_keywords).prepare_build(
             build_settings=VideoBuildSettings(
                 prompt=enhanced_prompt_from_prompt_text,
                 target_model_provider=build_stgs.target_model_provider,
@@ -158,7 +157,6 @@ class PromptBasedVideo(CompositeVideo):
             ),
             ml_models_gateway=ml_models_gateway,
         )
-
         
         prompt_based_vid2 = await RawTextBasedVideo(enhanced_prompt_from_prompt_text).prepare_build(
             build_settings=VideoBuildSettings(
