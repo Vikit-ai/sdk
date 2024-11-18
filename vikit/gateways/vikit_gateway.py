@@ -1005,6 +1005,34 @@ interesting the resulting music will be. Here is your prompt: '"""
     
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     async def ask_gemini(self, prompt, gemini_version="gemini-1.5-pro-002", more_contents = None):
+         """
+        Prompts Google Gemini model
+
+        Args:
+            prompt: The Prompt to query Gemini on
+            gemini_version: the version of gemini we want to use
+            more_contents: To get more precise answers, an array of a conversation we want to simulate with gemini after the prompt, in the form 
+            [{
+                "role": "model",
+                "parts": [
+                    {
+                        "text": "I do not agree"
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "text": "Ok, what would be another point of view ?"
+                    }
+                ]
+            }
+            ]
+
+        returns:
+                The link to the generated video
+        """
         logger.debug(f"Galling Gemini model {gemini_version} with prompt {prompt} text {prompt.text}")
 
         if prompt.image is not None:
@@ -1031,11 +1059,11 @@ interesting the resulting music will be. Here is your prompt: '"""
             part={}
             
             if prompt.image.split('.') is not None and prompt.image.split('.')[-1].lower() in ["jpg", "png", "jpeg", "bmp", "tiff", "webp"]:
-                #Read file path and then convert to Base64
+                #Read file path and get Bytes
                 with open(prompt.image, "rb") as image_file:
                     image_data = image_file.read()
             else: 
-                # Convert result to Base64
+                # Image data is a base64, we extract Bytes
                 image_data = base64.b64decode(prompt.image)
 
             # Convert the image data to a NumPy array
@@ -1059,17 +1087,18 @@ interesting the resulting music will be. Here is your prompt: '"""
             parts_array.append(part)
         
         if prompt.video is not None and prompt.video.startswith("http"):
+            videoType = prompt.video.split(".")[-1].split("?")[0]
             part={}
             part["fileData"] = {
                 "fileUri": prompt.video,
-                "mimeType": "video/mp4"
+                "mimeType": "video/" + videoType
             }
 
             parts_array.append(part)
         elif prompt.video is not None:
             part={}
             video_data = ""
-            mimetype = "video/mp4"
+            mimetype = "video/" + videoType
             
             #We check if the video is a local path
             if prompt.video.split('.') is not None and prompt.video.split('.')[-1].lower() in ["mp4", "mov", "avi", "wmv", "webm"]:
@@ -1080,7 +1109,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                     )
                     mimetype = "video/" + prompt.video.split(".")[-1].lower()
             else: 
-                # Convert result to Base64
+                #Result is already a base64
                 video_data = prompt.video
 
 
