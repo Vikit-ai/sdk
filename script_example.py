@@ -375,7 +375,7 @@ async def colabCode():
 
 async def is_qualitative_until(media_url, ml_models_gateway, gemini_version="gemini-1.5-pro-002"):
 
-    prompt_is_outside = await PromptFactory().create_prompt_from_multimodal_async(text="""
+    prompt_is_outdoor = await PromptFactory().create_prompt_from_multimodal_async(text="""
 You are an part of a program that will determine if a video should be processed further.
 
 If the scene showcases an human, output True.
@@ -385,9 +385,9 @@ If theere is no human, output False.
 Output ONLY True or False nothing else. No other text or characters are allowed. Do not get wrong. Do not output any text.
 
     """,  video=media_url)
-    is_outside = await ml_models_gateway.ask_gemini(prompt_is_outside, gemini_version)
+    is_outdoor = await ml_models_gateway.ask_gemini(prompt_is_outdoor, gemini_version)
 
-    if ("True" in is_outside): 
+    if ("True" in is_outdoor): 
         print("Outside")
 
         prompt_ouside = await PromptFactory().create_prompt_from_multimodal_async(text="""
