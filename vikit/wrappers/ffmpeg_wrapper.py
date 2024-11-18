@@ -630,7 +630,7 @@ async def reencode_video(video_url, target_video_name=None):
     if not target_video_name:
         target_video_name = "reencoded_" + get_canonical_name(video_url) + ".mp4"
 
-    logger.debug("Re-encoding video " + video_url + " with name " + target_video_name)
+    logger.trace("Re-encoding video " + video_url + " with name " + target_video_name)
     logger.debug("ffmpeg " + 
         "-y " + 
         "-i " + 
@@ -703,11 +703,11 @@ async def cut_video(video_url, start_time, end_time, target_duration=None, targe
     """
     Cuts the video starting at start_time and ending at end_time
     Args:
-        video_url (str): The video url to cut
-        start_time (float): The begining time of the video 
-        end_time (float): The end time of the video
-        target_video_name (string) : Optional, the name of the output video
-        target_duration (float) : Optional, the duration of the output video
+        video_url (str): The video url to cut (eg ./videofolder/video.mp4)
+        start_time (float): The begining time of the video in seconds
+        end_time (float): The end time of the video in seconds
+        target_duration (float) : Optional, the duration of the output video in seconds
+        target_video_name (string) : Optional, the name of the output video in seconds
 
     Returns:
         Video: The reencoded video
@@ -812,11 +812,11 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
 
 async def create_zoom_video(image_url, target_duration=3, target_video_name=None, ):
     """
-    Cuts the video starting at start_time and ending at end_time
+    Creates a video zooming into an image for a certain duration
     Args:
         image_url (str): The image url to zoom in
-        target_duration (float) : Optional, the duration of the output video
-        target_video_name (string) : Optional, the name of the output video
+        target_duration (float) : Optional, the duration of the output video in seconds
+        target_video_name (string) : Optional, the name of the output video 
 
     Returns:
         Video: The reencoded video
