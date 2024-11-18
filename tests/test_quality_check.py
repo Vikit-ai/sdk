@@ -25,7 +25,6 @@ from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
-# from unittest.mock import patch, MagicMock, Mock
 from vikit.video.raw_multimodal_based_video import RawMultiModalBasedVideo
 from vikit.video.video import VideoBuildSettings
 
