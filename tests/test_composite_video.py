@@ -158,7 +158,7 @@ class TestCompositeVideo:
         with WorkingFolderContext():
             sections = []
             current_section = []
-            print("current_section", os.getcwd())
+            logger.debug("current_section", os.getcwd())
 
             test_video_gpt = CompositeVideo()
             prompt_text = ""
