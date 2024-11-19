@@ -37,9 +37,12 @@ from vikit.wrappers.ffmpeg_wrapper import (
     get_first_frame_as_image_ffmpeg,
     get_last_frame_as_image_ffmpeg,
     get_media_duration,
+    cut_video,
+    create_zoom_video,
 )
 from vikit.prompt.prompt import Prompt
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.common.config import get_max_file_size_url_gemini
 
 DEFAULT_VIDEO_TITLE = "no-title-yet"
 
@@ -89,8 +92,10 @@ class Video(ABC):
         )
         self._source = None
         self.prompt = prompt
+        self.media_url_http = None
         self.build_settings: VideoBuildSettings = VideoBuildSettings()
         self.are_build_settings_prepared = False
+        self.discarded = False
         self.video_dependencies = (
             []
         )  # Define video dependencies, i.e. the videos that are needed to build the current video
@@ -268,9 +273,15 @@ class Video(ABC):
                 )
                 return False
 
-    def build(self, build_settings: VideoBuildSettings = VideoBuildSettings(), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)):
+    def build(self, build_settings: VideoBuildSettings = VideoBuildSettings(), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False), quality_check=None):
         """
         Build in async but expose a sync interface
+        Args:
+            build_settings (VideoBuildSettings): The build settings to take into account for this build
+            ml_models_gateway (MLModelsGateway): The ML Models Gateway that will call the required models
+            quality_check, optional: A custom quality function, with arguments the video media_url and an 
+                                     MLModelsGateway object, that will return -1 if there is no problem or 
+                                     the second at which a problem is detected in the video
         """
         import asyncio
 
@@ -281,13 +292,13 @@ class Video(ABC):
 
         if loop and loop.is_running():
             # If there's already a running loop, create a new task and wait for it
-            return loop.create_task(self.build_async(build_settings, ml_models_gateway))
+            return loop.create_task(self.build_async(build_settings, ml_models_gateway, quality_check))
         else:
             # If no loop is running, use asyncio.run
-            return asyncio.run(self.build_async(build_settings, ml_models_gateway))
+            return asyncio.run(self.build_async(build_settings, ml_models_gateway, quality_check))
 
     async def build_async(
-        self, build_settings: VideoBuildSettings = VideoBuildSettings(), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
+        self, build_settings: VideoBuildSettings = VideoBuildSettings(), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False), quality_check=None
     ):
         """
         Build the video in the child classes, unless the video is already built, in  which case
@@ -335,9 +346,52 @@ class Video(ABC):
 
         built_video = await self.run_build_core_logic_hook(
             build_settings=build_settings,
-            ml_models_gateway=ml_models_gateway
+            ml_models_gateway=ml_models_gateway,
+            quality_check=quality_check,
         )  # logic from the child classes if any
+
         built_video = await self.gather_and_run_handlers(ml_models_gateway)
+
+        #If the user provided a custom-purposed quality check function
+        if quality_check is not None and not self.is_composite_video():
+            is_qualitative_until = -1
+ 
+            #Gemini does not support providing a link to a video if the size is superior to get_max_length_url_gemini() (6.5mb by default)
+            if (os.path.getsize(built_video.media_url) < get_max_file_size_url_gemini() and built_video.media_url_http): 
+                is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
+            else:
+                is_qualitative_until = await quality_check(built_video.media_url, ml_models_gateway)
+            logger.debug("After checking, video is qualitative until " + str(is_qualitative_until) + " seconds")
+            
+            #If the video has not at least 3 seconds of good quality, we need to regenerate it as it is too short to show it to the user
+            regeneration_number = 0
+            while is_qualitative_until != -1 and is_qualitative_until < 3 and regeneration_number < 4 :
+                logger.info(f"Quality check was negative, rebuilding Video {self.id} ")
+                built_video = await self.gather_and_run_handlers(ml_models_gateway)
+                
+                if (os.path.getsize(built_video.media_url) < get_max_file_size_url_gemini() and built_video.media_url_http): 
+                    is_qualitative_until = await quality_check(built_video.media_url_http, ml_models_gateway)
+                else:
+                    is_qualitative_until = await quality_check(built_video.media_url, ml_models_gateway)
+                logger.debug("After another checking, video is qualitative until " + str(is_qualitative_until) + " seconds.")
+                regeneration_number = regeneration_number + 1
+            
+            #If we made more than 3 unsuccessful generation trials, the AI engine is not capable of generaing qualitative content. We just output a naive zoom video if we have an image, and discard the video if we just have text
+            #If the video has 3 or more seconds of qualitative content, we can cut it to discard unqualitative content
+            #If the video is qualitative (function results -1), we just keep the media_url we had before unchanged
+            if is_qualitative_until != -1:
+                if is_qualitative_until < 3 and regeneration_number >= 4: #Special case: we did 3 trials and did not manage to get at least 3 qualitative seconds
+                    logger.debug(f"We did not manage to generate a qualitative video {self.id} with AI")
+                    if (hasattr(self.prompt, 'image') and self.prompt.image is not None):
+                        logger.debug(f"Generating video {self.id} with ffmpeg by zooming in")
+                        self.media_url = await create_zoom_video(self.prompt.image)
+                    else:
+                        logger.debug(f"Discarding video {self.id}")
+                        built_video.discarded = True
+                else
+                    logger.debug(f"Video {self.id} is only qualitative until {is_qualitative_until}, reducing it")
+                    built_video.media_url = await cut_video(built_video.media_url, 0, is_qualitative_until-1, 5)
+            #Else : is_qualitative_until = -1, we just keep the original built_video.media_url
 
         logger.debug(f"Starting the post build hook for Video {self.id} ")
         await self.run_post_build_actions_hook(build_settings=build_settings)
@@ -381,6 +435,11 @@ class Video(ABC):
                 assert built_video.media_url, "The video media URL is not set"
 
         self.metadata.title = self.get_title()
+
+        if self.media_url.startswith("http"):
+            self.media_url_http = self.media_url #We keep the external video URL for further reuse
+            logger.debug("Video is a link, storing the link for future online usage : " + self.media_url_http)
+
         self.media_url = await download_or_copy_file(
             url=self.media_url,
             local_path=self.get_file_name_by_state(self.build_settings),
@@ -391,7 +450,7 @@ class Video(ABC):
 
         return built_video
 
-    async def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway):
+    async def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway, quality_check=None):
         """
         Run the core logic of the video building
 
@@ -531,3 +590,12 @@ class Video(ABC):
         Get the core handlers for the video
         """
         return []
+
+    async def is_qualitative(self, media_url, ml_models_gateway): 
+        return True
+
+    async def is_qualitative_until(self, media_url, ml_models_gateway): 
+        return -1
+
+    def is_composite_video(self):
+        return False
