@@ -442,10 +442,10 @@ interesting the resulting music will be. Here is your prompt: '"""
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
 
-        response_json = json.loads(output)
+        #response_json = json.loads(output)
 
-        if "output" in response_json:
-            output = response_json["output"]
+        #if "output" in response_json:
+        #    output = response_json["output"]
 
         if not output.startswith("http"):
             raise AttributeError("The result interpolated link is not a link")
