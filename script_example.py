@@ -31,6 +31,7 @@ from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.seine_transition import SeineTransition
 from vikit.video.transition import Transition
 from vikit.video.video import VideoBuildSettings
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 negative_prompt = """bad anatomy, bad hands, missing fingers, extra fingers, three hands, 
 three legs, bad arms, missing legs, missing arms, poorly drawn face, bad face, fused face, 
@@ -50,7 +51,7 @@ def get_estimated_duration(composite: CompositeVideo) -> float:
         "dynamicrafter": 2.0,
         "haiper": 4.0,
         "transition": 2.0,
-        "runway": 10.0,
+        "runway": 5.0,
     }
     duration = 0
     for video in composite.video_list:
@@ -361,7 +362,7 @@ async def colabCode():
                 generate_background_music=True,
             ),
             include_read_aloud_prompt=True,
-            target_model_provider="runway", #Available models: videocrafter, stabilityai, haiper
+            target_model_provider="videocrafter", #Available models: videocrafter, stabilityai, haiper
             output_video_file_name="AICosmetics.mp4",
             interpolate=True,
         )
@@ -371,6 +372,79 @@ async def colabCode():
         prompt = await PromptFactory().create_prompt_from_text(prompt)
         video = PromptBasedVideo(prompt=prompt)
         await video.build(build_settings=video_build_settings)
+
+async def is_qualitative_until(media_url, ml_models_gateway, gemini_version="gemini-1.5-pro-002"):
+
+    prompt_is_outdoor = await PromptFactory().create_prompt_from_multimodal_async(text="""
+You are an part of a program that will determine if a video should be processed further.
+
+If the scene showcases an human, output True.
+
+If theere is no human, output False.
+
+Output ONLY True or False nothing else. No other text or characters are allowed. Do not get wrong. Do not output any text.
+
+    """,  video=media_url)
+    is_outdoor = await ml_models_gateway.ask_gemini(prompt_is_outdoor, gemini_version)
+
+    if ("True" in is_outdoor): 
+        print("Outside")
+
+        prompt_ouside = await PromptFactory().create_prompt_from_multimodal_async(text="""
+You are an part of a program that will determine if a video will be trimmed if yes you will output the second and if not -1. Perform a frame-by-frame analysis of the provided video. 
+
+Identify if there is an human face and if this human face looks blurry, or weird.
+
+If nothing of this happens, respond with -1. Output ONLY the second or -1 nothing else. No other text or characters are allowed. Do not get wrong. Do not output any text.
+        """,  video=media_url)
+        response = await ml_models_gateway.ask_gemini(prompt_ouside, gemini_version)
+        return str(response)
+    else:
+        return -1
+
+async def quality_check_with_gemini():
+    working_folder="./examples/inputs/ImageOnly/"
+    with WorkingFolderContext(working_folder):
+        gemini_prompt="""
+            **Instruction:**  You are a prompt generator specializing in creating text prompts for Runway Gen-3 Alpha, an AI video generation model.  Given an input image and a desired camera movement, you will output a concise and effective prompt that achieves the desired effect.  The prompt should adhere to Runway's best practices for optimal results.
+
+            **Input Image:** [Insert Image Here]
+
+            **Desired Camera Movement:** Analyze the provided image and determine the most effective camera movement to transform it into a compelling real estate video.  Choose from the following options: slowly zoom in. The camera movement must be smooth and stable, and no elements should be added to the image.  The goal is to showcase the space in the most appealing way. If there is a window somewhere, the zoom should go in the other direction.
+
+            **Output:** A single, concise text prompt designed for Runway Gen-3 Alpha that will animate the input image using the chosen camera movement.  The prompt should be less than 20 words if possible, and prioritize clarity and precision. Do not include any explanation or commentary, only the prompt itself.
+            """
+
+        ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
+
+        video_build_settings = VideoBuildSettings(
+            output_video_file_name="image.mp4",
+            target_model_provider="runway",
+        )
+
+        vid_cp_final = CompositeVideo()
+        vid_cp_final._is_root_video_composite = True
+        for i in range(1, 4):
+            current_image = str(i) + ".jpg"
+            prompt = await PromptFactory().create_prompt_from_multimodal_async(text=gemini_prompt,  image=current_image, reengineer_text_prompt_from_image_and_text=True)
+            
+            # Query Gemini to get an appropriate prompt
+            response = await ml_models_gateway.ask_gemini(prompt)
+            
+            #Then we create an image based video for the last video, for example to showcase a product
+            image_prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_image(
+                    image=current_image,
+                    text=response.strip() + ". Slow motion.",
+                    model_provider="runway",
+                )
+
+            image_based_video = RawImageBasedVideo(prompt=image_prompt)
+            vid_cp_final.append_video(image_based_video)
+        
+        await vid_cp_final.build(ml_models_gateway=ml_models_gateway, build_settings=video_build_settings, quality_check=is_qualitative_until)
+        print(f"Saved video {vid_cp_final.media_url}")
+
+
 
 if __name__ == "__main__":
 
@@ -440,3 +514,5 @@ if __name__ == "__main__":
     
     elif run_an_example == 7:
         asyncio.run(colabCode())
+    elif run_an_example == 8:
+        asyncio.run(quality_check_with_gemini())

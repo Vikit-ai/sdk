@@ -150,15 +150,15 @@ class BuildOutputAssertor():
         Check that the number of subtitle files is as expected
         """
         if len(self._subtitles) != nb_files_expected:
-            print("Found subtitle files: ", self._subtitle)
+            logger.debug("Found subtitle files: ", self._subtitle)
 
     def assert_exists_generated_audio_prompt(self, nb_files_expected):
-    pass
+        pass
 
 
     def assert_exists_generated_bg_music(self, nb_files_expected):
-    pass
+        pass
 
 
     def assert_exists_default_bg_music(self, nb_files_expected):
-    pass
+        pass

@@ -39,7 +39,6 @@ def get_media_polling_interval() -> int:
         raise Exception("MEDIA_POLLING_INTERVAL is not set")
     return int(media_polling_interval)
 
-
 def get_default_background_music() -> str:
     default_background_music = os.getenv("DEFAULT_BACKGROUND_MUSIC", None)
     if default_background_music is None:
@@ -179,4 +178,10 @@ def get_video_list_file_name(uuid = creation_uuid):
     video_list_file_name = os.getenv("VIDEO_LIST_FILE_NAME", "videosToMerge" + uuid + ".txt")
     if video_list_file_name is None:
         raise Exception("VIDEO_LIST_FILE_NAME is not set")
-    return video_list_file_name
+    return video_list_file_name 
+
+def get_max_file_size_url_gemini() -> int:
+    max_file_size_url_gemini = os.getenv("MAX_FILE_SIZE_URL_GEMINI", 6500000)
+    if max_file_size_url_gemini is None:
+        raise Exception("MAX_FILE_SIZE_URL_GEMINI is not set")
+    return int(max_file_size_url_gemini)
