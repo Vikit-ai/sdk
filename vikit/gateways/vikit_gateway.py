@@ -1005,7 +1005,7 @@ interesting the resulting music will be. Here is your prompt: '"""
     
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     async def ask_gemini(self, prompt, gemini_version="gemini-1.5-pro-002", more_contents = None):
-         """
+        """
         Prompts Google Gemini model
 
         Args:
@@ -1121,6 +1121,8 @@ interesting the resulting music will be. Here is your prompt: '"""
 
             parts_array.append(part)
 
+        output=""
+        print(len(parts_array))
         try:
             async with aiohttp.ClientSession() as session:
                 

@@ -388,7 +388,7 @@ class Video(ABC):
                     else:
                         logger.debug(f"Discarding video {self.id}")
                         built_video.discarded = True
-                else
+                else:
                     logger.debug(f"Video {self.id} is only qualitative until {is_qualitative_until}, reducing it")
                     built_video.media_url = await cut_video(built_video.media_url, 0, is_qualitative_until-1, 5)
             #Else : is_qualitative_until = -1, we just keep the original built_video.media_url
@@ -590,12 +590,6 @@ class Video(ABC):
         Get the core handlers for the video
         """
         return []
-
-    async def is_qualitative(self, media_url, ml_models_gateway): 
-        return True
-
-    async def is_qualitative_until(self, media_url, ml_models_gateway): 
-        return -1
 
     def is_composite_video(self):
         return False

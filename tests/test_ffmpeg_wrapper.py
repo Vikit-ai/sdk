@@ -138,14 +138,14 @@ class TestFFMPEGWrapper:
         with WorkingFolderContext():
             zoomed_video = await create_zoom_video(
                 image_url=tests_medias.get_test_prompt_image(),
+                target_duration=5,
             )
             logger.debug("Cutting video, initial video size : " + str(get_media_duration(zoomed_video)))
-
+            
             assert int(get_media_duration(zoomed_video)) == 5
 
             zoomed_video = await create_zoom_video(
-                image_url=tests_medias.get_test_prompt_image(),
-                target_duration=3,
+                image_url=tests_medias.get_test_prompt_image()
             )
-
+            
             assert int(get_media_duration(zoomed_video)) == 3
