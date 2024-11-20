@@ -333,16 +333,17 @@ class VikitGateway(MLModelsGateway):
 
             async with session.post(vikit_backend_url, json=payload) as response:
                 result_music_link = await response.text()
+                print(result_music_link)
 
         if result_music_link is None:
             raise AttributeError("The result music link is None")
         if len(result_music_link) < 1:
             raise AttributeError("The result music link is empty")
 
-        response_json = json.loads(result_music_link)
+        #response_json = json.loads(result_music_link)
 
-        if "output" in response_json:
-            result_music_link = response_json["output"]
+        #if "output" in response_json:
+        #    result_music_link = response_json["output"]
 
         if not result_music_link.startswith("http"):
             raise AttributeError("The result music link is not a link")
@@ -441,10 +442,10 @@ interesting the resulting music will be. Here is your prompt: '"""
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
 
-        response_json = json.loads(output)
+        #response_json = json.loads(output)
 
-        if "output" in response_json:
-            output = response_json["output"]
+        #if "output" in response_json:
+        #    output = response_json["output"]
 
         if not output.startswith("http"):
             raise AttributeError("The result interpolated link is not a link")
@@ -794,6 +795,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 The link to the generated video
         """
         logger.debug(f"Generating video from prompt: {prompt.text}")
+
         async with aiohttp.ClientSession(timeout=http_timeout) as session:
             payload = {
                 "key": self.vikit_api_key,
@@ -807,14 +809,14 @@ interesting the resulting music will be. Here is your prompt: '"""
             }
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
-
-        response_json = json.loads(output)
-
-        if "output" in response_json:
-            output = response_json["output"]
+        
+        #response_json = json.loads(output)
+        logger.debug(f"Response from VideoCrafter2 Backend: {output}")
+        #if "output" in response_json:
+        #    output = response_json["output"]
 
         if not output.startswith("http"):
-            raise AttributeError("The result Videocrafter video link is not a link")
+            raise AttributeError("The result Videocrafter response is not a link ")
         return output
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
@@ -1122,7 +1124,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             parts_array.append(part)
 
         output=""
-        print(len(parts_array))
+        
         try:
             async with aiohttp.ClientSession() as session:
                 

@@ -345,8 +345,8 @@ async def prompt_based_composite(prompt: str, model_provider="stabilityai"):
         interpolate=to_interpolate,
     )
 
-    gw = video_build_settings.get_ml_models_gateway()
-    prompt = await PromptFactory(ml_models_gateway=gw).create_prompt_from_text(prompt)
+    prompt = await PromptFactory().create_prompt_from_text(prompt)
+
     # you can set negative prompt, for the moment it is  effective only for Haiper
     prompt.negative_prompt = negative_prompt
     video = PromptBasedVideo(prompt=prompt)
@@ -509,8 +509,8 @@ if __name__ == "__main__":
         # Example 6 - Create a prompt-based videos
         with WorkingFolderContext("./examples/inputs/PromptBased/"):
             logger.add("log.txt")
-            prompt = """Paris, the City of Light, is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere. The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions. Paris is also famous for its charming cafes, chic boutiques, and world-class cuisine, offering visitors a delightful blend of history, elegance, and joie de vivre along the scenic Seine River."""
-            asyncio.run(prompt_based_composite(prompt=prompt))
+            prompt = """Paris, the City of Light """ #is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere. The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions. Paris is also famous for its charming cafes, chic boutiques, and world-class cuisine, offering visitors a delightful blend of history, elegance, and joie de vivre along the scenic Seine River."""
+            asyncio.run(prompt_based_composite(prompt=prompt, model_provider="videocrafter"))
     
     elif run_an_example == 7:
         asyncio.run(colabCode())
