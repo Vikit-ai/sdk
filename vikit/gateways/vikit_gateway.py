@@ -1100,7 +1100,6 @@ interesting the resulting music will be. Here is your prompt: '"""
         elif prompt.video is not None:
             part={}
             video_data = ""
-            mimetype = "video/" + videoType
             
             #We check if the video is a local path
             if prompt.video.split('.') is not None and prompt.video.split('.')[-1].lower() in ["mp4", "mov", "avi", "wmv", "webm"]:
