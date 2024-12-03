@@ -21,11 +21,20 @@ from loguru import logger
 
 import tests.testing_medias as tests_medias
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.wrappers.ffmpeg_wrapper import concatenate_videos, reencode_video, cut_video, get_media_duration, create_zoom_video
+from vikit.wrappers.ffmpeg_wrapper import (
+    concatenate_videos,
+    reencode_video,
+    cut_video,
+    get_media_duration,
+    create_zoom_video,
+    extract_audio_from_video,
+)
+
+import math
 
 
 class TestFFMPEGWrapper:
-    def setup():
+    def setup(self):
         logger.add("log_test_ffmpegwrapper.txt", rotation="10 MB")
         warnings.simplefilter("ignore", category=UserWarning)
         warnings.simplefilter("ignore", ResourceWarning)
@@ -109,24 +118,33 @@ class TestFFMPEGWrapper:
         with WorkingFolderContext():
             cutted_video = await cut_video(
                 video_url=tests_medias.get_cat_video_path(),
-                start_time=1, 
-                end_time=2, 
+                start_time=1,
+                end_time=2,
             )
-            logger.debug("Cutting video, video size before cut: " + str(get_media_duration(tests_medias.get_cat_video_path())) + " and after cut: " + str(get_media_duration(cutted_video)))
+            logger.debug(
+                "Cutting video, video size before cut: "
+                + str(get_media_duration(tests_medias.get_cat_video_path()))
+                + " and after cut: "
+                + str(get_media_duration(cutted_video))
+            )
 
             assert int(get_media_duration(cutted_video)) == 1
 
             cutted_video = await cut_video(
                 video_url=tests_medias.get_haiper_video_path(),
-                start_time=1, 
-                end_time=3, 
+                start_time=1,
+                end_time=3,
             )
 
-            logger.debug("Cutting video, video size before cut: " + str(get_media_duration(tests_medias.get_cat_video_path())) + " and after cut: " + str(get_media_duration(cutted_video)))
-
+            logger.debug(
+                "Cutting video, video size before cut: "
+                + str(get_media_duration(tests_medias.get_cat_video_path()))
+                + " and after cut: "
+                + str(get_media_duration(cutted_video))
+            )
 
             assert int(get_media_duration(cutted_video)) == 2
-    
+
     @pytest.mark.local_integration
     @pytest.mark.asyncio
     async def test_create_zoom_video(
@@ -140,12 +158,38 @@ class TestFFMPEGWrapper:
                 image_url=tests_medias.get_test_prompt_image(),
                 target_duration=5,
             )
-            logger.debug("Cutting video, initial video size : " + str(get_media_duration(zoomed_video)))
-            
+            logger.debug(
+                "Cutting video, initial video size : "
+                + str(get_media_duration(zoomed_video))
+            )
+
             assert int(get_media_duration(zoomed_video)) == 5
 
             zoomed_video = await create_zoom_video(
                 image_url=tests_medias.get_test_prompt_image()
             )
-            
+
             assert int(get_media_duration(zoomed_video)) == 3
+
+    @pytest.mark.local_integration
+    @pytest.mark.asyncio
+    async def test_extract_audio(self):
+        """
+        Extract the audio and test its duration
+        """
+        with WorkingFolderContext() as wf:
+            target_audio = await extract_audio_from_video(
+                video_full_path=tests_medias.get_paris_video(),
+                target_dir=os.path.join(wf.original_path, wf.path),
+            )
+            logger.debug(
+                "Extracting audio, video duration: "
+                + str(get_media_duration(tests_medias.get_cat_video_path()))
+                + " and audio duration: "
+                + str(get_media_duration(target_audio))
+            )
+            assert math.isclose(
+                get_media_duration(target_audio),
+                get_media_duration(tests_medias.get_paris_video()),
+                rel_tol=0.05,
+            )
