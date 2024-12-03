@@ -25,6 +25,34 @@ from vikit.common.decorators import log_function_params
 from vikit.common.file_tools import get_canonical_name
 
 
+async def extract_audio_from_video(video_full_path, target_dir):
+    """
+    Extract all audio tracks from a video and output them as separate files.
+    Naive implementation:
+        - we do not check the existence of audio stream,
+        - we do not check the pre-existence of the output file,
+
+    Args:
+        video_full_path (str): Full path of the input video file.
+        target_dir: Directory where to store audio file
+
+    Returns:
+       The output audio file path
+
+    """
+    # set the output file
+    target_file_path = os.path.join(
+        target_dir, os.path.splitext(os.path.basename(video_full_path))[0] + ".wav"
+    )
+
+    # The command you want to execute
+    cmd = ["ffmpeg", "-i", video_full_path, target_file_path]
+
+    # Execute the command
+    subprocess.run(cmd, check=True)
+    return target_file_path
+
+
 @log_function_params
 def has_audio_track(video_path):
     """
@@ -418,17 +446,13 @@ async def _merge_audio_and_video_with_existing_audio(
         str: The merged audio file
 
     """
-    
+
     media_url_to_use = media_url
-    #Special case 
+    # Special case
     if target_file_name == media_url:
         new_media_name = media_url.split(".")[0] + "_." + media_url.split(".")[1]
         logger.debug("Renaming file : ffmpeg mv " + media_url + " " + new_media_name)
-        await asyncio.create_subprocess_exec(
-            "mv", 
-            media_url, 
-            new_media_name
-        )
+        await asyncio.create_subprocess_exec("mv", media_url, new_media_name)
         media_url_to_use = media_url.split(".")[0] + "_." + media_url.split(".")[1]
 
     logger.debug(
@@ -438,11 +462,15 @@ async def _merge_audio_and_video_with_existing_audio(
         + " "
         + "-i"
         + " "
-        + "'" + audio_file_path + "'"
+        + "'"
+        + audio_file_path
+        + "'"
         + " "
         + "-i"
         + " "
-        + "'" + media_url_to_use + "'"
+        + "'"
+        + media_url_to_use
+        + "'"
         + " "
         + "-filter_complex"
         + " "
@@ -631,27 +659,30 @@ async def reencode_video(video_url, target_video_name=None):
         target_video_name = "reencoded_" + get_canonical_name(video_url) + ".mp4"
 
     logger.trace("Re-encoding video " + video_url + " with name " + target_video_name)
-    logger.debug("ffmpeg " + 
-        "-y " + 
-        "-i " + 
-        video_url + " " + 
-        "-filter:v " + 
-        "fps=24 " + 
-        "-c:v " + 
-        "libx264 " + 
-        "-profile:v " + 
-        "baseline " + 
-        "-level " + 
-        "3.0 " +   # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
-        "-pix_fmt " + 
-        "yuv420p " +   # This tells FFmpeg to use the yuv420p pixel format.
-        "-acodec " + 
-        "aac " + 
-        "-ar " + 
-        "44100 " +   # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
-        "-ac " + 
-        "2 " +   # This tells FFmpeg to use 2 audio channels.
-        target_video_name)
+    logger.debug(
+        "ffmpeg "
+        + "-y "
+        + "-i "
+        + video_url
+        + " "
+        + "-filter:v "
+        + "fps=24 "
+        + "-c:v "
+        + "libx264 "
+        + "-profile:v "
+        + "baseline "
+        + "-level "
+        + "3.0 "  # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
+        + "-pix_fmt "
+        + "yuv420p "  # This tells FFmpeg to use the yuv420p pixel format.
+        + "-acodec "
+        + "aac "
+        + "-ar "
+        + "44100 "  # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
+        + "-ac "
+        + "2 "  # This tells FFmpeg to use 2 audio channels.
+        + target_video_name
+    )
 
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
@@ -699,7 +730,10 @@ async def reencode_video(video_url, target_video_name=None):
 
     return target_video_name
 
-async def cut_video(video_url, start_time, end_time, target_duration=None, target_video_name=None):
+
+async def cut_video(
+    video_url, start_time, end_time, target_duration=None, target_video_name=None
+):
     """
     Cuts the video starting at start_time and ending at end_time
     Args:
@@ -718,23 +752,27 @@ async def cut_video(video_url, start_time, end_time, target_duration=None, targe
     if not target_video_name:
         target_video_name = "cutted_" + get_canonical_name(video_url) + ".mp4"
 
-    logger.debug("ffmpeg " +
-        "-y " + 
-        "-i " +
-        video_url + " " + 
-        "-ss " +
-        str(start_time) + " " +
-        "-to " +
-        str(end_time) + " " +
-        "-c:v " + 
-        "libx264 " +
-        target_video_name
+    logger.debug(
+        "ffmpeg "
+        + "-y "
+        + "-i "
+        + video_url
+        + " "
+        + "-ss "
+        + str(start_time)
+        + " "
+        + "-to "
+        + str(end_time)
+        + " "
+        + "-c:v "
+        + "libx264 "
+        + target_video_name
     )
 
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
         "-y",
-        "-i", 
+        "-i",
         video_url,
         "-ss",
         str(start_time),
@@ -765,8 +803,9 @@ async def cut_video(video_url, start_time, end_time, target_duration=None, targe
 
         logger.error(error_message)
         raise Exception(error_message)
-        
+
     return target_video_name
+
 
 async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
     """
@@ -810,13 +849,17 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
     return target_path
 
 
-async def create_zoom_video(image_url, target_duration=3, target_video_name=None, ):
+async def create_zoom_video(
+    image_url,
+    target_duration=3,
+    target_video_name=None,
+):
     """
     Creates a video zooming into an image for a certain duration
     Args:
         image_url (str): The image url to zoom in
         target_duration (float) : Optional, the duration of the output video in seconds
-        target_video_name (string) : Optional, the name of the output video 
+        target_video_name (string) : Optional, the name of the output video
 
     Returns:
         Video: The reencoded video
@@ -827,30 +870,46 @@ async def create_zoom_video(image_url, target_duration=3, target_video_name=None
     if not target_video_name:
         target_video_name = "zoom_" + get_canonical_name(image_url) + ".mp4"
 
-    logger.debug("ffmpeg" + " " + 
-        "-y" + " " + 
-        "-framerate" + " " + 
-        "24" + " " + 
-        "-loop" + " " + 
-        "1" + " " + 
-        "-i" + " " + 
-        image_url + " " + 
-        "-vf" + " " + 
-        "\"scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24\"" + " " + 
-        "-c:v" + " " + 
-        "libx264" + " " + 
-        "-t" + " " + 
-        str(target_duration) + " " + 
-        target_video_name)
+    logger.debug(
+        "ffmpeg"
+        + " "
+        + "-y"
+        + " "
+        + "-framerate"
+        + " "
+        + "24"
+        + " "
+        + "-loop"
+        + " "
+        + "1"
+        + " "
+        + "-i"
+        + " "
+        + image_url
+        + " "
+        + "-vf"
+        + " "
+        + "\"scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24\""
+        + " "
+        + "-c:v"
+        + " "
+        + "libx264"
+        + " "
+        + "-t"
+        + " "
+        + str(target_duration)
+        + " "
+        + target_video_name
+    )
 
-#ffmpeg -framerate 25 -loop 1 -i 07.jpg -filter_complex "[0:v]scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,trim=duration=5[v]" -map "[v]" -y out.mp4
+    # ffmpeg -framerate 25 -loop 1 -i 07.jpg -filter_complex "[0:v]scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,trim=duration=5[v]" -map "[v]" -y out.mp4
 
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
         "-y",
         "-loop",
         "1",
-        "-i", 
+        "-i",
         image_url,
         "-vf",
         "scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24",
@@ -881,8 +940,9 @@ async def create_zoom_video(image_url, target_duration=3, target_video_name=None
 
         logger.error(error_message)
         raise Exception(error_message)
-        
+
     return target_video_name
+
 
 async def get_last_frame_as_image_ffmpeg(media_url, target_path=None):
     """
