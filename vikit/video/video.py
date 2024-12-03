@@ -39,6 +39,7 @@ from vikit.wrappers.ffmpeg_wrapper import (
     get_media_duration,
     cut_video,
     create_zoom_video,
+    reverse_video,
 )
 from vikit.prompt.prompt import Prompt
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
@@ -384,7 +385,7 @@ class Video(ABC):
                     logger.debug(f"We did not manage to generate a qualitative video {self.id} with AI")
                     if (hasattr(self.prompt, 'image') and self.prompt.image is not None):
                         logger.debug(f"Generating video {self.id} with ffmpeg by zooming in")
-                        self.media_url = await create_zoom_video(self.prompt.image)
+                        self.media_url = await reverse_video(await create_zoom_video(self.prompt.image))
                     else:
                         logger.debug(f"Discarding video {self.id}")
                         built_video.discarded = True
