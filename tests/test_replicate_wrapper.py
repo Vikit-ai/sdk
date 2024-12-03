@@ -41,9 +41,7 @@ class TestReplicateWrapper:
     async def test_int_get_keywords_from_prompt(self):
 
         with WorkingFolderContext():
-            ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway(
-                test_mode=False
-            )
+            ml_gw = ML_models_gateway_factory.MLModelsGatewayFactory().get_ml_models_gateway()
 
             test_prompt = await PromptFactory(ml_models_gateway=ml_gw).create_prompt_from_text(
                 SAMPLE_PROMPT_TEXT
