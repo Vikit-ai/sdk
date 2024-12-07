@@ -998,7 +998,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                     output = json.loads(output)
                     if not output["video_url"].startswith("http"):
                         raise AttributeError(
-                            "The result Runway video link is not a link"
+                            "The result Runway video link is not a link: " + str(output)
                         )
                     return output["video_url"]
         except Exception as e:
@@ -1156,4 +1156,4 @@ interesting the resulting music will be. Here is your prompt: '"""
         except Exception as e:
             logger.error(f"Error calling gemini from prompt: {e}")
             logger.error(f"Returned by gemini : {output}")
-            raise
+            raise Exception(output)
