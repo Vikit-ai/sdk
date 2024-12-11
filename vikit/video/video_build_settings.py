@@ -68,3 +68,4 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.target_model_provider = target_model_provider
         self.cascade_build_settings = cascade_build_settings
         self.vikit_api_key = vikit_api_key
+        self.aspect_ratio = aspect_ratio
