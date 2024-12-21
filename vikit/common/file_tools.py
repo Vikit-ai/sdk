@@ -21,7 +21,6 @@ import urllib.parse
 from typing import Optional, Union
 from urllib.error import URLError
 from urllib.request import urlopen
-import asyncio
 
 import aiofiles
 import aiohttp

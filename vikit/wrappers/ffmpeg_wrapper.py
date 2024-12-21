@@ -40,16 +40,31 @@ async def extract_audio_from_video(video_full_path, target_dir):
        The output audio file path
 
     """
+
+    if not os.path.exists(video_full_path):
+        raise FileNotFoundError(f"File {video_full_path} does not exist")
+
     # set the output file
     target_file_path = os.path.join(
         target_dir, os.path.splitext(os.path.basename(video_full_path))[0] + ".wav"
     )
 
+    if os.path.exists(target_file_path):  # Fail open
+        logger.debug(f"File {target_file_path} already exists. Skipping extraction")
+        return target_file_path
+
+    if not os.path.exists(target_dir):  # Fail open
+        os.makedirs(target_dir)
+
     # The command you want to execute
+    # TODO: allow for encoding and frequency selection by end user
     cmd = ["ffmpeg", "-i", video_full_path, target_file_path]
 
     # Execute the command
     subprocess.run(cmd, check=True)
+
+    assert os.path.exists(target_file_path), f"File {target_file_path} does not exist"
+
     return target_file_path
 
 

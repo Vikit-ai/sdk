@@ -13,18 +13,11 @@
 # limitations under the License.
 # ==============================================================================
 
-import warnings
-
 import pytest
-from loguru import logger
 
 from tests.testing_medias import get_paris_subtitle_file, get_paris_video
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.postprocessing.video_subtitle_renderer import VideoSubtitleRenderer
-
-warnings.simplefilter("ignore", category=ResourceWarning)
-warnings.simplefilter("ignore", category=UserWarning)
-logger.add("log_test_async.txt", rotation="10 MB")
 
 PARIS_VIDEO = get_paris_video()
 SUBTITLE_PATH = get_paris_subtitle_file()

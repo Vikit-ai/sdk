@@ -193,3 +193,9 @@ class TestFFMPEGWrapper:
                 get_media_duration(tests_medias.get_paris_video()),
                 rel_tol=0.05,
             )
+
+
+
+
+
+

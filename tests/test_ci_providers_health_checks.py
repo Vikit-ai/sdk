@@ -13,8 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-import warnings
-
 import pytest
 from loguru import logger
 
@@ -22,12 +20,11 @@ from vikit.common.context_managers import WorkingFolderContext
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video import VideoBuildSettings
 
-warnings.simplefilter("ignore", category=ResourceWarning)
-warnings.simplefilter("ignore", category=UserWarning)
-logger.add("log_test_CI_providers_health_checks.txt", rotation="10 MB")
-
 
 class TestProvidersHealthChecks:
+    """
+    Test the providers health checks
+    """
 
     @pytest.mark.integration
     @pytest.mark.asyncio
@@ -38,9 +35,7 @@ class TestProvidersHealthChecks:
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a fantastic day today")
             await video.build_async(
-                build_settings=VideoBuildSettings(
-                    target_model_provider="haiper"
-                )
+                build_settings=VideoBuildSettings(target_model_provider="haiper")
             )
             assert video.media_url is not None
 
@@ -50,9 +45,7 @@ class TestProvidersHealthChecks:
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a fantastic day today")
             await video.build_async(
-                build_settings=VideoBuildSettings(
-                    target_model_provider="stabilityai"
-                )
+                build_settings=VideoBuildSettings(target_model_provider="stabilityai")
             )
             assert video.media_url is not None
 
@@ -62,9 +55,7 @@ class TestProvidersHealthChecks:
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a fantastic day today")
             await video.build_async(
-                build_settings=VideoBuildSettings(
-                    target_model_provider="videocrafter"
-                )
+                build_settings=VideoBuildSettings(target_model_provider="videocrafter")
             )
             assert video.media_url is not None
 
