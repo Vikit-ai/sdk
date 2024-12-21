@@ -18,6 +18,7 @@ import os
 import pytest
 
 import tests.testing_medias as testing_medias
+from vikit.common.file_tools import download_or_copy_file
 from vikit.common.context_managers import WorkingFolderContext
 
 
@@ -36,7 +37,6 @@ class TestFileTools:
         """
         Test the download of a local file
         """
-        from vikit.common.file_tools import download_or_copy_file
 
         with WorkingFolderContext():
 
