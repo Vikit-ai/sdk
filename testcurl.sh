@@ -1,0 +1,1 @@
+curl -d '{"model":"haiper", "vikit_api_key":"Uaal6c7tXfImvxmUDPBvYSiORQTbYIxP", "prompt": "I am writing about a car, a very nice car that is going in the road"}' -H "Content-Type: application/json" -X POST https://mainapi-492268420500.europe-west1.run.app/createvideo

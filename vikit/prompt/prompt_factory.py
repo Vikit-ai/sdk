@@ -279,10 +279,15 @@ class PromptFactory:
 
         args:
             - text: the text of the prompt
+            - reengineer_text: should we reegineer text with an LLM
+            - negative_text: negative text prompt for the model (for the moment only applicable for haiper)
             - image: the image base64, URL or URI of the prompt
             - audio: the audio base64, URL or URI of the prompt
             - video: the video base64, URL or URI of the prompt
-            - duration: expected duration of output
+            - duration: expected duration of the output, should be supported by the model provider
+            - seed: seed to give to the model provider
+            - model_provider: overide model_provider from the video_build_settings
+            - reengineer_text_prompt_from_image_and_text: will use the provided text and image to prompt a vLLM to generate a text that will be sent with the image to the model provider. Useful if text is about something in the image.
 
         returns:
             self

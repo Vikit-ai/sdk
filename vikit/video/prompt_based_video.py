@@ -16,6 +16,7 @@
 import os
 
 import pysrt
+import copy
 from loguru import logger
 
 from vikit.prompt.prompt import Prompt
@@ -71,7 +72,7 @@ class PromptBasedVideo(CompositeVideo):
         Returns:
             The current instance
         """
-        await super().prepare_build(build_settings=build_settings)
+        await super().prepare_build(build_settings=build_settings, ml_models_gateway=ml_models_gateway)
         return await self.compose(build_settings=build_settings, ml_models_gateway=ml_models_gateway)
 
     async def compose(self, build_settings: VideoBuildSettings, ml_models_gateway):
@@ -149,21 +150,17 @@ class PromptBasedVideo(CompositeVideo):
             )
         )
         
+        build_stgs_video_1 = copy.copy(build_stgs)
+        build_stgs_video_1.target_file_name = None
         prompt_based_vid = await RawTextBasedVideo(enhanced_prompt_from_keywords).prepare_build(
-            build_settings=VideoBuildSettings(
-                prompt=enhanced_prompt_from_prompt_text,
-                target_model_provider=build_stgs.target_model_provider,
-                interpolate=build_stgs.interpolate,
-            ),
+            build_settings=build_stgs_video_1,
             ml_models_gateway=ml_models_gateway,
         )
-        
+
+        build_stgs_video_2 = copy.copy(build_stgs)
+        build_stgs_video_2.target_file_name = None
         prompt_based_vid2 = await RawTextBasedVideo(enhanced_prompt_from_prompt_text).prepare_build(
-            build_settings=VideoBuildSettings(
-                prompt=enhanced_prompt_from_prompt_text,
-                target_model_provider=build_stgs.target_model_provider,
-                interpolate=build_stgs.interpolate,
-            ),
+            build_settings=build_stgs_video_2,
             ml_models_gateway=ml_models_gateway
         )
         assert prompt_based_vid is not None, "prompt_based_vid cannot be None"
