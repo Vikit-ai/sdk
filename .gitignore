@@ -117,3 +117,6 @@ examples/inputs/*/*.mp3
 examples/inputs/*/*.srt
 examples/inputs/*/*.txt
 examples/inputs/*/*.jpg
+
+#Pypi
+#.pypirc
