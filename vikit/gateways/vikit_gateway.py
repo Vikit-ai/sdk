@@ -641,7 +641,7 @@ interesting the resulting music will be. Here is your prompt: '"""
         elif model_provider == "" or model_provider is None:
             return await self.generate_video_stabilityai_async(prompt)
         elif model_provider == "haiper":
-            return await self.generate_video_haiper_async(prompt)
+            return await self.generate_video_haiper_async(prompt, aspect_ratio)
         elif model_provider == "videocrafter":
             return await self.generate_video_VideoCrafter2_async(prompt)
         elif model_provider == "dynamicrafter":
@@ -747,7 +747,7 @@ interesting the resulting music will be. Here is your prompt: '"""
         reraise=True,
         wait=wait_exponential(min=1, max=5),
     )
-    async def generate_video_haiper_async(self, prompt):
+    async def generate_video_haiper_async(self, prompt, aspect_ratio):
         """
         Generate a video from the given prompt
 
@@ -759,14 +759,28 @@ interesting the resulting music will be. Here is your prompt: '"""
         """
         try:
             logger.debug(f"Generating video from prompt: {prompt.text}")
+
+            ratio = str(aspect_ratio[0]) + ":" + str(aspect_ratio[1])
+
+            duration = 4 #default duration for Haiper
+            if prompt.duration:
+                duration = prompt.duration
+            
             async with aiohttp.ClientSession(timeout=http_timeout) as session:
                 payload = {
                     "key": self.vikit_api_key,
                     "model": "haiper_text2video",
                     "input": {
                         "prompt": prompt.text,  # + ", 4k",
+                        "negative_prompt": prompt.negative_text,
+                        "settings": {
+                            "aspect_ratio": ratio,
+                            "duration": duration,
+                        },
                     },
                 }
+
+                #Legacy
                 if hasattr(prompt, "negative_prompt"):
                     payload["input"]["negative_prompt"] = prompt.negative_prompt
 
