@@ -426,10 +426,10 @@ async def quality_check_with_gemini():
 
         vid_cp_final = CompositeVideo()
         vid_cp_final._is_root_video_composite = True
-        for i in range(1, 4):
+        for i in range(1, 2):
             current_image = str(i) + ".jpg"
             prompt = await PromptFactory().create_prompt_from_multimodal_async(text=gemini_prompt,  image=current_image, reengineer_text_prompt_from_image_and_text=True)
-            
+
             # Query Gemini to get an appropriate prompt
             response = await ml_models_gateway.ask_gemini(prompt)
             
@@ -438,6 +438,7 @@ async def quality_check_with_gemini():
                     image=current_image,
                     text=response.strip() + ". Slow motion.",
                     model_provider="runway",
+                    duration=10,
                 )
 
             image_based_video = RawImageBasedVideo(prompt=image_prompt)
