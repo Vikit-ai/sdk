@@ -14,23 +14,20 @@
 # ==============================================================================
 
 import os
-import warnings
 
 import pytest
-from loguru import logger
 
 import tests.testing_medias as testing_medias
+from vikit.common.file_tools import download_or_copy_file
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.common.file_tools import (
-    download_or_copy_file,
-)
-
-logger.add("log_test_Filetools.txt", rotation="10 MB")
-warnings.simplefilter("ignore", category=UserWarning)
-warnings.simplefilter("ignore", ResourceWarning)
 
 
 class TestFileTools:
+    """
+    Test the file tools functions
+
+    Includes tests of files required to be stored on public http url, non public accessible cloud storage, and local files
+    """
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
@@ -42,6 +39,7 @@ class TestFileTools:
         """
 
         with WorkingFolderContext():
+
             local_file = testing_medias.get_cat_video_path()
             downloaded_file = await download_or_copy_file(
                 local_file, "downloaded_cat.mp4"

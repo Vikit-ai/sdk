@@ -14,27 +14,28 @@
 # ==============================================================================
 
 import os
-import warnings
 
 import pytest
-from loguru import logger
 
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
-warnings.simplefilter("ignore", category=ResourceWarning)
-warnings.simplefilter("ignore", category=UserWarning)
-logger.add("log_test_async.txt", rotation="10 MB")
-
 
 class TestAsync:
+    """
+    Tests for RawTextBasedVideo
+    """
 
     @pytest.mark.local_integration
     def test_sinc_on_async_build_single_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a prompt text")
-            built = video.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
+            built = video.build(
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                    test_mode=True
+                )
+            )
 
             assert built.media_url is not None
             assert os.path.exists(video.media_url), "The generated video does not exist"
@@ -44,7 +45,11 @@ class TestAsync:
     async def test_build_single_video_no_bg_music_without_subs(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a prompt text")
-            built = await video.build_async(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
+            built = await video.build_async(
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                    test_mode=True
+                )
+            )
 
             assert built.media_url is not None
             assert os.path.exists(video.media_url), "The generated video does not exist"

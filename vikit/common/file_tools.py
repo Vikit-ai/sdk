@@ -21,12 +21,15 @@ import urllib.parse
 from typing import Optional, Union
 from urllib.error import URLError
 from urllib.request import urlopen
-import asyncio
 
 import aiofiles
 import aiohttp
 from loguru import logger
 from tenacity import retry, stop_after_attempt
+
+# Maybe we will consider breaking down the copying logic into modules to prevent adding too many dependencies on external linbs
+from google.cloud import storage
+
 
 from vikit.common.config import get_nb_retries_http_calls
 
@@ -195,7 +198,7 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
 
     # Check if the path is a URL
     parsed_uri = urllib.parse.urlparse(str(path))
-    if parsed_uri.scheme in ["http", "https", "s3", "gs"]:
+    if parsed_uri.scheme in ["http", "https", "gs"]:
         return {"type": parsed_uri.scheme, "path": path}, None
 
     if path.startswith("file://"):
@@ -226,7 +229,7 @@ async def download_or_copy_file(url, local_path):
     Download a file from a URL to a local file asynchronously
 
     Args:
-        url (str): The URL to download the file from
+        url (str): The URL to download the file from (supported: http, https, , gs, local)
         local_path (str): The filename to save the file to
 
     Returns:
@@ -271,5 +274,38 @@ async def download_or_copy_file(url, local_path):
             logger.debug(f"Copying file from {url} to {local_path}")
             shutil.copyfile(url, local_path)
             return local_path
+        elif path_desc["type"] == "gs":
+            return copy_file_from_gcs(
+                bucket=url.split("/")[2],
+                blob_path="/".join(url.split("/")[3:]),
+                destination_file_name=local_path,
+            )
     else:
         raise ValueError(f"Unsupported remote path type: {url} with error: {error}")
+
+
+def copy_file_from_gcs(
+    bucket: str, blob_path: str, destination_file_name: str = "downloaded_file"
+):
+    """
+    Copy a file from Google Cloud storage using the API
+
+    params:
+        gcs_full_url: the full URL of the file to copy
+        blob_path: the name of the object to copy
+        destination_file_name: the local path of the copied file
+
+    return: the local path of the copied file
+
+    """
+    if not bucket or not object:
+        raise ValueError("No GCS bucket or object provided")
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket)
+    blob = bucket.blob(blob_path)
+    blob.download_to_filename(destination_file_name)
+
+    logger.debug(f"Blob {blob_path} downloaded to {destination_file_name}.")
+
+    return destination_file_name

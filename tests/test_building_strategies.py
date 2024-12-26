@@ -13,8 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-import warnings
-
 import pytest
 
 import tests.testing_tools as tools
@@ -27,10 +25,9 @@ from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 
 class TestVideoBuildingStrategies:
-
-    def setUp(self) -> None:
-        warnings.simplefilter("ignore", category=ResourceWarning)
-        warnings.simplefilter("ignore", category=UserWarning)
+    """
+    Test the video building strategies
+    """
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -78,7 +75,12 @@ class TestVideoBuildingStrategies:
         pbv = PromptBasedVideo(
             tools.test_prompt_library["moss_stones-train_boy"]
         )  # 4 subtitles -> 4 composite videos of 2 vids each
-        await pbv.compose(build_settings=build_settings, ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway())
+        await pbv.compose(
+            build_settings=build_settings,
+            ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                test_mode=True
+            ),
+        )
 
         assert pbv is not None, "Inner composite should be generated"
 

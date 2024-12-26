@@ -5,6 +5,8 @@
 
 </div>
 
+[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
+
 # Vikit.ai Software Development  Kit
 
 [Vikit.ai](https://vikit.ai/)  SDK let you develop easily video generators leveraging generative AI and other AI models. You may see this as a langchain to orchestrate AI models and video editing tools. 
@@ -109,7 +111,7 @@ If you have questions, reach out to us **<hello@vikit.ai>**.
 
 ## Contribution guidelines
 
-Wanna help? You're very welcome!:
+Wanna help? You're very welcome! 🚀 :
 
 1. New PR: You submit your PR and explain clearly what you want to change. We will review your PR as soon as possible,
 2. PR validation: If the PR passes all the quality checks then Vikit.ai team assign a reviewer,

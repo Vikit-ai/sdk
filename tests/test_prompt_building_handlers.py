@@ -13,24 +13,24 @@
 # limitations under the License.
 # ==============================================================================
 
-import warnings
 
 import pytest
-from loguru import logger
+
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
-from vikit.prompt.building.handlers.prompt_by_keywords_handler import \
-    PromptByKeywordsHandler
-from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import \
-    PromptByRawUserTextHandler
+from vikit.prompt.building.handlers.prompt_by_keywords_handler import (
+    PromptByKeywordsHandler,
+)
+from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
+    PromptByRawUserTextHandler,
+)
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
-
-logger.add("log_test_prompt_building_handlers.txt", rotation="10 MB")
-warnings.simplefilter("ignore", category=ResourceWarning)
-warnings.simplefilter("ignore", category=UserWarning)
 
 
 class TestPromptBuildingHandlers:
+    """
+    Test the prompt building handlers
+    """
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -38,7 +38,11 @@ class TestPromptBuildingHandlers:
         prompt_handler = PromptByKeywordsHandler()
         text_prompt = str("test")
         prompt_built = await prompt_handler.execute_async(
-            text_prompt=text_prompt, prompt_build_settings=PromptBuildSettings(), ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway()
+            text_prompt=text_prompt,
+            prompt_build_settings=PromptBuildSettings(),
+            ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                test_mode=True
+            ),
         )
         assert prompt_built is not None, "Prompt built should not be None"
 
@@ -48,6 +52,10 @@ class TestPromptBuildingHandlers:
         prompt_handler = PromptByRawUserTextHandler()
         text_prompt = str("test")
         prompt_built = await prompt_handler.execute_async(
-            text_prompt=text_prompt, prompt_build_settings=PromptBuildSettings(), ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway()
+            text_prompt=text_prompt,
+            prompt_build_settings=PromptBuildSettings(),
+            ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                test_mode=True
+            ),
         )
         assert prompt_built is not None, "Prompt built should not be None"
