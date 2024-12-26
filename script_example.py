@@ -371,7 +371,7 @@ async def colabCode():
 
         prompt = "Unlock your radiance with AI Cosmetics."  # @param {type:"string"}
         ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
-        prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_multimodal_async(text=prompt, negative_text="human faces", duration=8)
+        prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_multimodal_async(text=prompt, negative_text="human faces", duration=2)
         video = RawMultiModalBasedVideo(prompt=prompt)
         await video.build(build_settings=video_build_settings, ml_models_gateway=ml_models_gateway)
 
@@ -421,14 +421,14 @@ async def quality_check_with_gemini():
 
         video_build_settings = VideoBuildSettings(
             output_video_file_name="image.mp4",
-            target_model_provider="runway",
+            target_model_provider="haiper",
         )
 
         vid_cp_final = CompositeVideo()
         vid_cp_final._is_root_video_composite = True
         for i in range(1, 2):
             current_image = str(i) + ".jpg"
-            prompt = await PromptFactory().create_prompt_from_multimodal_async(text=gemini_prompt,  image=current_image, reengineer_text_prompt_from_image_and_text=True)
+            prompt = await PromptFactory().create_prompt_from_multimodal_async(text=gemini_prompt,  image=current_image) #, reengineer_text_prompt_from_image_and_text=True
 
             # Query Gemini to get an appropriate prompt
             response = await ml_models_gateway.ask_gemini(prompt)
@@ -437,8 +437,8 @@ async def quality_check_with_gemini():
             image_prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_image(
                     image=current_image,
                     text=response.strip() + ". Slow motion.",
-                    model_provider="runway",
-                    duration=10,
+                    model_provider="haiper",
+                    duration=2,
                 )
 
             image_based_video = RawImageBasedVideo(prompt=image_prompt)
