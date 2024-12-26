@@ -863,6 +863,59 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
 
     return target_path
 
+async def reverse_video(video_url, target_video_name=None, ):
+    """
+    Reverses the frames of the video, with last frame being the first, second to last the second etc... and first frame the latest one
+    Args:
+        video_url (str): The video to reverse
+        target_video_name (string) : Optional, the name of the output video 
+
+    Returns:
+        Video: The reversed video
+    """
+    assert video_url, "no media URL provided"
+
+    if not target_video_name:
+        target_video_name = "reversed_" + get_canonical_name(video_url) + ".mp4"
+    #ffmpeg -i example.mp4 -vf reverse -an output_r.mp4
+    logger.debug(
+        "ffmpeg" + " " + 
+        "-i" + " " + 
+        video_url + " " + 
+        "-vf" + " " + 
+        "reverse" + " " + 
+        target_video_name
+    )
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-i",
+        video_url,
+        "-vf",
+        "reverse", 
+        target_video_name,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
+    print(stdout)
+    if process.returncode != 0:
+        error_messages = []
+        if stdout:
+            error_messages.append(f"stdout: {stdout.decode()}")
+        if stderr:
+            error_messages.append(f"stderr: {stderr.decode()}")
+
+        if error_messages:
+            error_message = "ffmpeg command failed with: " + " and ".join(
+                error_messages
+            )
+        else:
+            error_message = "ffmpeg command failed without error output"
+
+        logger.error(error_message)
+        raise Exception(error_message)
+    return target_video_name
+
 
 async def create_zoom_video(
     image_url,
@@ -877,7 +930,7 @@ async def create_zoom_video(
         target_video_name (string) : Optional, the name of the output video
 
     Returns:
-        Video: The reencoded video
+        Video: The zoomed video
     """
 
     assert image_url, "no media URL provided"
@@ -885,39 +938,24 @@ async def create_zoom_video(
     if not target_video_name:
         target_video_name = "zoom_" + get_canonical_name(image_url) + ".mp4"
 
-    logger.debug(
-        "ffmpeg"
-        + " "
-        + "-y"
-        + " "
-        + "-framerate"
-        + " "
-        + "24"
-        + " "
-        + "-loop"
-        + " "
-        + "1"
-        + " "
-        + "-i"
-        + " "
-        + image_url
-        + " "
-        + "-vf"
-        + " "
-        + "\"scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24\""
-        + " "
-        + "-c:v"
-        + " "
-        + "libx264"
-        + " "
-        + "-t"
-        + " "
-        + str(target_duration)
-        + " "
-        + target_video_name
-    )
+    logger.debug("ffmpeg" + " " + 
+        "-y" + " " + 
+        "-framerate" + " " + 
+        "24" + " " + 
+        "-loop" + " " + 
+        "1" + " " + 
+        "-i" + " " + 
+        image_url + " " + 
+        "-vf" + " " + 
+        "\"scale=16000:-1,zoompan=z='min(zoom+0.0015,2.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24\"" + " " + 
+        "-c:v" + " " + 
+        "libx264" + " " + 
+        "-t" + " " + 
+        str(target_duration) + " " + 
+        target_video_name)
 
-    # ffmpeg -framerate 25 -loop 1 -i 07.jpg -filter_complex "[0:v]scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,trim=duration=5[v]" -map "[v]" -y out.mp4
+#ffmpeg -framerate 25 -loop 1 -i 07.jpg -filter_complex "[0:v]scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,trim=duration=5[v]" -map "[v]" -y out.mp4
+
 
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
@@ -927,7 +965,7 @@ async def create_zoom_video(
         "-i",
         image_url,
         "-vf",
-        "scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24",
+        "scale=16000:-1,zoompan=z='min(zoom+0.008,2)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24",
         "-c:v",
         "libx264",
         "-t",

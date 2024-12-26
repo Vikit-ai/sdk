@@ -93,7 +93,6 @@ await video_composite.build(
 
     await video_composite.build(
         build_settings=VideoBuildSettings(
-            test_mode=False,
             output_video_file_name="Composite.mp4",
         )
     )
