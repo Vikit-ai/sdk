@@ -69,3 +69,17 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.cascade_build_settings = cascade_build_settings
         self.vikit_api_key = vikit_api_key
         self.aspect_ratio = aspect_ratio
+
+    def __copy__(self):
+        return VideoBuildSettings(delete_interim_files=self.delete_interim_files,
+                                    target_model_provider = self.target_model_provider,
+                                    expected_length = None,
+                                    include_read_aloud_prompt = False,
+                                    prompt = None,
+                                    interpolate = self.interpolate,
+                                    music_building_context = MusicBuildingContext(),
+                                    cascade_build_settings = self.cascade_build_settings,
+                                    target_dir_path = self.target_dir_path,
+                                    output_video_file_name = None,
+                                    vikit_api_key = self.vikit_api_key,
+                                    aspect_ratio = self.aspect_ratio)

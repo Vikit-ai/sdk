@@ -28,6 +28,7 @@ from vikit.video.composite_video import CompositeVideo
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.raw_image_based_video import RawImageBasedVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
+from vikit.video.raw_multimodal_based_video import RawMultiModalBasedVideo
 from vikit.video.seine_transition import SeineTransition
 from vikit.video.transition import Transition
 from vikit.video.video import VideoBuildSettings
@@ -362,16 +363,17 @@ async def colabCode():
                 generate_background_music=True,
             ),
             include_read_aloud_prompt=True,
-            target_model_provider="videocrafter", #Available models: videocrafter, stabilityai, haiper
+            target_model_provider="haiper", #Available models: videocrafter, stabilityai, haiper
             output_video_file_name="AICosmetics.mp4",
             interpolate=True,
+            aspect_ratio=(9,16),
         )
 
         prompt = "Unlock your radiance with AI Cosmetics."  # @param {type:"string"}
-
-        prompt = await PromptFactory().create_prompt_from_text(prompt)
-        video = PromptBasedVideo(prompt=prompt)
-        await video.build(build_settings=video_build_settings)
+        ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
+        prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_multimodal_async(text=prompt, negative_text="human faces", duration=2)
+        video = RawMultiModalBasedVideo(prompt=prompt)
+        await video.build(build_settings=video_build_settings, ml_models_gateway=ml_models_gateway)
 
 async def is_qualitative_until(media_url, ml_models_gateway, gemini_version="gemini-1.5-pro-002"):
 
@@ -419,15 +421,15 @@ async def quality_check_with_gemini():
 
         video_build_settings = VideoBuildSettings(
             output_video_file_name="image.mp4",
-            target_model_provider="runway",
+            target_model_provider="haiper",
         )
 
         vid_cp_final = CompositeVideo()
         vid_cp_final._is_root_video_composite = True
-        for i in range(1, 4):
+        for i in range(1, 2):
             current_image = str(i) + ".jpg"
             prompt = await PromptFactory().create_prompt_from_multimodal_async(text=gemini_prompt,  image=current_image, reengineer_text_prompt_from_image_and_text=True)
-            
+
             # Query Gemini to get an appropriate prompt
             response = await ml_models_gateway.ask_gemini(prompt)
             
@@ -435,7 +437,8 @@ async def quality_check_with_gemini():
             image_prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_image(
                     image=current_image,
                     text=response.strip() + ". Slow motion.",
-                    model_provider="runway",
+                    model_provider="haiper",
+                    duration=2,
                 )
 
             image_based_video = RawImageBasedVideo(prompt=image_prompt)
@@ -510,7 +513,7 @@ if __name__ == "__main__":
         with WorkingFolderContext("./examples/inputs/PromptBased/"):
             logger.add("log.txt")
             prompt = """Paris, the City of Light """ #is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere. The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions. Paris is also famous for its charming cafes, chic boutiques, and world-class cuisine, offering visitors a delightful blend of history, elegance, and joie de vivre along the scenic Seine River."""
-            asyncio.run(prompt_based_composite(prompt=prompt, model_provider="videocrafter"))
+            asyncio.run(prompt_based_composite(prompt=prompt, model_provider="haiper"))
     
     elif run_an_example == 7:
         asyncio.run(colabCode())
