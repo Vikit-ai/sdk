@@ -10,9 +10,9 @@ def read_version():
 
 
 setup(
-    name="vikit",
+    name="vikit-ai-sdk-dev",
     version=read_version(),
-    description="Video Processing Toolkit",
+    description="Vikit.ai Software Development Kit",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     author="Vikit.ai",
@@ -38,9 +38,9 @@ setup(
             "wheel",
         ],
     },
-    python_requires=">=3.8",
+    python_requires=">=3.6",
     classifiers=[
-        "Development Status :: 0.2.2 - Beta",
+        "Development Status :: 4 - Beta",  # Corrected classifier
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
