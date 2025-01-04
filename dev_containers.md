@@ -29,6 +29,6 @@ If you prefer to work locally, you can use VS Code and Dev Containers to set up 
 
 Play with the SDK: add features, collaborate with the community to enhance it, and run your own scripts to see the magic of Vikit.ai SDK and generate cool videos (or mix them with your own videos). 🎬✨
 
-**First things** first: Don't forget to [Get your Vikit,ai SDK key](https://vikit.ai/#/platform) and add it to your .env.secrets file. 🔑
+**First things** first: Don't forget to [Get your Vikit,ai SDK key](https://platform.vikit.ai/) and add it to your .env.secrets file. 🔑
 
 That's it! You're now ready to start working on Vikit.ai SDK. If you have any questions, feel free to reach out to the project maintainers using discussions, or email hello@vikit.ai for more private matters. Happy coding! 
