@@ -91,8 +91,8 @@ def has_audio_track(video_path):
         video_path,
     ]
     result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    logger.debug(f"Subprocess run stdout for has_audio_track :  {result.stdout}")
-    logger.debug(f"Subprocess run stderr for has_audio_track :  {result.stderr}")
+    logger.trace(f"Subprocess run stdout for has_audio_track :  {result.stdout}")
+    logger.trace(f"Subprocess run stderr for has_audio_track :  {result.stderr}")
 
     result.check_returncode()
 
@@ -801,7 +801,7 @@ async def cut_video(
     )
 
     stdout, stderr = await process.communicate()
-    print(stdout)
+    logger.trace(stdout)
     if process.returncode != 0:
         error_messages = []
         if stdout:
@@ -863,12 +863,16 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
 
     return target_path
 
-async def reverse_video(video_url, target_video_name=None, ):
+
+async def reverse_video(
+    video_url,
+    target_video_name=None,
+):
     """
     Reverses the frames of the video, with last frame being the first, second to last the second etc... and first frame the latest one
     Args:
         video_url (str): The video to reverse
-        target_video_name (string) : Optional, the name of the output video 
+        target_video_name (string) : Optional, the name of the output video
 
     Returns:
         Video: The reversed video
@@ -877,27 +881,32 @@ async def reverse_video(video_url, target_video_name=None, ):
 
     if not target_video_name:
         target_video_name = "reversed_" + get_canonical_name(video_url) + ".mp4"
-    #ffmpeg -i example.mp4 -vf reverse -an output_r.mp4
+    # ffmpeg -i example.mp4 -vf reverse -an output_r.mp4
     logger.debug(
-        "ffmpeg" + " " + 
-        "-i" + " " + 
-        video_url + " " + 
-        "-vf" + " " + 
-        "reverse" + " " + 
-        target_video_name
+        "ffmpeg"
+        + " "
+        + "-i"
+        + " "
+        + video_url
+        + " "
+        + "-vf"
+        + " "
+        + "reverse"
+        + " "
+        + target_video_name
     )
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
         "-i",
         video_url,
         "-vf",
-        "reverse", 
+        "reverse",
         target_video_name,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
     stdout, stderr = await process.communicate()
-    print(stdout)
+    logger.trace(f"In reverse video, here is the stdout: {stdout}")
     if process.returncode != 0:
         error_messages = []
         if stdout:
@@ -938,24 +947,39 @@ async def create_zoom_video(
     if not target_video_name:
         target_video_name = "zoom_" + get_canonical_name(image_url) + ".mp4"
 
-    logger.debug("ffmpeg" + " " + 
-        "-y" + " " + 
-        "-framerate" + " " + 
-        "24" + " " + 
-        "-loop" + " " + 
-        "1" + " " + 
-        "-i" + " " + 
-        image_url + " " + 
-        "-vf" + " " + 
-        "\"scale=16000:-1,zoompan=z='min(zoom+0.0015,2.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24\"" + " " + 
-        "-c:v" + " " + 
-        "libx264" + " " + 
-        "-t" + " " + 
-        str(target_duration) + " " + 
-        target_video_name)
+    logger.debug(
+        "ffmpeg"
+        + " "
+        + "-y"
+        + " "
+        + "-framerate"
+        + " "
+        + "24"
+        + " "
+        + "-loop"
+        + " "
+        + "1"
+        + " "
+        + "-i"
+        + " "
+        + image_url
+        + " "
+        + "-vf"
+        + " "
+        + "\"scale=16000:-1,zoompan=z='min(zoom+0.0015,2.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24\""
+        + " "
+        + "-c:v"
+        + " "
+        + "libx264"
+        + " "
+        + "-t"
+        + " "
+        + str(target_duration)
+        + " "
+        + target_video_name
+    )
 
-#ffmpeg -framerate 25 -loop 1 -i 07.jpg -filter_complex "[0:v]scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,trim=duration=5[v]" -map "[v]" -y out.mp4
-
+    # ffmpeg -framerate 25 -loop 1 -i 07.jpg -filter_complex "[0:v]scale=16000:-1,zoompan=z='min(zoom+0.0015,1.5)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,trim=duration=5[v]" -map "[v]" -y out.mp4
 
     process = await asyncio.create_subprocess_exec(
         "ffmpeg",
@@ -976,7 +1000,7 @@ async def create_zoom_video(
     )
 
     stdout, stderr = await process.communicate()
-    print(stdout)
+    logger.trace(f"In create_zoom_video , here is the stdout: {stdout}")
     if process.returncode != 0:
         error_messages = []
         if stdout:
