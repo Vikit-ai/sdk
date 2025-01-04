@@ -399,7 +399,7 @@ class Video(ABC):
 
         if self.build_settings.target_file_name:
             self.set_final_video_name(
-                output_file_name=build_settings.target_file_name,
+                output_file_name=self.build_settings.target_file_name,
             )
 
         if wfolder_changed:

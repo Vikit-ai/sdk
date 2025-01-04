@@ -73,6 +73,52 @@ class VikitGateway(MLModelsGateway):
         else:
             self.vikit_api_key = get_vikit_api_token()
 
+    def get_sendable_image(self, image, aspect_ratio):
+        image_prompt = image
+        if (aspect_ratio == (16,9)):
+            target_size=(1280,768)
+        else:
+            target_size=(768, 1280)
+        
+        #If base64, we resize it. If URL, we cannot resize without downloading it
+        if (not image_prompt.startswith("http")):
+            #Base64 image
+            img_b64 = self.convert_image_to_b64(image_prompt, target_size)
+            image_prompt = img_b64
+
+    def convert_image_to_b64(self, image, target_size=None):
+        if image.split('.') is not None and image.split('.')[-1].lower() in ["jpg", "png", "jpeg", "bmp", "tiff", "webp"]:
+            #Read file path and get Bytes
+            with open(image, "rb") as image_file:
+                image_data = image_file.read()
+        else: 
+            # Image data is a base64, we extract Bytes
+            image_data = base64.b64decode(image)
+
+        # Convert the image data to a NumPy array
+        np_arr = np.frombuffer(image_data, np.uint8)
+
+        # Decode the image using OpenCV
+        image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+        if target_size:
+            # Resize the image using OpenCV
+            resized_image = cv2.resize(
+                image, target_size, interpolation=cv2.INTER_AREA
+            )
+        else:
+            resized_image = image
+
+        # Encode the resized image back to base64
+        _, buffer = cv2.imencode(".png", resized_image)
+
+        # Encode the image as base64
+        img_b64 = base64.b64encode(buffer).decode(
+            "utf-8"
+        )
+
+        return img_b64
+
     async def generate_mp3_from_text_async_elevenlabs(
         self,
         prompt_text: str,
@@ -635,26 +681,26 @@ interesting the resulting music will be. Here is your prompt: '"""
         logger.debug(f"Generating video using model provider: {model_provider}")
 
         if model_provider == "vikit":
-            return await self.generate_video_stabilityai_async(prompt)
+            return await self.generate_video_stabilityai_async(prompt, aspect_ratio)
         elif model_provider == "stabilityai":
-            return await self.generate_video_stabilityai_async(prompt)
+            return await self.generate_video_stabilityai_async(prompt, aspect_ratio)
         elif model_provider == "" or model_provider is None:
-            return await self.generate_video_stabilityai_async(prompt)
+            return await self.generate_video_stabilityai_async(prompt, aspect_ratio)
         elif model_provider == "haiper":
-            return await self.generate_video_haiper_async(prompt)
+            return await self.generate_video_haiper_async(prompt, aspect_ratio)
         elif model_provider == "videocrafter":
             return await self.generate_video_VideoCrafter2_async(prompt)
         elif model_provider == "dynamicrafter":
             return await self.generate_video_DynamiCrafter_image_async(prompt)
         elif model_provider == "stabilityai_image":
-            return await self.generate_video_from_image_stabilityai_async(prompt)
+            return await self.generate_video_from_image_stabilityai_async(prompt, aspect_ratio)
         elif model_provider == "runway":
             return await self.generate_video_from_image_and_text_runway(prompt, aspect_ratio)
         else:
             raise ValueError(f"Unknown model provider: {model_provider}")
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def generate_video_stabilityai_async(self, prompt):
+    async def generate_video_stabilityai_async(self, prompt, aspect_ratio):
         """
         Generate a video from the given prompt
 
@@ -664,8 +710,8 @@ interesting the resulting music will be. Here is your prompt: '"""
         returns:
                 The link to the generated video
         """
-        output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
         logger.debug(f"Generating image from prompt: {prompt.text[:50]}")
+        ratio = str(aspect_ratio[0]) + ":" + str(aspect_ratio[1])
         async with aiohttp.ClientSession() as session:
             payload = (
                 {
@@ -674,7 +720,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                     "input": {
                         "prompt": prompt.text,  # + ", 4k",
                         "output_format": "png",
-                        "aspect_ratio": "16:9",
+                        "aspect_ratio": ratio,
                     },
                 },
             )
@@ -682,7 +728,6 @@ interesting the resulting music will be. Here is your prompt: '"""
             async with session.post(vikit_backend_url, json=payload) as response:
                 output = await response.text()
 
-                logger.debug("Resizing image for video generator")
                 # Convert result to Base64
                 buffer = io.BytesIO()
                 output = json.loads(output)
@@ -696,58 +741,15 @@ interesting the resulting music will be. Here is your prompt: '"""
                         f'Output does not contain image: {output["error"]}'
                     )
 
-                # Convert result to Base64
-                image_data = base64.b64decode(output["image"])
+                prompt.image = output["image"]
 
-                # Convert the image data to a NumPy array
-                np_arr = np.frombuffer(image_data, np.uint8)
-
-                # Decode the image using OpenCV
-                image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-
-                # Resize the image using OpenCV
-                target_size = (1024, 576)
-                resized_image = cv2.resize(
-                    image, target_size, interpolation=cv2.INTER_AREA
-                )
-
-                # Encode the resized image back to base64
-                _, buffer = cv2.imencode(".png", resized_image)
-
-                # Encode the image as base64
-                img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode(
-                    "utf-8"
-                )
-
-                logger.debug("Generating video from image")
-                # Ask for a video
-                async with aiohttp.ClientSession() as session:
-                    payload = (
-                        {
-                            "key": self.vikit_api_key,
-                            "model": "stability_image2video",
-                            "input": {
-                                "image": img_b64,
-                                "seed": 0,
-                                "cfg_scale": 1.8,
-                                "motion_bucket_id": 127,
-                            },
-                        },
-                    )
-                    async with session.post(
-                        vikit_backend_url, json=payload
-                    ) as response:
-                        output = await response.json()
-                        with open(output_vid_file_name, "wb") as video_file:
-                            video_file.write(base64.b64decode(output["video"]))
-                        return output_vid_file_name
+            return await self.generate_video_from_image_stabilityai_async(prompt, aspect_ratio)
 
     @retry(
         stop=stop_after_attempt(get_nb_retries_http_calls()),
         reraise=True,
-        wait=wait_exponential(min=1, max=5),
     )
-    async def generate_video_haiper_async(self, prompt):
+    async def generate_video_haiper_async(self, prompt, aspect_ratio):
         """
         Generate a video from the given prompt
 
@@ -759,18 +761,57 @@ interesting the resulting music will be. Here is your prompt: '"""
         """
         try:
             logger.debug(f"Generating video from prompt: {prompt.text}")
+
+            ratio = str(aspect_ratio[0]) + ":" + str(aspect_ratio[1])
+            
+            duration = 4 #default duration for Haiper
+            if prompt.duration:
+                duration = prompt.duration
+            
             async with aiohttp.ClientSession(timeout=http_timeout) as session:
                 payload = {
-                    "key": self.vikit_api_key,
-                    "model": "haiper_text2video",
-                    "input": {
-                        "prompt": prompt.text,  # + ", 4k",
-                    },
-                }
+                        "key": self.vikit_api_key,
+                        "model": "haiper_text2video",
+                        "input": {
+                            "prompt": prompt.text,  # + ", 4k",
+                            "negative_prompt": prompt.negative_text,
+                            "settings": {
+                                "duration": duration,
+                            },
+                        },
+                    }
+                if (prompt.image):
+                    image_prompt = prompt.image
+                    if (aspect_ratio == (16,9)):
+                        target_size=(1280,768)
+                    else:
+                        target_size=(768, 1280)
+                    
+                    #If base64, we resize it. If URL, we cannot resize without downloading it
+                    if (not prompt.image.startswith("http")):
+                        #Base64 image
+                        img_b64 = self.convert_image_to_b64(prompt.image, target_size)
+                        image_prompt = "data:image/png;base64," + img_b64
+                    
+
+                    payload["model"] = "haiper_image2video"
+                    payload["input"]["config"] = {
+                        "source_image": image_prompt
+                    }
+                else:
+                    payload["input"]["settings"]["aspect_ratio"] = ratio
+                print(payload)
+
+                #Legacy
                 if hasattr(prompt, "negative_prompt"):
                     payload["input"]["negative_prompt"] = prompt.negative_prompt
 
+                if hasattr(prompt, "negative_text"):
+                    payload["input"]["negative_prompt"] = prompt.negative_text
+
+                print(vikit_backend_url)
                 async with session.post(vikit_backend_url, json=payload) as response:
+                    print(response)
                     output = await response.text()
                     logger.debug(f"{output}")
                     output = json.loads(output)
@@ -853,7 +894,7 @@ interesting the resulting music will be. Here is your prompt: '"""
         return output
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-    async def generate_video_from_image_stabilityai_async(self, prompt):
+    async def generate_video_from_image_stabilityai_async(self, prompt, aspect_ratio):
         """
         Generate a video from the given image prompt
 
@@ -878,9 +919,14 @@ interesting the resulting music will be. Here is your prompt: '"""
 
             # Decode the image using OpenCV
             image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-
             # Resize the image using OpenCV
-            target_size = (1024, 576)
+
+            if (aspect_ratio == (9, 16)):
+                target_size = (576, 1024)
+            elif (aspect_ratio[0] == aspect_ratio[1]):
+                target_size = (768, 768)
+            else:
+                target_size = (1024, 576)
             resized_image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
 
             # Encode the resized image back to base64
@@ -890,6 +936,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode(
                 "utf-8"
             )
+            img_b64 = self.convert_image_to_b64(prompt.image, target_size)
 
             logger.debug("Generating video from image")
             # Ask for a video
@@ -928,7 +975,6 @@ interesting the resulting music will be. Here is your prompt: '"""
         if prompt.image is None:
             ValueError(f'Image needs to be provided for Runway model')
         try:
-            output_vid_file_name = f"outputvid-{uid.uuid4()}.mp4"
             logger.debug(f"Generating video from image prompt {prompt.image[:50]} and text {prompt.text}")
             
             image_prompt = prompt.image
@@ -941,39 +987,16 @@ interesting the resulting music will be. Here is your prompt: '"""
             if (not prompt.image.startswith("http")):
                 #Base64 image
                 logger.debug("Resizing image for video generator")
-                image_data= ""
-                
-                if prompt.image.split('.') is not None and prompt.image.split('.')[-1].lower() in ["jpg", "png", "jpeg", "bmp", "tiff", "webp"]:
-                    #Read file path and then convert to Base64
-                    with open(prompt.image, "rb") as image_file:
-                        image_data = image_file.read()
-                else: 
-                    # Convert result to Base64
-                    image_data = base64.b64decode(prompt.image)
-
-                # Convert the image data to a NumPy array
-                np_arr = np.frombuffer(image_data, np.uint8)
-
-                # Decode the image using OpenCV
-                image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-
-                # Resize the image using OpenCV
-                resized_image = cv2.resize(
-                    image, target_size, interpolation=cv2.INTER_AREA
-                )
-
-                # Encode the resized image back to base64
-                _, buffer = cv2.imencode(".png", resized_image)
-
-                # Encode the image as base64
-                img_b64 = "data:image/png;base64," + base64.b64encode(buffer).decode(
-                    "utf-8"
-                )
-                image_prompt = img_b64
+                img_b64 = self.convert_image_to_b64(prompt.image, target_size)
+                image_prompt = "data:image/png;base64," + img_b64
 
             logger.debug(f"Generating video from resized image {image_prompt[:50]}")
 
             ratio = str(aspect_ratio[0]) + ":" + str(aspect_ratio[1])
+
+            duration = 5
+            if prompt.duration:
+                duration = prompt.duration
 
             # Ask for a video
             async with aiohttp.ClientSession() as session:
@@ -985,11 +1008,12 @@ interesting the resulting music will be. Here is your prompt: '"""
                             "model": "gen3a_turbo", 
                             "promptImage": image_prompt, 
                             "promptText": prompt.text,
-                            "duration": 5,
+                            "duration": duration,
                             "ratio": ratio,
                         },
                     },
                 )
+                print(payload)
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
                     if not output:
@@ -1060,27 +1084,7 @@ interesting the resulting music will be. Here is your prompt: '"""
         elif prompt.image is not None:
             part={}
             
-            if prompt.image.split('.') is not None and prompt.image.split('.')[-1].lower() in ["jpg", "png", "jpeg", "bmp", "tiff", "webp"]:
-                #Read file path and get Bytes
-                with open(prompt.image, "rb") as image_file:
-                    image_data = image_file.read()
-            else: 
-                # Image data is a base64, we extract Bytes
-                image_data = base64.b64decode(prompt.image)
-
-            # Convert the image data to a NumPy array
-            np_arr = np.frombuffer(image_data, np.uint8)
-
-            # Decode the image using OpenCV
-            image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-
-            # Encode the resized image back to base64
-            _, buffer = cv2.imencode(".png", image)
-
-            # Encode the image as base64
-            img_b64 = base64.b64encode(buffer).decode(
-                "utf-8"
-            )
+            img_b64 = self.convert_image_to_b64(prompt.image)
 
             part["inline_data"] = {
                 "data": img_b64, 
@@ -1157,3 +1161,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             logger.error(f"Error calling gemini from prompt: {e}")
             logger.error(f"Returned by gemini : {output}")
             raise Exception(output)
+
+
+
+
