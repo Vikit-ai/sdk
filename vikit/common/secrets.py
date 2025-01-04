@@ -59,7 +59,7 @@ def get_vikit_api_token():
     replicate_api_key = getenv("VIKIT_API_TOKEN", None)
     if replicate_api_key is None:
         logger.error(
-            "VIKIT_API_TOKEN is not set. If you do not have a token, get one at https://vikit.ai/#/platform and add it to your .env.secrets file. Restart and rerun the file if you are working in a Colab or Jupyter notebook."
+            "VIKIT_API_TOKEN is not set. If you do not have a token, get one at https://platform.vikit.ai and add it to your .env.secrets file. Restart and rerun the file if you are working in a Colab or Jupyter notebook."
         )
         exit(1)
     return replicate_api_key
