@@ -3,10 +3,11 @@ import os
 
 
 def read_version():
-    version_file = os.path.join(os.path.dirname(__file__), "vikit", "version.py")
-    with open(version_file, "r") as f:
-        exec(f.read())
-        return locals()["__version__"]
+    return "0.25.0"
+    # version_file = os.path.join(os.path.dirname(__file__), "vikit", "version.py")
+    # with open(version_file, "r") as f:
+    #     exec(f.read())
+    #     return locals()["__version__"]
 
 
 setup(

@@ -16,3 +16,5 @@ pandas==2.2.2
 moviepy==1.0.3
 opencv-python==4.10.0.84
 google-cloud-storage==2.14.0
+loguru==0.7.2
+python-dotenv==1.0.1
