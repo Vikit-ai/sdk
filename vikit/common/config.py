@@ -57,7 +57,7 @@ def get_elevenLabs_url() -> str:
 def get_vikit_backend_url() -> str:
     vikitBackend_url = os.getenv("VIKIT_BACKEND_URI", None)
     if vikitBackend_url is None:
-        return "https://videho.replit.app/models"
+        return "https://vikit-backend-492268420500.europe-west1.run.app/models"
     return vikitBackend_url
 
 
