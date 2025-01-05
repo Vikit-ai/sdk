@@ -34,6 +34,10 @@ import math
 
 
 class TestFFMPEGWrapper:
+    """
+    Test the ffmpeg wrapper
+    """
+
     def setup(self):
         logger.add("log_test_ffmpegwrapper.txt", rotation="10 MB")
         warnings.simplefilter("ignore", category=UserWarning)
@@ -173,14 +177,22 @@ class TestFFMPEGWrapper:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
-    async def test_extract_audio(self):
+    @pytest.mark.parametrize(
+        "video_path, target_dir",
+        [
+            (tests_medias.get_paris_video(), None),
+            (tests_medias.get_paris_video(), "."),
+            (tests_medias.get_paris_video(), "aFolder"),
+        ],
+    )
+    async def test_extract_audio_from_video(self, video_path, target_dir):
         """
         Extract the audio and test its duration
         """
         with WorkingFolderContext() as wf:
             target_audio = await extract_audio_from_video(
-                video_full_path=tests_medias.get_paris_video(),
-                target_dir=os.path.join(wf.original_path, wf.path),
+                video_full_path=video_path,
+                target_dir=target_dir,
             )
             logger.debug(
                 "Extracting audio, video duration: "
@@ -194,8 +206,14 @@ class TestFFMPEGWrapper:
                 rel_tol=0.05,
             )
 
-
-
-
-
-
+    @pytest.mark.unit
+    @pytest.mark.asyncio
+    async def test_extract_audio_no_video(self):
+        """
+        Extract the audio and test its duration
+        """
+        with pytest.raises(ValueError):
+            _ = await extract_audio_from_video(
+                video_full_path=None,
+                target_dir=None,
+            )
