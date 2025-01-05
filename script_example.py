@@ -451,6 +451,7 @@ async def quality_check_with_gemini():
         print(f"Saved video {vid_cp_final.media_url}")
 
 async def add_subtitles():
+    #Adding subtitles to a video
     subtitle_writer = VideoSubtitleRenderer()
 
     subtitle_writer.add_subtitles_to_video(
