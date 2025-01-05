@@ -25,7 +25,7 @@ from vikit.common.decorators import log_function_params
 from vikit.common.file_tools import get_canonical_name
 
 
-async def extract_audio_from_video(video_full_path, target_dir):
+async def extract_audio_from_video(video_full_path, target_dir: str = None) -> str:
     """
     Extract all audio tracks from a video and output them as separate files.
     Naive implementation:
@@ -40,14 +40,23 @@ async def extract_audio_from_video(video_full_path, target_dir):
        The output audio file path
 
     """
+    if not video_full_path:
+        raise ValueError("No video file path provided")
 
     if not os.path.exists(video_full_path):
+        logger.error(f"File {video_full_path} does not exist")
         raise FileNotFoundError(f"File {video_full_path} does not exist")
 
     # set the output file
+    logger.debug(f"Extracting audio from {video_full_path} to {target_dir}")
+    if not target_dir:
+        target_dir = "."
+
     target_file_path = os.path.join(
-        target_dir, os.path.splitext(os.path.basename(video_full_path))[0] + ".wav"
+        target_dir,
+        os.path.basename(video_full_path) + "_extracted_audio.wav",
     )
+    logger.debug(f"Extracting audio from {video_full_path} to {target_file_path}")
 
     if os.path.exists(target_file_path):  # Fail open
         logger.debug(f"File {target_file_path} already exists. Skipping extraction")
