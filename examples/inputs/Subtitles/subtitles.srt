@@ -1,0 +1,20 @@
+1
+00:00:00,000 --> 00:00:06,720
+Vikit.ai allows to leverage the vast array of AI video generation and video processing technologies
+
+2
+00:00:06,720 --> 00:00:11,520
+to create custom, high-quality video content tailored to each specific use case.
+
+3
+00:00:12,320 --> 00:00:17,520
+Whether you want to create automatic product presentation from a photo, text content illustration,
+
+4
+00:00:17,520 --> 00:00:23,440
+user-tailored advertising generation, existing content repurposing, or any other use case,
+
+5
+00:00:23,440 --> 00:00:33,440
+Vikit.ai allows you to build an AI video generation agent for that.
+

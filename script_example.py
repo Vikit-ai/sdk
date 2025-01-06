@@ -32,7 +32,10 @@ from vikit.video.raw_multimodal_based_video import RawMultiModalBasedVideo
 from vikit.video.seine_transition import SeineTransition
 from vikit.video.transition import Transition
 from vikit.video.video import VideoBuildSettings
+from vikit.video.imported_video import  ImportedVideo
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.postprocessing.video_subtitle_renderer import VideoSubtitleRenderer
+
 
 negative_prompt = """bad anatomy, bad hands, missing fingers, extra fingers, three hands, 
 three legs, bad arms, missing legs, missing arms, poorly drawn face, bad face, fused face, 
@@ -447,6 +450,15 @@ async def quality_check_with_gemini():
         await vid_cp_final.build(ml_models_gateway=ml_models_gateway, build_settings=video_build_settings, quality_check=is_qualitative_until)
         print(f"Saved video {vid_cp_final.media_url}")
 
+async def add_subtitles():
+    #Adding subtitles to a video
+    subtitle_writer = VideoSubtitleRenderer()
+
+    subtitle_writer.add_subtitles_to_video(
+        input_video_path="./examples/inputs/Subtitles/vikit-presentation.mp4",
+        subtitle_srt_filepath="./examples/inputs/Subtitles/subtitles.srt",
+        output_video_path="./examples/inputs/Subtitles/vikit-presentation_subtitles.mp4",
+    )
 
 
 if __name__ == "__main__":
@@ -519,3 +531,5 @@ if __name__ == "__main__":
         asyncio.run(colabCode())
     elif run_an_example == 8:
         asyncio.run(quality_check_with_gemini())
+    elif run_an_example == 9:
+        asyncio.run(add_subtitles())
