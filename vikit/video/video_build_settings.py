@@ -32,17 +32,15 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         target_dir_path: str = None,
         output_video_file_name: str = None,
         vikit_api_key: str = None,
-        aspect_ratio:tuple = (16,9),
+        aspect_ratio: tuple = (16, 9),
     ):
         """
         VideoBuildSettings class constructor
 
         params:
-            delete_interim_files: bool : Whether to delete the interim files generated during the video building process
-
+            delete_interim_files: bool : Not implemented yet, Whether to delete the interim files generated during the video building process
             target_model_provider: str : The target model provider, in case you don't want to use the one defined by Vikit for each scene of the video
             Could be vikit, haiper, stabilityai, videocrafter, etc.
-
             expected_length:  The expected length in seconds of the video, will be used when actually building the video
             include_read_aloud_prompt:  Include a synthetic voice that reads the prompts in the final video
             prompt: Prompt : Include subtitles in the final video and fit videos to match the prompt subtitles timelines
@@ -51,6 +49,9 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
             music_building_context: MusicBuildingContext : The music building context to use when building the video
             cascade_build_settings: bool : Whether to cascade the build settings to the sub videos
             target_path: str : The target path to save the video
+            target_dir_path: str : The target directory path to save the video
+            vikit_api_key: str : The Vikit API key to use when building the video
+            aspect_ratio: tuple : The aspect ratio of the video
             output_video_file_name: str : The output video file name (one is generated for you by default)
         """
 
@@ -71,15 +72,17 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.aspect_ratio = aspect_ratio
 
     def __copy__(self):
-        return VideoBuildSettings(delete_interim_files=self.delete_interim_files,
-                                    target_model_provider = self.target_model_provider,
-                                    expected_length = None,
-                                    include_read_aloud_prompt = False,
-                                    prompt = None,
-                                    interpolate = self.interpolate,
-                                    music_building_context = MusicBuildingContext(),
-                                    cascade_build_settings = self.cascade_build_settings,
-                                    target_dir_path = self.target_dir_path,
-                                    output_video_file_name = None,
-                                    vikit_api_key = self.vikit_api_key,
-                                    aspect_ratio = self.aspect_ratio)
+        return VideoBuildSettings(
+            delete_interim_files=self.delete_interim_files,
+            target_model_provider=self.target_model_provider,
+            expected_length=None,
+            include_read_aloud_prompt=False,
+            prompt=None,
+            interpolate=self.interpolate,
+            music_building_context=MusicBuildingContext(),
+            cascade_build_settings=self.cascade_build_settings,
+            target_dir_path=self.target_dir_path,
+            output_video_file_name=None,
+            vikit_api_key=self.vikit_api_key,
+            aspect_ratio=self.aspect_ratio,
+        )
