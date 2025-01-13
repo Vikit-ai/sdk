@@ -43,6 +43,7 @@ class VideoSubtitleRenderer:
         input_video_path: str,
         subtitle_srt_filepath: str,
         output_video_path: str,
+        text_color: str = "white",
         highlight_color: tuple = (0, 0, 0),
         highlight_opacity: float = 0.4,
     ) -> None:
@@ -100,7 +101,7 @@ class VideoSubtitleRenderer:
             text_clip = TextClip(
                 sub.text,
                 fontsize=font_size,
-                color="white",
+                color=text_color,
                 font=self.font_path,
                 method="caption",
                 size=(available_width, None),
