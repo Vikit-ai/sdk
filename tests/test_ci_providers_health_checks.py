@@ -61,12 +61,47 @@ class TestProvidersHealthChecks:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
+    async def test_dynamicrafter_provider_and_generate(self):
+        with WorkingFolderContext():
+            video = RawTextBasedVideo("This is a fantastic day today")
+            await video.build_async(
+                build_settings=VideoBuildSettings(target_model_provider="dynamicrafter")
+            )
+            assert video.media_url is not None
+
+    @pytest.mark.integration
+    @pytest.mark.asyncio
     async def test_luma_provider_and_generate(self):
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a fantastic day today")
             await video.build_async(
+                build_settings=VideoBuildSettings(target_model_provider="luma")
+            )
+            assert video.media_url is not None
+
+    @pytest.mark.integration
+    @pytest.mark.asyncio
+    async def test_runway_provider_and_generate(self):
+        with WorkingFolderContext():
+            video = RawTextBasedVideo("This is a fantastic day today")
+
+            from vikit.prompt.image_prompt import ImagePrompt
+
+            image_prompt = PromptFactory().create_prompt_from_image(image=prompt_content, text=text)
+
+            await video.build_async(
                 build_settings=VideoBuildSettings(
-                    test_mode=False, target_model_provider="luma"
+                    target_model_provider="runway", prompt=ImagePrompt
                 )
+            )
+            assert video.media_url is not None
+
+    @pytest.mark.integration
+    @pytest.mark.asyncio
+    async def test_vikit_provider_and_generate(self):
+        with WorkingFolderContext():
+            video = RawTextBasedVideo("This is a fantastic day today")
+            await video.build_async(
+                build_settings=VideoBuildSettings(target_model_provider="vikit")
             )
             assert video.media_url is not None
