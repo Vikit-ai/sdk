@@ -14,9 +14,10 @@
 # ==============================================================================
 
 import pysrt
+import textwrap
+from PIL import ImageFont
 from loguru import logger
 from moviepy.editor import ColorClip, CompositeVideoClip, TextClip, VideoFileClip
-
 
 class VideoSubtitleRenderer:
     """
@@ -25,9 +26,9 @@ class VideoSubtitleRenderer:
 
     def __init__(
         self,
-        font_path="../../medias/arial.ttf",
-        font_size_ratio=0.05,
-        margin_bottom_ratio=0.03,
+        font_path="arial.ttf",
+        font_size_ratio=0.045,
+        margin_bottom_ratio=0.04,
         margin_right_ratio=0.05,
         margin_left_ratio=0.05,
     ) -> None:
@@ -38,6 +39,40 @@ class VideoSubtitleRenderer:
         self.margin_left_ratio = margin_left_ratio
         self.codec = "libx264"
 
+    def wrap_text(self, text, max_width, font_path, font_size):
+        """
+        Wraps text into multiple lines based on the maximum width.
+
+        Args:
+            text (str): The original text.
+            max_width (int): The maximum width for each line.
+            font_path (str): Path to the font file.
+            font_size (int): Font size for the text.
+
+        Returns:
+            str: Wrapped text with line breaks.
+        """
+        
+        # Load the font to measure text dimensions
+        font = ImageFont.truetype(font_path, font_size)
+        lines = []
+        current_line = ""
+
+        for word in text.split():
+            test_line = f"{current_line} {word}".strip()
+            # Use getbbox to calculate text width
+            test_width = font.getbbox(test_line)[2]  # getbbox returns (x_min, y_min, x_max, y_max)
+
+            if test_width <= max_width:
+                current_line = test_line
+            else:
+                lines.append(current_line)
+                current_line = word
+
+        lines.append(current_line)  # Add the last line
+
+        return "\n".join(lines)
+
     def add_subtitles_to_video(
         self,
         input_video_path: str,
@@ -45,7 +80,7 @@ class VideoSubtitleRenderer:
         output_video_path: str,
         text_color: str = "white",
         highlight_color: tuple = (0, 0, 0),
-        highlight_opacity: float = 0.4,
+        highlight_opacity: float = 1,
     ) -> None:
         """
         Append subtitle to a video and save it
@@ -88,27 +123,32 @@ class VideoSubtitleRenderer:
                 + sub.end.seconds
                 + sub.end.milliseconds / 1000.0
             )
+
             # Sometimes srt file is longer than the real video, here is to avoid having black extra frames at the end
             if start_time < 0:
                 start_time = 0
             if end_time > video_duration:
                 end_time = video_duration
 
-            # Text Clip
             # Calculate the available width for the text
             available_width = video.w - margin_left - margin_right
-
+            wrapped_text = self.wrap_text(sub.text, available_width, self.font_path, font_size)
+            
             text_clip = TextClip(
-                sub.text,
+                # sub.text,
+                wrapped_text,
                 fontsize=font_size,
                 color=text_color,
                 font=self.font_path,
-                method="caption",
-                size=(available_width, None),
+                method="label",
+                align="center",
+                # size=(available_width, None),
             )
 
+            # Get the exact dimensions of the rendered text
+            text_width, text_height = text_clip.size
+
             # Calculate the position of the text clip with margins
-            text_height = text_clip.h
             text_y_position = video.h - margin_bottom - text_height
 
             # Ensure the text does not overflow from the bottom
@@ -123,10 +163,13 @@ class VideoSubtitleRenderer:
                 .set_start(start_time)
             )
 
+            bg_padding = 10
+
             # Highlight Clip
             bg_clip = (
                 ColorClip(
-                    size=(int(text_clip.w * 1.0), int(text_clip.h * 1.05)),
+                    # size=(int(text_clip.w * 1.0), int(text_clip.h * 1.05)),
+                    size=(text_width + bg_padding * 2, text_height + bg_padding * 2),
                     color=highlight_color,
                     duration=end_time - start_time,
                 )
@@ -135,9 +178,9 @@ class VideoSubtitleRenderer:
                 .set_start(start_time)
             )
 
-            # Calculate and set the position of the background clip
-            bg_position = ((video.w - bg_clip.w) / 2, text_y_position)
-            bg_clip = bg_clip.set_position(bg_position)
+            # Adjust background position to account for padding
+            bg_position = ((video.w - (text_width + bg_padding * 2)) / 2, text_y_position - bg_padding)
+            bg_clip = bg_clip.set_position(bg_position).set_fps(video.fps).set_start(start_time)
 
             subtitle_clips.append(bg_clip)
             subtitle_clips.append(text_clip)
