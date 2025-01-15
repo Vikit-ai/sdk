@@ -26,7 +26,7 @@ class VideoSubtitleRenderer:
 
     def __init__(
         self,
-        font_path="arial.ttf",
+        font_path="../../medias/arial.ttf",
         font_size_ratio=0.045,
         margin_bottom_ratio=0.04,
         margin_right_ratio=0.05,
