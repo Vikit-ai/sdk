@@ -21,6 +21,9 @@ from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
 from vikit.prompt.prompt import Prompt
 from vikit.prompt.prompt_factory import PromptFactory
+from vikit.video.building.handlers.interpolation_handler import (
+    VideoInterpolationHandler,
+)
 
 
 class RawImageBasedVideo(Video):
@@ -96,4 +99,6 @@ class RawImageBasedVideo(Video):
         handlers.append(
             VideoGenHandler(video_gen_build_settings=build_settings)
         )
+        if build_settings.interpolate:
+            handlers.append(VideoInterpolationHandler())
         return handlers
