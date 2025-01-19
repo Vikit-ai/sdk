@@ -33,6 +33,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         output_video_file_name: str = None,
         vikit_api_key: str = None,
         aspect_ratio:tuple = (16,9),
+        check_quality:bool=False,
     ):
         """
         VideoBuildSettings class constructor
@@ -69,6 +70,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.cascade_build_settings = cascade_build_settings
         self.vikit_api_key = vikit_api_key
         self.aspect_ratio = aspect_ratio
+        self.check_quality = check_quality
 
     def __copy__(self):
         return VideoBuildSettings(delete_interim_files=self.delete_interim_files,

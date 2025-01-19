@@ -25,6 +25,9 @@ from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.building.handlers.interpolation_handler import (
     VideoInterpolationHandler,
 )
+from vikit.video.building.handlers.quality_check_handler import (
+    QualityCheckHandler,
+)
 
 class RawMultiModalBasedVideo(Video):
     """
@@ -83,9 +86,14 @@ class RawMultiModalBasedVideo(Video):
              list: The list of handlers to use for building the video
         """
         handlers = []
+        video_gen_handler = VideoGenHandler(video_gen_build_settings=build_settings)
         handlers.append(
-            VideoGenHandler(video_gen_build_settings=build_settings)
+            video_gen_handler
         )
+
+        if build_settings.check_quality:
+            handlers.append(QualityCheckHandler(video_gen_handler=video_gen_handler))
+
         if build_settings.interpolate:
             handlers.append(VideoInterpolationHandler())
         return handlers

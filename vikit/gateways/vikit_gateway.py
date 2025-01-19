@@ -471,13 +471,23 @@ interesting the resulting music will be. Here is your prompt: '"""
 
         logger.debug(f"Video to interpolate {video[:50]}")
 
+        if video.split('.') is not None and video.split('.')[-1].lower() in ["mp4", "mov", "avi", "wmv", "webm"]:
+            #Read file path and then convert to Base64
+            with open(video, "rb") as video_file:
+                video_data = "data:video/" + video.split('.')[-1].lower() + ";base64," + base64.b64encode(video_file.read()).decode(
+                    "utf-8"
+                )
+        else: 
+            #Result is already a base64
+            video_data = video
+
         async with aiohttp.ClientSession(timeout=http_timeout) as session:
             payload = (
                 {
                     "key": self.vikit_api_key,
                     "model": "pollinations/amt:6e03c945a24b2defe4576e35235b9c9c0120d81c9df58880c0b3832a5777cdcd",
                     "input": {
-                        "video": video,
+                        "video": video_data,
                         "model_type": "amt-l",
                         "output_video_fps": 24,
                         "recursive_interpolation_passes": 1,
@@ -486,6 +496,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             )
 
             async with session.post(vikit_backend_url, json=payload) as response:
+                print(response)
                 output = await response.text()
 
         #response_json = json.loads(output)
