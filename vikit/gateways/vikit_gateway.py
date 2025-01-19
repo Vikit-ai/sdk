@@ -480,7 +480,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                         "video": video,
                         "model_type": "amt-l",
                         "output_video_fps": 16,
-                        "recursive_interpolation_passes": 2,
+                        "recursive_interpolation_passes": 1,
                     },
                 },
             )
