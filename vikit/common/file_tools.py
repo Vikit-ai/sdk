@@ -126,6 +126,7 @@ def file_url_exists(url):
     """
     Check if a file URL exists locally
     """
+    logger.debug(f"Checking file URL: {url}")
     if url.startswith("file://"):
         file_path = url[7:]  # Remove 'file://' prefix
         return os.path.exists(file_path)
@@ -143,19 +144,19 @@ def url_exists(url: str):
     Returns:
         bool: True if the URL exists, False otherwise
     """
-    url_exists = False
+    does_url_exists = False
     assert url, "url cannot be None"
 
     if os.path.exists(url):
-        url_exists = True
+        does_url_exists = True
 
     if file_url_exists(url):
-        url_exists = True
+        does_url_exists = True
 
     if web_url_exists(url):
-        url_exists = True
+        does_url_exists = True
 
-    return url_exists
+    return does_url_exists
 
 
 def is_valid_path(path: Optional[Union[str, os.PathLike]]) -> bool:
@@ -224,13 +225,14 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
 
 
 @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
-async def download_or_copy_file(url, local_path):
+async def download_or_copy_file(url, local_path, force_download=False):
     """
     Download a file from a URL to a local file asynchronously
 
     Args:
         url (str): The URL to download the file from (supported: http, https, , gs, local)
         local_path (str): The filename to save the file to
+        force_download (bool): If True, the file will be downloaded even if it already exists
 
     Returns:
         str: The filename of the downloaded file
@@ -241,6 +243,10 @@ async def download_or_copy_file(url, local_path):
     path_desc, error = get_path_type(url)
     if len(local_path) > 255:
         local_path = local_path[-255:]
+    if os.path.exists(local_path) and not force_download:
+        logger.debug(f"File already exists at {local_path}, skipping download")
+        return local_path
+
     if not error:
         if path_desc["type"] == "http" or path_desc["type"] == "https":
             async with aiohttp.ClientSession() as session:

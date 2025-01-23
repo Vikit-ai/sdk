@@ -50,3 +50,6 @@ class TestFileTools:
             assert downloaded_file != ""
             assert os.path.exists(downloaded_file)
             assert os.path.getsize(downloaded_file) > 0
+
+
+# TODO: other file tools functions tests
