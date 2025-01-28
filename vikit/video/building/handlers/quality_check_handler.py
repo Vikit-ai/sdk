@@ -76,7 +76,7 @@ class QualityCheckHandler(Handler):
         num_attempts = 0
         while is_good_up_to_secs != -1 and is_good_up_to_secs < 3 and num_attempts < max_attempts :
             logger.info(f"Quality check was negative, rebuilding Video {video.id} ")
-            video = await self.video_gen_handler.execute_async(video, 
+            video = await self.video_gen_handler.execute_async(video,
                                                                ml_models_gateway=ml_models_gateway)
             video.media_url = await download_or_copy_file(
                 url=video.media_url,
@@ -114,7 +114,7 @@ class QualityCheckHandler(Handler):
             else:
                 logger.debug(f"Video {video.id} is only qualitative \
                              until {is_good_up_to_secs}, reducing it")
-                video.media_url = await cut_video(video.media_url, 0, 3, 5)
+                video.media_url = await cut_video(video.media_url, 0, is_good_up_to_secs, 5)
         #Else : is_good_up_to_secs = -1, we just keep the original built_video.media_url
 
         return video
