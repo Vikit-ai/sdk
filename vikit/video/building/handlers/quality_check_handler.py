@@ -36,13 +36,13 @@ class QualityCheckHandler(Handler):
             raise ValueError("VideoGenHandler is not set")
         self.video_gen_handler = video_gen_handler
 
-    async def execute_async(self, video, ml_models_gateway: MLModelsGateway, quality_check = None, max_attempts=4):
+    async def execute_async(self, video, ml_models_gateway: MLModelsGateway, is_good_until = None, max_attempts=4):
         """
         Checks the quality of a video and rebuilds it if necessary
 
         Args:
             video (Video): The video to process
-            quality_check (function): The quality check function
+            is_good_until (function): The quality check function
 
         Returns:
             The same video if the quality check was positive, and a regeneration if not
@@ -52,7 +52,7 @@ class QualityCheckHandler(Handler):
         
         # The is_good_up_to_secs variable will either be -1 if the generated video is qualitative,
         # or the second at which a problem starts to appear.
-        # It will be computed through the user provided quality_check function,
+        # It will be computed through the user provided is_good_until function,
         # because the definition of quality may vary depending on the video generation use-case
         is_good_up_to_secs = -1
 
@@ -65,9 +65,9 @@ class QualityCheckHandler(Handler):
         # get_max_length_url_gemini() (6.5mb by default)
         if (os.path.getsize(video.media_url) < get_max_file_size_url_gemini()
                 and video.media_url_http):
-            is_good_up_to_secs = await quality_check(video.media_url_http, ml_models_gateway)
+            is_good_up_to_secs = await is_good_until(video.media_url_http, ml_models_gateway)
         else:
-            is_good_up_to_secs = await quality_check(video.media_url, ml_models_gateway)
+            is_good_up_to_secs = await is_good_until(video.media_url, ml_models_gateway)
         logger.debug("After checking, video is qualitative \
                      until " + str(is_good_up_to_secs) + " seconds")
 
@@ -84,9 +84,9 @@ class QualityCheckHandler(Handler):
             )
             if (os.path.getsize(video.media_url) < get_max_file_size_url_gemini()
                 and video.media_url_http):
-                is_good_up_to_secs = await quality_check(video.media_url_http, ml_models_gateway)
+                is_good_up_to_secs = await is_good_until(video.media_url_http, ml_models_gateway)
             else:
-                is_good_up_to_secs = await quality_check(video.media_url, ml_models_gateway)
+                is_good_up_to_secs = await is_good_until(video.media_url, ml_models_gateway)
             logger.debug("After another checking, video is qualitative until \
                          " + str(is_good_up_to_secs) + " seconds.")
             num_attempts = num_attempts + 1
