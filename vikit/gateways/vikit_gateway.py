@@ -819,7 +819,6 @@ interesting the resulting music will be. Here is your prompt: '"""
                     payload["input"]["config"] = {"source_image": image_prompt}
                 else:
                     payload["input"]["settings"]["aspect_ratio"] = ratio
-                print(payload)
 
                 # Legacy
                 if hasattr(prompt, "negative_prompt"):
@@ -828,9 +827,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 if hasattr(prompt, "negative_text"):
                     payload["input"]["negative_prompt"] = prompt.negative_text
 
-                print(vikit_backend_url)
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    print(response)
                     output = await response.text()
                     logger.debug(f"{output}")
                     output = json.loads(output)
@@ -1036,7 +1033,6 @@ interesting the resulting music will be. Here is your prompt: '"""
                         },
                     },
                 )
-                print(payload)
                 async with session.post(vikit_backend_url, json=payload) as response:
                     output = await response.text()
                     if not output:

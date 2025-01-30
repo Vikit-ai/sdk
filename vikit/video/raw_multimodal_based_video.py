@@ -91,8 +91,8 @@ class RawMultiModalBasedVideo(Video):
             video_gen_handler
         )
 
-        if build_settings.check_quality:
-            handlers.append(QualityCheckHandler(video_gen_handler=video_gen_handler))
+        if build_settings.is_good_until:
+            handlers.append(QualityCheckHandler(video_gen_handler=video_gen_handler, is_good_until=build_settings.is_good_until))
 
         if build_settings.interpolate:
             handlers.append(VideoInterpolationHandler())

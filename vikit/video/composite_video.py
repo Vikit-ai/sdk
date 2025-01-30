@@ -102,7 +102,7 @@ class CompositeVideo(Video, is_composite_video):
                 target_model_provider=self.build_settings.target_model_provider,
                 vikit_api_key=self.build_settings.vikit_api_key,
                 aspect_ratio=self.build_settings.aspect_ratio,
-                check_quality=self.build_settings.check_quality,
+                is_good_until=self.build_settings.is_good_until,
             )
 
     def append_video(self, video: Video):

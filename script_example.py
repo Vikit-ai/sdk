@@ -31,7 +31,7 @@ from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.raw_multimodal_based_video import RawMultiModalBasedVideo
 from vikit.video.seine_transition import SeineTransition
 from vikit.video.transition import Transition
-from vikit.video.video import VideoBuildSettings
+from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.imported_video import  ImportedVideo
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.postprocessing.video_subtitle_renderer import VideoSubtitleRenderer
@@ -424,7 +424,8 @@ async def quality_check_with_gemini():
 
         video_build_settings = VideoBuildSettings(
             output_video_file_name="image.mp4",
-            target_model_provider="haiper",
+            target_model_provider="runway",
+            is_good_until=is_qualitative_until,
         )
 
         vid_cp_final = CompositeVideo()
@@ -440,14 +441,13 @@ async def quality_check_with_gemini():
             image_prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_image(
                     image=current_image,
                     text=response.strip() + ". Slow motion.",
-                    model_provider="haiper",
-                    duration=2,
+                    model_provider="runway",
                 )
 
             image_based_video = RawImageBasedVideo(prompt=image_prompt)
             vid_cp_final.append_video(image_based_video)
         
-        await vid_cp_final.build(ml_models_gateway=ml_models_gateway, build_settings=video_build_settings, quality_check=is_qualitative_until)
+        await vid_cp_final.build(ml_models_gateway=ml_models_gateway, build_settings=video_build_settings)
         print(f"Saved video {vid_cp_final.media_url}")
 
 async def add_subtitles():

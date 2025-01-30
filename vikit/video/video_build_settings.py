@@ -33,7 +33,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         output_video_file_name: str = None,
         vikit_api_key: str = None,
         aspect_ratio:tuple = (16,9),
-        check_quality:bool=False,
+        is_good_until=None,
     ):
         """
         VideoBuildSettings class constructor
@@ -54,6 +54,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
             vikit_api_key: str : The Vikit API key to use when building the video
             aspect_ratio: tuple : The aspect ratio of the video
             output_video_file_name: str : The output video file name (one is generated for you by default)
+            is_good_until: A filter function to apply to the generated videos
         """
 
         super().__init__(
@@ -71,7 +72,7 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.cascade_build_settings = cascade_build_settings
         self.vikit_api_key = vikit_api_key
         self.aspect_ratio = aspect_ratio
-        self.check_quality = check_quality
+        self.is_good_until = is_good_until
 
     def __copy__(self):
         return VideoBuildSettings(

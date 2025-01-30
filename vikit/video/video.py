@@ -389,11 +389,7 @@ class Video(ABC):
                 f"about to run {len(handler_chain)} handlers for video {self.id} of type {self.short_type_name} / {type(self)}"
             )
             for handler in handler_chain:
-                if handler.__class__.__name__ == "QualityCheckHandler":
-                    built_video = await handler.execute_async(video=self, ml_models_gateway=ml_models_gateway, quality_check=quality_check)
-                else:
-                    built_video = await handler.execute_async(video=self, ml_models_gateway=ml_models_gateway)                
-                
+                built_video = await handler.execute_async(video=self, ml_models_gateway=ml_models_gateway)
                 built_video.is_video_built = True
 
                 assert built_video.media_url, "The video media URL is not set"
