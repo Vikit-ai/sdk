@@ -20,6 +20,8 @@ import os
 import pandas as pd  # type: ignore
 from loguru import logger  # type: ignore
 
+import tests.testing_medias as test_media
+
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.common.decorators import log_function_params
 from vikit.music_building_context import MusicBuildingContext
@@ -460,6 +462,23 @@ async def add_subtitles():
         output_video_path="./examples/inputs/Subtitles/vikit-presentation_subtitles.mp4",
     )
 
+async def add_music():
+    working_folder="./examples/inputs/Imported/"
+    with WorkingFolderContext(working_folder):
+
+        video_build_settings = VideoBuildSettings(
+            output_video_file_name="music.mp4",
+            music_building_context=MusicBuildingContext(
+                apply_background_music=True,
+                background_music_file=test_media.get_sample_gen_background_music(),
+            ),
+        )
+
+        composite_video = CompositeVideo().append_video(
+            ImportedVideo(test_media.get_cat_video_path())
+        )
+
+        await composite_video.build(build_settings=video_build_settings)
 
 if __name__ == "__main__":
 
@@ -533,3 +552,5 @@ if __name__ == "__main__":
         asyncio.run(quality_check_with_gemini())
     elif run_an_example == 9:
         asyncio.run(add_subtitles())
+    elif run_an_example == 10:
+        asyncio.run(add_music())
