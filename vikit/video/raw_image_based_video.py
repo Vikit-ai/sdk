@@ -20,13 +20,6 @@ from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
 from vikit.prompt.prompt import Prompt
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.video.building.handlers.interpolation_handler import (
-    VideoInterpolationHandler,
-)
-from vikit.video.building.handlers.quality_check_handler import (
-    QualityCheckHandler,
-)
 
 
 class RawImageBasedVideo(Video):
@@ -74,7 +67,7 @@ class RawImageBasedVideo(Video):
             )
         elif self.prompt and self.prompt.text:
             summarised_title = self.get_title_from_description(
-                description=self.text
+                description=self.prompt.text
             )
         else:
             summarised_title = "ImagePrompt"
@@ -100,14 +93,7 @@ class RawImageBasedVideo(Video):
              list: The list of handlers to use for building the video
         """
         handlers = []
-        video_gen_handler = VideoGenHandler(video_gen_build_settings=build_settings)
         handlers.append(
-            video_gen_handler
+            VideoGenHandler(video_gen_build_settings=build_settings)
         )
-        if build_settings.is_good_until:
-            handlers.append(QualityCheckHandler(
-                video_gen_handler=video_gen_handler, is_good_until=build_settings.is_good_until))
-
-        if build_settings.interpolate:
-            handlers.append(VideoInterpolationHandler())
         return handlers

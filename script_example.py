@@ -28,8 +28,10 @@ from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.prompt_based_video import PromptBasedVideo
-from vikit.video.raw_image_based_video import RawImageBasedVideo
+from vikit.video.raw_fixed_image_video import RawFixedImageVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
+from vikit.video.raw_image_based_video import RawImageBasedVideo
+
 from vikit.video.raw_multimodal_based_video import RawMultiModalBasedVideo
 from vikit.video.seine_transition import SeineTransition
 from vikit.video.transition import Transition
@@ -400,7 +402,7 @@ Output ONLY True or False nothing else. No other text or characters are allowed.
         prompt_ouside = await PromptFactory().create_prompt_from_multimodal_async(text="""
 You are an part of a program that will determine if a video will be trimmed if yes you will output the second and if not -1. Perform a frame-by-frame analysis of the provided video. 
 
-Identify if there is an human face and if this human face looks blurry, or weird.
+Identify if there is an human face and if this hucurrent_imageman face looks blurry, or weird.
 
 If nothing of this happens, respond with -1. Output ONLY the second or -1 nothing else. No other text or characters are allowed. Do not get wrong. Do not output any text.
         """,  video=media_url)
@@ -480,6 +482,23 @@ async def add_music():
 
         await composite_video.build(build_settings=video_build_settings)
 
+async def fixed_image_video_generation():
+    working_folder="./examples/inputs/FixedImage/"
+    with WorkingFolderContext(working_folder):
+
+        ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
+
+        video_build_settings = VideoBuildSettings(
+            output_video_file_name="FixedImage.mp4",
+        )
+
+        image_prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_image(
+                    image=test_media.get_test_prompt_image(),
+                )
+
+        fixed_image_video = CompositeVideo().append_video(RawFixedImageVideo(prompt=image_prompt))
+        await fixed_image_video.build(build_settings=video_build_settings)
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -554,3 +573,5 @@ if __name__ == "__main__":
         asyncio.run(add_subtitles())
     elif run_an_example == 10:
         asyncio.run(add_music())
+    elif run_an_example == 11:
+        asyncio.run(fixed_image_video_generation())

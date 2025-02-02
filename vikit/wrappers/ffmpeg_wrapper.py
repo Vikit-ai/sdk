@@ -1073,3 +1073,65 @@ async def get_last_frame_as_image_ffmpeg(media_url, target_path=None):
         raise Exception(error_message)
 
     return target_path
+
+async def generate_video_from_image(image_url, duration=5, dimensions=(1280,720), target_path=None):
+    """
+    Generates a video from an image
+    """
+    assert image_url, "no media URL provided"
+
+    if not target_path:
+        target_path = "animated_" + get_canonical_name(image_url) + ".mp4"
+
+    logger.debug("ffmpeg" + " " +
+        "-y "
+        "-loop"  +  " " +  #Loops on first frame, the image
+        "1" + " " +   
+        "-i" + " " + 
+        image_url +  " " + #Specifies first frame as the image
+        "-c:v" + " " +    # The encoding library
+        "libx264" + " " +   # We want one single frame
+        "-t" + " " +  # Specifying the duration
+        str(duration) + " " +
+        "-vf" + " " +
+        "scale=" + str(dimensions[0]) + ":" + str(dimensions[1]) + " " +
+        target_path)
+    
+    process = await asyncio.create_subprocess_exec(
+        "ffmpeg",
+        "-y",
+        "-loop",  #Loops on first frame, the image
+        "1", 
+        "-i",
+        image_url, #Specifies first frame as the image
+        "-c:v",  # The encoding library
+        "libx264",  
+        "-t",  # Specifying the duration
+        str(duration),
+        "-vf",
+        "scale=" + str(dimensions[0]) + ":" + str(dimensions[1]), #Specifying dimensions, should be a multiple of 2
+        target_path,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+
+    stdout, stderr = await process.communicate()
+    if process.returncode != 0:
+        error_messages = []
+        if stdout:
+            error_messages.append(f"stdout: {stdout.decode()}")
+        if stderr:
+            error_messages.append(f"stderr: {stderr.decode()}")
+
+        if error_messages:
+            error_message = "ffmpeg command failed with: " + " and ".join(
+                error_messages
+            )
+        else:
+            error_message = "ffmpeg command failed without error output"
+
+        logger.error(error_message)
+        raise Exception(error_message)
+    return target_path
+
+
