@@ -18,15 +18,12 @@ import warnings
 
 import pytest
 from loguru import logger
-
 from tests.testing_medias import get_test_prompt_image
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.music_building_context import MusicBuildingContext
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-
-
+from vikit.music_building_context import MusicBuildingContext
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
+from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.raw_fixed_image_video import RawFixedImageVideo
 from vikit.video.video import VideoBuildSettings
 
