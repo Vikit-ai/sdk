@@ -71,8 +71,8 @@ class RawMultiModalBasedVideo(Video):
         """
         return str(VideoType.RAWMULTIMODAL)
 
-    def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway, quality_check=None):
-        return super().run_build_core_logic_hook(build_settings, ml_models_gateway, quality_check)
+    def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway):
+        return super().run_build_core_logic_hook(build_settings, ml_models_gateway)
 
     def get_core_handlers(self, build_settings) -> list[Handler]:
         """
