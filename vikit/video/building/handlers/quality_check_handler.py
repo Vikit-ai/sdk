@@ -47,7 +47,32 @@ class QualityCheckHandler(Handler):
         self.video_gen_handler = video_gen_handler
         self.is_good_until = is_good_until
 
-    async def execute_async(self, video, ml_models_gateway: MLModelsGateway, max_attempts=4):
+    
+    async def get_is_good_up_to_secs_for_video(self, video, ml_models_gateway): 
+        """
+        Gets the second until the video is considered good, or -1 if the video is qualitative.
+        Args:
+            video (Video): The video to test
+            ml_models_gateway (MLModelGateway): The ML Models Gateway
+
+        Returns:
+            The second until the video is considered good, or -1
+        """
+        # Gemini does not support providing a link to a video if the size is superior to
+        # get_max_length_url_gemini() (6.5mb by default)
+        video.media_url = await download_or_copy_file(
+            url=video.media_url,
+            local_path=video.get_file_name_by_state(video.build_settings),
+        )
+
+        if (os.path.getsize(video.media_url) < get_max_file_size_url_gemini()
+                and video.media_url_http):
+            is_good_up_to_secs = await self.is_good_until(video.media_url_http, ml_models_gateway)
+        else:
+            is_good_up_to_secs = await self.is_good_until(video.media_url, ml_models_gateway)
+        return is_good_up_to_secs
+
+    async def execute_async(self, video, ml_models_gateway: MLModelsGateway, max_attempts=4, min_good_secs = 3):
         """
         Checks the quality of a video and rebuilds it if necessary
 
@@ -64,54 +89,42 @@ class QualityCheckHandler(Handler):
         # or the second at which a problem starts to appear.
         # It will be computed through the user provided is_good_until function,
         # because the definition of quality may vary depending on the video generation use-case
-        is_good_up_to_secs = -1
+        is_good_up_to_secs = None
 
-        video.media_url = await download_or_copy_file(
-            url=video.media_url,
-            local_path=video.get_file_name_by_state(video.build_settings),
-        )
+        
 
         # Gemini does not support providing a link to a video if the size is superior to
         # get_max_length_url_gemini() (6.5mb by default)
-        if (os.path.getsize(video.media_url) < get_max_file_size_url_gemini()
-                and video.media_url_http):
-            is_good_up_to_secs = await self.is_good_until(video.media_url_http, ml_models_gateway)
-        else:
-            is_good_up_to_secs = await self.is_good_until(video.media_url, ml_models_gateway)
+        is_good_up_to_secs = await self.get_is_good_up_to_secs_for_video(video, ml_models_gateway)
+
         logger.debug("After checking, video is qualitative \
                      until " + str(is_good_up_to_secs) + " seconds")
 
-        # If the video has not at least 3 seconds of good quality, we need to regenerate it as it is
+        # If the video has not at least min_good_secs seconds of good quality, we need to regenerate it as it is
         # too short to show it to the user
         num_attempts = 0
-        while is_good_up_to_secs != -1 and is_good_up_to_secs < 3 and num_attempts < max_attempts :
+        while is_good_up_to_secs != -1 and is_good_up_to_secs < min_good_secs and num_attempts < max_attempts :
             logger.info(f"Quality check was negative, rebuilding Video {video.id} ")
             video = await self.video_gen_handler.execute_async(video,
                                                                ml_models_gateway=ml_models_gateway)
-            video.media_url = await download_or_copy_file(
-                url=video.media_url,
-                local_path=video.get_file_name_by_state(video.build_settings),
-            )
-            if (os.path.getsize(video.media_url) < get_max_file_size_url_gemini()
-                and video.media_url_http):
-                is_good_up_to_secs = await self.is_good_until(video.media_url_http, ml_models_gateway)
-            else:
-                is_good_up_to_secs = await self.is_good_until(video.media_url, ml_models_gateway)
+
+            is_good_up_to_secs = await self.get_is_good_up_to_secs_for_video(video, ml_models_gateway)
+
             logger.debug("After another checking, video is qualitative until \
                          " + str(is_good_up_to_secs) + " seconds.")
             num_attempts = num_attempts + 1
 
-        # If we made more than 3 unsuccessful generation trials, the AI engine is not capable of
+        # If we made more than min_good_secs unsuccessful generation trials, the AI engine is not capable of
         # generating qualitative content. We just output a naive zoom video if we have an image,
         # and discard the video if we just have text
-        # If the video has 3 or more seconds of qualitative content,
+        # If the video has min_good_secs or more seconds of qualitative content,
         # we can cut it to discard unqualitative content
         # If the video is qualitative (function results -1),
         # we just keep the media_url we had before unchanged
         if is_good_up_to_secs != -1:
-            if is_good_up_to_secs < 3 and num_attempts >= max_attempts:
-                # Special case: we did 3 trials and did not manage to
-                # get at least 3 qualitative seconds
+            if is_good_up_to_secs < min_good_secs and num_attempts >= max_attempts:
+                # Special case: we did min_good_secs trials and did not manage to
+                # get at least min_good_secs qualitative seconds
                 logger.debug(f"We did not manage to generate a qualitative \
                              video {video.id} with AI")
                 if (hasattr(video.prompt, 'image') and video.prompt.image is not None):
@@ -125,6 +138,6 @@ class QualityCheckHandler(Handler):
                 logger.debug(f"Video {video.id} is only qualitative \
                              until {is_good_up_to_secs}, reducing it")
                 video.media_url = await cut_video(video.media_url, 0, is_good_up_to_secs, 5)
-        #Else : is_good_up_to_secs = -1, we just keep the original built_video.media_url
+        #Or else : is_good_up_to_secs = -1, we just keep the original built_video.media_url
 
         return video
