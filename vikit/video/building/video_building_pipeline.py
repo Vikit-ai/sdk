@@ -126,8 +126,9 @@ class VideoBuildingPipeline:
                             music_duration=music_duration
                         )
                     )
-            
-            if build_settings.music_building_context.background_music_file:
+
+            background_music_file = build_settings.music_building_context.background_music_file
+            if background_music_file:
                 handlers.append(MusicMergeHandler(music_to_merge = build_settings.music_building_context.background_music_file))
             
             if len(handlers) > 0:

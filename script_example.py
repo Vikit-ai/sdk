@@ -24,21 +24,20 @@ import tests.testing_medias as test_media
 
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.common.decorators import log_function_params
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
+from vikit.postprocessing.video_subtitle_renderer import VideoSubtitleRenderer
 from vikit.video.composite_video import CompositeVideo
+from vikit.video.imported_video import  ImportedVideo
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.raw_fixed_image_video import RawFixedImageVideo
-from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.raw_image_based_video import RawImageBasedVideo
-
 from vikit.video.raw_multimodal_based_video import RawMultiModalBasedVideo
 from vikit.video.seine_transition import SeineTransition
+from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.transition import Transition
 from vikit.video.video_build_settings import VideoBuildSettings
-from vikit.video.imported_video import  ImportedVideo
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-from vikit.postprocessing.video_subtitle_renderer import VideoSubtitleRenderer
 
 
 negative_prompt = """bad anatomy, bad hands, missing fingers, extra fingers, three hands, 
@@ -402,7 +401,7 @@ Output ONLY True or False nothing else. No other text or characters are allowed.
         prompt_ouside = await PromptFactory().create_prompt_from_multimodal_async(text="""
 You are an part of a program that will determine if a video will be trimmed if yes you will output the second and if not -1. Perform a frame-by-frame analysis of the provided video. 
 
-Identify if there is an human face and if this hucurrent_imageman face looks blurry, or weird.
+Identify if there is an human face and if this human face looks blurry, or weird.
 
 If nothing of this happens, respond with -1. Output ONLY the second or -1 nothing else. No other text or characters are allowed. Do not get wrong. Do not output any text.
         """,  video=media_url)
@@ -465,7 +464,7 @@ async def add_subtitles():
     )
 
 async def add_music():
-    working_folder="./examples/inputs/Imported/"
+    working_folder="./examples/inputs/AddMusic/"
     with WorkingFolderContext(working_folder):
 
         video_build_settings = VideoBuildSettings(

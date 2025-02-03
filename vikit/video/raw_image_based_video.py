@@ -20,7 +20,6 @@ from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
 from vikit.prompt.prompt import Prompt
-from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.building.handlers.interpolation_handler import (
     VideoInterpolationHandler,
 )
@@ -74,7 +73,7 @@ class RawImageBasedVideo(Video):
             )
         elif self.prompt and self.prompt.text:
             summarised_title = self.get_title_from_description(
-                description=self.text
+                description=self.prompt.text
             )
         else:
             summarised_title = "ImagePrompt"

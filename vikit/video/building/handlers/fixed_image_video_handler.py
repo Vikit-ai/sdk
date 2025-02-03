@@ -24,6 +24,9 @@ from vikit.wrappers.ffmpeg_wrapper import generate_video_from_image
 from vikit.common.file_tools import get_canonical_name
 
 class FixedImageVideoGenHandler(Handler):
+    """
+    Handler used to generate a fixed video displaying an image
+    """
 
     async def execute_async(self, video: Video, ml_models_gateway: MLModelsGateway):
 
@@ -46,6 +49,5 @@ class FixedImageVideoGenHandler(Handler):
         assert fixed_image_video, "Fixed image video video was not generated properly"
 
         video.media_url = fixed_image_video
-        assert video.media_url, "Fixed image video was not downloaded properly"
 
         return video

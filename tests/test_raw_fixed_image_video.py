@@ -27,7 +27,6 @@ from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 
-# from unittest.mock import patch, MagicMock, Mock
 from vikit.video.raw_fixed_image_video import RawFixedImageVideo
 from vikit.video.video import VideoBuildSettings
 
@@ -39,7 +38,7 @@ class TestRawFixedImageVideo:
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
-        logger.add("log_test_raw_image_based_video.txt", rotation="10 MB")
+        logger.add("log_test_raw_fixed_based_video.txt", rotation="10 MB")
 
     @pytest.mark.local_integration
     async def test_get_title(self):
@@ -47,10 +46,7 @@ class TestRawFixedImageVideo:
             video_title = RawFixedImageVideo(
                 prompt=await PromptFactory(
                     prompt_build_settings=PromptBuildSettings()
-                )
-                .create_prompt_from_image(
-                    image=TEST_PROMPT, text="test image prompt"
-                ),
+                ).create_prompt_from_image(image=TEST_PROMPT, text="test image prompt"),
                 title="test_image_prompt",
             ).get_title()
             logger.debug(f"Test get_title, video title: {video_title}")
@@ -69,7 +65,11 @@ class TestRawFixedImageVideo:
                 title="test_image_prompt",
             )
 
-            await pbvid.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
+            await pbvid.build(
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                    test_mode=True
+                )
+            )
             logger.debug(
                 f"Test build_single_video_no_bg_music_without_subs, media URL: {pbvid.media_url}"
             )
@@ -89,7 +89,11 @@ class TestRawFixedImageVideo:
                 prompt=image_prompt,
                 title="test_image_prompt",
             )
-            await pbvid.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
+            await pbvid.build(
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                    test_mode=True
+                )
+            )
 
             assert pbvid._background_music_file_name is None
             assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
@@ -112,7 +116,10 @@ class TestRawFixedImageVideo:
                         apply_background_music=True, generate_background_music=False
                     ),
                     prompt=image_prompt,
-                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
+                ),
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                    test_mode=True
+                ),
             )
 
             assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
@@ -131,7 +138,8 @@ class TestRawFixedImageVideo:
                 target_model_provider="stabilityai_image",
             )
             image_prompt = await PromptFactory().create_prompt_from_image(
-                image=TEST_PROMPT, text="test image prompt")
+                image=TEST_PROMPT, text="test image prompt"
+            )
             build_settings.prompt = image_prompt
 
             video = RawFixedImageVideo(
