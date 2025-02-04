@@ -118,7 +118,10 @@ class VideoBuildingPipeline:
                     )
                 )
             else:
-                if build_settings.music_building_context.use_recorded_prompt_as_audio:
+                background_music_file = build_settings.music_building_context.background_music_file
+                if background_music_file:
+                    handlers.append(MusicMergeHandler(music_to_merge = build_settings.music_building_context.background_music_file))
+                elif build_settings.music_building_context.use_recorded_prompt_as_audio:
                     handlers.append(UsePromptAudioTrackAndAudioMergingHandler())
                 else:
                     handlers.append(
@@ -127,9 +130,7 @@ class VideoBuildingPipeline:
                         )
                     )
 
-            background_music_file = build_settings.music_building_context.background_music_file
-            if background_music_file:
-                handlers.append(MusicMergeHandler(music_to_merge = build_settings.music_building_context.background_music_file))
+            
             
             if len(handlers) > 0:
                 logger.warning(f"bg music added  for  Video of type {type(video)}")
