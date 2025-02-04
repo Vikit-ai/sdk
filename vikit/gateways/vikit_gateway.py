@@ -474,7 +474,7 @@ interesting the resulting music will be. Here is your prompt: '"""
 
         logger.debug(f"Video to interpolate {video[:50]}")
 
-        if video.split('.') is not None and os.path.splitext(video)[1].lower() in ["mp4", "mov", "avi", "wmv", "webm"]:
+        if video.split('.') is not None and os.path.splitext(video)[1].lower() in [".mp4", ".mov", ".avi", ".wmv", ".webm"]:
             #Read file path and then convert to Base64
             with open(video, "rb") as video_file:
                 video_data = "data:video/" + video.split('.')[-1].lower() + ";base64," + base64.b64encode(video_file.read()).decode(
@@ -1127,7 +1127,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             # We check if the video is a local path
             if prompt.video.split(".") is not None and os.path.splitext(prompt.video)[
                 1
-            ].lower() in ["mp4", "mov", "avi", "wmv", "webm"]:
+            ].lower() in [".mp4", ".mov", ".avi", ".wmv", ".webm"]:
                 # Read file path and then convert to Base64
                 with open(prompt.video, "rb") as video_file:
                     video_data = base64.b64encode(video_file.read()).decode("utf-8")
