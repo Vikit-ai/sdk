@@ -62,8 +62,9 @@ class TestRawMultiModalBasedVideo:
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=False
-                    )
-                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True), quality_check=dummy_quality_check
+                    ),
+                    is_good_until=dummy_quality_check,
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
@@ -86,8 +87,9 @@ class TestRawMultiModalBasedVideo:
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=False
-                    )
-                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True), quality_check=dummy_quality_check_negative
+                    ),
+                    is_good_until=dummy_quality_check_negative,
+                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
             )
 
             assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"

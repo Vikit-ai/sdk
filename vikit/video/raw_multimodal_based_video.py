@@ -22,6 +22,12 @@ from vikit.video.video_types import VideoType
 from vikit.prompt.prompt import Prompt
 from vikit.prompt.multimodal_prompt import MultiModalPrompt
 from vikit.prompt.prompt_factory import PromptFactory
+from vikit.video.building.handlers.interpolation_handler import (
+    VideoInterpolationHandler,
+)
+from vikit.video.building.handlers.quality_check_handler import (
+    QualityCheckHandler,
+)
 
 class RawMultiModalBasedVideo(Video):
     """
@@ -65,8 +71,8 @@ class RawMultiModalBasedVideo(Video):
         """
         return str(VideoType.RAWMULTIMODAL)
 
-    def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway, quality_check=None):
-        return super().run_build_core_logic_hook(build_settings, ml_models_gateway, quality_check)
+    def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway):
+        return super().run_build_core_logic_hook(build_settings, ml_models_gateway)
 
     def get_core_handlers(self, build_settings) -> list[Handler]:
         """
@@ -80,7 +86,14 @@ class RawMultiModalBasedVideo(Video):
              list: The list of handlers to use for building the video
         """
         handlers = []
+        video_gen_handler = VideoGenHandler(video_gen_build_settings=build_settings)
         handlers.append(
-            VideoGenHandler(video_gen_build_settings=build_settings)
+            video_gen_handler
         )
+
+        if build_settings.is_good_until:
+            handlers.append(QualityCheckHandler(video_gen_handler=video_gen_handler, is_good_until=build_settings.is_good_until))
+
+        if build_settings.interpolate:
+            handlers.append(VideoInterpolationHandler())
         return handlers

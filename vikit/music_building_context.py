@@ -21,6 +21,7 @@ class MusicBuildingContext:
         generate_background_music: bool = False,
         use_recorded_prompt_as_audio: bool = False,
         expected_music_length: float = None,
+        background_music_file:str=None
     ):
         """
         A context class for building music.
@@ -38,4 +39,5 @@ class MusicBuildingContext:
         self.apply_background_music = apply_background_music
         self.generate_background_music = generate_background_music
         self.expected_music_length = expected_music_length
+        self.background_music_file = background_music_file
         self._generated_background_music_file = None

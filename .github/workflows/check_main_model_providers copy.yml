@@ -38,6 +38,6 @@ jobs:
         VIDEO_LIST_FILE_NAME :  ${{ vars.VIDEO_LIST_FILE_NAME }}
         DEFAULT_BACKGROUND_MUSIC : ${{ vars.DEFAULT_BACKGROUND_MUSIC }}        
       run: |
-          pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_stabilityai_provider_and_generate
-          pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_videocrafter_provider_and_generate
+          pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_runway_provider_and_generate
           pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_haiper_provider_and_generate
+          pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_vikit_provider_and_generate                    
