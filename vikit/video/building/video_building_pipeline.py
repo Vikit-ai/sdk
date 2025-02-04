@@ -30,7 +30,11 @@ from vikit.video.building.handlers.use_prompt_audio_track_and_audio_merging_hand
 from vikit.video.building.handlers.video_reencoding_handler import (
     VideoReencodingHandler,
 )
+from vikit.video.building.handlers.music_merge_handler import (
+    MusicMergeHandler,
+)
 from vikit.video.video_build_settings import VideoBuildSettings
+
 
 
 class VideoBuildingPipeline:
@@ -122,6 +126,11 @@ class VideoBuildingPipeline:
                             music_duration=music_duration
                         )
                     )
+
+            background_music_file = build_settings.music_building_context.background_music_file
+            if background_music_file:
+                handlers.append(MusicMergeHandler(music_to_merge = build_settings.music_building_context.background_music_file))
+            
             if len(handlers) > 0:
                 logger.warning(f"bg music added  for  Video of type {type(video)}")
 

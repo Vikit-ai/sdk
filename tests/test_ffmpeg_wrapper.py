@@ -28,6 +28,7 @@ from vikit.wrappers.ffmpeg_wrapper import (
     get_media_duration,
     create_zoom_video,
     extract_audio_from_video,
+    generate_video_from_image,
 )
 
 import math
@@ -217,3 +218,15 @@ class TestFFMPEGWrapper:
                 video_full_path=None,
                 target_dir=None,
             )
+
+    @pytest.mark.local_integration
+    @pytest.mark.asyncio
+    async def test_generate_image_video(self):
+        """
+        Extract the audio and test its duration
+        """
+        
+        image_video = await generate_video_from_image(
+            image_url=tests_medias.get_test_prompt_image(),
+        )
+        assert int(get_media_duration(image_video)) == 5

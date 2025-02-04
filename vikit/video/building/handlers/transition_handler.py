@@ -38,7 +38,8 @@ class VideoBuildingHandlerTransition(Handler):
             CompositeVideo: The composite video
         """
         logger.info(
-            f"about to generate transition as video: {video.id}, source:  {video.source_video.media_url}, target: {video.target_video.media_url}"
+            f"about to generate transition as video: {video.id}, source: \
+                {video.source_video.media_url}, target: {video.target_video.media_url}"
         )
 
         assert (
@@ -46,18 +47,22 @@ class VideoBuildingHandlerTransition(Handler):
         ), f"source video must be generated, video: {video.source_video}"
         assert (
             video.target_video.media_url
-        ), f"target video must be generated, {video.target_video.media_url}, id: {video.target_video.id}"
+        ), f"target video must be generated, \
+                {video.target_video.media_url}, id: {video.target_video.id}"
         assert url_exists(video.source_video.media_url), "source_video must exist"
         assert url_exists(video.target_video.media_url), "target_video must exist"
 
         logger.debug(
-            f"Applying transition from {video.source_video.media_url} to {video.target_video.media_url}"
+            f"Applying transition from \
+                {video.source_video.media_url} to {video.target_video.media_url}"
         )
-        
+
         # We generate a transition
-        link_to_transition_video = await ml_models_gateway.generate_seine_transition_async(
-            source_image_path=await video.source_video.get_last_frame_as_image(),
-            target_image_path=await video.target_video.get_first_frame_as_image(),
+        link_to_transition_video = (
+            await ml_models_gateway.generate_seine_transition_async(
+                source_image_path=await video.source_video.get_last_frame_as_image(),
+                target_image_path=await video.target_video.get_first_frame_as_image(),
+            )
         )
 
         if link_to_transition_video is None:

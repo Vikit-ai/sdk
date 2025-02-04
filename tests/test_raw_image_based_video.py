@@ -18,16 +18,12 @@ import warnings
 
 import pytest
 from loguru import logger
-
 from tests.testing_medias import get_test_prompt_image
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.music_building_context import MusicBuildingContext
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-
-
-# from unittest.mock import patch, MagicMock, Mock
+from vikit.music_building_context import MusicBuildingContext
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
+from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.raw_image_based_video import RawImageBasedVideo
 from vikit.video.video import VideoBuildSettings
 
@@ -47,10 +43,7 @@ class TestRawImagePromptBasedVideo:
             video_title = RawImageBasedVideo(
                 prompt=await PromptFactory(
                     prompt_build_settings=PromptBuildSettings()
-                )
-                .create_prompt_from_image(
-                    image=TEST_PROMPT, text="test image prompt"
-                ),
+                ).create_prompt_from_image(image=TEST_PROMPT, text="test image prompt"),
                 title="test_image_prompt",
             ).get_title()
             logger.debug(f"Test get_title, video title: {video_title}")
@@ -69,7 +62,11 @@ class TestRawImagePromptBasedVideo:
                 title="test_image_prompt",
             )
 
-            await pbvid.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
+            await pbvid.build(
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                    test_mode=True
+                )
+            )
             logger.debug(
                 f"Test build_single_video_no_bg_music_without_subs, media URL: {pbvid.media_url}"
             )
@@ -89,7 +86,11 @@ class TestRawImagePromptBasedVideo:
                 prompt=image_prompt,
                 title="test_image_prompt",
             )
-            await pbvid.build(ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
+            await pbvid.build(
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                    test_mode=True
+                )
+            )
 
             assert pbvid._background_music_file_name is None
             assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
@@ -112,7 +113,10 @@ class TestRawImagePromptBasedVideo:
                         apply_background_music=True, generate_background_music=False
                     ),
                     prompt=image_prompt,
-                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
+                ),
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                    test_mode=True
+                ),
             )
 
             assert pbvid.media_url, f"media URL was not updated: {pbvid.media_url}"
@@ -130,7 +134,9 @@ class TestRawImagePromptBasedVideo:
                 ),
                 target_model_provider="stabilityai_image",
             )
-            image_prompt = await PromptFactory().create_prompt_from_image(image=TEST_PROMPT, text="test image prompt")
+            image_prompt = await PromptFactory().create_prompt_from_image(
+                image=TEST_PROMPT, text="test image prompt"
+            )
             build_settings.prompt = image_prompt
 
             video = RawImageBasedVideo(

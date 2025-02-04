@@ -102,6 +102,7 @@ class CompositeVideo(Video, is_composite_video):
                 target_model_provider=self.build_settings.target_model_provider,
                 vikit_api_key=self.build_settings.vikit_api_key,
                 aspect_ratio=self.build_settings.aspect_ratio,
+                is_good_until=self.build_settings.is_good_until,
             )
 
     def append_video(self, video: Video):
@@ -196,7 +197,6 @@ class CompositeVideo(Video, is_composite_video):
         self,
         ml_models_gateway,
         build_settings=VideoBuildSettings(),
-        quality_check=None,
     ):
         """
         Mix all the videos in the list: here we actually build and stitch the videos together,
@@ -228,7 +228,7 @@ class CompositeVideo(Video, is_composite_video):
             ]
             await asyncio.gather(
                 *(
-                    v.build(self.get_children_build_settings(), ml_models_gateway=ml_models_gateway, quality_check=quality_check)
+                    v.build(self.get_children_build_settings(), ml_models_gateway=ml_models_gateway)
                     for v in no_dependency_videos
                 )
             )
