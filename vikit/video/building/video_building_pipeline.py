@@ -130,8 +130,6 @@ class VideoBuildingPipeline:
                         )
                     )
 
-            
-            
             if len(handlers) > 0:
                 logger.warning(f"bg music added  for  Video of type {type(video)}")
 

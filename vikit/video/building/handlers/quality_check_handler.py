@@ -63,6 +63,7 @@ class QualityCheckHandler(Handler):
         video.media_url = await download_or_copy_file(
             url=video.media_url,
             local_path=video.get_file_name_by_state(video.build_settings),
+            force_download=True,
         )
 
         if (os.path.getsize(video.media_url) < get_max_file_size_url_gemini()
