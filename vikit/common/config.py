@@ -14,12 +14,11 @@
 # ==============================================================================
 
 import os
+import uuid
 from os import path
 
 from dotenv import load_dotenv
 from loguru import logger
-
-import uuid
 
 # Get the absolute path to the directory this file is in.
 # TODO: make this cleaner and more robust by using the __file__ attribute

@@ -14,7 +14,6 @@
 # ==============================================================================
 
 import os
-
 # from unittest.mock import patch, MagicMock, Mock
 import warnings
 
@@ -23,10 +22,10 @@ from loguru import logger
 
 from tests.testing_medias import get_cat_video_path
 from vikit.common.context_managers import WorkingFolderContext
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.imported_video import ImportedVideo
 from vikit.video.video import VideoBuildSettings
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 
 class TestImportedVideo:

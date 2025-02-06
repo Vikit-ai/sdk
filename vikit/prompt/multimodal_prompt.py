@@ -13,9 +13,10 @@
 # limitations under the License.
 # ==============================================================================
 
+import copy
+
 from vikit.prompt.prompt import Prompt
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
-import copy
 
 
 class MultiModalPrompt(Prompt):

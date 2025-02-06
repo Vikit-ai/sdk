@@ -18,6 +18,7 @@ import warnings
 
 import pytest
 from loguru import logger
+
 from tests.testing_medias import (get_cat_video_path, get_test_prompt_image,
                                   get_test_prompt_recording)
 from vikit.common.context_managers import WorkingFolderContext

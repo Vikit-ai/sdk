@@ -15,26 +15,18 @@
 
 from loguru import logger
 
-from vikit.video.building.handlers.default_bg_music_and_audio_merging_handler import (
-    DefaultBGMusicAndAudioMergingHandler,
-)
-from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handler import (
-    ReadAloudPromptAudioMergingHandler,
-)
-from vikit.video.building.handlers.generate_music_and_merge_handler import (
-    GenerateMusicAndMergeHandler,
-)
-from vikit.video.building.handlers.use_prompt_audio_track_and_audio_merging_handler import (
-    UsePromptAudioTrackAndAudioMergingHandler,
-)
-from vikit.video.building.handlers.video_reencoding_handler import (
-    VideoReencodingHandler,
-)
-from vikit.video.building.handlers.music_merge_handler import (
-    MusicMergeHandler,
-)
+from vikit.video.building.handlers.default_bg_music_and_audio_merging_handler import \
+    DefaultBGMusicAndAudioMergingHandler
+from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handler import \
+    ReadAloudPromptAudioMergingHandler
+from vikit.video.building.handlers.generate_music_and_merge_handler import \
+    GenerateMusicAndMergeHandler
+from vikit.video.building.handlers.music_merge_handler import MusicMergeHandler
+from vikit.video.building.handlers.use_prompt_audio_track_and_audio_merging_handler import \
+    UsePromptAudioTrackAndAudioMergingHandler
+from vikit.video.building.handlers.video_reencoding_handler import \
+    VideoReencodingHandler
 from vikit.video.video_build_settings import VideoBuildSettings
-
 
 
 class VideoBuildingPipeline:

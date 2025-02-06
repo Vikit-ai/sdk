@@ -23,32 +23,21 @@ import time
 import uuid as uid
 
 import aiohttp
+import cv2
+import numpy as np
 from loguru import logger
-from tenacity import (
-    AsyncRetrying,
-    after_log,
-    before_log,
-    retry,
-    stop_after_attempt,
-    wait_exponential,
-)
+from tenacity import (AsyncRetrying, after_log, before_log, retry,
+                      stop_after_attempt, wait_exponential)
 
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
-from vikit.common.config import get_nb_retries_http_calls
+from vikit.common.config import (get_nb_retries_http_calls,
+                                 get_vikit_backend_url)
 from vikit.common.file_tools import download_or_copy_file
-from vikit.common.secrets import (
-    get_replicate_api_token,
-    get_vikit_api_token,
-    has_eleven_labs_api_key,
-)
+from vikit.common.secrets import (get_replicate_api_token, get_vikit_api_token,
+                                  has_eleven_labs_api_key)
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
-import cv2
-import numpy as np
-
-from vikit.common.config import get_vikit_backend_url
-
 
 os.environ["REPLICATE_API_TOKEN"] = get_replicate_api_token()
 vikit_backend_url = get_vikit_backend_url()

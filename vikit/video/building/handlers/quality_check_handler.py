@@ -16,19 +16,16 @@
 
 
 import os
+
 from loguru import logger
+
+from vikit.common.config import get_max_file_size_url_gemini
+from vikit.common.file_tools import download_or_copy_file
 from vikit.common.handler import Handler
 from vikit.gateways.ML_models_gateway import MLModelsGateway
+from vikit.wrappers.ffmpeg_wrapper import (create_zoom_video, cut_video,
+                                           reverse_video)
 
-from vikit.wrappers.ffmpeg_wrapper import (
-    cut_video,
-    create_zoom_video,
-    reverse_video,
-)
-from vikit.common.config import get_max_file_size_url_gemini
-from vikit.common.file_tools import (
-    download_or_copy_file,
-)
 
 class QualityCheckHandler(Handler):
     """

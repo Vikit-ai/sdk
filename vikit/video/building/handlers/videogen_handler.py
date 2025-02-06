@@ -13,23 +13,21 @@
 # limitations under the License.
 # ==============================================================================
 
-from loguru import logger
+import copy
 import time
 
-from vikit.common.handler import Handler
-from vikit.video.video import Video
+from loguru import logger
+
 from vikit.common.config import get_media_polling_interval
-from vikit.common.file_tools import (
-    url_exists,
-)
-from vikit.prompt.prompt import Prompt
-from vikit.prompt.image_prompt import ImagePrompt
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.prompt.multimodal_prompt import MultiModalPrompt
-from vikit.video.video import VideoBuildSettings
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.common.file_tools import url_exists
+from vikit.common.handler import Handler
 from vikit.gateways.ML_models_gateway import MLModelsGateway
-import copy
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.prompt.image_prompt import ImagePrompt
+from vikit.prompt.multimodal_prompt import MultiModalPrompt
+from vikit.prompt.prompt import Prompt
+from vikit.prompt.prompt_factory import PromptFactory
+from vikit.video.video import Video, VideoBuildSettings
 
 
 class VideoGenHandler(Handler):

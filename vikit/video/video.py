@@ -15,35 +15,28 @@
 
 import os
 import random
+import re
 import shutil
 import uuid as uid
 from abc import ABC, abstractmethod
-import re
 
 from loguru import logger
 
+from vikit.common.config import get_max_file_size_url_gemini
 from vikit.common.decorators import log_function_params
-from vikit.common.file_tools import (
-    download_or_copy_file,
-    is_valid_filename,
-    is_valid_path,
-)
+from vikit.common.file_tools import (download_or_copy_file, is_valid_filename,
+                                     is_valid_path)
 from vikit.common.handler import Handler
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.prompt.prompt import Prompt
 from vikit.video.building.video_building_pipeline import VideoBuildingPipeline
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_file_name import VideoFileName
 from vikit.video.video_metadata import VideoMetadata
-from vikit.wrappers.ffmpeg_wrapper import (
-    get_first_frame_as_image_ffmpeg,
-    get_last_frame_as_image_ffmpeg,
-    get_media_duration,
-    cut_video,
-    create_zoom_video,
-    reverse_video,
-)
-from vikit.prompt.prompt import Prompt
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-from vikit.common.config import get_max_file_size_url_gemini
+from vikit.wrappers.ffmpeg_wrapper import (create_zoom_video, cut_video,
+                                           get_first_frame_as_image_ffmpeg,
+                                           get_last_frame_as_image_ffmpeg,
+                                           get_media_duration, reverse_video)
 
 DEFAULT_VIDEO_TITLE = "no-title-yet"
 

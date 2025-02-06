@@ -18,7 +18,8 @@ import warnings
 import pytest
 from loguru import logger
 
-from tests.testing_medias import get_test_prompt_image, get_test_prompt_recording
+from tests.testing_medias import (get_test_prompt_image,
+                                  get_test_prompt_recording)
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.gateways import replicate_gateway as replicate_gateway
 from vikit.gateways import vikit_gateway as vgateway

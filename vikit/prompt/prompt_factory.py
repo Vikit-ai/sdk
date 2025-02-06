@@ -15,6 +15,7 @@
 
 import base64
 import os
+import uuid
 
 from loguru import logger
 
@@ -22,23 +23,19 @@ import vikit.common.config as config
 from vikit.common.decorators import log_function_params
 from vikit.common.handler import Handler
 from vikit.gateways.ML_models_gateway import MLModelsGateway
-from vikit.prompt.building.handlers.prompt_by_keywords_handler import (
-    PromptByKeywordsHandler,
-)
-from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
-    PromptByRawUserTextHandler,
-)
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.prompt.building.handlers.prompt_by_keywords_handler import \
+    PromptByKeywordsHandler
+from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import \
+    PromptByRawUserTextHandler
 from vikit.prompt.image_prompt import ImagePrompt
 from vikit.prompt.multimodal_prompt import MultiModalPrompt
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.prompt.recorded_prompt import RecordedPrompt
-from vikit.prompt.recorded_prompt_subtitles_extractor import (
-    RecordedPromptSubtitlesExtractor,
-)
+from vikit.prompt.recorded_prompt_subtitles_extractor import \
+    RecordedPromptSubtitlesExtractor
 from vikit.wrappers.ffmpeg_wrapper import get_media_duration
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
-import uuid
 
 class PromptFactory:
     """

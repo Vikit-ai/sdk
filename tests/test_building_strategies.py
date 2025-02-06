@@ -16,12 +16,13 @@
 import pytest
 
 import tests.testing_tools as tools
-from vikit.video.building.build_order import get_lazy_dependency_chain_build_order
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.video.building.build_order import \
+    get_lazy_dependency_chain_build_order
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video_build_settings import VideoBuildSettings
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 
 class TestVideoBuildingStrategies:

@@ -15,19 +15,18 @@
 
 from vikit.common.decorators import log_function_params
 from vikit.common.handler import Handler
+from vikit.prompt.prompt import Prompt
+from vikit.prompt.prompt_factory import PromptFactory
+from vikit.video.building.handlers.fixed_image_video_handler import \
+    FixedImageVideoGenHandler
+from vikit.video.building.handlers.interpolation_handler import \
+    VideoInterpolationHandler
+from vikit.video.building.handlers.quality_check_handler import \
+    QualityCheckHandler
 from vikit.video.building.handlers.videogen_handler import VideoGenHandler
 from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
-from vikit.video.building.handlers.fixed_image_video_handler import FixedImageVideoGenHandler
-from vikit.prompt.prompt import Prompt
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.video.building.handlers.interpolation_handler import (
-    VideoInterpolationHandler,
-)
-from vikit.video.building.handlers.quality_check_handler import (
-    QualityCheckHandler,
-)
 
 
 class RawFixedImageVideo(Video):

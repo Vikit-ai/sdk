@@ -22,20 +22,17 @@ from loguru import logger
 import tests.testing_medias as test_media
 import tests.testing_tools as tools  # used to get a library of test prompts
 import vikit.wrappers.ffmpeg_wrapper as ffmpegwrapper
-from tests.testing_medias import (
-    get_cat_video_path,
-    get_test_transition_stones_trainboy_path,
-)
+from tests.testing_medias import (get_cat_video_path,
+                                  get_test_transition_stones_trainboy_path)
 from tests.testing_tools import test_prompt_library
 from vikit.common.context_managers import WorkingFolderContext
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.imported_video import ImportedVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video import Video, VideoBuildSettings
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-
 
 prompt_mystic = tools.test_prompt_library["moss_stones-train_boy"]
 

@@ -20,9 +20,9 @@ from loguru import logger
 
 import vikit.gateways.ML_models_gateway_factory as ML_models_gateway_factory
 from vikit.common.context_managers import WorkingFolderContext
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.prompt.prompt_factory import PromptFactory
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 SAMPLE_PROMPT_TEXT = """A group of ancient, moss-covered stones come to life in an abandoned forest, revealing intricate carvings
 and symbols. This is additional text to make sure we generate several subtitles. """

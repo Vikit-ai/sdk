@@ -22,17 +22,12 @@ from loguru import logger
 import vikit.common.config as config
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.building.build_order import (
-    get_lazy_dependency_chain_build_order,
-    is_composite_video,
-)
+    get_lazy_dependency_chain_build_order, is_composite_video)
 from vikit.video.video import DEFAULT_VIDEO_TITLE, Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
-from vikit.wrappers.ffmpeg_wrapper import (
-    concatenate_videos,
-    get_media_duration,
-    get_media_fps,
-)
+from vikit.wrappers.ffmpeg_wrapper import (concatenate_videos,
+                                           get_media_duration, get_media_fps)
 
 
 class CompositeVideo(Video, is_composite_video):
