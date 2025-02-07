@@ -66,7 +66,7 @@ class QualityCheckHandler(Handler):
             force_download=True,
         )
 
-        if (os.path.getsize(video.media_url) < get_max_file_size_url_gemini()
+        if (os.path.getsize(video.media_url) > get_max_file_size_url_gemini()
                 and video.media_url_http):
             is_good_up_to_secs = await self.is_good_until(video.media_url_http, ml_models_gateway)
         else:
