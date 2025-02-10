@@ -19,7 +19,8 @@ class VideoLogoOverlay:
         output_path: str,
         logo_height: int,
         position: str = "top_right",
-        margin: int = 10,
+        logo_height_percentage: int = 10,
+        margin: int = 15,
     ):
         """
         Args:
@@ -35,6 +36,7 @@ class VideoLogoOverlay:
         self.output_path = output_path
         self.position = position
         self.logo_height = logo_height
+        self.logo_height_percentage = logo_height_percentage
         self.margin = margin
 
     async def add_logo(self):
@@ -66,7 +68,7 @@ class VideoLogoOverlay:
                 "No height provided. Automatically computing logo heigh based on video height ..."
             )
 
-            self.logo_height = int(video.h * 0.1)  # 10% of video height
+            self.logo_height = int(video.h * (self.logo_height_percentage/100))
 
         logger.debug(
             f"Started adding logo {self.logo_path} to video {self.video_path} ..."
@@ -76,8 +78,15 @@ class VideoLogoOverlay:
 
         logo = logo.resize(height=int(self.logo_height))
         
+        margins = {
+            "top_right": {"right": self.margin, "top": self.margin},
+            "top_left": {"left": self.margin, "top": self.margin},
+            "bottom_right": {"right": self.margin, "bottom": self.margin},
+            "bottom_left": {"left": self.margin, "bottom": self.margin},
+        }
+
         logo = logo.set_position(positions[self.position], relative=True).margin(
-            right=self.margin, top=self.margin, opacity=0
+            **margins[self.position], opacity=0
         )
 
         logo = logo.set_duration(video.duration)
