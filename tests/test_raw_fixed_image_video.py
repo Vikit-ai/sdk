@@ -18,6 +18,7 @@ import warnings
 
 import pytest
 from loguru import logger
+
 from tests.testing_medias import get_test_prompt_image
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory

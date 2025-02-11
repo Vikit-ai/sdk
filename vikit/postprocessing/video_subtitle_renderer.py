@@ -13,11 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-import pysrt
 import textwrap
-from PIL import ImageFont
+
+import pysrt
 from loguru import logger
-from moviepy.editor import ColorClip, CompositeVideoClip, TextClip, VideoFileClip
+from moviepy.editor import (ColorClip, CompositeVideoClip, TextClip,
+                            VideoFileClip)
+from PIL import ImageFont
+
 
 class VideoSubtitleRenderer:
     """

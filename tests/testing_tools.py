@@ -18,10 +18,8 @@ from pathlib import Path
 
 import pysrt
 
-from tests.testing_medias import (
-    get_test_prompt_recording_trainboy,
-    get_test_recorded_prompt_path,
-)
+from tests.testing_medias import (get_test_prompt_recording_trainboy,
+                                  get_test_recorded_prompt_path)
 from vikit.prompt.recorded_prompt import RecordedPrompt
 from vikit.prompt.subtitle_extractor import SubtitleExtractor
 from vikit.video.video import Video

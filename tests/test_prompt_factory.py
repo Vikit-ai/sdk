@@ -16,10 +16,10 @@
 
 import pytest
 
-from vikit.prompt.prompt_build_settings import PromptBuildSettings
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-from vikit.prompt.prompt_factory import PromptFactory
 from tests.testing_medias import get_test_prompt_image
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.prompt.prompt_build_settings import PromptBuildSettings
+from vikit.prompt.prompt_factory import PromptFactory
 
 TEST_PROMPT = get_test_prompt_image()
 

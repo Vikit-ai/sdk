@@ -13,15 +13,16 @@
 # limitations under the License.
 # ==============================================================================
 
-from loguru import logger
 import uuid as uid
 
-from vikit.common.file_tools import download_or_copy_file
+from loguru import logger
+
+from vikit.common.file_tools import download_or_copy_file, get_canonical_name
 from vikit.common.handler import Handler
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.video.video import Video
 from vikit.wrappers.ffmpeg_wrapper import generate_video_from_image
-from vikit.common.file_tools import get_canonical_name
+
 
 class FixedImageVideoGenHandler(Handler):
     """

@@ -24,12 +24,14 @@ from urllib.request import urlopen
 
 import aiofiles
 import aiohttp
+
 from loguru import logger
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 # Maybe we will consider breaking down the copying logic into modules to prevent adding too many dependencies on external linbs
 from google.cloud import storage
-
+from loguru import logger
+from tenacity import retry, stop_after_attempt
 
 from vikit.common.config import get_nb_retries_http_calls
 

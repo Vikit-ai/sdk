@@ -18,8 +18,8 @@ import os
 import pytest
 
 import tests.testing_medias as testing_medias
-from vikit.common.file_tools import download_or_copy_file, copy_file_from_gcs
 from vikit.common.context_managers import WorkingFolderContext
+from vikit.common.file_tools import copy_file_from_gcs, download_or_copy_file
 
 
 class TestFileTools:

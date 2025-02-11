@@ -19,8 +19,8 @@ import warnings
 import pytest
 from loguru import logger
 
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.common.context_managers import WorkingFolderContext
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.gateways.vikit_gateway import VikitGateway
 
 TEST_PROMPT = "A group of stones in a forest, with symbols"

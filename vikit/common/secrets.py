@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-from sys import exit
 from os import getenv, path
+from sys import exit
 
 from dotenv import load_dotenv
 from loguru import logger

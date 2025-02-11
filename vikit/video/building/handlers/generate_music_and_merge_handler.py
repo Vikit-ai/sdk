@@ -16,9 +16,9 @@
 from loguru import logger
 
 from vikit.common.handler import Handler
-from vikit.wrappers.ffmpeg_wrapper import merge_audio, get_media_duration
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.gateways.ML_models_gateway import MLModelsGateway
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.wrappers.ffmpeg_wrapper import get_media_duration, merge_audio
 
 
 class GenerateMusicAndMergeHandler(Handler):

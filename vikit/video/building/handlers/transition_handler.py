@@ -17,9 +17,8 @@ from loguru import logger
 
 from vikit.common.file_tools import url_exists
 from vikit.common.handler import Handler
-from vikit.video.video import Video
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.gateways.ML_models_gateway import MLModelsGateway
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.video.video import Video
 
 

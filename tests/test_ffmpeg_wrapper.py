@@ -13,6 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
+import math
 import os
 import warnings
 
@@ -21,17 +22,11 @@ from loguru import logger
 
 import tests.testing_medias as tests_medias
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.wrappers.ffmpeg_wrapper import (
-    concatenate_videos,
-    reencode_video,
-    cut_video,
-    get_media_duration,
-    create_zoom_video,
-    extract_audio_from_video,
-    generate_video_from_image,
-)
-
-import math
+from vikit.wrappers.ffmpeg_wrapper import (concatenate_videos,
+                                           create_zoom_video, cut_video,
+                                           extract_audio_from_video,
+                                           generate_video_from_image,
+                                           get_media_duration, reencode_video)
 
 
 class TestFFMPEGWrapper:

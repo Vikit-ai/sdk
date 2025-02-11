@@ -19,12 +19,12 @@ import warnings
 import pytest
 from loguru import logger
 
-from tests.testing_medias import get_test_prompt_image, get_test_prompt_recording, get_cat_video_path
+from tests.testing_medias import (get_cat_video_path, get_test_prompt_image,
+                                  get_test_prompt_recording)
 from vikit.common.context_managers import WorkingFolderContext
+from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.music_building_context import MusicBuildingContext
 from vikit.prompt.prompt_factory import PromptFactory
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-
 from vikit.video.raw_multimodal_based_video import RawMultiModalBasedVideo
 from vikit.video.video import VideoBuildSettings
 

@@ -3,8 +3,8 @@ import time
 
 import pytest
 
-from vikit.postprocessing.place_logo import VideoLogoOverlay
 from vikit.common.context_managers import WorkingFolderContext
+from vikit.postprocessing.place_logo import VideoLogoOverlay
 
 # List of test videos
 TEST_CASES = [

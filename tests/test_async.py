@@ -18,8 +18,8 @@ import os
 import pytest
 
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
+from vikit.video.raw_text_based_video import RawTextBasedVideo
 
 
 class TestAsync:

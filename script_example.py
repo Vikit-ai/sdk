@@ -21,24 +21,22 @@ import pandas as pd  # type: ignore
 from loguru import logger  # type: ignore
 
 import tests.testing_medias as test_media
-
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.common.decorators import log_function_params
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.music_building_context import MusicBuildingContext
-from vikit.prompt.prompt_factory import PromptFactory
 from vikit.postprocessing.video_subtitle_renderer import VideoSubtitleRenderer
+from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.composite_video import CompositeVideo
-from vikit.video.imported_video import  ImportedVideo
+from vikit.video.imported_video import ImportedVideo
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.raw_fixed_image_video import RawFixedImageVideo
 from vikit.video.raw_image_based_video import RawImageBasedVideo
 from vikit.video.raw_multimodal_based_video import RawMultiModalBasedVideo
-from vikit.video.seine_transition import SeineTransition
 from vikit.video.raw_text_based_video import RawTextBasedVideo
+from vikit.video.seine_transition import SeineTransition
 from vikit.video.transition import Transition
 from vikit.video.video_build_settings import VideoBuildSettings
-
 
 negative_prompt = """bad anatomy, bad hands, missing fingers, extra fingers, three hands, 
 three legs, bad arms, missing legs, missing arms, poorly drawn face, bad face, fused face, 
