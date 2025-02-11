@@ -24,6 +24,10 @@ from urllib.request import urlopen
 
 import aiofiles
 import aiohttp
+
+from loguru import logger
+from tenacity import retry, stop_after_attempt, wait_exponential
+
 # Maybe we will consider breaking down the copying logic into modules to prevent adding too many dependencies on external linbs
 from google.cloud import storage
 from loguru import logger
@@ -222,7 +226,11 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
     return result
 
 
-@retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
+@retry(
+    stop=stop_after_attempt(get_nb_retries_http_calls()),
+    wait=wait_exponential(min=4, max=10),
+    reraise=True,
+)
 async def download_or_copy_file(url, local_path, force_download=False):
     """
     Download a file from a URL to a local file asynchronously

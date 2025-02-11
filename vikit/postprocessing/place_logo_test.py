@@ -8,11 +8,11 @@ from vikit.postprocessing.place_logo import VideoLogoOverlay
 
 # List of test videos
 TEST_CASES = [
-    ("tests/medias/luma.mp4"),
-    ("tests/medias/vikit_pitch.mp4"),
+    ( os.path.abspath("tests/medias/luma.mp4")),
+    (os.path.abspath("tests/medias/vikit_pitch.mp4")),
 ]
 
-LOGO_PATH = "tests/medias/transparent_vikit_logo_black.png"
+LOGO_PATH =  os.path.abspath("tests/medias/transparent_vikit_logo_black.png")
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("video_path", TEST_CASES)
@@ -26,7 +26,7 @@ async def test_place_logo_on_video_valid_case(video_path, position):
     video_basename = os.path.splitext(os.path.basename(video_path))[
         0
     ]  # Extract video name without extension
-    output_path = f"tmp/{video_basename}-test-{position}_{timestamp}.mp4"
+    output_path =  os.path.abspath(f"tmp/{video_basename}-test-{position}_{timestamp}.mp4")
 
     assert os.path.exists(video_path), f"Test video not found: {video_path}"
     assert os.path.exists(LOGO_PATH), f"Logo not found: {LOGO_PATH}"
@@ -45,13 +45,13 @@ async def test_place_logo_on_video_valid_case(video_path, position):
         (
             "no-video",
             LOGO_PATH,
-            "../../tests/medias/luma_with_logo.mp4",
+            os.path.abspath("tests/medias/luma_with_logo.mp4"),
             FileNotFoundError,
         ),
         (
             TEST_CASES[0],
             "no-logo",
-            "../../tests/medias/luma_with_logo.mp4",
+            os.path.abspath("tests/medias/luma_with_logo.mp4"),
             FileNotFoundError,
         ),
     ],

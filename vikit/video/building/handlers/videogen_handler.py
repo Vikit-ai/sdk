@@ -93,6 +93,7 @@ class VideoGenHandler(Handler):
                 logger.error(
                     f"Media URL {video.media_url} is not available yet, the related video will need to be generated after the overall video generation process"
                 )
+        video.media_url_http = video.media_url
 
         logger.debug(f"Video generated from prompt: {video.media_url}")
         return video
