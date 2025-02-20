@@ -23,31 +23,21 @@ import time
 import uuid as uid
 
 import aiohttp
+import cv2
+import numpy as np
 from loguru import logger
-from tenacity import (
-    AsyncRetrying,
-    after_log,
-    before_log,
-    retry,
-    stop_after_attempt,
-    wait_exponential,
-)
+from tenacity import (AsyncRetrying, after_log, before_log, retry,
+                      stop_after_attempt, wait_exponential)
 
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
-from vikit.common.config import get_nb_retries_http_calls
+from vikit.common.config import (get_nb_retries_http_calls,
+                                 get_vikit_backend_url)
 from vikit.common.file_tools import download_or_copy_file
-from vikit.common.secrets import (
-    get_replicate_api_token,
-    get_vikit_api_token,
-    has_eleven_labs_api_key,
-)
+from vikit.common.secrets import (get_replicate_api_token, get_vikit_api_token,
+                                  has_eleven_labs_api_key)
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
-import cv2
-import numpy as np
-
-from vikit.common.config import get_vikit_backend_url
 
 
 os.environ["REPLICATE_API_TOKEN"] = get_replicate_api_token()
@@ -121,26 +111,6 @@ class VikitGateway(MLModelsGateway):
 
         return img_b64
 
-    async def handle_backend_errors(self, response):
-        """
-        Handles error from a response from asyncif
-
-        Args:
-            - response:  the response from the backend
-
-        Returns:
-            - None
-        """
-        if response.status == 403:
-            raise PermissionError(
-                "Access to the Vikit API was forbidden (403). Please check your API credentials. " + await response.text()
-            )
-
-        if response.status != 200:
-            raise RuntimeError(
-                f"We failed to connect to Vikit API. Returned Error: {response.status}, {response.reason}"
-            )
-
     async def generate_mp3_from_text_async_elevenlabs(
         self,
         prompt_text: str,
@@ -191,7 +161,16 @@ class VikitGateway(MLModelsGateway):
                 )
 
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    await self.handle_backend_errors(response)
+
+                    if response.status == 403:
+                        raise PermissionError(
+                            "Access to the Vikit API was forbidden (403). Please check your API credentials."
+                        )
+
+                    if response.status != 200:
+                        raise RuntimeError(
+                            f"We failed to connect to Vikit API. Returned Error: {response.status}, {response.reason}"
+                        )
 
                     response = await response.text()
                     if not response.startswith("http"):
@@ -333,7 +312,6 @@ class VikitGateway(MLModelsGateway):
                         async with session.post(
                             vikit_backend_url, json=payload
                         ) as response:
-                            await self.handle_backend_errors(response)
                             response = await response.text()
                     time.sleep(2)
                     if not response.startswith("http"):
@@ -343,7 +321,7 @@ class VikitGateway(MLModelsGateway):
                     else:
                         return response
         except Exception as e:
-            raise Exception(f"Retry failed {e}")
+            raise Exception("Retry failed {e}")
 
     @retry(
         stop=stop_after_attempt(get_nb_retries_http_calls()),
@@ -392,7 +370,6 @@ class VikitGateway(MLModelsGateway):
             }
 
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
                 result_music_link = await response.text()
                 print(result_music_link)
 
@@ -461,7 +438,6 @@ interesting the resulting music will be. Here is your prompt: '"""
                 },
             }
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
                 llm_keywords = await response.text()
         logger.debug(f"LLM Keywords: {llm_keywords}")
         return cleanse_llm_keywords(llm_keywords)
@@ -488,13 +464,13 @@ interesting the resulting music will be. Here is your prompt: '"""
 
         logger.debug(f"Video to interpolate {video[:50]}")
 
-        if not video.startswith("http") and video.split('.') is not None and os.path.splitext(video)[1].lower() in [".mp4", ".mov", ".avi", ".wmv", ".webm"]:
+        if video.split('.') is not None and os.path.splitext(video)[1].lower() in [".mp4", ".mov", ".avi", ".wmv", ".webm"]:
             #Read file path and then convert to Base64
             with open(video, "rb") as video_file:
                 video_data = "data:video/" + video.split('.')[-1].lower() + ";base64," + base64.b64encode(video_file.read()).decode(
                     "utf-8"
                 )
-        else:
+        else: 
             #Result is already a base64
             video_data = video
 
@@ -513,7 +489,6 @@ interesting the resulting music will be. Here is your prompt: '"""
             )
 
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
                 output = await response.text()
 
         # response_json = json.loads(output)
@@ -579,7 +554,6 @@ interesting the resulting music will be. Here is your prompt: '"""
                 },
             )
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
                 llm_keywords = await response.text()
 
         clean_result = cleanse_llm_keywords(llm_keywords)
@@ -625,7 +599,6 @@ interesting the resulting music will be. Here is your prompt: '"""
             }
 
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
                 outputLLM = await response.text()
 
         clean_result = cleanse_llm_keywords(outputLLM)
@@ -683,7 +656,6 @@ interesting the resulting music will be. Here is your prompt: '"""
                             async with session.post(
                                 vikit_backend_url, json=payload
                             ) as response:
-                                await self.handle_backend_errors(response)
                                 subs = await response.text()
                                 # TO DO: check if subs has correct json format
                         except Exception as e:
@@ -695,7 +667,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                     logger.trace(f"Subtitles: {subs}")
                     return json.loads(subs)
         except Exception as e:
-            raise Exception(f"Retry failed {e}")
+            raise Exception("Retry failed {e}")
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     async def generate_video_async(
@@ -763,7 +735,6 @@ interesting the resulting music will be. Here is your prompt: '"""
             )
 
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
                 output = await response.text()
 
                 # Convert result to Base64
@@ -846,7 +817,6 @@ interesting the resulting music will be. Here is your prompt: '"""
                     payload["input"]["negative_prompt"] = prompt.negative_text
 
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    await self.handle_backend_errors(response)
                     output = await response.text()
                     logger.debug(f"{output}")
                     output = json.loads(output)
@@ -884,7 +854,6 @@ interesting the resulting music will be. Here is your prompt: '"""
                 },
             }
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
                 output = await response.text()
 
         # response_json = json.loads(output)
@@ -923,7 +892,6 @@ interesting the resulting music will be. Here is your prompt: '"""
                 },
             }
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
                 output = await response.text()
 
         if not output.startswith("http"):
@@ -991,7 +959,6 @@ interesting the resulting music will be. Here is your prompt: '"""
                     },
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    await self.handle_backend_errors(response)
                     output = await response.json()
                     print(json.dumps(output, indent=4))
                     with open(output_vid_file_name, "wb") as video_file:
@@ -1056,7 +1023,6 @@ interesting the resulting music will be. Here is your prompt: '"""
                     },
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    await self.handle_backend_errors(response)
                     output = await response.text()
                     if not output:
                         raise AttributeError("Backend result is empty")
@@ -1188,7 +1154,6 @@ interesting the resulting music will be. Here is your prompt: '"""
                     },
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    await self.handle_backend_errors(response)
                     output = await response.text()
 
                     logger.debug(f"Response from Gemini: {json.loads(output)['text']}")
