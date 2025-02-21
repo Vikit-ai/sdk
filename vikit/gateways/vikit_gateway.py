@@ -1100,6 +1100,35 @@ interesting the resulting music will be. Here is your prompt: '"""
             part["inline_data"] = {"data": img_b64, "mimeType": "image/png"}
             parts_array.append(part)
 
+        if prompt.audio is not None and prompt.audio.startswith("http"):
+            audio_type = prompt.audio.split(".")[-1].split("?")[0]
+            part = {}
+            part["fileData"] = {
+                "fileUri": prompt.audio,
+                "mimeType": "audio/" + audio_type,
+            }
+
+            parts_array.append(part)
+        elif prompt.audio is not None:
+            part = {}
+            audio_data = ""
+
+            # We check if the video is a local path
+            if prompt.audio.split(".") is not None and os.path.splitext(prompt.audio)[
+                1
+            ].lower() in [".mp3", ".wav", ".aiff", ".aac", ".ogg", ".flac"]:
+                # Read file path and then convert to Base64
+                with open(prompt.audio, "rb") as audio_file:
+                    audio_data = base64.b64encode(audio_file.read()).decode("utf-8")
+                    mimetype = "audio/" + prompt.audio.split(".")[-1].lower()
+            else:
+                # Result is already a base64
+                audio_data = prompt.audio
+                mimetype = "mp3"
+
+            part["inlineData"] = {"mimeType": mimetype, "data": audio_data}
+            parts_array.append(part)
+
         if prompt.video is not None and prompt.video.startswith("http"):
             videoType = prompt.video.split(".")[-1].split("?")[0]
             part = {}
@@ -1124,6 +1153,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             else:
                 # Result is already a base64
                 video_data = prompt.video
+                mimetype = "mp4"
 
             part["inlineData"] = {"mimeType": mimetype, "data": video_data}
 

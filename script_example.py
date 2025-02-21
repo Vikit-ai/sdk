@@ -496,6 +496,21 @@ async def fixed_image_video_generation():
         fixed_image_video = CompositeVideo().append_video(RawFixedImageVideo(prompt=image_prompt))
         await fixed_image_video.build(build_settings=video_build_settings)
 
+async def call_gemini_with_audio(url=False):
+    ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
+
+    if url:
+        audio_input = "https://storage.googleapis.com/real-estate-musics/aube_doree.mp3"
+    else:
+        audio_input = test_media.get_sample_gen_background_music()
+
+    audio_prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_multimodal_async(
+                        audio=audio_input,text="What is in this audio ?"
+                    )
+    response = await ml_models_gateway.ask_gemini(audio_prompt)
+    print(response)
+    
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -572,3 +587,5 @@ if __name__ == "__main__":
         asyncio.run(add_music())
     elif run_an_example == 11:
         asyncio.run(fixed_image_video_generation())
+    elif run_an_example == 12:
+        asyncio.run(call_gemini_with_audio(True))
