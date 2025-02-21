@@ -13,8 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 
-import textwrap
-import os
+from pathlib import Path
+
 import pysrt
 from loguru import logger
 from moviepy.editor import ColorClip, CompositeVideoClip, TextClip, VideoFileClip
@@ -32,7 +32,7 @@ class VideoSubtitleRenderer:
 
     def __init__(
         self,
-        font_path=f"{os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))}/medias/arial.ttf",
+        font_path=f"{Path(__file__).parent.parent.parent}/medias/arial.ttf",
         font_size_pt=None,
         margin_bottom_ratio=0.04,
         margin_right_ratio=0.05,
