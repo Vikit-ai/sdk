@@ -24,19 +24,15 @@ SUBTITLE_PATH = get_paris_subtitle_file()
 
 
 class TestPostProcessing:
+
     @pytest.mark.local_integration
-    def test_render_subtitle(self):
+    @pytest.mark.parametrize("font_size_pt", [None, 15, 20])
+    def test_render_subtitle(self, font_size_pt):
         with WorkingFolderContext():
 
-            subtitle_writer = VideoSubtitleRenderer(font_size=15)
+            subtitle_writer = VideoSubtitleRenderer(font_size_pt=font_size_pt)
             subtitle_writer.add_subtitles_to_video(
                 input_video_path=PARIS_VIDEO,
                 subtitle_srt_filepath=SUBTITLE_PATH,
-                output_video_path="Video_with_subtitle_font_15.mp4",
-            )
-            subtitle_writer.font_size = 20
-            subtitle_writer.add_subtitles_to_video(
-                input_video_path=PARIS_VIDEO,
-                subtitle_srt_filepath=SUBTITLE_PATH,
-                output_video_path="Video_with_subtitle_font_20.mp4",
+                output_video_path=f"Video_with_subtitle_font_{font_size_pt}.mp4",
             )

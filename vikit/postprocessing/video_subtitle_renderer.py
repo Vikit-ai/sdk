@@ -20,6 +20,8 @@ from loguru import logger
 from moviepy.editor import ColorClip, CompositeVideoClip, TextClip, VideoFileClip
 from PIL import ImageFont
 
+FONT_SIZE_RATIO = 0.045
+
 
 class VideoSubtitleRenderer:
     """
@@ -31,19 +33,19 @@ class VideoSubtitleRenderer:
     def __init__(
         self,
         font_path=f"{os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))}/medias/arial.ttf",
-        font_size=None,
+        font_size_pt=None,
         margin_bottom_ratio=0.04,
         margin_right_ratio=0.05,
         margin_left_ratio=0.05,
     ) -> None:
         self.font_path = font_path
-        self.font_size = font_size
+        self.font_size_pt = font_size_pt
         self.margin_bottom_ratio = margin_bottom_ratio
         self.margin_right_ratio = margin_right_ratio
         self.margin_left_ratio = margin_left_ratio
         self.codec = "libx264"
 
-    def wrap_text(self, text, max_width, font_path, font_size):
+    def wrap_text(self, text, max_width, font_path, font_size_pt):
         """
         Wraps text into multiple lines based on the maximum width.
 
@@ -51,21 +53,21 @@ class VideoSubtitleRenderer:
             text (str): The original text.
             max_width (int): The maximum width for each line.
             font_path (str): Path to the font file.
-            font_size (int): Font size for the text in pt.
+            font_size_pt (int): Font size for the text in pt.
 
         Returns:
             str: Wrapped text with line breaks.
         """
 
         # Load the font to measure text dimensions
-        font = ImageFont.truetype(font_path, font_size)
+        font = ImageFont.truetype(font_path, font_size_pt)
         lines = []
         current_line = ""
 
         for word in text.split():
             test_line = f"{current_line} {word}".strip()
             # Use getbbox to calculate text width
-            test_width = font.getbbox(test_line)[2]
+            _, _, test_width, _ = font.getbbox(test_line)
 
             if test_width <= max_width:
                 current_line = test_line
@@ -103,10 +105,10 @@ class VideoSubtitleRenderer:
         # Load the video
         logger.debug(f"Loading video from {input_video_path} to add subtitle ...")
         video = VideoFileClip(input_video_path)
-        video_duration = video.duration
 
         # Calculate the parameters relative to the video height
-        font_size = int(video.h * 0.045) if self.font_size is None else self.font_size
+        font_size = self.font_size_pt or int(video.h * FONT_SIZE_RATIO)
+
         margin_bottom = int(video.h * self.margin_bottom_ratio)
         margin_left = int(video.w * self.margin_left_ratio)
         margin_right = int(video.w * self.margin_right_ratio)
@@ -131,8 +133,8 @@ class VideoSubtitleRenderer:
             # Sometimes srt file is longer than the real video, here is to avoid having black extra frames at the end
             if start_time < 0:
                 start_time = 0
-            if end_time > video_duration:
-                end_time = video_duration
+            if end_time > video.duration:
+                end_time = video.duration
 
             # Calculate the available width for the text
             available_width = video.w - margin_left - margin_right
