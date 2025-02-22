@@ -20,6 +20,7 @@ import json
 import os
 import subprocess
 import time
+from urllib.parse import urlparse
 import uuid as uid
 
 import aiohttp
@@ -1036,7 +1037,7 @@ interesting the resulting music will be. Here is your prompt: '"""
 
     def add_part_gemini(self, data_to_add, data_kind, valid_data_extensions):
         part = None
-        if data_to_add and data_to_add.startswith("http"):
+        if data_to_add and urlparse(data_to_add).scheme: #We check if the data_to_add is an URL
             data_type = data_to_add.split(".")[-1].split("?")[0]
             part = {}
             part["fileData"] = {
