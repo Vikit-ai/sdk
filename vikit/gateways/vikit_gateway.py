@@ -110,26 +110,6 @@ class VikitGateway(MLModelsGateway):
 
         return img_b64
 
-    async def handle_backend_errors(self, response):
-        """
-        Handles error from a response from asyncif
-
-        Args:
-            - response:  the response from the backend
-
-        Returns:
-            - None
-        """
-        if response.status == 403:
-            raise PermissionError(
-                "Access to the Vikit API was forbidden (403). " + await response.text()
-            )
-
-        if response.status != 200:
-            raise RuntimeError(
-                f"We failed to connect to Vikit API. Returned Error: {response.status}, {response.reason}"
-            )
-
     async def generate_mp3_from_text_async_elevenlabs(
         self,
         prompt_text: str,
@@ -180,7 +160,7 @@ class VikitGateway(MLModelsGateway):
                 )
 
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    await self.handle_backend_errors(response)
+                    await _handle_backend_errors(response)
 
                     response = await response.text()
                     if not response.startswith("http"):
@@ -322,7 +302,7 @@ class VikitGateway(MLModelsGateway):
                         async with session.post(
                             vikit_backend_url, json=payload
                         ) as response:
-                            await self.handle_backend_errors(response)
+                            await _handle_backend_errors(response)
                             response = await response.text()
                     time.sleep(2)
                     if not response.startswith("http"):
@@ -381,7 +361,7 @@ class VikitGateway(MLModelsGateway):
             }
 
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
+                await _handle_backend_errors(response)
                 result_music_link = await response.text()
                 print(result_music_link)
 
@@ -450,7 +430,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 },
             }
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
+                await _handle_backend_errors(response)
                 llm_keywords = await response.text()
         logger.debug(f"LLM Keywords: {llm_keywords}")
         return cleanse_llm_keywords(llm_keywords)
@@ -502,7 +482,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             )
 
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
+                await _handle_backend_errors(response)
                 output = await response.text()
 
         # response_json = json.loads(output)
@@ -568,7 +548,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 },
             )
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
+                await _handle_backend_errors(response)
                 llm_keywords = await response.text()
 
         clean_result = cleanse_llm_keywords(llm_keywords)
@@ -614,7 +594,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             }
 
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
+                await _handle_backend_errors(response)
                 outputLLM = await response.text()
 
         clean_result = cleanse_llm_keywords(outputLLM)
@@ -672,7 +652,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                             async with session.post(
                                 vikit_backend_url, json=payload
                             ) as response:
-                                await self.handle_backend_errors(response)
+                                await _handle_backend_errors(response)
                                 subs = await response.text()
                                 # TO DO: check if subs has correct json format
                         except Exception as e:
@@ -752,7 +732,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             )
 
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
+                await _handle_backend_errors(response)
                 output = await response.text()
 
                 # Convert result to Base64
@@ -835,7 +815,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                     payload["input"]["negative_prompt"] = prompt.negative_text
 
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    await self.handle_backend_errors(response)
+                    await _handle_backend_errors(response)
                     output = await response.text()
                     logger.debug(f"{output}")
                     output = json.loads(output)
@@ -873,7 +853,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 },
             }
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
+                await _handle_backend_errors(response)
                 output = await response.text()
 
         # response_json = json.loads(output)
@@ -912,7 +892,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                 },
             }
             async with session.post(vikit_backend_url, json=payload) as response:
-                await self.handle_backend_errors(response)
+                await _handle_backend_errors(response)
                 output = await response.text()
 
         if not output.startswith("http"):
@@ -980,7 +960,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                     },
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    await self.handle_backend_errors(response)
+                    await _handle_backend_errors(response)
                     output = await response.json()
                     print(json.dumps(output, indent=4))
                     with open(output_vid_file_name, "wb") as video_file:
@@ -1045,7 +1025,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                     },
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    await self.handle_backend_errors(response)
+                    await _handle_backend_errors(response)
                     output = await response.text()
                     if not output:
                         raise AttributeError("Backend result is empty")
@@ -1177,7 +1157,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                     },
                 )
                 async with session.post(vikit_backend_url, json=payload) as response:
-                    await self.handle_backend_errors(response)
+                    await _handle_backend_errors(response)
                     output = await response.text()
 
                     logger.debug(f"Response from Gemini: {json.loads(output)['text']}")
@@ -1186,3 +1166,23 @@ interesting the resulting music will be. Here is your prompt: '"""
             logger.error(f"Error calling gemini from prompt: {e}")
             logger.error(f"Returned by gemini : {output}")
             raise Exception(output)
+
+async def _handle_backend_errors(response):
+    """
+    Handles error from a response from asyncif
+
+    Args:
+        - response:  the response from the backend
+
+    Returns:
+        - None
+    """
+    if response.status == 403:
+        raise PermissionError(
+            "Access to the Vikit API was forbidden (403). " + await response.text()
+        )
+
+    if response.status != 200:
+        raise RuntimeError(
+            f"We failed to connect to Vikit API. Returned Error: {response.status}, {response.reason}"
+        )
