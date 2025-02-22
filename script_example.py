@@ -547,7 +547,7 @@ async def call_gemini_with_audio(use_audio_from_mp3=False):
     audio_prompt = await PromptFactory(
         ml_models_gateway=ml_models_gateway
     ).create_prompt_from_multimodal_async(
-        image=audio_input, text="What is in this audio ?"
+        audio=audio_input, text="What is in this audio ?"
     )
     response = await ml_models_gateway.ask_gemini(audio_prompt)
     print(response)

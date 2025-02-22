@@ -1125,6 +1125,7 @@ interesting the resulting music will be. Here is your prompt: '"""
         if video_part:
             parts_array.append(video_part)
 
+        print(parts_array)
         output = ""
 
         try:
