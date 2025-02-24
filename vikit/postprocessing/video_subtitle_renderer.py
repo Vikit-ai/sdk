@@ -131,10 +131,8 @@ class VideoSubtitleRenderer:
             )
 
             # Sometimes srt file is longer than the real video, here is to avoid having black extra frames at the end
-            if start_time < 0:
-                start_time = 0
-            if end_time > video.duration:
-                end_time = video.duration
+            start_time = max(0, start_time)
+            end_time = min(video.duration, end_time)
 
             # Calculate the available width for the text
             available_width = video.w - margin_left - margin_right
