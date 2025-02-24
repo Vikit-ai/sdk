@@ -1,3 +1,7 @@
+"""
+A class to overlay a logo on a video.
+"""
+
 import os
 
 from loguru import logger
@@ -5,13 +9,13 @@ from moviepy.editor import CompositeVideoClip, ImageClip, VideoFileClip
 
 
 class VideoLogoOverlay:
-
     """
     A class to overlay a logo on a video at a specified position.
 
-    This class takes a video file and a logo image, resizes the logo, 
+    This class takes a video file and a logo image, resizes the logo,
     and overlays it onto the video at one of four predefined positions.
     """
+
     def __init__(
         self,
         video_path: str,
@@ -68,16 +72,16 @@ class VideoLogoOverlay:
                 "No height provided. Automatically computing logo heigh based on video height ..."
             )
 
-            self.logo_height = int(video.h * (self.logo_height_percentage/100))
+            self.logo_height = int(video.h * (self.logo_height_percentage / 100))
 
         logger.debug(
             f"Started adding logo {self.logo_path} to video {self.video_path} ..."
         )
-        
+
         logo = ImageClip(self.logo_path)
 
-        logo = logo.resize(height=int(self.logo_height))
-        
+        logo = logo.resize(height=int(self.logo_height))  # type: ignore
+
         margins = {
             "top_right": {"right": self.margin, "top": self.margin},
             "top_left": {"left": self.margin, "top": self.margin},
