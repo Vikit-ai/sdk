@@ -24,16 +24,19 @@ from vikit.common.decorators import log_function_params
 from vikit.common.handler import Handler
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-from vikit.prompt.building.handlers.prompt_by_keywords_handler import \
-    PromptByKeywordsHandler
-from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import \
-    PromptByRawUserTextHandler
+from vikit.prompt.building.handlers.prompt_by_keywords_handler import (
+    PromptByKeywordsHandler,
+)
+from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
+    PromptByRawUserTextHandler,
+)
 from vikit.prompt.image_prompt import ImagePrompt
 from vikit.prompt.multimodal_prompt import MultiModalPrompt
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.prompt.recorded_prompt import RecordedPrompt
-from vikit.prompt.recorded_prompt_subtitles_extractor import \
-    RecordedPromptSubtitlesExtractor
+from vikit.prompt.recorded_prompt_subtitles_extractor import (
+    RecordedPromptSubtitlesExtractor,
+)
 from vikit.wrappers.ffmpeg_wrapper import get_media_duration
 
 
@@ -59,7 +62,7 @@ class PromptFactory:
             ml_models_gateway: The ML Gateway to use to generate the prompt from the audio file
 
         """
-        
+
         self.prompt_factory_uuid = str(uuid.uuid4())
         self.prompt_build_settings = prompt_build_settings
 
@@ -68,7 +71,9 @@ class PromptFactory:
         if ml_models_gateway:
             self.ml_models_gateway = ml_models_gateway
         else:
-            self.ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
+            self.ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(
+                test_mode=False
+            )
 
     async def create_prompt_from_text(
         self, prompt_text: str = None, negative_prompt: str = None
@@ -99,7 +104,9 @@ class PromptFactory:
 
         extractor = RecordedPromptSubtitlesExtractor()
         subs = await extractor.extract_subtitles_async(
-            recorded_prompt_file_path=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
+            recorded_prompt_file_path=config.get_prompt_mp3_file_name(
+                self.prompt_factory_uuid
+            ),
             ml_models_gateway=self.ml_models_gateway,
         )
         merged_subs = (
@@ -112,7 +119,9 @@ class PromptFactory:
             text=prompt_text,
             subtitles=merged_subs,
             audio_recording=config.get_prompt_mp3_file_name(self.prompt_factory_uuid),
-            duration=get_media_duration(config.get_prompt_mp3_file_name(self.prompt_factory_uuid)),
+            duration=get_media_duration(
+                config.get_prompt_mp3_file_name(self.prompt_factory_uuid)
+            ),
             build_settings=self.prompt_build_settings,
         )
         prompt.negative_prompt = negative_prompt
@@ -176,7 +185,9 @@ class PromptFactory:
             subs, min_duration=config.get_subtitles_min_duration()
         )
         text = extractor.build_subtitles_as_text_tokens(merged_subs)
-        prompt = RecordedPrompt(subtitles=merged_subs, text=text, build_settings=self.prompt_build_settings)
+        prompt = RecordedPrompt(
+            subtitles=merged_subs, text=text, build_settings=self.prompt_build_settings
+        )
         await prompt.convert_recorded_audio_prompt_path_to_mp3(
             recorded_audio_prompt_path
         )
@@ -204,7 +215,9 @@ class PromptFactory:
         else:
             for handler in handler_chain:
                 text_prompt, video_suggested_title = await handler.execute_async(
-                    text_prompt=prompt, prompt_build_settings=prompt_build_settings, ml_models_gateway=self.ml_models_gateway
+                    text_prompt=prompt,
+                    prompt_build_settings=prompt_build_settings,
+                    ml_models_gateway=self.ml_models_gateway,
                 )
 
         return text_prompt  # return the last enhanced prompt from handlers chain
@@ -236,10 +249,10 @@ class PromptFactory:
         self,
         image: str = None,
         text: str = None,
-        reengineer_text:bool = False,
-        model_provider: str= None,
+        reengineer_text: bool = False,
+        model_provider: str = None,
         reengineer_text_prompt_from_image_and_text=False,
-        duration:float = None,
+        duration: float = None,
     ):
         """
         Create a prompt object from a prompt image path
@@ -252,24 +265,33 @@ class PromptFactory:
         """
         if image is None:
             raise ValueError("The prompt image is not provided")
-        
-        if reengineer_text:
-            text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
 
-        img_prompt = MultiModalPrompt(image=image, text=text, model_provider=model_provider, build_settings=self.prompt_build_settings, reengineer_text_prompt_from_image_and_text=reengineer_text_prompt_from_image_and_text, duration=duration)
+        if reengineer_text:
+            text = await self.get_reengineered_prompt_text_from_raw_text(
+                text, self.prompt_build_settings
+            )
+
+        img_prompt = MultiModalPrompt(
+            image=image,
+            text=text,
+            model_provider=model_provider,
+            build_settings=self.prompt_build_settings,
+            reengineer_text_prompt_from_image_and_text=reengineer_text_prompt_from_image_and_text,
+            duration=duration,
+        )
         return img_prompt
 
     async def create_prompt_from_multimodal_async(
         self,
-        text: str = None, 
-        reengineer_text:bool = False,
+        text: str = None,
+        reengineer_text: bool = False,
         negative_text: str = None,
-        image: str = None, 
-        audio: str = None, 
-        video:str = None, 
-        duration:float = None,
+        image: str = None,
+        audio: str = None,
+        video: str = None,
+        duration: float = None,
         seed: int = None,
-        model_provider: str= None,
+        model_provider: str = None,
         reengineer_text_prompt_from_image_and_text=False,
     ):
         """
@@ -292,9 +314,22 @@ class PromptFactory:
         """
         if text is None and image is None and audio is None and video is None:
             raise ValueError("No prompt data is provided")
-        
-        if reengineer_text:
-            text = await get_reengineered_prompt_text_from_raw_text(text, self.prompt_build_settings)
 
-        multimodal_prompt = MultiModalPrompt(text=text, negative_text=negative_text, image=image, audio=audio, video=video, duration=duration, seed=seed, model_provider=model_provider, build_settings=self.prompt_build_settings, reengineer_text_prompt_from_image_and_text=reengineer_text_prompt_from_image_and_text)
+        if reengineer_text:
+            text = await self.get_reengineered_prompt_text_from_raw_text(
+                text, self.prompt_build_settings
+            )
+
+        multimodal_prompt = MultiModalPrompt(
+            text=text,
+            negative_text=negative_text,
+            image=image,
+            audio=audio,
+            video=video,
+            duration=duration,
+            seed=seed,
+            model_provider=model_provider,
+            build_settings=self.prompt_build_settings,
+            reengineer_text_prompt_from_image_and_text=reengineer_text_prompt_from_image_and_text,
+        )
         return multimodal_prompt
