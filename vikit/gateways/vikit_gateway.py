@@ -1168,15 +1168,6 @@ interesting the resulting music will be. Here is your prompt: '"""
             raise Exception(output)
 
 async def _handle_backend_errors(response):
-    """
-    Handles error from a response from asyncif
-
-    Args:
-        - response:  the response from the backend
-
-    Returns:
-        - None
-    """
     if response.status == 403:
         raise PermissionError(
             "Access to the Vikit API was forbidden (403). " + await response.text()
