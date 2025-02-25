@@ -171,7 +171,9 @@ async def create_single_image_based_video(
             target_model_provider="stabilityai_image",
             output_video_file_name=output_filename,
         )
-    image_prompt = PromptFactory().create_prompt_from_image(image=prompt_content, text=text)
+    image_prompt = PromptFactory().create_prompt_from_image(
+        image=prompt_content, text=text
+    )
 
     video = RawImageBasedVideo(
         prompt=image_prompt,
@@ -212,7 +214,7 @@ async def batch_image_based_prompting(prompt_file: str):
         assert os.path.exists(
             video.media_url
         ), f"The generated video {video.media_url} does not exist"
-        print(f"video saved on {output_file}")
+        logger.info(f"video saved on {output_file}")
 
 
 async def composite_imageonly_prompting(prompt_file: str):
@@ -233,7 +235,7 @@ async def composite_imageonly_prompting(prompt_file: str):
         video, _ = await create_single_image_based_video(
             prompt_content=prompt_content,
             build_settings=single_video_buildsettings,
-            text="Moving fast"
+            text="Moving fast",
         )
         # Add transitions from time to time
         if i >= 1 and i % 2 == 0:
@@ -293,7 +295,7 @@ async def composite_mixed_prompting(
                 await create_single_image_based_video(
                     prompt_content=prompt_content,
                     build_settings=image_based_video_buildsettings,
-                    text="Moving fast"
+                    text="Moving fast",
                 )
             )
 
@@ -359,7 +361,7 @@ async def prompt_based_composite(prompt: str, model_provider="stabilityai"):
 
 
 async def colabCode():
-    working_folder="./examples/inputs/PromptbasedVideo/"
+    working_folder = "./examples/inputs/PromptbasedVideo/"
     with WorkingFolderContext(working_folder):
         video_build_settings = VideoBuildSettings(
             music_building_context=MusicBuildingContext(
@@ -367,21 +369,33 @@ async def colabCode():
                 generate_background_music=True,
             ),
             include_read_aloud_prompt=True,
-            target_model_provider="haiper", #Available models: videocrafter, stabilityai, haiper
+            target_model_provider="haiper",  # Available models: videocrafter, stabilityai, haiper
             output_video_file_name="AICosmetics.mp4",
             interpolate=True,
-            aspect_ratio=(9,16),
+            aspect_ratio=(9, 16),
         )
 
         prompt = "Unlock your radiance with AI Cosmetics."  # @param {type:"string"}
-        ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
-        prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_multimodal_async(text=prompt, negative_text="human faces", duration=2)
+        ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(
+            test_mode=False
+        )
+        prompt = await PromptFactory(
+            ml_models_gateway=ml_models_gateway
+        ).create_prompt_from_multimodal_async(
+            text=prompt, negative_text="human faces", duration=2
+        )
         video = RawMultiModalBasedVideo(prompt=prompt)
-        await video.build(build_settings=video_build_settings, ml_models_gateway=ml_models_gateway)
+        await video.build(
+            build_settings=video_build_settings, ml_models_gateway=ml_models_gateway
+        )
 
-async def is_qualitative_until(media_url, ml_models_gateway, gemini_version="gemini-1.5-pro-002"):
 
-    prompt_is_outdoor = await PromptFactory().create_prompt_from_multimodal_async(text="""
+async def is_qualitative_until(
+    media_url, ml_models_gateway, gemini_version="gemini-1.5-pro-002"
+):
+
+    prompt_is_outdoor = await PromptFactory().create_prompt_from_multimodal_async(
+        text="""
 You are an part of a program that will determine if a video should be processed further.
 
 If the scene showcases an human, output True.
@@ -390,28 +404,34 @@ If theere is no human, output False.
 
 Output ONLY True or False nothing else. No other text or characters are allowed. Do not get wrong. Do not output any text.
 
-    """,  video=media_url)
+    """,
+        video=media_url,
+    )
     is_outdoor = await ml_models_gateway.ask_gemini(prompt_is_outdoor, gemini_version)
 
-    if ("True" in is_outdoor): 
-        print("Outside")
+    if "True" in is_outdoor:
+        logger.info("Outside")
 
-        prompt_ouside = await PromptFactory().create_prompt_from_multimodal_async(text="""
+        prompt_ouside = await PromptFactory().create_prompt_from_multimodal_async(
+            text="""
 You are an part of a program that will determine if a video will be trimmed if yes you will output the second and if not -1. Perform a frame-by-frame analysis of the provided video. 
 
 Identify if there is an human face and if this human face looks blurry, or weird.
 
 If nothing of this happens, respond with -1. Output ONLY the second or -1 nothing else. No other text or characters are allowed. Do not get wrong. Do not output any text.
-        """,  video=media_url)
+        """,
+            video=media_url,
+        )
         response = await ml_models_gateway.ask_gemini(prompt_ouside, gemini_version)
         return str(response)
     else:
         return -1
 
+
 async def quality_check_with_gemini():
-    working_folder="./examples/inputs/ImageOnly/"
+    working_folder = "./examples/inputs/ImageOnly/"
     with WorkingFolderContext(working_folder):
-        gemini_prompt="""
+        gemini_prompt = """
             **Instruction:**  You are a prompt generator specializing in creating text prompts for Runway Gen-3 Alpha, an AI video generation model.  Given an input image and a desired camera movement, you will output a concise and effective prompt that achieves the desired effect.  The prompt should adhere to Runway's best practices for optimal results.
 
             **Input Image:** [Insert Image Here]
@@ -421,7 +441,9 @@ async def quality_check_with_gemini():
             **Output:** A single, concise text prompt designed for Runway Gen-3 Alpha that will animate the input image using the chosen camera movement.  The prompt should be less than 20 words if possible, and prioritize clarity and precision. Do not include any explanation or commentary, only the prompt itself.
             """
 
-        ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
+        ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(
+            test_mode=False
+        )
 
         video_build_settings = VideoBuildSettings(
             output_video_file_name="image.mp4",
@@ -433,26 +455,35 @@ async def quality_check_with_gemini():
         vid_cp_final._is_root_video_composite = True
         for i in range(1, 2):
             current_image = str(i) + ".jpg"
-            prompt = await PromptFactory().create_prompt_from_multimodal_async(text=gemini_prompt,  image=current_image, reengineer_text_prompt_from_image_and_text=True)
+            prompt = await PromptFactory().create_prompt_from_multimodal_async(
+                text=gemini_prompt,
+                image=current_image,
+                reengineer_text_prompt_from_image_and_text=True,
+            )
 
             # Query Gemini to get an appropriate prompt
             response = await ml_models_gateway.ask_gemini(prompt)
-            
-            #Then we create an image based video for the last video, for example to showcase a product
-            image_prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_image(
-                    image=current_image,
-                    text=response.strip() + ". Slow motion.",
-                    model_provider="runway",
-                )
+
+            # Then we create an image based video for the last video, for example to showcase a product
+            image_prompt = await PromptFactory(
+                ml_models_gateway=ml_models_gateway
+            ).create_prompt_from_image(
+                image=current_image,
+                text=response.strip() + ". Slow motion.",
+                model_provider="runway",
+            )
 
             image_based_video = RawImageBasedVideo(prompt=image_prompt)
             vid_cp_final.append_video(image_based_video)
-        
-        await vid_cp_final.build(ml_models_gateway=ml_models_gateway, build_settings=video_build_settings)
-        print(f"Saved video {vid_cp_final.media_url}")
+
+        await vid_cp_final.build(
+            ml_models_gateway=ml_models_gateway, build_settings=video_build_settings
+        )
+        logger.info(f"Saved video {vid_cp_final.media_url}")
+
 
 async def add_subtitles():
-    #Adding subtitles to a video
+    # Adding subtitles to a video
     subtitle_writer = VideoSubtitleRenderer()
 
     subtitle_writer.add_subtitles_to_video(
@@ -461,8 +492,9 @@ async def add_subtitles():
         output_video_path="./examples/inputs/Subtitles/vikit-presentation_subtitles.mp4",
     )
 
+
 async def add_music():
-    working_folder="./examples/inputs/AddMusic/"
+    working_folder = "./examples/inputs/AddMusic/"
     with WorkingFolderContext(working_folder):
 
         video_build_settings = VideoBuildSettings(
@@ -479,22 +511,48 @@ async def add_music():
 
         await composite_video.build(build_settings=video_build_settings)
 
+
 async def fixed_image_video_generation():
-    working_folder="./examples/inputs/FixedImage/"
+    working_folder = "./examples/inputs/FixedImage/"
     with WorkingFolderContext(working_folder):
 
-        ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
+        ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(
+            test_mode=False
+        )
 
         video_build_settings = VideoBuildSettings(
             output_video_file_name="FixedImage.mp4",
         )
 
-        image_prompt = await PromptFactory(ml_models_gateway=ml_models_gateway).create_prompt_from_image(
-                    image=test_media.get_test_prompt_image(),
-                )
+        image_prompt = await PromptFactory(
+            ml_models_gateway=ml_models_gateway
+        ).create_prompt_from_image(
+            image=test_media.get_test_prompt_image(),
+        )
 
-        fixed_image_video = CompositeVideo().append_video(RawFixedImageVideo(prompt=image_prompt))
+        fixed_image_video = CompositeVideo().append_video(
+            RawFixedImageVideo(prompt=image_prompt)
+        )
         await fixed_image_video.build(build_settings=video_build_settings)
+
+
+async def call_gemini_with_audio(use_audio_from_mp3=False):
+    ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
+
+    #Gemini can be queried with an URL or a file, this function allows to try both methods
+    if use_audio_from_mp3:
+        audio_input = "https://storage.googleapis.com/real-estate-musics/aube_doree.mp3"
+    else:
+        audio_input = test_media.get_sample_gen_background_music()
+
+    audio_prompt = await PromptFactory(
+        ml_models_gateway=ml_models_gateway
+    ).create_prompt_from_multimodal_async(
+        audio=audio_input, text="What is in this audio ?"
+    )
+    response = await ml_models_gateway.ask_gemini(audio_prompt)
+    logger.info(response)
+
 
 if __name__ == "__main__":
 
@@ -559,9 +617,9 @@ if __name__ == "__main__":
         # Example 6 - Create a prompt-based videos
         with WorkingFolderContext("./examples/inputs/PromptBased/"):
             logger.add("log.txt")
-            prompt = """Paris, the City of Light """ #is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere. The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions. Paris is also famous for its charming cafes, chic boutiques, and world-class cuisine, offering visitors a delightful blend of history, elegance, and joie de vivre along the scenic Seine River."""
+            prompt = """Paris, the City of Light """  # is a global center of art, fashion, and culture, renowned for its iconic landmarks and romantic atmosphere. The Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral are just a few of the city's must-see attractions. Paris is also famous for its charming cafes, chic boutiques, and world-class cuisine, offering visitors a delightful blend of history, elegance, and joie de vivre along the scenic Seine River."""
             asyncio.run(prompt_based_composite(prompt=prompt, model_provider="haiper"))
-    
+
     elif run_an_example == 7:
         asyncio.run(colabCode())
     elif run_an_example == 8:
@@ -572,3 +630,5 @@ if __name__ == "__main__":
         asyncio.run(add_music())
     elif run_an_example == 11:
         asyncio.run(fixed_image_video_generation())
+    elif run_an_example == 12:
+        asyncio.run(call_gemini_with_audio(True))

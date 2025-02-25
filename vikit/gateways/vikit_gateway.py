@@ -20,6 +20,7 @@ import json
 import os
 import subprocess
 import time
+from urllib.parse import urlparse
 import uuid as uid
 
 import aiohttp
@@ -48,6 +49,9 @@ http_timeout = aiohttp.ClientTimeout(
 
 mistral_version = "meta/meta-llama-3-70b-instruct"
 
+VALID_AUDIO_EXTENSIONS = [".mp3", ".wav", ".aiff", ".aac", ".ogg", ".flac"]
+VALID_VIDEO_EXTENSIONS = [".mp4", ".mov", ".avi", ".wmv", ".webm"]
+VALID_IMAGE_EXTENSIONS = [".png",".jpg",".jpeg",".bmp",".tiff",".webp"]
 
 class VikitGateway(MLModelsGateway):
     """
@@ -75,14 +79,9 @@ class VikitGateway(MLModelsGateway):
             image_prompt = img_b64
 
     def convert_image_to_b64(self, image, target_size=None):
-        if image.split(".") is not None and image.split(".")[-1].lower() in [
-            "jpg",
-            "png",
-            "jpeg",
-            "bmp",
-            "tiff",
-            "webp",
-        ]:
+        if image.split(".") is not None and os.path.splitext(image)[
+                1
+            ].lower() in VALID_IMAGE_EXTENSIONS:
             # Read file path and get Bytes
             with open(image, "rb") as image_file:
                 image_data = image_file.read()
@@ -1040,6 +1039,36 @@ interesting the resulting music will be. Here is your prompt: '"""
             logger.error(f"Error generating video from prompt: {e}")
             raise
 
+    def add_part_gemini(self, data_to_add, data_kind, valid_data_extensions):
+        part = None
+        if data_to_add and urlparse(data_to_add).scheme: #We check if the data_to_add is an URL
+            data_type = data_to_add.split(".")[-1].split("?")[0]
+            part = {}
+            part["fileData"] = {
+                "fileUri": data_to_add,
+                "mimeType": data_kind + "/" + data_type,
+            }
+
+        elif data_to_add:
+            part = {}
+            base64_data = ""
+
+            # At this point, data_to_add contains either a file path or a base64 encoded data. The presence of a dot (.) indicates that it's a path.
+            if data_to_add.split(".") is not None and os.path.splitext(data_to_add)[
+                1
+            ].lower() in valid_data_extensions:
+                # Read file path and then convert to Base64
+                with open(data_to_add, "rb") as data_file:
+                    base64_data = base64.b64encode(data_file.read()).decode("utf-8")
+                    mimetype = data_kind + "/" + data_to_add.split(".")[-1].lower()
+            else:
+                # Result is already a base64
+                base64_data = data_to_add
+                mimetype = valid_data_extensions[0].replace(".", "").lower()
+
+            part["inlineData"] = {"mimeType": mimetype, "data": base64_data}
+        return part
+
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     async def ask_gemini(
         self, prompt, gemini_version="gemini-1.5-pro-002", more_contents=None
@@ -1088,51 +1117,19 @@ interesting the resulting music will be. Here is your prompt: '"""
             part["text"] = prompt.text
             parts_array.append(part)
 
-        if prompt.image is not None and prompt.image.startswith("http"):
-            part = {}
-            part["fileData"] = {
-                "fileUri": prompt.image,
-                "mimeType": "image/" + prompt.image.split(".")[-1],
-            }
+        image_part = self.add_part_gemini(prompt.image, "image", VALID_IMAGE_EXTENSIONS)
+        if image_part:
+            parts_array.append(image_part)
 
-            parts_array.append(part)
-        elif prompt.image is not None:
-            part = {}
+        audio_part = self.add_part_gemini(prompt.audio, "audio", VALID_AUDIO_EXTENSIONS)
+        if audio_part:
+            parts_array.append(audio_part)
 
-            img_b64 = self.convert_image_to_b64(prompt.image)
+        video_part = self.add_part_gemini(prompt.video, "video", VALID_VIDEO_EXTENSIONS)
+        if video_part:
+            parts_array.append(video_part)
 
-            part["inline_data"] = {"data": img_b64, "mimeType": "image/png"}
-            parts_array.append(part)
-
-        if prompt.video is not None and prompt.video.startswith("http"):
-            videoType = prompt.video.split(".")[-1].split("?")[0]
-            part = {}
-            part["fileData"] = {
-                "fileUri": prompt.video,
-                "mimeType": "video/" + videoType,
-            }
-
-            parts_array.append(part)
-        elif prompt.video is not None:
-            part = {}
-            video_data = ""
-
-            # We check if the video is a local path
-            if prompt.video.split(".") is not None and os.path.splitext(prompt.video)[
-                1
-            ].lower() in [".mp4", ".mov", ".avi", ".wmv", ".webm"]:
-                # Read file path and then convert to Base64
-                with open(prompt.video, "rb") as video_file:
-                    video_data = base64.b64encode(video_file.read()).decode("utf-8")
-                    mimetype = "video/" + prompt.video.split(".")[-1].lower()
-            else:
-                # Result is already a base64
-                video_data = prompt.video
-
-            part["inlineData"] = {"mimeType": mimetype, "data": video_data}
-
-            parts_array.append(part)
-
+        print(parts_array)
         output = ""
 
         try:
