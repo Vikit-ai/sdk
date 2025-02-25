@@ -214,7 +214,7 @@ async def batch_image_based_prompting(prompt_file: str):
         assert os.path.exists(
             video.media_url
         ), f"The generated video {video.media_url} does not exist"
-        print(f"video saved on {output_file}")
+        logger.info(f"video saved on {output_file}")
 
 
 async def composite_imageonly_prompting(prompt_file: str):
@@ -410,7 +410,7 @@ Output ONLY True or False nothing else. No other text or characters are allowed.
     is_outdoor = await ml_models_gateway.ask_gemini(prompt_is_outdoor, gemini_version)
 
     if "True" in is_outdoor:
-        print("Outside")
+        logger.info("Outside")
 
         prompt_ouside = await PromptFactory().create_prompt_from_multimodal_async(
             text="""
@@ -479,7 +479,7 @@ async def quality_check_with_gemini():
         await vid_cp_final.build(
             ml_models_gateway=ml_models_gateway, build_settings=video_build_settings
         )
-        print(f"Saved video {vid_cp_final.media_url}")
+        logger.info(f"Saved video {vid_cp_final.media_url}")
 
 
 async def add_subtitles():
@@ -539,6 +539,7 @@ async def fixed_image_video_generation():
 async def call_gemini_with_audio(use_audio_from_mp3=False):
     ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
 
+    #Gemini can be queried with an URL or a file, this function allows to try both methods
     if use_audio_from_mp3:
         audio_input = "https://storage.googleapis.com/real-estate-musics/aube_doree.mp3"
     else:
@@ -550,7 +551,7 @@ async def call_gemini_with_audio(use_audio_from_mp3=False):
         audio=audio_input, text="What is in this audio ?"
     )
     response = await ml_models_gateway.ask_gemini(audio_prompt)
-    print(response)
+    logger.info(response)
 
 
 if __name__ == "__main__":
