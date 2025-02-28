@@ -382,7 +382,7 @@ async def colabCode():
         prompt = await PromptFactory(
             ml_models_gateway=ml_models_gateway
         ).create_prompt_from_multimodal_async(
-            text=prompt, negative_text="human faces", duration=2
+            text=prompt, negative_text="human faces"
         )
         video = RawMultiModalBasedVideo(prompt=prompt)
         await video.build(
