@@ -121,3 +121,5 @@ examples/inputs/*/*.jpg
 #Pypi
 .pypirc
 .egg-info/
+
+tmp/
