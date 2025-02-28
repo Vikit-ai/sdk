@@ -15,8 +15,10 @@
 
 from loguru import logger
 
+from vikit.common.file_tools import download_or_copy_file
 from vikit.common.handler import Handler
 from vikit.wrappers.ffmpeg_wrapper import reencode_video
+
 
 
 class VideoReencodingHandler(Handler):
@@ -49,6 +51,7 @@ class VideoReencodingHandler(Handler):
             if video.media_url.startswith("http"):
                 video.media_url_http = video.media_url #We keep the external video URL for further reuse
                 logger.debug("Video is a link during re-encoding, storing the link for future online usage :" + video.media_url_http)
+                video.media_url = download_or_copy_file(video.media_url_http, target_file_name)
 
             if target_file_name == video.media_url:
                 logger.warning(
