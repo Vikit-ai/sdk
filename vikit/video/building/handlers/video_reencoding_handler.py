@@ -51,7 +51,7 @@ class VideoReencodingHandler(Handler):
             if video.media_url.startswith("http"):
                 video.media_url_http = video.media_url #We keep the external video URL for further reuse
                 logger.debug("Video is a link during re-encoding, storing the link for future online usage :" + video.media_url_http)
-                video.media_url = download_or_copy_file(video.media_url_http, target_file_name)
+                video.media_url = await download_or_copy_file(video.media_url_http, target_file_name)
 
             if target_file_name == video.media_url:
                 logger.warning(
