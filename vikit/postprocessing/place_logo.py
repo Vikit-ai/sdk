@@ -43,6 +43,8 @@ class VideoLogoOverlay:
         self.logo_height_percentage = logo_height_percentage
         self.margin = margin
 
+        self.min_resolution_threshold = 720
+
     async def add_logo(self):
         """Adds the logo to the video and saves the output."""
 
@@ -77,11 +79,11 @@ class VideoLogoOverlay:
         logger.debug(
             f"Started adding logo {self.logo_path} to video {self.video_path} ..."
         )
-
+        
         logo = ImageClip(self.logo_path)
 
-        logo = logo.resize(height=int(self.logo_height))  # type: ignore
-
+        logo = logo.resize(height=int(self.logo_height))
+        
         margins = {
             "top_right": {"right": self.margin, "top": self.margin},
             "top_left": {"left": self.margin, "top": self.margin},
@@ -96,4 +98,13 @@ class VideoLogoOverlay:
         logo = logo.set_duration(video.duration)
 
         final_video = CompositeVideoClip([video, logo])
-        final_video.write_videofile(self.output_path, codec="libx264", fps=24)
+
+        video_kwargs = {
+            "codec": "libx264",
+            "fps": video.fps,
+        }
+
+        if max(final_video.size) < min_resolution_threshold:
+            video_kwargs["bitrate"] = "14000k"
+
+        final_video.write_videofile(self.output_path, **video_kwargs)
