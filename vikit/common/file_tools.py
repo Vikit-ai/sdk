@@ -34,7 +34,7 @@ from vikit.common.config import get_nb_retries_http_calls
 
 TIMEOUT = 10  # seconds before stopping the request to check an URL exists
 
-# A regex that matches Google Cloud Storage URLs. It matches the following pattern:
+# A regex that matches Google Cloud Storage URLs. It matches the following patterns:
 # http://storage.googleapis.com/<file_path>
 # https://storage.googleapis.com/<file_path>
 GOOGLE_STORAGE_URL_PATTERN = r"https?://storage\.googleapis\.com/(.*)"
@@ -249,7 +249,7 @@ async def download_or_copy_file(url, local_path, force_download=False):
         raise ValueError("URL must be provided")
 
     # Replace the Google Cloud Storage URL with the gs:// format in order to take
-    # advantage of the copy_file_from_gcs function as much as possible.
+    # advantage of the google.cloud.storage library as much as possible.
     match = re.match(GOOGLE_STORAGE_URL_PATTERN, url)
     if match:
         gs_url = "gs://" + match.group(1)
