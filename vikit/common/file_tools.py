@@ -257,14 +257,14 @@ async def download_or_copy_file(url, local_path, force_download=False):
         url = gs_url
 
     path_desc, error = get_path_type(url)
+    if error:
+        raise ValueError(f"Unsupported remote path type: {url} with error: {error}")
+
     if len(local_path) > 255:
         local_path = local_path[-255:]
     if os.path.exists(local_path) and not force_download:
         logger.debug(f"File already exists at {local_path}, skipping download")
         return local_path
-
-    if error:
-        raise ValueError(f"Unsupported remote path type: {url} with error: {error}")
 
     if path_desc["type"] == "http" or path_desc["type"] == "https":
         async with aiohttp.ClientSession() as session:
