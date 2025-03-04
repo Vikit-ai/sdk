@@ -25,17 +25,19 @@ from urllib.request import urlopen
 import aiofiles
 import aiohttp
 
-from loguru import logger
-from tenacity import retry, stop_after_attempt, wait_exponential
-
 # Maybe we will consider breaking down the copying logic into modules to prevent adding too many dependencies on external linbs
 from google.cloud import storage
 from loguru import logger
-from tenacity import retry, stop_after_attempt
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 from vikit.common.config import get_nb_retries_http_calls
 
 TIMEOUT = 10  # seconds before stopping the request to check an URL exists
+
+# A regex that matches Google Cloud Storage URLs. It matches the following pattern:
+# http://storage.googleapis.com/<file_path>
+# https://storage.googleapis.com/<file_path>
+GOOGLE_STORAGE_URL_PATTERN = r"https?://storage\.googleapis\.com/(.*)"
 
 
 def get_canonical_name(file_path: str):
@@ -246,6 +248,14 @@ async def download_or_copy_file(url, local_path, force_download=False):
     if not url:
         raise ValueError("URL must be provided")
 
+    # Replace the Google Cloud Storage URL with the gs:// format in order to take
+    # advantage of the copy_file_from_gcs function as much as possible.
+    match = re.match(GOOGLE_STORAGE_URL_PATTERN, url)
+    if match:
+        gs_url = "gs://" + match.group(1)
+        logger.debug(f"Replacing HTTP(S) URL with GCS URL:\nold: {url}\nnew: {gs_url}")
+        url = gs_url
+
     path_desc, error = get_path_type(url)
     if len(local_path) > 255:
         local_path = local_path[-255:]
@@ -253,47 +263,46 @@ async def download_or_copy_file(url, local_path, force_download=False):
         logger.debug(f"File already exists at {local_path}, skipping download")
         return local_path
 
-    if not error:
-        if path_desc["type"] == "http" or path_desc["type"] == "https":
-            async with aiohttp.ClientSession() as session:
-                logger.debug(f"Downloading file from {url} to {local_path}")
-                async with session.get(url) as response:
-                    if response.status == 200:
-                        # Use aiofiles to write the content asynchronously.
-                        async with aiofiles.open(local_path, "wb") as f:
-                            while (
-                                True
-                            ):  # Read the content in chunks to avoid overloading the memory
-                                chunk = await response.content.read(1024)
-                                if not chunk:
-                                    break
-                                await f.write(chunk)
-                        return local_path
-                    else:
-                        raise FileNotFoundError(
-                            f"The URL did not work with response: {response}"
-                        )
-        elif path_desc["type"] == "local":
-            logger.debug(f"Copying file from {url} to {local_path}")
-            if url == local_path:
-                logger.debug(f"File already exists at {local_path}, skipping copy")
-                return local_path
-            else:
-                shutil.copyfile(url, local_path)
-            return local_path
-        elif path_desc["type"] == "local_url_format":
-            url = url.replace("file://", "")
-            logger.debug(f"Copying file from {url} to {local_path}")
-            shutil.copyfile(url, local_path)
-            return local_path
-        elif path_desc["type"] == "gs":
-            return copy_file_from_gcs(
-                bucket=url.split("/")[2],
-                blob_path="/".join(url.split("/")[3:]),
-                destination_file_name=local_path,
-            )
-    else:
+    if error:
         raise ValueError(f"Unsupported remote path type: {url} with error: {error}")
+
+    if path_desc["type"] == "http" or path_desc["type"] == "https":
+        async with aiohttp.ClientSession() as session:
+            logger.debug(f"Downloading file from {url} to {local_path}")
+            async with session.get(url) as response:
+                if response.status == 200:
+                    # Use aiofiles to write the content asynchronously.
+                    async with aiofiles.open(local_path, "wb") as f:
+                        # Read the content in chunks to avoid overloading the memory
+                        while True:
+                            chunk = await response.content.read(1024)
+                            if not chunk:
+                                break
+                            await f.write(chunk)
+                    return local_path
+                else:
+                    raise FileNotFoundError(
+                        f"The URL did not work with response: {response}"
+                    )
+    elif path_desc["type"] == "local":
+        logger.debug(f"Copying file from {url} to {local_path}")
+        if url == local_path:
+            logger.debug(f"File already exists at {local_path}, skipping copy")
+            return local_path
+        else:
+            shutil.copyfile(url, local_path)
+        return local_path
+    elif path_desc["type"] == "local_url_format":
+        url = url.replace("file://", "")
+        logger.debug(f"Copying file from {url} to {local_path}")
+        shutil.copyfile(url, local_path)
+        return local_path
+    elif path_desc["type"] == "gs":
+        return copy_file_from_gcs(
+            bucket=url.split("/")[2],
+            blob_path="/".join(url.split("/")[3:]),
+            destination_file_name=local_path,
+        )
 
 
 def copy_file_from_gcs(
