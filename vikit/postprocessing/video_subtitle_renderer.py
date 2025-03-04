@@ -23,6 +23,7 @@ from moviepy.editor import ColorClip, CompositeVideoClip, TextClip, VideoFileCli
 from PIL import ImageFont
 
 FONT_SIZE_RATIO = 0.045
+MINIMUM_RESOLUTION_THRESHOLD = 720
 
 
 class VideoSubtitleRenderer:
@@ -213,7 +214,7 @@ class VideoSubtitleRenderer:
             "audio_codec": "aac",
         }
 
-        if max(final_video.size) < min_resolution_threshold:
+        if max(final_video.size) < MINIMUM_RESOLUTION_THRESHOLD:
             video_kwargs["bitrate"] = "14000k"
 
         final_video.write_videofile(output_video_path, **video_kwargs)

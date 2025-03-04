@@ -7,6 +7,7 @@ import os
 from loguru import logger
 from moviepy.editor import CompositeVideoClip, ImageClip, VideoFileClip
 
+MINIMUM_RESOLUTION_THRESHOLD = 720
 
 class VideoLogoOverlay:
     """
@@ -104,7 +105,7 @@ class VideoLogoOverlay:
             "fps": video.fps,
         }
 
-        if max(final_video.size) < min_resolution_threshold:
+        if max(final_video.size) < MINIMUM_RESOLUTION_THRESHOLD:
             video_kwargs["bitrate"] = "14000k"
 
         final_video.write_videofile(self.output_path, **video_kwargs)
