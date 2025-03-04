@@ -47,6 +47,8 @@ class VideoSubtitleRenderer:
         self.margin_left_ratio = margin_left_ratio
         self.codec = "libx264"
 
+        self.min_resolution_threshold = 720
+
     def wrap_text(self, text, max_width, font_path, font_size_pt):
         """
         Wraps text into multiple lines based on the maximum width.
@@ -204,9 +206,14 @@ class VideoSubtitleRenderer:
         )
         logger.debug(f"Saving video with subtitles to {output_video_path} ...")
         # Write the result to a file, keeping the original audio
-        final_video.write_videofile(
-            output_video_path,
-            fps=video.fps,
-            codec=self.codec,
-            audio_codec="aac",
-        )
+
+        video_kwargs = {
+            "codec": self.codec,
+            "fps": video.fps,
+            "audio_codec": "aac",
+        }
+
+        if max(final_video.size) < min_resolution_threshold:
+            video_kwargs["bitrate"] = "14000k"
+
+        final_video.write_videofile(output_video_path, **video_kwargs)
