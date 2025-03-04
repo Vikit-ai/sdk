@@ -261,7 +261,12 @@ async def download_or_copy_file(url, local_path, force_download=False):
         raise ValueError(f"Unsupported remote path type: {url} with error: {error}")
 
     if len(local_path) > 255:
-        local_path = local_path[-255:]
+        truncated_path = local_path[-255:]
+        logger.warning(
+            "Local path is too long, truncating:"
+            f"\nold: {local_path}\nnew: {truncated_path}"
+        )
+        local_path = truncated_path
     if os.path.exists(local_path) and not force_download:
         logger.debug(f"File already exists at {local_path}, skipping download")
         return local_path
