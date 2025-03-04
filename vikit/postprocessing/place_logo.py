@@ -44,6 +44,8 @@ class VideoLogoOverlay:
         self.logo_height_percentage = logo_height_percentage
         self.margin = margin
 
+        self.min_resolution_threshold = 720
+
     async def add_logo(self):
         """Adds the logo to the video and saves the output."""
 

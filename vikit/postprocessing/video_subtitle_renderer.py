@@ -48,6 +48,8 @@ class VideoSubtitleRenderer:
         self.margin_left_ratio = margin_left_ratio
         self.codec = "libx264"
 
+        self.min_resolution_threshold = 720
+
     def wrap_text(self, text, max_width, font_path, font_size_pt):
         """
         Wraps text into multiple lines based on the maximum width.
