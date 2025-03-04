@@ -23,6 +23,7 @@ from moviepy.editor import ColorClip, CompositeVideoClip, TextClip, VideoFileCli
 from PIL import ImageFont
 
 FONT_SIZE_RATIO = 0.045
+MINIMUM_RESOLUTION_THRESHOLD = 720
 
 
 class VideoSubtitleRenderer:
@@ -46,8 +47,6 @@ class VideoSubtitleRenderer:
         self.margin_right_ratio = margin_right_ratio
         self.margin_left_ratio = margin_left_ratio
         self.codec = "libx264"
-
-        self.min_resolution_threshold = 720
 
     def wrap_text(self, text, max_width, font_path, font_size_pt):
         """
@@ -213,7 +212,7 @@ class VideoSubtitleRenderer:
             "audio_codec": "aac",
         }
 
-        if max(final_video.size) < min_resolution_threshold:
+        if max(final_video.size) < MINIMUM_RESOLUTION_THRESHOLD:
             video_kwargs["bitrate"] = "14000k"
 
         final_video.write_videofile(output_video_path, **video_kwargs)

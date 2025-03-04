@@ -7,6 +7,7 @@ import os
 from loguru import logger
 from moviepy.editor import CompositeVideoClip, ImageClip, VideoFileClip
 
+MINIMUM_RESOLUTION_THRESHOLD = 720
 
 class VideoLogoOverlay:
     """
@@ -42,8 +43,6 @@ class VideoLogoOverlay:
         self.logo_height = logo_height
         self.logo_height_percentage = logo_height_percentage
         self.margin = margin
-
-        self.min_resolution_threshold = 720
 
     async def add_logo(self):
         """Adds the logo to the video and saves the output."""
@@ -104,7 +103,7 @@ class VideoLogoOverlay:
             "fps": video.fps,
         }
 
-        if max(final_video.size) < min_resolution_threshold:
+        if max(final_video.size) < MINIMUM_RESOLUTION_THRESHOLD:
             video_kwargs["bitrate"] = "14000k"
 
         final_video.write_videofile(self.output_path, **video_kwargs)
