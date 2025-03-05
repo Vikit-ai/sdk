@@ -19,7 +19,11 @@ import pytest
 
 import tests.testing_medias as testing_medias
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.common.file_tools import copy_file_from_gcs, download_or_copy_file
+from vikit.common.file_tools import (
+    _parse_gcs_url,
+    copy_file_from_gcs,
+    download_or_copy_file,
+)
 
 
 class TestFileTools:
@@ -49,21 +53,25 @@ class TestFileTools:
 
     @pytest.mark.integration
     @pytest.mark.asyncio
-    async def test_Download_from_google_cloud_storage(self):
+    @pytest.mark.parametrize(
+        "url",
+        [testing_medias.GCS_TEST_FILE_GS_URL, testing_medias.GCS_TEST_FILE_HTTPS_URL],
+    )
+    async def test_Download_from_google_cloud_storage(self, url):
         """
-        Test the download of a file stored on a Google cloud storage bucket
+        Test the download of a file stored on a Google cloud storage bucket.
 
-        Prerequisistes:
+        Prerequisites:
             Will need an access token to Google Cloud Storage,
-                either you use gcloud auth application-default login and connect with your identity before running the tests
-                or you ensure a service account key file with low privileges (i.e. just read the test bucket files) is available
-                You could also call the secret manager to get the SA key from it using your own credientials (better for tracability but oberkill here)
+              - either you use gcloud auth application-default login and connect with
+                your identity before running the tests
+              - or you ensure a service account key file with low privileges (i.e. just
+                read the test bucket files) is available
+              - You could also call the secret manager to get the SA key from it using
+                your own credentials (better for traceability but overkill here)
         """
         with WorkingFolderContext():
-            gcs_file_path = testing_medias.get_gcs_test_file_path()
-            downloaded_file = await download_or_copy_file(
-                gcs_file_path, "downloaded_file.abc"
-            )
+            downloaded_file = await download_or_copy_file(url, "downloaded_file.abc")
 
             assert downloaded_file is not None
             assert downloaded_file == "downloaded_file.abc"
@@ -86,3 +94,35 @@ class TestFileTools:
             )
             assert result == "test_download.txt"
             assert os.path.exists("test_download.txt")
+
+    @pytest.mark.unit
+    @pytest.mark.parametrize(
+        "url, expected_result",
+        [
+            # Normal URLs
+            (
+                "http://storage.googleapis.com/bucket/path/to/file",
+                (True, "bucket", "path/to/file"),
+            ),
+            (
+                "https://storage.googleapis.com/bucket/path/to/file",
+                (True, "bucket", "path/to/file"),
+            ),
+            # URLs with encoded characters
+            (
+                "https://storage.googleapis.com/bucket/urlencoded%20path",
+                (True, "bucket", "urlencoded path"),
+            ),
+            # Valid edge cases
+            ("https://storage.googleapis.com", (True, "", "")),
+            ("https://storage.googleapis.com/", (True, "", "")),
+            ("https://storage.googleapis.com/bucket", (True, "bucket", "")),
+            ("https://storage.googleapis.com/bucket/", (True, "bucket", "")),
+            # Invalid GCS URLs
+            ("unsupported_protocol://bucket/object", (False, None, None)),
+            ("https://not-gcs.com/bucket/object", (False, None, None)),
+        ],
+    )
+    def test_parse_gcs_url(self, url, expected_result):
+        result = _parse_gcs_url(url)
+        assert result == expected_result, result
