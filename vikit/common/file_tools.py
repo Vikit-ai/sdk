@@ -34,11 +34,6 @@ from vikit.common.config import get_nb_retries_http_calls
 
 TIMEOUT = 10  # seconds before stopping the request to check an URL exists
 
-# A regex that matches Google Cloud Storage URLs. It matches the following patterns:
-# http://storage.googleapis.com/<file_path>
-# https://storage.googleapis.com/<file_path>
-GOOGLE_STORAGE_URL_PATTERN = r"https?://storage\.googleapis\.com/(.*)"
-
 
 def get_canonical_name(file_path: str):
     """
@@ -62,6 +57,29 @@ def get_max_path_length(path="."):
         # PC_NAME_MAX may not be available or may fail for certain paths on some OSes
         # Returns a common default value (255) in this case
         return 255
+
+
+def _parse_gcs_url(url: str) -> tuple[bool, str, str]:
+    """
+    Converts a Google Cloud Storage HTTP(S) URL to a bucket and blob path.
+
+    GCS URLs have the form: http(s)://storage.googleapis.com/bucket/blob_path
+
+    Returns:
+        bool: True if the URL is a GCS URL, False otherwise.
+        str: The bucket name, or None if the URL is not a GCS URL.
+        str: The blob path, or None if the URL is not a GCS URL.
+    """
+    parsed_url = urllib.parse.urlparse(url)
+    if parsed_url.scheme not in ["http", "https"]:
+        return False, None, None
+    if parsed_url.netloc != "storage.googleapis.com":
+        return False, None, None
+    if not parsed_url.path:
+        return True, "", ""
+    _, bucket, *path_segments = parsed_url.path.split("/")
+    path = urllib.parse.unquote("/".join(path_segments))
+    return True, bucket, path
 
 
 def get_safe_filename(filename):
@@ -250,9 +268,10 @@ async def download_or_copy_file(url, local_path, force_download=False):
 
     # Replace the Google Cloud Storage URL with the gs:// format in order to take
     # advantage of the google.cloud.storage library as much as possible.
-    match = re.match(GOOGLE_STORAGE_URL_PATTERN, url)
-    if match:
-        gs_url = "gs://" + match.group(1)
+
+    is_gcs_url, bucket, file_path = _parse_gcs_url(url)
+    if is_gcs_url:
+        gs_url = f"gs://{bucket}/{file_path}"
         logger.debug(f"Replacing HTTP(S) URL with GCS URL:\nold: {url}\nnew: {gs_url}")
         url = gs_url
 

@@ -40,19 +40,16 @@ SAMPLE_IMAGE_PROMPT = "image_prompt.jpeg"
 SAMPLE_GCS_BUCKET = "dev-vikit-ai"
 SAMPLE_GCS_OBJECT = "tests/file.txt"
 
+# Here we assume the file is already present per convention at Vikit, though we might
+# just as well create it on the fly (later version maybe)
+GCS_TEST_FILE_GS_URL = f"gs://{SAMPLE_GCS_BUCKET}/{SAMPLE_GCS_OBJECT}"
+GCS_TEST_FILE_HTTPS_URL = (
+    f"https://storage.googleapis.com/{SAMPLE_GCS_BUCKET}/{SAMPLE_GCS_OBJECT}"
+)
+
 _media_dir = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), TESTS_MEDIA_FOLDER
 )
-
-
-def get_gcs_test_file_path():
-    """
-    Return the path to a file stored on Google Cloud Storage
-
-    Here we assume the file is already present per convention at Vikit, though we might
-    just as well create it on the fly (later version maybe)
-    """
-    return f"gs://{SAMPLE_GCS_BUCKET}/{SAMPLE_GCS_OBJECT}"
 
 
 def get_gcs_test_object():
