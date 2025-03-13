@@ -2,6 +2,7 @@
 A class to overlay a logo on a video.
 """
 
+import cv2
 import os
 
 from loguru import logger
@@ -80,6 +81,13 @@ class VideoLogoOverlay:
         logger.debug(
             f"Started adding logo {self.logo_path} to video {self.video_path} ..."
         )
+
+        #There are issues with some PNGs transparency, converting to webp to be sure to avoid problems
+        if self.logo_path.lower().endswith(".png"):
+            webp_logo_path = self.logo_path.replace(".png", ".webp")
+            image = cv2.imread(self.logo_path, cv2.IMREAD_UNCHANGED)
+            cv2.imwrite(webp_logo_path, image, [int(cv2.IMWRITE_WEBP_QUALITY), 100])
+            self.logo_path = webp_logo_path
         
         logo = ImageClip(self.logo_path)
 
