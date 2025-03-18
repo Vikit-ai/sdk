@@ -555,11 +555,11 @@ async def call_gemini_with_audio(use_audio_from_mp3=False):
     logger.info(response)
 
 async def add_logo():
-    working_folder = "./examples/inputs/AddLogo/"
+    working_folder = "./output/add_logo_files/"
     with WorkingFolderContext(working_folder):
 
         video_build_settings = VideoBuildSettings(
-            output_video_file_name="music.mp4",
+            output_video_file_name="logo.mp4",
             music_building_context=MusicBuildingContext(
                 apply_background_music=True,
                 background_music_file=test_media.get_sample_gen_background_music(),
@@ -573,7 +573,7 @@ async def add_logo():
         await composite_video.build(build_settings=video_build_settings)
 
         # Create the VideoLogoOverlay instance and expect an exception to be raised
-        overlay = VideoLogoOverlay(composite_video.media_url, "/home/leclem/vikit/sdk/homki-1-1.png", "logo_" + composite_video.media_url, "", "top_left", 15)
+        overlay = VideoLogoOverlay(composite_video.media_url, test_media.get_sample_logo(), "logo_" + composite_video.media_url, "", "top_left", 15)
         composite_video.media_url = "logo_" + composite_video.media_url
         await overlay.add_logo()
 
