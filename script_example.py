@@ -25,6 +25,7 @@ from vikit.common.context_managers import WorkingFolderContext
 from vikit.common.decorators import log_function_params
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.music_building_context import MusicBuildingContext
+from vikit.postprocessing.place_logo import VideoLogoOverlay
 from vikit.postprocessing.video_subtitle_renderer import VideoSubtitleRenderer
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.composite_video import CompositeVideo
@@ -553,6 +554,29 @@ async def call_gemini_with_audio(use_audio_from_mp3=False):
     response = await ml_models_gateway.ask_gemini(audio_prompt)
     logger.info(response)
 
+async def add_logo():
+    working_folder = "./output/add_logo_files/"
+    with WorkingFolderContext(working_folder):
+
+        video_build_settings = VideoBuildSettings(
+            output_video_file_name="logo.mp4",
+            music_building_context=MusicBuildingContext(
+                apply_background_music=True,
+                background_music_file=test_media.get_sample_gen_background_music(),
+            ),
+        )
+
+        composite_video = CompositeVideo().append_video(
+            ImportedVideo(test_media.get_cat_video_path())
+        )
+
+        await composite_video.build(build_settings=video_build_settings)
+
+        # Create the VideoLogoOverlay instance and expect an exception to be raised
+        overlay = VideoLogoOverlay(composite_video.media_url, test_media.get_sample_logo(), "logo_" + composite_video.media_url, "", "top_left", 15)
+        composite_video.media_url = "logo_" + composite_video.media_url
+        await overlay.add_logo()
+
 
 if __name__ == "__main__":
 
@@ -632,3 +656,5 @@ if __name__ == "__main__":
         asyncio.run(fixed_image_video_generation())
     elif run_an_example == 12:
         asyncio.run(call_gemini_with_audio(True))
+    elif run_an_example == 13:
+        asyncio.run(add_logo())
