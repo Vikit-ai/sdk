@@ -25,7 +25,6 @@ TEST_PROMPT = get_test_prompt_image()
 
 
 class TestPromptFactory:
-
     @pytest.mark.local_integration
     async def test_override_model_provider(self):
         image_prompt = await PromptFactory(
@@ -33,14 +32,13 @@ class TestPromptFactory:
         ).create_prompt_from_image(
             image=TEST_PROMPT, text="test image prompt", model_provider="fake model"
         )
-        assert (
-            image_prompt.build_settings.model_provider == "fake model"
-        ), "The prompt model should be overrided when model_provider is not None"
+        assert image_prompt.build_settings.model_provider == "fake model", (
+            "The prompt model should be overrided when model_provider is not None"
+        )
 
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_reengineer_prompt_from_text(self):
-
         pt_build_settings = PromptBuildSettings(
             generate_from_llm_keyword=True, generate_from_llm_prompt=False
         )

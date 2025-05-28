@@ -30,4 +30,3 @@ class Handler(ABC):
         Returns:
             the transformed object_to_transforms
         """
-        pass

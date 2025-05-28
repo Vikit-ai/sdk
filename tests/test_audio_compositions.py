@@ -23,22 +23,24 @@ import warnings
 import pytest
 from loguru import logger
 
-from tests.testing_medias import (get_cat_video_path,
-                                  get_generated_3s_forest_video_1_path,
-                                  get_generated_3s_forest_video_2_path)
+from tests.testing_medias import (
+    get_cat_video_path,
+    get_generated_3s_forest_video_1_path,
+    get_generated_3s_forest_video_2_path,
+)
 from tests.testing_tools import test_prompt_library
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.music_building_context import MusicBuildingContext
-from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handler import \
-    ReadAloudPromptAudioMergingHandler
+from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handler import (
+    ReadAloudPromptAudioMergingHandler,
+)
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.imported_video import ImportedVideo
 from vikit.video.video import VideoBuildSettings
 
 
 class TestAudioCompositions:
-
     def setUp(self) -> None:
         self.sample_video_path = get_cat_video_path()
         self.prompt_loosing_faith = None
@@ -61,7 +63,12 @@ class TestAudioCompositions:
             handler = ReadAloudPromptAudioMergingHandler(
                 recorded_prompt=test_prompt_library["moss_stones-train_boy"]
             )
-            res_vid = await handler.execute_async(video=video, ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True))
+            res_vid = await handler.execute_async(
+                video=video,
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                    test_mode=True
+                ),
+            )
 
             assert res_vid is not None, "Video was not generated properly"
             assert res_vid.media_url is not None, "Media URL was not generated properly"
@@ -110,9 +117,9 @@ class TestAudioCompositions:
 
             assert video_comp.background_music is not None, f"No background music set"
             assert video_comp.media_url is not None, f"No media URL"
-            assert (
-                video_comp.media_url != vid1.media_url
-            ), f"Media URL is the same as the first video, {video_comp.media_url}"
-            assert (
-                video_comp.media_url != vid2.media_url
-            ), f"Media URL is the same as the second video, {video_comp.media_url}"
+            assert video_comp.media_url != vid1.media_url, (
+                f"Media URL is the same as the first video, {video_comp.media_url}"
+            )
+            assert video_comp.media_url != vid2.media_url, (
+                f"Media URL is the same as the second video, {video_comp.media_url}"
+            )

@@ -25,8 +25,9 @@ from vikit.common.context_managers import WorkingFolderContext
 from vikit.common.decorators import log_function_params
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.music_building_context import MusicBuildingContext
-from vikit.postprocessing.place_logo import VideoLogoOverlay
-from vikit.postprocessing.video_subtitle_renderer import VideoSubtitleRenderer
+from vikit.postprocessing.subtitles.simple_video_subtitle_renderer import (
+    SimpleVideoSubtitleRenderer,
+)
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.imported_video import ImportedVideo
@@ -39,8 +40,8 @@ from vikit.video.seine_transition import SeineTransition
 from vikit.video.transition import Transition
 from vikit.video.video_build_settings import VideoBuildSettings
 
-negative_prompt = """bad anatomy, bad hands, missing fingers, extra fingers, three hands, 
-three legs, bad arms, missing legs, missing arms, poorly drawn face, bad face, fused face, 
+negative_prompt = """bad anatomy, bad hands, missing fingers, extra fingers, three hands,
+three legs, bad arms, missing legs, missing arms, poorly drawn face, bad face, fused face,
 cloned face, three crus, fused feet, fused thigh, extra crus, ugly fingers, amputation,
  disconnected limbs"""
 
@@ -107,7 +108,6 @@ async def batch_raw_text_based_prompting(
 async def composite_textonly_prompting(
     prompt_file: str, model_provider: str = "stabilityai"
 ):
-
     # It is strongly recommended to activate interpolate for videocrafter model
     to_interpolate = True if model_provider == "videocrafter" else False
 
@@ -186,7 +186,6 @@ async def create_single_image_based_video(
 
 
 async def batch_image_based_prompting(prompt_file: str):
-
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
 
     for _, row in prompt_df.iterrows():
@@ -212,14 +211,13 @@ async def batch_image_based_prompting(prompt_file: str):
         await video.build(build_settings=build_settings)
 
         assert video.media_url, "media URL was not updated"
-        assert os.path.exists(
-            video.media_url
-        ), f"The generated video {video.media_url} does not exist"
+        assert os.path.exists(video.media_url), (
+            f"The generated video {video.media_url} does not exist"
+        )
         logger.info(f"video saved on {output_file}")
 
 
 async def composite_imageonly_prompting(prompt_file: str):
-
     model_provider = "videocrafter"
 
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
@@ -270,7 +268,6 @@ async def composite_imageonly_prompting(prompt_file: str):
 async def composite_mixed_prompting(
     prompt_file: str, text_to_video_model_provider: str = "stabilityai"
 ):
-
     prompt_df = pd.read_csv(prompt_file, delimiter=";", header=0)
 
     # It is strongly recommended to activate interpolate for videocrafter model
@@ -284,7 +281,6 @@ async def composite_mixed_prompting(
     vid_cp_sub = CompositeVideo()
 
     for i in range(len(prompt_df)):
-
         prompt_content = prompt_df.iloc[i]["prompt"]
         prompt_type = prompt_df.iloc[i]["type"]
 
@@ -292,12 +288,13 @@ async def composite_mixed_prompting(
             image_based_video_buildsettings = VideoBuildSettings(
                 target_model_provider="stabilityai_image",
             )
-            video, image_based_video_buildsettings = (
-                await create_single_image_based_video(
-                    prompt_content=prompt_content,
-                    build_settings=image_based_video_buildsettings,
-                    text="Moving fast",
-                )
+            (
+                video,
+                image_based_video_buildsettings,
+            ) = await create_single_image_based_video(
+                prompt_content=prompt_content,
+                build_settings=image_based_video_buildsettings,
+                text="Moving fast",
             )
 
         elif prompt_type == "text":
@@ -338,7 +335,6 @@ async def composite_mixed_prompting(
 
 
 async def prompt_based_composite(prompt: str, model_provider="stabilityai"):
-
     # It is strongly recommended to activate interpolate for videocrafter model
     to_interpolate = True if model_provider == "videocrafter" else False
 
@@ -383,7 +379,7 @@ async def colabCode():
         prompt = await PromptFactory(
             ml_models_gateway=ml_models_gateway
         ).create_prompt_from_multimodal_async(
-            text=prompt, negative_text="human faces"
+            text=prompt, negative_text="human faces", duration=2
         )
         video = RawMultiModalBasedVideo(prompt=prompt)
         await video.build(
@@ -394,7 +390,6 @@ async def colabCode():
 async def is_qualitative_until(
     media_url, ml_models_gateway, gemini_version="gemini-1.5-pro-002"
 ):
-
     prompt_is_outdoor = await PromptFactory().create_prompt_from_multimodal_async(
         text="""
 You are an part of a program that will determine if a video should be processed further.
@@ -415,7 +410,7 @@ Output ONLY True or False nothing else. No other text or characters are allowed.
 
         prompt_ouside = await PromptFactory().create_prompt_from_multimodal_async(
             text="""
-You are an part of a program that will determine if a video will be trimmed if yes you will output the second and if not -1. Perform a frame-by-frame analysis of the provided video. 
+You are an part of a program that will determine if a video will be trimmed if yes you will output the second and if not -1. Perform a frame-by-frame analysis of the provided video.
 
 Identify if there is an human face and if this human face looks blurry, or weird.
 
@@ -485,9 +480,9 @@ async def quality_check_with_gemini():
 
 async def add_subtitles():
     # Adding subtitles to a video
-    subtitle_writer = VideoSubtitleRenderer()
+    subtitle_renderer = SimpleVideoSubtitleRenderer()
 
-    subtitle_writer.add_subtitles_to_video(
+    subtitle_renderer.add_subtitles_to_video(
         input_video_path="./examples/inputs/Subtitles/vikit-presentation.mp4",
         subtitle_srt_filepath="./examples/inputs/Subtitles/subtitles.srt",
         output_video_path="./examples/inputs/Subtitles/vikit-presentation_subtitles.mp4",
@@ -497,7 +492,6 @@ async def add_subtitles():
 async def add_music():
     working_folder = "./examples/inputs/AddMusic/"
     with WorkingFolderContext(working_folder):
-
         video_build_settings = VideoBuildSettings(
             output_video_file_name="music.mp4",
             music_building_context=MusicBuildingContext(
@@ -516,7 +510,6 @@ async def add_music():
 async def fixed_image_video_generation():
     working_folder = "./examples/inputs/FixedImage/"
     with WorkingFolderContext(working_folder):
-
         ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(
             test_mode=False
         )
@@ -540,7 +533,7 @@ async def fixed_image_video_generation():
 async def call_gemini_with_audio(use_audio_from_mp3=False):
     ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=False)
 
-    #Gemini can be queried with an URL or a file, this function allows to try both methods
+    # Gemini can be queried with an URL or a file, this function allows to try both methods
     if use_audio_from_mp3:
         audio_input = "https://storage.googleapis.com/real-estate-musics/aube_doree.mp3"
     else:
@@ -554,32 +547,8 @@ async def call_gemini_with_audio(use_audio_from_mp3=False):
     response = await ml_models_gateway.ask_gemini(audio_prompt)
     logger.info(response)
 
-async def add_logo():
-    working_folder = "./output/add_logo_files/"
-    with WorkingFolderContext(working_folder):
-
-        video_build_settings = VideoBuildSettings(
-            output_video_file_name="logo.mp4",
-            music_building_context=MusicBuildingContext(
-                apply_background_music=True,
-                background_music_file=test_media.get_sample_gen_background_music(),
-            ),
-        )
-
-        composite_video = CompositeVideo().append_video(
-            ImportedVideo(test_media.get_cat_video_path())
-        )
-
-        await composite_video.build(build_settings=video_build_settings)
-
-        # Create the VideoLogoOverlay instance and expect an exception to be raised
-        overlay = VideoLogoOverlay(composite_video.media_url, test_media.get_sample_logo(), "logo_" + composite_video.media_url, "", "top_left", 15)
-        composite_video.media_url = "logo_" + composite_video.media_url
-        await overlay.add_logo()
-
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -656,5 +625,3 @@ if __name__ == "__main__":
         asyncio.run(fixed_image_video_generation())
     elif run_an_example == 12:
         asyncio.run(call_gemini_with_audio(True))
-    elif run_an_example == 13:
-        asyncio.run(add_logo())

@@ -20,12 +20,17 @@ from os import path
 from dotenv import load_dotenv
 from loguru import logger
 
-# Get the absolute path to the directory this file is in.
-# TODO: make this cleaner and more robust by using the __file__ attribute
-dir_path = path.dirname(path.dirname(os.path.dirname(os.path.abspath(__file__))))
-env_file = os.path.join(
-    dir_path, ".env.config." + os.getenv("CONFIG_ENVIRONMENT", "dev")
-)
+
+def get_environment():
+    env = os.getenv("CONFIG_ENVIRONMENT", "dev")
+    if env is None:
+        raise Exception("CONFIG_ENVIRONMENT is not set")
+    return env
+
+
+sdk_root = path.dirname(path.dirname(os.path.dirname(os.path.abspath(__file__))))
+repo_root = sdk_root
+env_file = os.path.join(sdk_root, ".env.config." + get_environment())
 if not os.path.exists(env_file):
     logger.warning(f"config file {env_file} does not exist")
 else:
@@ -45,7 +50,7 @@ def get_default_background_music() -> str:
     default_background_music = os.getenv("DEFAULT_BACKGROUND_MUSIC", None)
     if default_background_music is None:
         raise Exception("DEFAULT_BACKGROUND_MUSIC is not set")
-    bg_music_path = os.path.join(dir_path, default_background_music)
+    bg_music_path = os.path.join(sdk_root, default_background_music)
     logger.debug(f"Default background music: {bg_music_path}")
     return bg_music_path
 
@@ -195,3 +200,28 @@ def get_max_file_size_url_gemini() -> int:
     if max_file_size_url_gemini is None:
         raise Exception("MAX_FILE_SIZE_URL_GEMINI is not set")
     return int(max_file_size_url_gemini)
+
+
+def get_default_working_folder_root() -> str:
+    if get_environment() == "dev":
+        default_root = os.path.join(repo_root, "tmp")
+    else:
+        default_root = "/app/"
+
+    return os.getenv("DEFAULT_WORKING_FOLDER_ROOT", default_root)
+
+
+def get_seconds_per_word() -> float:
+    nb_seconds_per_words = os.getenv("NB_SECONDS_PER_WORDS", 0.5)
+    if nb_seconds_per_words is None:
+        raise Exception("NB_SECONDS_PER_WORDS is not set")
+    return float(nb_seconds_per_words)
+
+
+def get_gcs_upload_timeout_sec() -> int:
+    gcs_upload_timeout_sec = int(os.getenv("GCS_UPLOAD_TIMEOUT_SEC", 60))
+    if not gcs_upload_timeout_sec > 0:
+        raise ValueError(
+            f"GCS_UPLOAD_TIMEOUT_SEC ({gcs_upload_timeout_sec}) must be > 0"
+        )
+    return gcs_upload_timeout_sec

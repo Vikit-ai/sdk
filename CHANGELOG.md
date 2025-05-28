@@ -7,6 +7,6 @@
 - async and multi processor video generation
 - Image Based Prompt
 
-## 01.0 - 2024-07-12
+## 0.1.0 - 2024-07-12
 
 _Initial version_

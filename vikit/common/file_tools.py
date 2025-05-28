@@ -19,18 +19,21 @@ import shutil
 import sys
 import urllib.parse
 from typing import Optional, Union
-from urllib.error import URLError
-from urllib.request import urlopen
+from urllib.parse import quote
 
 import aiofiles
 import aiohttp
+import requests
 
 # Maybe we will consider breaking down the copying logic into modules to prevent adding too many dependencies on external linbs
 from google.cloud import storage
 from loguru import logger
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from vikit.common.config import get_nb_retries_http_calls
+from vikit.common.config import (
+    get_gcs_upload_timeout_sec,
+    get_nb_retries_http_calls,
+)
 
 TIMEOUT = 10  # seconds before stopping the request to check an URL exists
 
@@ -63,7 +66,10 @@ def _parse_gcs_url(url: str) -> tuple[bool, str, str]:
     """
     Converts a Google Cloud Storage HTTP(S) URL to a bucket and blob path.
 
-    GCS URLs have the form: http(s)://storage.googleapis.com/bucket/blob_path
+    GCS URLs have the form: http(s)://storage.googleapis.com/bucket/blob_path when publicly accessible
+    or http(s)://storage.cloud.google.com/bucket/blob_path when private.
+
+    GCS URLs can also be in the gs:// format, in which case the netloc becomes the bucket name.
 
     Returns:
         bool: True if the URL is a GCS URL, False otherwise.
@@ -71,14 +77,30 @@ def _parse_gcs_url(url: str) -> tuple[bool, str, str]:
         str: The blob path, or None if the URL is not a GCS URL.
     """
     parsed_url = urllib.parse.urlparse(url)
-    if parsed_url.scheme not in ["http", "https"]:
+    logger.debug(f"parsed_url: {parsed_url}")
+    if parsed_url.scheme not in ["http", "https", "gs"]:
         return False, None, None
-    if parsed_url.netloc != "storage.googleapis.com":
-        return False, None, None
-    if not parsed_url.path:
-        return True, "", ""
-    _, bucket, *path_segments = parsed_url.path.split("/")
-    path = urllib.parse.unquote("/".join(path_segments))
+    if parsed_url.scheme in ["http", "https"]:
+        if parsed_url.netloc not in [
+            "storage.googleapis.com",
+            "storage.cloud.google.com",
+        ]:
+            return False, None, None
+        else:
+            parts = parsed_url.path.split("/")
+            if len(parts) >= 2:
+                _, bucket, *path_segments = parts
+            else:
+                bucket = parts[0] if parts else ""
+                path_segments = []
+            path = "/".join(path_segments)
+        if not parsed_url.path:
+            return True, "", ""
+        path = urllib.parse.unquote("/".join(path_segments))
+    else:
+        bucket = parsed_url.netloc
+        path = parsed_url.path[1:]
+
     return True, bucket, path
 
 
@@ -132,15 +154,11 @@ def is_valid_filename(filename: str) -> bool:
 
 
 def web_url_exists(url):
-    """
-    Check if a URL exists on the web
-    """
     try:
-        urlopen(url=url, timeout=TIMEOUT)
-        return True
-    except URLError:
-        return False
-    except ValueError:
+        logger.debug(f"Checking web_url_exists for URL: {url}")
+        response = requests.head(url, timeout=TIMEOUT, allow_redirects=True)
+        return response.status_code == 200
+    except requests.RequestException:
         return False
 
 
@@ -178,6 +196,30 @@ def url_exists(url: str):
     if web_url_exists(url):
         does_url_exists = True
 
+    is_gcs_url, bucket, file_path = _parse_gcs_url(url)
+    logger.debug(f"is_gcs_url, bucket, file_path: {is_gcs_url}, {bucket}, {file_path}")
+    if is_gcs_url:
+        does_url_exists = gcs_file_exists(
+            bucket=bucket,
+            file_path=file_path,
+        )
+
+    return does_url_exists
+
+
+def gcs_file_exists(bucket: str, file_path: str) -> bool:
+    does_url_exists = False
+    try:
+        storage_client = storage.Client()
+        gcs_bucket = storage_client.bucket(bucket)
+        blob = gcs_bucket.blob(file_path)
+        logger.debug(
+            f"Checking GCS URL on blob: {blob} , does it exist?: {blob.exists()}"
+        )
+        does_url_exists = blob.exists()
+    except Exception as e:
+        logger.error(f"Error checking GCS URL: {e}")
+        does_url_exists = False
     return does_url_exists
 
 
@@ -251,26 +293,35 @@ def get_path_type(path: Optional[Union[str, os.PathLike]]) -> dict:
     wait=wait_exponential(min=4, max=10),
     reraise=True,
 )
-async def download_or_copy_file(url, local_path, force_download=False):
+async def download_or_copy_file(
+    url: str,
+    local_path: str,
+    force_download: bool = False,
+    enable_gcs_url_rewrite: bool = True,
+) -> str:
     """
     Download a file from a URL to a local file asynchronously
 
     Args:
-        url (str): The URL to download the file from (supported: http, https, , gs, local)
-        local_path (str): The filename to save the file to
-        force_download (bool): If True, the file will be downloaded even if it already exists
+        url (str): The URL to download the file from (supported: http, https, gs, local)
+        local_path (str): The filename to save the file to.
+        force_download (bool): If True, the file will be downloaded even if it already
+            exists
+        enable_gcs_url_rewrite (bool): If True, the GCS Cloud Storage libraries will be
+            used for HTTP(S) URLs pointing to cloud storage resource. If False, the file
+            will be downloaded using the HTTP(S) protocol. This parameter exists mainly
+            for testing purposes. We recommend using the GCS library whenever possible.
 
     Returns:
-        str: The filename of the downloaded file
+        str: The filename of the downloaded file.
     """
     if not url:
         raise ValueError("URL must be provided")
 
     # Replace the Google Cloud Storage URL with the gs:// format in order to take
     # advantage of the google.cloud.storage library as much as possible.
-
     is_gcs_url, bucket, file_path = _parse_gcs_url(url)
-    if is_gcs_url:
+    if is_gcs_url and enable_gcs_url_rewrite:
         gs_url = f"gs://{bucket}/{file_path}"
         logger.debug(f"Replacing HTTP(S) URL with GCS URL:\nold: {url}\nnew: {gs_url}")
         url = gs_url
@@ -294,20 +345,15 @@ async def download_or_copy_file(url, local_path, force_download=False):
         async with aiohttp.ClientSession() as session:
             logger.debug(f"Downloading file from {url} to {local_path}")
             async with session.get(url) as response:
-                if response.status == 200:
-                    # Use aiofiles to write the content asynchronously.
-                    async with aiofiles.open(local_path, "wb") as f:
-                        # Read the content in chunks to avoid overloading the memory
-                        while True:
-                            chunk = await response.content.read(1024)
-                            if not chunk:
-                                break
-                            await f.write(chunk)
-                    return local_path
-                else:
-                    raise FileNotFoundError(
-                        f"The URL did not work with response: {response}"
-                    )
+                _check_http_response(response)
+
+                # Use aiofiles to write the content asynchronously.
+                async with aiofiles.open(local_path, "wb") as f:
+                    # Read the content in chunks of 1MB to avoid using a lot of memory.
+                    async for chunk in response.content.iter_chunked(1024 * 1024):
+                        await f.write(chunk)
+                return local_path
+
     elif path_desc["type"] == "local":
         logger.debug(f"Copying file from {url} to {local_path}")
         if url == local_path:
@@ -327,6 +373,22 @@ async def download_or_copy_file(url, local_path, force_download=False):
             blob_path="/".join(url.split("/")[3:]),
             destination_file_name=local_path,
         )
+
+
+def _check_http_response(response: aiohttp.ClientResponse):
+    """Throws the appropriate exception if the response indicates an error."""
+    if response.status == 200:
+        return
+
+    if response.status == 403:
+        raise PermissionError(response)
+    if response.status == 404:
+        raise FileNotFoundError(response)
+
+    # TODO: Add more specialized errors here. See the full list of available errors at
+    # https://docs.python.org/3/library/exceptions.html
+
+    raise ConnectionError(response)
 
 
 def copy_file_from_gcs(
@@ -354,3 +416,41 @@ def copy_file_from_gcs(
     logger.debug(f"Blob {blob_path} downloaded to {destination_file_name}.")
 
     return destination_file_name
+
+
+async def upload_to_bucket(
+    source_file_name,
+    destination_blob,
+    destination_file_name,
+    bucket_name,
+):
+    if not source_file_name:
+        raise ValueError("source_file_name cannot be None or empty string")
+    if not destination_blob:
+        raise ValueError("destination_blob cannot be None or empty string")
+    if not destination_file_name:
+        raise ValueError("destination_file_name cannot be None or empty string")
+    if not bucket_name:
+        raise ValueError("bucket_name cannot be None or empty string")
+
+    bucket = storage.Client().bucket(bucket_name)
+    blob = bucket.blob(f"{destination_blob}/{destination_file_name}")
+    blob.upload_from_filename(source_file_name, timeout=get_gcs_upload_timeout_sec())
+
+    gcs_url = f"gs://{bucket.name}/{blob.name}"
+    logger.debug(f"Uploaded {source_file_name} to {gcs_url}, Blob name is {blob.name}")
+
+    return gcs_url
+
+
+# TODO: get the public URI from GCS path
+
+
+def get_public_uri_from_gcs_path(gcs_path: str) -> str:
+    inferred_public_path = f"https://storage.googleapis.com/{gcs_path.lstrip('gs://')}"
+    inferred_public_path = quote(inferred_public_path, safe=":/")
+
+    logger.debug(
+        f"Inferred public path: {inferred_public_path} from GCS path: {gcs_path}"
+    )
+    return inferred_public_path

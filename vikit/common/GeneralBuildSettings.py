@@ -16,8 +16,6 @@
 import datetime
 from random import randint
 
-import vikit.gateways.ML_models_gateway_factory as mlfactory
-
 
 class GeneralBuildSettings:
 

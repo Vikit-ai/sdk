@@ -17,21 +17,21 @@ import pytest
 
 from tests.testing_medias import get_paris_subtitle_file, get_paris_video
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.postprocessing.video_subtitle_renderer import VideoSubtitleRenderer
+from vikit.postprocessing.subtitles.simple_video_subtitle_renderer import (
+    SimpleVideoSubtitleRenderer,
+)
 
 PARIS_VIDEO = get_paris_video()
 SUBTITLE_PATH = get_paris_subtitle_file()
 
 
 class TestPostProcessing:
-
     @pytest.mark.local_integration
     @pytest.mark.parametrize("font_size_pt", [None, 15, 20])
     def test_render_subtitle(self, font_size_pt):
         with WorkingFolderContext():
-
-            subtitle_writer = VideoSubtitleRenderer(font_size_pt=font_size_pt)
-            subtitle_writer.add_subtitles_to_video(
+            subtitle_renderer = SimpleVideoSubtitleRenderer(font_size_pt=font_size_pt)
+            subtitle_renderer.add_subtitles_to_video(
                 input_video_path=PARIS_VIDEO,
                 subtitle_srt_filepath=SUBTITLE_PATH,
                 output_video_path=f"Video_with_subtitle_font_{font_size_pt}.mp4",

@@ -14,10 +14,8 @@
 # ==============================================================================
 
 import os
-import warnings
 
 import pytest
-from loguru import logger
 
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
@@ -70,9 +68,9 @@ class TestRawTextBasedVideo:
             )
 
             assert built.media_url is not None
-            assert os.path.exists(
-                "my_video.mp4"
-            ), f"File not found: my_video.mp4, {os.listdir()}"
+            assert os.path.exists("my_video.mp4"), (
+                f"File not found: my_video.mp4, {os.listdir()}"
+            )
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
@@ -81,7 +79,7 @@ class TestRawTextBasedVideo:
     ):
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a prompt text")
-            target_path = os.makedirs("testdir")
+            os.makedirs("testdir")
             built = await video.build(
                 build_settings=VideoBuildSettings(target_dir_path="testdir"),
                 ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
@@ -90,7 +88,7 @@ class TestRawTextBasedVideo:
             )
 
             assert built.media_url is not None
-            assert os.path.isdir("testdir"), f"Directory not found: {target_path}"
+            assert os.path.isdir("testdir"), f"Directory not found: testdir"
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
@@ -99,7 +97,7 @@ class TestRawTextBasedVideo:
     ):
         with WorkingFolderContext():
             video = RawTextBasedVideo("This is a prompt text")
-            target_path = os.makedirs("testdir2")
+            os.makedirs("testdir2")
             built = await video.build(
                 build_settings=VideoBuildSettings(
                     target_dir_path="testdir2",
@@ -111,4 +109,4 @@ class TestRawTextBasedVideo:
             )
 
             assert built.media_url is not None
-            assert os.path.isdir("testdir2"), f"Directory not found: {target_path}"
+            assert os.path.isdir("testdir2"), f"Directory not found: testdir2"

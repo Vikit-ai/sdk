@@ -20,22 +20,29 @@ import json
 import os
 import subprocess
 import time
-from urllib.parse import urlparse
 import uuid as uid
+from urllib.parse import urlparse
 
 import aiohttp
 import cv2
 import numpy as np
 from loguru import logger
-from tenacity import (AsyncRetrying, after_log, before_log, retry,
-                      stop_after_attempt, wait_exponential)
+from tenacity import (
+    AsyncRetrying,
+    after_log,
+    before_log,
+    retry,
+    stop_after_attempt,
+)
 
 import vikit.gateways.elevenlabs_gateway as elevenlabs_gateway
-from vikit.common.config import (get_nb_retries_http_calls,
-                                 get_vikit_backend_url)
+from vikit.common.config import get_nb_retries_http_calls, get_vikit_backend_url
 from vikit.common.file_tools import download_or_copy_file
-from vikit.common.secrets import (get_replicate_api_token, get_vikit_api_token,
-                                  has_eleven_labs_api_key)
+from vikit.common.secrets import (
+    get_replicate_api_token,
+    get_vikit_api_token,
+    has_eleven_labs_api_key,
+)
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.prompt_cleaning import cleanse_llm_keywords
 from vikit.wrappers.ffmpeg_wrapper import convert_as_mp3_file
@@ -51,7 +58,8 @@ mistral_version = "meta/meta-llama-3-70b-instruct"
 
 VALID_AUDIO_EXTENSIONS = [".mp3", ".wav", ".aiff", ".aac", ".ogg", ".flac"]
 VALID_VIDEO_EXTENSIONS = [".mp4", ".mov", ".avi", ".wmv", ".webm"]
-VALID_IMAGE_EXTENSIONS = [".png",".jpg",".jpeg",".bmp",".tiff",".webp"]
+VALID_IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".webp"]
+
 
 class VikitGateway(MLModelsGateway):
     """
@@ -79,9 +87,10 @@ class VikitGateway(MLModelsGateway):
             image_prompt = img_b64
 
     def convert_image_to_b64(self, image, target_size=None):
-        if image.split(".") is not None and os.path.splitext(image)[
-                1
-            ].lower() in VALID_IMAGE_EXTENSIONS:
+        if (
+            image.split(".") is not None
+            and os.path.splitext(image)[1].lower() in VALID_IMAGE_EXTENSIONS
+        ):
             # Read file path and get Bytes
             with open(image, "rb") as image_file:
                 image_data = image_file.read()
@@ -127,9 +136,9 @@ class VikitGateway(MLModelsGateway):
         await elevenlabs_gateway.generate_mp3_from_text_async(
             text=prompt_text, target_file=target_file
         )
-        assert os.path.exists(
-            target_file
-        ), f"The generated audio file does not exists: {target_file}"
+        assert os.path.exists(target_file), (
+            f"The generated audio file does not exists: {target_file}"
+        )
 
     @retry(stop=stop_after_attempt(get_nb_retries_http_calls()), reraise=True)
     async def generate_mp3_from_text_async(
@@ -409,10 +418,10 @@ class VikitGateway(MLModelsGateway):
                 "input": {
                     "top_k": 50,
                     "top_p": 0.9,
-                    "prompt": """I want you to act as a english keyword generator for a music generation artificial intelligence program  
-with the aim of generating a background music for a podcast video. Your job is to provide detailed and creative keywords that 
-will inspire unique and interesting music from the AI for background music for a video. Keep in mind that the AI is capable of understanding a wide 
-range of language and can interpret abstract concepts, so feel free to be  as imaginative.  The more detailed and imaginative your keywords, the more 
+                    "prompt": """I want you to act as a english keyword generator for a music generation artificial intelligence program
+with the aim of generating a background music for a podcast video. Your job is to provide detailed and creative keywords that
+will inspire unique and interesting music from the AI for background music for a video. Keep in mind that the AI is capable of understanding a wide
+range of language and can interpret abstract concepts, so feel free to be  as imaginative.  The more detailed and imaginative your keywords, the more
 interesting the resulting music will be. Here is your prompt: '"""
                     + text
                     + KEYWORDS_FORMAT_PROMPT
@@ -456,14 +465,22 @@ interesting the resulting music will be. Here is your prompt: '"""
 
         logger.debug(f"Video to interpolate {video[:50]}")
 
-        if not video.startswith("http") and video.split('.') is not None and os.path.splitext(video)[1].lower() in [".mp4", ".mov", ".avi", ".wmv", ".webm"]:
-            #Read file path and then convert to Base64
+        if (
+            not video.startswith("http")
+            and video.split(".") is not None
+            and os.path.splitext(video)[1].lower()
+            in [".mp4", ".mov", ".avi", ".wmv", ".webm"]
+        ):
+            # Read file path and then convert to Base64
             with open(video, "rb") as video_file:
-                video_data = "data:video/" + video.split('.')[-1].lower() + ";base64," + base64.b64encode(video_file.read()).decode(
-                    "utf-8"
+                video_data = (
+                    "data:video/"
+                    + video.split(".")[-1].lower()
+                    + ";base64,"
+                    + base64.b64encode(video_file.read()).decode("utf-8")
                 )
         else:
-            #Result is already a base64
+            # Result is already a base64
             video_data = video
 
         async with aiohttp.ClientSession(timeout=http_timeout) as session:
@@ -614,9 +631,9 @@ interesting the resulting music will be. Here is your prompt: '"""
             subs: The subtitles obtained from the Replicate API
 
         """
-        assert os.path.exists(
-            audiofile_path
-        ), f"The prompt recording file does not exist: {audiofile_path}"
+        assert os.path.exists(audiofile_path), (
+            f"The prompt recording file does not exist: {audiofile_path}"
+        )
         try:
             async for attempt in AsyncRetrying(
                 stop=stop_after_attempt(get_nb_retries_http_calls()),
@@ -744,7 +761,7 @@ interesting the resulting music will be. Here is your prompt: '"""
 
                 if "image" not in output:
                     raise ValueError(
-                        f'Output does not contain image: {output["error"]}'
+                        f"Output does not contain image: {output['error']}"
                     )
 
                 prompt.image = output["image"]
@@ -988,10 +1005,19 @@ interesting the resulting music will be. Here is your prompt: '"""
             )
 
             image_prompt = prompt.image
+
             if aspect_ratio == (16, 9):
-                target_size = (1280, 768)
+                target_size = (1280, 720)
+            elif aspect_ratio == (1, 1):
+                target_size = (960, 960)
+            elif aspect_ratio == (4, 3):
+                target_size = (1104, 832)
+            elif aspect_ratio == (3, 4):
+                target_size = (832, 1104)
+            elif aspect_ratio == (21, 9):
+                target_size = (1584, 672)
             else:
-                target_size = (768, 1280)
+                target_size = (720, 1280)
 
             # If base64, we resize it. If URL, we cannot resize without downloading it
             if not prompt.image.startswith("http"):
@@ -1002,7 +1028,7 @@ interesting the resulting music will be. Here is your prompt: '"""
 
             logger.debug(f"Generating video from resized image {image_prompt[:50]}")
 
-            ratio = str(aspect_ratio[0]) + ":" + str(aspect_ratio[1])
+            ratio = str(target_size[0]) + ":" + str(target_size[1])
 
             duration = 5
             if prompt.duration:
@@ -1015,7 +1041,7 @@ interesting the resulting music will be. Here is your prompt: '"""
                         "key": self.vikit_api_key,
                         "model": "runway",
                         "input": {
-                            "model": "gen3a_turbo",
+                            "model": "gen4_turbo",
                             "promptImage": image_prompt,
                             "promptText": prompt.text,
                             "duration": duration,
@@ -1041,7 +1067,9 @@ interesting the resulting music will be. Here is your prompt: '"""
 
     def add_part_gemini(self, data_to_add, data_kind, valid_data_extensions):
         part = None
-        if data_to_add and urlparse(data_to_add).scheme: #We check if the data_to_add is an URL
+        if (
+            data_to_add and urlparse(data_to_add).scheme
+        ):  # We check if the data_to_add is an URL
             data_type = data_to_add.split(".")[-1].split("?")[0]
             part = {}
             part["fileData"] = {
@@ -1054,9 +1082,10 @@ interesting the resulting music will be. Here is your prompt: '"""
             base64_data = ""
 
             # At this point, data_to_add contains either a file path or a base64 encoded data. The presence of a dot (.) indicates that it's a path.
-            if data_to_add.split(".") is not None and os.path.splitext(data_to_add)[
-                1
-            ].lower() in valid_data_extensions:
+            if (
+                data_to_add.split(".") is not None
+                and os.path.splitext(data_to_add)[1].lower() in valid_data_extensions
+            ):
                 # Read file path and then convert to Base64
                 with open(data_to_add, "rb") as data_file:
                     base64_data = base64.b64encode(data_file.read()).decode("utf-8")
@@ -1129,12 +1158,10 @@ interesting the resulting music will be. Here is your prompt: '"""
         if video_part:
             parts_array.append(video_part)
 
-        print(parts_array)
         output = ""
 
         try:
             async with aiohttp.ClientSession() as session:
-
                 contents_array = [{"role": "USER", "parts": parts_array}]
 
                 if more_contents is not None:
@@ -1163,6 +1190,7 @@ interesting the resulting music will be. Here is your prompt: '"""
             logger.error(f"Error calling gemini from prompt: {e}")
             logger.error(f"Returned by gemini : {output}")
             raise Exception(output)
+
 
 async def _handle_backend_errors(response):
     if response.status == 403:

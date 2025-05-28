@@ -43,7 +43,7 @@ class MLModelsGateway(ABC):
     ):
         pass
 
-    def cleanse_llm_keywords_async(input):
+    def cleanse_llm_keywords_async(self, input):
         pass
 
     @abstractmethod

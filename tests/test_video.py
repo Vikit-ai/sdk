@@ -36,7 +36,6 @@ def get_cat():
 
 
 class TestVideo:
-
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)

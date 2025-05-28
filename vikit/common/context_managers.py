@@ -21,46 +21,82 @@ from datetime import datetime
 
 from loguru import logger
 
+from vikit.common.config import get_default_working_folder_root
+
 
 class WorkingFolderContext:
     """
     This class is a context manager to change the working directory to the one specified
-    in the constructor
+    by the constructor parameters.
+
+    WARNING: Not thread safe. This class it is meant to be used in a synchronous context
+    or by launching several ones in separate processes as we change directory in the
+    process.
     """
 
     def __init__(
-        self, path=None, delete_on_exit=False, mark: str = None, include_mark=True
+        self,
+        root=None,
+        mark: str = "mark",
+        include_mark=True,
+        include_caller_stack=False,
+        insert_date=True,
+        insert_minutes=True,
+        date_format="%Y-%m-%d",
+        insert_small_id=True,
     ):
         """
-        Allows for dynamic creation of a working folder, with the option to delete it on exit
+        Allows for dynamic creation of a working folder.
 
         Args:
-            path: the path to the working folder, if None a new folder will be created
-            delete_on_exit: if True, the folder will be deleted on exit
-            mark: a mark to help identify the working folder
+            root: The root directory for the working folder path. If None, a default
+                root directory will be used.
+            mark: A string identifier to help distinguish the working folder.
+            include_mark: If True, the `mark` will be included in the folder path.
+            include_caller_stack: If True, the caller's function name will be included in
+                the folder path.
+            insert_date: If True, the current date will be included in the folder path.
+            insert_minutes: If True, the current time (hours and minutes) will be included
+                in the folder path.
+            date_format: The format of the date to include in the folder path.
+            insert_small_id: If True, a randomly generated 10-character alphanumeric ID
+                will be included in the folder path.
         """
         logger.debug("Current Working Folder is: " + os.getcwd())
-        if not mark:
+
+        if include_caller_stack:
             mark = inspect.stack()[1].function
 
-        if path is None:
-            now = datetime.now()
-            date_string = now.strftime("%Y-%m-%d")
+        if include_mark and not mark:
+            raise ValueError("If include_mark is set, mark must be set also.")
 
-            temp_folder = os.path.join(
-                "working_folder",
-                date_string,
-                "".join(random.choice(string.hexdigits) for i in range(20)),
-            )
-            if include_mark:
-                temp_folder = temp_folder + ("-" + mark) if mark else temp_folder
-            os.makedirs(temp_folder)
-        else:
-            if not os.path.exists(path):
-                os.makedirs(path)
-            temp_folder = path
+        now = datetime.now()
+        date_string = now.strftime(date_format)
+        self.small_id = "".join(random.choice(string.hexdigits) for i in range(10))
+        temp_folder = ""
 
-        self.delete_on_exit = delete_on_exit
+        self.delivery_folder_suffix = ""
+        self.delivery_folder_suffix += date_string + os.sep if insert_date else ""
+        self.delivery_folder_suffix += (
+            now.strftime("%H-%M") + os.sep if insert_minutes else ""
+        )
+        self.delivery_folder_suffix += mark + os.sep if include_mark else ""
+        self.delivery_folder_suffix += self.small_id + os.sep if insert_small_id else ""
+        self.delivery_folder_suffix = self.delivery_folder_suffix.rstrip("/")
+
+        if not root:
+            root = get_default_working_folder_root()
+
+        new_path = os.path.join(root, self.delivery_folder_suffix)
+        logger.debug(
+            f"Creating new path: {new_path}, root is {root}, suffix is "
+            f"{self.delivery_folder_suffix}"
+        )
+
+        os.makedirs(new_path, exist_ok=True)
+        temp_folder = os.path.join(os.path.abspath(os.getcwd()), new_path)
+        logger.debug(f"Context Manager - Created new folder: {temp_folder}")
+
         self.path = temp_folder
 
     def __enter__(self):
@@ -69,12 +105,9 @@ class WorkingFolderContext:
         logger.debug(f"Changed working directory to {self.path}")
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, wrapped_type, value, traceback):
         os.chdir(self.original_path)
-        # We may uncomment this line to debug the program and see what has been generated
-        if self.delete_on_exit:
-            os.rmdir(self.path)
-        if type is not None:  # An exception was raised
+        if wrapped_type is not None:  # An exception was raised
             logger.error(
                 f"Exception handled, with details: {value} and trace {traceback}"
             )
@@ -86,3 +119,14 @@ class WorkingFolderContext:
                 return func(*args, **kwargs)
 
         return wrapper
+
+    def get_delivery_folder_suffix(self) -> str:
+        """
+        Get a unique delivery folder.
+
+        Returns:
+            A unique folder name without the root folder path. For example, if the
+            full path is `/root_folder/2024-01-01-12-00-1234567890-MyMark`, this method
+            will return `2024-01-01-12-00-1234567890-MyMark`.
+        """
+        return self.delivery_folder_suffix

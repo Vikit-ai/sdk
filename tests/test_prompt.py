@@ -18,8 +18,7 @@ import warnings
 import pytest
 from loguru import logger
 
-from tests.testing_medias import (get_test_prompt_image,
-                                  get_test_prompt_recording)
+from tests.testing_medias import get_test_prompt_image, get_test_prompt_recording
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.gateways import replicate_gateway as replicate_gateway
 from vikit.gateways import vikit_gateway as vgateway
@@ -29,7 +28,6 @@ mp3_transcription = "This is a quick test with my recorded voice to do a test"
 
 
 class TestPrompt:
-
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
@@ -69,17 +67,21 @@ class TestPrompt:
     @pytest.mark.integration
     @pytest.mark.asyncio
     async def test_build_basic_text_prompt_from_text(self):
-        with WorkingFolderContext():  # we work in the temp folder once for all the script
+        with (
+            WorkingFolderContext()
+        ):  # we work in the temp folder once for all the script
             prompt = await PromptFactory(
                 ml_models_gateway=vgateway.VikitGateway()
             ).create_prompt_from_text(prompt_text="This is a fake prompt")
-            assert (
-                prompt.text == "This is a fake prompt"
-            ), "Prompt text is not the one expected"
+            assert prompt.text == "This is a fake prompt", (
+                "Prompt text is not the one expected"
+            )
 
     @pytest.mark.integration
     async def test_build_basic_image_prompt(self):
-        with WorkingFolderContext():  # we work in the temp folder once for all the script
+        with (
+            WorkingFolderContext()
+        ):  # we work in the temp folder once for all the script
             prompt_image = get_test_prompt_image()
             prompt = await PromptFactory(
                 ml_models_gateway=replicate_gateway.ReplicateGateway()

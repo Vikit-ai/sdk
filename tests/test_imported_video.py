@@ -14,7 +14,6 @@
 # ==============================================================================
 
 import os
-# from unittest.mock import patch, MagicMock, Mock
 import warnings
 
 import pytest
@@ -29,7 +28,6 @@ from vikit.video.video import VideoBuildSettings
 
 
 class TestImportedVideo:
-
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
@@ -50,14 +48,17 @@ class TestImportedVideo:
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=False
                     )
-                ), ml_models_gateway = MLModelsGatewayFactory().get_ml_models_gateway(test_mode=True)
+                ),
+                ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
+                    test_mode=True
+                ),
             )
 
             assert vid_result, "The video mixing should have worked"
-            assert (
-                vid_result.background_music
-            ), "The video should have a background music"
-            assert os.path.exists(
-                vid_result._background_music_file_name
-            ), "The background music file should exist"
+            assert vid_result.background_music, (
+                "The video should have a background music"
+            )
+            assert os.path.exists(vid_result._background_music_file_name), (
+                "The background music file should exist"
+            )
             assert os.path.exists(vid_result.media_url)
