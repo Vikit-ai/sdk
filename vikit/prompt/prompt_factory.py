@@ -13,8 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 
-import base64
-import os
 import uuid
 
 from loguru import logger
@@ -30,7 +28,6 @@ from vikit.prompt.building.handlers.prompt_by_keywords_handler import (
 from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
     PromptByRawUserTextHandler,
 )
-from vikit.prompt.image_prompt import ImagePrompt
 from vikit.prompt.multimodal_prompt import MultiModalPrompt
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 from vikit.prompt.recorded_prompt import RecordedPrompt

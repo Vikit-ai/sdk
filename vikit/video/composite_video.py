@@ -22,12 +22,17 @@ from loguru import logger
 import vikit.common.config as config
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.building.build_order import (
-    get_lazy_dependency_chain_build_order, is_composite_video)
+    get_lazy_dependency_chain_build_order,
+    is_composite_video,
+)
 from vikit.video.video import DEFAULT_VIDEO_TITLE, Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
-from vikit.wrappers.ffmpeg_wrapper import (concatenate_videos,
-                                           get_media_duration, get_media_fps)
+from vikit.wrappers.ffmpeg_wrapper import (
+    concatenate_videos,
+    get_media_duration,
+    get_media_fps,
+)
 
 
 class CompositeVideo(Video, is_composite_video):
@@ -98,6 +103,8 @@ class CompositeVideo(Video, is_composite_video):
                 vikit_api_key=self.build_settings.vikit_api_key,
                 aspect_ratio=self.build_settings.aspect_ratio,
                 is_good_until=self.build_settings.is_good_until,
+                max_attempts=self.build_settings.max_attempts,
+                prompt_updater_fn=self.build_settings.prompt_updater_fn,
             )
 
     def append_video(self, video: Video):
@@ -115,9 +122,7 @@ class CompositeVideo(Video, is_composite_video):
         self.video_list.append(video)
         self.video_dependencies.append(video)
 
-        if (
-            video._needs_video_reencoding
-        ):  # Adding a video that needs reencoding will trigger reencoding of the whole tree
+        if video._needs_video_reencoding:  # Adding a video that needs reencoding will trigger reencoding of the whole tree
             self._needs_video_reencoding = True
 
         if isinstance(video, CompositeVideo):
@@ -223,7 +228,10 @@ class CompositeVideo(Video, is_composite_video):
             ]
             await asyncio.gather(
                 *(
-                    v.build(self.get_children_build_settings(), ml_models_gateway=ml_models_gateway)
+                    v.build(
+                        self.get_children_build_settings(),
+                        ml_models_gateway=ml_models_gateway,
+                    )
                     for v in no_dependency_videos
                 )
             )
@@ -279,7 +287,7 @@ class CompositeVideo(Video, is_composite_video):
 
         with open(video_list_file, "w") as myfile:
             for video in self.video_list:
-                if not video.discarded: #If the video has a media url
+                if not video.discarded:  # If the video has a media url
                     file_name = video.media_url
                     video_fps = get_media_fps(video.media_url)
                     logger.trace(f"Video fps (composite_video): {video_fps}")
@@ -290,7 +298,7 @@ class CompositeVideo(Video, is_composite_video):
                     myfile.write("file " + file_name + os.linesep)
 
         logger.debug(
-            f"Setting average fps to the composite video: {str(sum_files_fps/number_files)}"
+            f"Setting average fps to the composite video: {str(sum_files_fps / number_files)}"
         )
 
         return await concatenate_videos(
@@ -299,7 +307,7 @@ class CompositeVideo(Video, is_composite_video):
                 build_settings=video.build_settings,
             ),
             ratioToMultiplyAnimations=ratio,
-            fps=24, #sum_files_fps / number_files,
+            fps=24,  # sum_files_fps / number_files,
             max_fps=max_fps,
         )  # keeping one consistent file name
 

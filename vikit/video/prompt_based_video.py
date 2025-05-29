@@ -62,7 +62,9 @@ class PromptBasedVideo(CompositeVideo):
             description=self._prompt.subtitles[0].text
         )
 
-    async def prepare_build(self, ml_models_gateway: MLModelsGateway, build_settings=VideoBuildSettings()):
+    async def prepare_build(
+        self, ml_models_gateway: MLModelsGateway, build_settings=VideoBuildSettings()
+    ):
         """
         Generate the actual inner video
 
@@ -72,8 +74,12 @@ class PromptBasedVideo(CompositeVideo):
         Returns:
             The current instance
         """
-        await super().prepare_build(build_settings=build_settings, ml_models_gateway=ml_models_gateway)
-        return await self.compose(build_settings=build_settings, ml_models_gateway=ml_models_gateway)
+        await super().prepare_build(
+            build_settings=build_settings, ml_models_gateway=ml_models_gateway
+        )
+        return await self.compose(
+            build_settings=build_settings, ml_models_gateway=ml_models_gateway
+        )
 
     async def compose(self, build_settings: VideoBuildSettings, ml_models_gateway):
         """
@@ -97,7 +103,9 @@ class PromptBasedVideo(CompositeVideo):
             (
                 keyword_based_vid,
                 prompt_based_vid,
-            ) = await self._prepare_basic_building_block(sub, build_stgs=build_settings, ml_models_gateway=ml_models_gateway)
+            ) = await self._prepare_basic_building_block(
+                sub, build_stgs=build_settings, ml_models_gateway=ml_models_gateway
+            )
 
             vid_cp_sub.append_video(keyword_based_vid).append_video(
                 prompt_based_vid
@@ -108,7 +116,10 @@ class PromptBasedVideo(CompositeVideo):
         return self
 
     async def _prepare_basic_building_block(
-        self, sub: pysrt.SubRipItem, ml_models_gateway: MLModelsGateway, build_stgs: VideoBuildSettings = None,
+        self,
+        sub: pysrt.SubRipItem,
+        ml_models_gateway: MLModelsGateway,
+        build_stgs: VideoBuildSettings = None,
     ):
         """
         build the basic building block of the full video/
@@ -127,9 +138,7 @@ class PromptBasedVideo(CompositeVideo):
             - prompt_based_vid: the video generated from the prompt
         """
 
-        prompt_fact = PromptFactory(
-            ml_models_gateway=ml_models_gateway
-        )
+        prompt_fact = PromptFactory(ml_models_gateway=ml_models_gateway)
         enhanced_prompt_from_keywords = (
             await prompt_fact.get_reengineered_prompt_text_from_raw_text(
                 prompt=sub.text,
@@ -149,19 +158,22 @@ class PromptBasedVideo(CompositeVideo):
                 ),
             )
         )
-        
+
         build_stgs_video_1 = copy.copy(build_stgs)
         build_stgs_video_1.target_file_name = None
-        prompt_based_vid = await RawTextBasedVideo(enhanced_prompt_from_keywords).prepare_build(
+        prompt_based_vid = await RawTextBasedVideo(
+            enhanced_prompt_from_keywords
+        ).prepare_build(
             build_settings=build_stgs_video_1,
             ml_models_gateway=ml_models_gateway,
         )
 
         build_stgs_video_2 = copy.copy(build_stgs)
         build_stgs_video_2.target_file_name = None
-        prompt_based_vid2 = await RawTextBasedVideo(enhanced_prompt_from_prompt_text).prepare_build(
-            build_settings=build_stgs_video_2,
-            ml_models_gateway=ml_models_gateway
+        prompt_based_vid2 = await RawTextBasedVideo(
+            enhanced_prompt_from_prompt_text
+        ).prepare_build(
+            build_settings=build_stgs_video_2, ml_models_gateway=ml_models_gateway
         )
         assert prompt_based_vid is not None, "prompt_based_vid cannot be None"
         assert prompt_based_vid2 is not None, "prompt_based_vid2 cannot be None"

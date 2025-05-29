@@ -22,8 +22,13 @@ class ImagePrompt(Prompt):
     A class to represent an image prompt
     """
 
-    def __init__(self, prompt_image: str = None, text: str = None, build_settings: PromptBuildSettings = PromptBuildSettings()):
-        super().__init__(build_settings = build_settings)
+    def __init__(
+        self,
+        prompt_image: str = None,
+        text: str = None,
+        build_settings: PromptBuildSettings = PromptBuildSettings(),
+    ):
+        super().__init__(build_settings=build_settings)
         if prompt_image is None:
             raise ValueError("The image prompt is not provided")
         self.image = prompt_image

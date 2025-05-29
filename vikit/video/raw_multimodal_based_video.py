@@ -13,15 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 
-from vikit.common.decorators import log_function_params
 from vikit.common.handler import Handler
 from vikit.prompt.multimodal_prompt import MultiModalPrompt
-from vikit.prompt.prompt import Prompt
-from vikit.prompt.prompt_factory import PromptFactory
-from vikit.video.building.handlers.interpolation_handler import \
-    VideoInterpolationHandler
-from vikit.video.building.handlers.quality_check_handler import \
-    QualityCheckHandler
+from vikit.video.building.handlers.interpolation_handler import (
+    VideoInterpolationHandler,
+)
+from vikit.video.building.handlers.quality_check_handler import (
+    QualityCheckHandler,
+)
 from vikit.video.building.handlers.videogen_handler import VideoGenHandler
 from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
@@ -39,7 +38,7 @@ class RawMultiModalBasedVideo(Video):
         self,
         title: str = None,
         prompt: MultiModalPrompt = None,
-    ): 
+    ):
         """
         Initialize the video
 
@@ -70,7 +69,9 @@ class RawMultiModalBasedVideo(Video):
         """
         return str(VideoType.RAWMULTIMODAL)
 
-    def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway):
+    def run_build_core_logic_hook(
+        self, build_settings: VideoBuildSettings, ml_models_gateway
+    ):
         return super().run_build_core_logic_hook(build_settings, ml_models_gateway)
 
     def get_core_handlers(self, build_settings) -> list[Handler]:
@@ -86,12 +87,15 @@ class RawMultiModalBasedVideo(Video):
         """
         handlers = []
         video_gen_handler = VideoGenHandler(video_gen_build_settings=build_settings)
-        handlers.append(
-            video_gen_handler
-        )
+        handlers.append(video_gen_handler)
 
         if build_settings.is_good_until:
-            handlers.append(QualityCheckHandler(video_gen_handler=video_gen_handler, is_good_until=build_settings.is_good_until))
+            handlers.append(
+                QualityCheckHandler(
+                    video_gen_handler=video_gen_handler,
+                    is_good_until=build_settings.is_good_until,
+                )
+            )
 
         if build_settings.interpolate:
             handlers.append(VideoInterpolationHandler())

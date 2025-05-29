@@ -15,7 +15,6 @@
 
 import datetime
 import os
-import random
 
 from loguru import logger
 

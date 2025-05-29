@@ -24,10 +24,21 @@ class MultiModalPrompt(Prompt):
     A class to represent an multimodal prompt
     """
 
-    def __init__(self, text: str = None, negative_text:str = None, image: str = None, audio: str = None, video:str = None, duration:float = None, seed:int=None, model_provider: str=None, reengineer_text_prompt_from_image_and_text = False, build_settings: PromptBuildSettings = PromptBuildSettings()):
-        
+    def __init__(
+        self,
+        text: str = None,
+        negative_text: str = None,
+        image: str = None,
+        audio: str = None,
+        video: str = None,
+        duration: float = None,
+        seed: int = None,
+        model_provider: str = None,
+        reengineer_text_prompt_from_image_and_text=False,
+        build_settings: PromptBuildSettings = PromptBuildSettings(),
+    ):
         if model_provider is None:
-            super().__init__(build_settings = build_settings)    
+            super().__init__(build_settings=build_settings)
         else:
             new_build_settings = copy.deepcopy(build_settings)
             new_build_settings.model_provider = model_provider
@@ -41,4 +52,6 @@ class MultiModalPrompt(Prompt):
         self.video = video
         self.duration = duration
         self.seed = seed
-        self.reengineer_text_prompt_from_image_and_text = reengineer_text_prompt_from_image_and_text
+        self.reengineer_text_prompt_from_image_and_text = (
+            reengineer_text_prompt_from_image_and_text
+        )

@@ -15,22 +15,26 @@
 
 from loguru import logger
 
-from vikit.video.building.handlers.default_bg_music_and_audio_merging_handler import \
-    DefaultBGMusicAndAudioMergingHandler
-from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handler import \
-    ReadAloudPromptAudioMergingHandler
-from vikit.video.building.handlers.generate_music_and_merge_handler import \
-    GenerateMusicAndMergeHandler
+from vikit.video.building.handlers.default_bg_music_and_audio_merging_handler import (
+    DefaultBGMusicAndAudioMergingHandler,
+)
+from vikit.video.building.handlers.gen_read_aloud_prompt_and_audio_merging_handler import (
+    ReadAloudPromptAudioMergingHandler,
+)
+from vikit.video.building.handlers.generate_music_and_merge_handler import (
+    GenerateMusicAndMergeHandler,
+)
 from vikit.video.building.handlers.music_merge_handler import MusicMergeHandler
-from vikit.video.building.handlers.use_prompt_audio_track_and_audio_merging_handler import \
-    UsePromptAudioTrackAndAudioMergingHandler
-from vikit.video.building.handlers.video_reencoding_handler import \
-    VideoReencodingHandler
+from vikit.video.building.handlers.use_prompt_audio_track_and_audio_merging_handler import (
+    UsePromptAudioTrackAndAudioMergingHandler,
+)
+from vikit.video.building.handlers.video_reencoding_handler import (
+    VideoReencodingHandler,
+)
 from vikit.video.video_build_settings import VideoBuildSettings
 
 
 class VideoBuildingPipeline:
-
     def get_handlers(self, video, build_settings: VideoBuildSettings):
         """
         Get the handlers for the video building pipeline, in the right order
@@ -41,7 +45,7 @@ class VideoBuildingPipeline:
         handlers = []
 
         # Special case here: the video used for testing should always be reencoded as coming from heterogenous sources
-        #if video.build_settings.test_mode:
+        # if video.build_settings.test_mode:
         video._needs_video_reencoding = True
 
         if video._needs_video_reencoding:
@@ -110,9 +114,15 @@ class VideoBuildingPipeline:
                     )
                 )
             else:
-                background_music_file = build_settings.music_building_context.background_music_file
+                background_music_file = (
+                    build_settings.music_building_context.background_music_file
+                )
                 if background_music_file:
-                    handlers.append(MusicMergeHandler(music_to_merge = build_settings.music_building_context.background_music_file))
+                    handlers.append(
+                        MusicMergeHandler(
+                            music_to_merge=build_settings.music_building_context.background_music_file
+                        )
+                    )
                 elif build_settings.music_building_context.use_recorded_prompt_as_audio:
                     handlers.append(UsePromptAudioTrackAndAudioMergingHandler())
                 else:

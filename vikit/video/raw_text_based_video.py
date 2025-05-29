@@ -19,10 +19,9 @@ from loguru import logger
 
 from vikit.common.handler import Handler
 from vikit.prompt.multimodal_prompt import MultiModalPrompt
-from vikit.prompt.prompt import Prompt
-from vikit.prompt.prompt_build_settings import PromptBuildSettings
-from vikit.video.building.handlers.interpolation_handler import \
-    VideoInterpolationHandler
+from vikit.video.building.handlers.interpolation_handler import (
+    VideoInterpolationHandler,
+)
 from vikit.video.building.handlers.videogen_handler import VideoGenHandler
 from vikit.video.video import Video
 from vikit.video.video_build_settings import VideoBuildSettings
@@ -82,7 +81,9 @@ class RawTextBasedVideo(Video):
     def get_title(self):
         return self.get_title_from_description(description=self.text)
 
-    def run_build_core_logic_hook(self, build_settings: VideoBuildSettings, ml_models_gateway):
+    def run_build_core_logic_hook(
+        self, build_settings: VideoBuildSettings, ml_models_gateway
+    ):
         return super().run_build_core_logic_hook(build_settings, ml_models_gateway)
         logger.info(f"Building video from raw text prompt: {self.text}")
 
@@ -98,7 +99,7 @@ class RawTextBasedVideo(Video):
              list: The list of handlers to use for building the video
         """
         handlers = []
-        handlers.append(VideoGenHandler(video_gen_build_settings = build_settings))
+        handlers.append(VideoGenHandler(video_gen_build_settings=build_settings))
         if build_settings.interpolate:
             if build_settings.target_model_provider == "videocrafter":
                 handlers.append(VideoInterpolationHandler())

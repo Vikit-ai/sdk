@@ -17,7 +17,6 @@ from loguru import logger
 
 from vikit.common.handler import Handler
 from vikit.gateways.ML_models_gateway import MLModelsGateway
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.wrappers.ffmpeg_wrapper import get_media_duration, merge_audio
 
 
@@ -42,9 +41,7 @@ class GenerateMusicAndMergeHandler(Handler):
         """
         logger.info(f"about to generate music for video: {video.id} ")
         self.bg_music_prompt = (
-            self.bg_music_prompt
-            if self.bg_music_prompt
-            else video.prompt.text
+            self.bg_music_prompt if self.bg_music_prompt else video.prompt.text
         )
         if self.music_duration:
             self.music_duration = float(self.music_duration)
@@ -69,8 +66,8 @@ class GenerateMusicAndMergeHandler(Handler):
             audio_file_path=video.background_music,
             target_file_name=video.get_file_name_by_state(),
         )
-        assert (
-            video.background_music is not None
-        ), "Background music was not generated properly"
+        assert video.background_music is not None, (
+            "Background music was not generated properly"
+        )
 
         return video

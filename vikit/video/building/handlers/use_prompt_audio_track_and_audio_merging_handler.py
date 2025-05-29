@@ -16,12 +16,10 @@
 from loguru import logger
 
 from vikit.common.handler import Handler
-from vikit.prompt.recorded_prompt import RecordedPrompt
 from vikit.wrappers.ffmpeg_wrapper import merge_audio
 
 
 class UsePromptAudioTrackAndAudioMergingHandler(Handler):
-
     async def execute_async(self, video: "Video"):
         """
         Merge music and video  as a single media file

@@ -129,14 +129,16 @@ def get_media_duration(input_video_path):
     """
     assert os.path.exists(input_video_path), f"File {input_video_path} does not exist"
 
-    cmd = ("ffprobe",
-            "-v",
-            "error",
-            "-show_entries",
-            "format=duration",
-            "-of",
-            "default=noprint_wrappers=1:nokey=1",
-            input_video_path)
+    cmd = (
+        "ffprobe",
+        "-v",
+        "error",
+        "-show_entries",
+        "format=duration",
+        "-of",
+        "default=noprint_wrappers=1:nokey=1",
+        input_video_path,
+    )
 
     logger.debug(" ".join(cmd))
 
@@ -163,16 +165,18 @@ def get_media_fps(input_video_path):
     """
     assert os.path.exists(input_video_path), f"File {input_video_path} does not exist"
 
-    cmd = ("ffprobe",
-            "-v",
-            "0",
-            "-of",
-            "csv=p=0",
-            "-select_streams",
-            "v:0",
-            "-show_entries",
-            "stream=r_frame_rate",
-            input_video_path)
+    cmd = (
+        "ffprobe",
+        "-v",
+        "0",
+        "-of",
+        "csv=p=0",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "stream=r_frame_rate",
+        input_video_path,
+    )
 
     logger.debug(" ".join(cmd))
 
@@ -185,8 +189,19 @@ def get_media_fps(input_video_path):
     )
     result.check_returncode()
 
+    # Extract the denominator of the frame rate fraction
+    result_stdout = str(result.stdout).split("/")[1].strip().replace("\\n'", "")
+
+    # Handle cases where the extracted value ends with an unwanted character
+    if result_stdout.endswith((".", ",")):
+        result_stdout = result_stdout[:-1] + (
+            "0" if result_stdout.endswith(".") else "."
+        )
+
+    # Compute FPS by dividing the numerator by the denominator
+
     return float(str(result.stdout).split("/")[0].replace("b'", "")) / float(
-        str(result.stdout).split("/")[1].replace("\\n'", "")
+        result_stdout
     )
 
 
@@ -232,7 +247,8 @@ async def extract_audio_slice(
     if media_length < end:
         raise ValueError("The expected audio length is longer than audio file provided")
 
-    cmd = ("ffmpeg",
+    cmd = (
+        "ffmpeg",
         "-y",
         "-ss",
         str(start),
@@ -242,7 +258,8 @@ async def extract_audio_slice(
         audiofile_path,
         "-acodec",
         "copy",
-        target_file_name)
+        target_file_name,
+    )
 
     logger.debug(" ".join(cmd))
 
@@ -286,12 +303,8 @@ async def convert_as_mp3_file(fileName, target_file_name: str):
         str: The path to the converted audio file
     """
 
-    cmd = ("ffmpeg",
-        "-y",
-        "-i",
-        fileName,
-        target_file_name)
-    
+    cmd = ("ffmpeg", "-y", "-i", fileName, target_file_name)
+
     logger.debug(" ".join(cmd))
 
     process = await asyncio.create_subprocess_exec(
@@ -349,8 +362,9 @@ async def concatenate_videos(
         raise ValueError(
             f"Ratio to multiply animations should be greater than 0. Got {ratioToMultiplyAnimations}"
         )
-    
-    cmd = ("ffmpeg",
+
+    cmd = (
+        "ffmpeg",
         "-y",
         "-f",
         "concat",
@@ -368,7 +382,8 @@ async def concatenate_videos(
         "aac",
         "-b:a",
         "192k",
-        target_file_name)
+        target_file_name,
+    )
 
     logger.debug(" ".join(cmd))
 
@@ -468,7 +483,8 @@ async def _merge_audio_and_video_with_existing_audio(
         await asyncio.create_subprocess_exec("mv", media_url, new_media_name)
         media_url_to_use = media_url.split(".")[0] + "_." + media_url.split(".")[1]
 
-    cmd = ("ffmpeg",
+    cmd = (
+        "ffmpeg",
         "-y",
         "-i",
         audio_file_path,
@@ -494,7 +510,8 @@ async def _merge_audio_and_video_with_existing_audio(
         "44100",  # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
         "-ac",
         "2",  # This tells FFmpeg to use 2 audio channels.
-        target_file_name)
+        target_file_name,
+    )
 
     logger.debug(" ".join(cmd))
 
@@ -546,7 +563,8 @@ async def _merge_audio_and_video_without_audio_track(
     """
     logger.debug(f"parameters: {media_url}, {audio_file_path}, {target_file_name}")
 
-    cmd = ("ffmpeg",
+    cmd = (
+        "ffmpeg",
         "-y",
         "-i",
         audio_file_path,
@@ -572,7 +590,8 @@ async def _merge_audio_and_video_without_audio_track(
         "-ar",
         "44100",
         "-ac",
-        "2")
+        "2",
+    )
 
     logger.debug(" ".join(cmd))
 
@@ -623,7 +642,8 @@ async def reencode_video(video_url, target_video_name=None):
 
     logger.trace("Re-encoding video " + video_url + " with name " + target_video_name)
 
-    cmd = ("ffmpeg",
+    cmd = (
+        "ffmpeg",
         "-y",
         "-i",
         video_url,
@@ -643,7 +663,8 @@ async def reencode_video(video_url, target_video_name=None):
         "44100",  # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
         "-ac",
         "2",  # This tells FFmpeg to use 2 audio channels.
-        target_video_name)
+        target_video_name,
+    )
 
     logger.debug(" ".join(cmd))
 
@@ -695,7 +716,8 @@ async def cut_video(
     if not target_video_name:
         target_video_name = "cutted_" + get_canonical_name(video_url) + ".mp4"
 
-    cmd = ("ffmpeg",
+    cmd = (
+        "ffmpeg",
         "-y",
         "-i",
         video_url,
@@ -705,7 +727,8 @@ async def cut_video(
         str(end_time),
         "-c:v",
         "libx264",
-        target_video_name)
+        target_video_name,
+    )
 
     logger.debug(" ".join(cmd))
 
@@ -743,7 +766,8 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
     """
     assert media_url, "no media URL provided"
 
-    cmd = ("ffmpeg",
+    cmd = (
+        "ffmpeg",
         "-y",
         "-i",
         media_url,
@@ -752,8 +776,9 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
         #  eq(n\\,0) means it selects the frame where n (the frame number) is equal to 0, in other word, the first frame.
         "-vframes",  # Specifies the number of video frames to output.
         "1",  # We want one single frame
-        target_path)
-    
+        target_path,
+    )
+
     logger.debug(" ".join(cmd))
 
     process = await asyncio.create_subprocess_exec(
@@ -801,15 +826,10 @@ async def reverse_video(
     if not target_video_name:
         target_video_name = "reversed_" + get_canonical_name(video_url) + ".mp4"
     # ffmpeg -i example.mp4 -vf reverse -an output_r.mp4
-    cmd = ("ffmpeg",
-        "-i",
-        video_url,
-        "-vf",
-        "reverse",
-        target_video_name)
-    
+    cmd = ("ffmpeg", "-i", video_url, "-vf", "reverse", target_video_name)
+
     logger.debug(" ".join(cmd))
-    
+
     process = await asyncio.create_subprocess_exec(
         *cmd,
         stdout=asyncio.subprocess.PIPE,
@@ -857,7 +877,8 @@ async def create_zoom_video(
     if not target_video_name:
         target_video_name = "zoom_" + get_canonical_name(image_url) + ".mp4"
 
-    cmd = ("ffmpeg",
+    cmd = (
+        "ffmpeg",
         "-y",
         "-loop",
         "1",
@@ -869,8 +890,9 @@ async def create_zoom_video(
         "libx264",
         "-t",
         str(target_duration),
-        target_video_name)
-    
+        target_video_name,
+    )
+
     logger.debug(" ".join(cmd))
 
     process = await asyncio.create_subprocess_exec(
@@ -942,7 +964,10 @@ async def get_last_frame_as_image_ffmpeg(media_url, target_path=None):
 
     return target_path
 
-async def generate_video_from_image(image_url, duration=5, dimensions=(1280,720), target_path=None):
+
+async def generate_video_from_image(
+    image_url, duration=5, dimensions=(1280, 720), target_path=None
+):
     """
     Generates a video from an image
     """
@@ -951,20 +976,22 @@ async def generate_video_from_image(image_url, duration=5, dimensions=(1280,720)
     if not target_path:
         target_path = "animated_" + get_canonical_name(image_url) + ".mp4"
 
-
     cmd = (
         "ffmpeg",
         "-y",
-        "-loop",  #Loops on first frame, the image
-        "1", 
+        "-loop",  # Loops on first frame, the image
+        "1",
         "-i",
-        image_url, #Specifies first frame as the image
+        image_url,  # Specifies first frame as the image
         "-c:v",  # The encoding library
-        "libx264",  
+        "libx264",
         "-t",  # Specifying the duration
         str(duration),
         "-vf",
-        "scale=" + str(dimensions[0]) + ":" + str(dimensions[1]), #Specifying dimensions, should be a multiple of 2
+        "scale="
+        + str(dimensions[0])
+        + ":"
+        + str(dimensions[1]),  # Specifying dimensions, should be a multiple of 2
         target_path,
     )
 
@@ -994,5 +1021,3 @@ async def generate_video_from_image(image_url, duration=5, dimensions=(1280,720)
         logger.error(error_message)
         raise Exception(error_message)
     return target_path
-
-

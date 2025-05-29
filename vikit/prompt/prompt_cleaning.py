@@ -52,7 +52,7 @@ def cleanse_llm_keywords(input):
             # remove quotes
             new_keywords = new_keywords.replace("'", " ")
             # remove double quotes
-            new_keywords = new_keywords.replace("\"", " ")
+            new_keywords = new_keywords.replace('"', " ")
             # Replace multiple consecutive commas with a single comma
             new_keywords = re.sub(r",+", ",", new_keywords)
             # remove newlines

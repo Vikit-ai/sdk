@@ -16,9 +16,7 @@
 from loguru import logger
 
 from vikit.common.handler import Handler
-from vikit.gateways.ML_models_gateway import MLModelsGateway
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-from vikit.wrappers.ffmpeg_wrapper import get_media_duration, merge_audio
+from vikit.wrappers.ffmpeg_wrapper import merge_audio
 
 
 class MusicMergeHandler(Handler):
@@ -49,8 +47,8 @@ class MusicMergeHandler(Handler):
             audio_file_path=self.music_to_merge,
             target_file_name=video.get_file_name_by_state(),
         )
-        assert (
-            video.background_music is not None
-        ), "Background music was not generated properly"
+        assert video.background_music is not None, (
+            "Background music was not generated properly"
+        )
 
         return video

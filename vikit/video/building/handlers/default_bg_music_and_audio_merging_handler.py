@@ -16,15 +16,17 @@ import os
 
 from loguru import logger
 
-# from vikit.video.video import Video
+# from  vikit.video.video import Video
 import vikit.common.config as config
 from vikit.common.handler import Handler
-from vikit.wrappers.ffmpeg_wrapper import (extract_audio_slice,
-                                           get_media_duration, merge_audio)
+from vikit.wrappers.ffmpeg_wrapper import (
+    extract_audio_slice,
+    get_media_duration,
+    merge_audio,
+)
 
 
 class DefaultBGMusicAndAudioMergingHandler(Handler):
-
     def __init__(self, music_duration: float = None):
         """
         Initialize the handler with the duration of the background music
