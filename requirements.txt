@@ -1,5 +1,6 @@
 aiohttp==3.9.5
 aiofiles==24.1.0
+CairoSVG==2.7.1
 replicate==0.24.0
 numpy==1.26.4
 pysrt==1.1.2
