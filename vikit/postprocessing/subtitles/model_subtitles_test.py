@@ -2,22 +2,22 @@ import pytest
 from pydantic import ValidationError
 
 from tests.medias.references_for_tests import (
-    MARCHAND_360P_MP4,
-    MARCHAND_CHUNK_SRT,
-    OUTPUT_VIDEO_WITH_SUBTITLES_NAME,
+    DEMAIN_DES_LAUBE_SRT,
+    VIKIT_PITCH_MP4,
 )
 from vikit.postprocessing.subtitles.model import SubtitleConfig
 
 
 @pytest.mark.unit
 @pytest.mark.parametrize(
-    "input_video_path, output_video_name, subtitle_srt_path, font_size_px, highlight_opacity, text_color, highlight_color, bg_color, expected_error",
+    "input_video_path, output_video_name, subtitle_srt_path, font_size_px, "
+    "highlight_opacity, text_color, highlight_color, bg_color, expected_error",
     [
         # Case : Empty input video path (ValidationError expected with specific message)
         (
             "",
-            OUTPUT_VIDEO_WITH_SUBTITLES_NAME,
-            MARCHAND_CHUNK_SRT,
+            "output.mp4",
+            DEMAIN_DES_LAUBE_SRT,
             None,
             None,
             "white",
@@ -27,9 +27,9 @@ from vikit.postprocessing.subtitles.model import SubtitleConfig
         ),
         # Case : Empty output video name (ValidationError expected with specific message)
         (
-            MARCHAND_360P_MP4,
+            VIKIT_PITCH_MP4,
             "",
-            MARCHAND_CHUNK_SRT,
+            DEMAIN_DES_LAUBE_SRT,
             None,
             None,
             "white",
@@ -39,8 +39,8 @@ from vikit.postprocessing.subtitles.model import SubtitleConfig
         ),
         # Case : Empty subtitle file path (ValidationError expected with specific message)
         (
-            MARCHAND_360P_MP4,
-            OUTPUT_VIDEO_WITH_SUBTITLES_NAME,
+            VIKIT_PITCH_MP4,
+            "output.mp4",
             "",
             None,
             None,
@@ -51,9 +51,9 @@ from vikit.postprocessing.subtitles.model import SubtitleConfig
         ),
         # Case : Invalid output video name format (ValidationError expected with specific message)
         (
-            MARCHAND_360P_MP4,
+            VIKIT_PITCH_MP4,
             "output.txt",
-            MARCHAND_CHUNK_SRT,
+            DEMAIN_DES_LAUBE_SRT,
             None,
             None,
             "white",
@@ -63,8 +63,8 @@ from vikit.postprocessing.subtitles.model import SubtitleConfig
         ),
         # Case : Invalid subtitle file format (ValidationError expected with specific message)
         (
-            MARCHAND_360P_MP4,
-            OUTPUT_VIDEO_WITH_SUBTITLES_NAME,
+            VIKIT_PITCH_MP4,
+            "output.mp4",
             "subtitle.txt",
             None,
             None,
@@ -75,9 +75,9 @@ from vikit.postprocessing.subtitles.model import SubtitleConfig
         ),
         # Case : Negative font size (ValidationError expected due to invalid font size)
         (
-            MARCHAND_360P_MP4,
-            OUTPUT_VIDEO_WITH_SUBTITLES_NAME,
-            MARCHAND_CHUNK_SRT,
+            VIKIT_PITCH_MP4,
+            "output.mp4",
+            DEMAIN_DES_LAUBE_SRT,
             None,
             None,
             "white",
@@ -87,9 +87,9 @@ from vikit.postprocessing.subtitles.model import SubtitleConfig
         ),
         # Case : Highlight opacity greater than 1 (ValidationError expected due to invalid opacity)
         (
-            MARCHAND_360P_MP4,
-            OUTPUT_VIDEO_WITH_SUBTITLES_NAME,
-            MARCHAND_CHUNK_SRT,
+            VIKIT_PITCH_MP4,
+            "output.mp4",
+            DEMAIN_DES_LAUBE_SRT,
             None,
             1.5,
             "white",
@@ -99,9 +99,9 @@ from vikit.postprocessing.subtitles.model import SubtitleConfig
         ),
         # Case : Invalid text_color format (ValidationError expected)
         (
-            MARCHAND_360P_MP4,
-            OUTPUT_VIDEO_WITH_SUBTITLES_NAME,
-            MARCHAND_CHUNK_SRT,
+            VIKIT_PITCH_MP4,
+            "output.mp4",
+            DEMAIN_DES_LAUBE_SRT,
             None,
             None,
             "invalid_color",
@@ -111,9 +111,9 @@ from vikit.postprocessing.subtitles.model import SubtitleConfig
         ),
         # Case : Invalid highlight_color format (ValidationError expected)
         (
-            MARCHAND_360P_MP4,
-            OUTPUT_VIDEO_WITH_SUBTITLES_NAME,
-            MARCHAND_CHUNK_SRT,
+            VIKIT_PITCH_MP4,
+            "output.mp4",
+            DEMAIN_DES_LAUBE_SRT,
             None,
             None,
             "white",
@@ -123,9 +123,9 @@ from vikit.postprocessing.subtitles.model import SubtitleConfig
         ),
         # Case : Invalid bg_color format (ValidationError expected)
         (
-            MARCHAND_360P_MP4,
-            OUTPUT_VIDEO_WITH_SUBTITLES_NAME,
-            MARCHAND_CHUNK_SRT,
+            VIKIT_PITCH_MP4,
+            "output.mp4",
+            DEMAIN_DES_LAUBE_SRT,
             None,
             None,
             "white",

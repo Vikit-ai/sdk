@@ -19,20 +19,17 @@ WHITE_BACKGROUND_VIKIT_LOGO_BLACK_PNG = _local_resource(
 )
 IMAGE_PROMPT = _local_resource("image_prompt.jpeg")
 VIKIT_PITCH_MP4 = _local_resource("vikit_pitch.mp4")
-MARCHAND_360P_MP4 = _local_resource("marchand_360p.mp4")
-MARCHAND_CHUNK_SRT = _local_resource("marchand_chunk.srt")
-QUOTIDIEN_360P_MP4 = _local_resource("quotidien_360p.mp4")
-QUOTIDIEN_CHUNK_SRT = _local_resource("quotidien_chunk.srt")
+DEMAIN_DES_LAUBE_SRT = _local_resource("demain_des_laube.srt")
 PODCAST_SERENITY_MUSIC = _local_resource("PodcastSerenity.mp3")
+
+CHATGPT_SCENARIO_TXT = _local_resource("chatgpt-scenario.txt")
 
 RANCHO_FONT = _local_resource("fonts/rancho.ttf")
 
-OUTPUT_VIDEO_WITH_SUBTITLES_NAME = "vikit_pitch_with_subtitles.mp4"
-
 VALID_SUBTITLE_CONFIG = SubtitleConfig(
-    input_video_path=MARCHAND_360P_MP4,
-    output_video_name=OUTPUT_VIDEO_WITH_SUBTITLES_NAME,
-    subtitle_srt_path=MARCHAND_CHUNK_SRT,
+    input_video_path=VIKIT_PITCH_MP4,
+    output_video_name="output.mp4",
+    subtitle_srt_path=DEMAIN_DES_LAUBE_SRT,
     text_color="white",
     highlight_color="yellow",
     bg_color=(0, 0, 0),

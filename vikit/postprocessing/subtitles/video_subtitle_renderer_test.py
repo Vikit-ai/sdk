@@ -7,11 +7,9 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 
 from tests.medias.references_for_tests import (
-    MARCHAND_360P_MP4,
-    MARCHAND_CHUNK_SRT,
-    QUOTIDIEN_360P_MP4,
-    QUOTIDIEN_CHUNK_SRT,
+    DEMAIN_DES_LAUBE_SRT,
     RANCHO_FONT,
+    VIKIT_PITCH_MP4,
 )
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.postprocessing.subtitles.video_subtitle_renderer import (
@@ -26,22 +24,22 @@ def valid_init_kwargs(remove: list[str] = [], update: dict[str, any] = {}):
     valid_kwargs = {
         "subtitle_style": "highlight_spoken_word",
         "font_path": RANCHO_FONT,
-        "font_size_pt": 24,
+        "font_size_pt": 40,
         "text_color": "white",
         "highlight_color": "yellow",
         "bg_color": "black",
         "bg_opacity": 0.8,
-        "margin_bottom_px": 100,
-        "margin_h_px": 10,
+        "margin_bottom_px": 250,
+        "margin_h_px": 25,
     }
     return {k: v for k, v in valid_kwargs.items() if k not in remove} | update
 
 
 def valid_render_kwargs(remove: list[str] = [], update: dict[str, any] = {}):
     valid_kwargs = {
-        "src_video_path": MARCHAND_360P_MP4,
+        "src_video_path": VIKIT_PITCH_MP4,
         "dst_video_path": "output.mp4",
-        "subtitles": SubRipFile.open(MARCHAND_CHUNK_SRT),
+        "subtitles": SubRipFile.open(DEMAIN_DES_LAUBE_SRT),
     }
     return {k: v for k, v in valid_kwargs.items() if k not in remove} | update
 
@@ -56,13 +54,6 @@ TEST_SUBTITLES = [
 
 @pytest.mark.local_integration
 @pytest.mark.parametrize(
-    "src_video_path, subtitles_srt_path",
-    [
-        (MARCHAND_360P_MP4, MARCHAND_CHUNK_SRT),
-        (QUOTIDIEN_360P_MP4, QUOTIDIEN_CHUNK_SRT),
-    ],
-)
-@pytest.mark.parametrize(
     "subtitle_style",
     [
         "static_block",
@@ -71,18 +62,17 @@ TEST_SUBTITLES = [
         "place_words",
     ],
 )
-def test_render_subtitles__valid_input(
-    src_video_path, subtitles_srt_path, subtitle_style
-):
+def test_render_subtitles__valid_input(subtitle_style):
     with WorkingFolderContext():
         init_kwargs = valid_init_kwargs(update={"subtitle_style": subtitle_style})
         renderer = VideoSubtitleRenderer(**init_kwargs)
 
+        src_video_path = VIKIT_PITCH_MP4
         dst_video_path = "output.mp4"
         renderer.render(
             src_video_path,
             dst_video_path,
-            SubRipFile.open(subtitles_srt_path),
+            SubRipFile.open(DEMAIN_DES_LAUBE_SRT),
         )
 
         assert os.path.exists(dst_video_path), (
@@ -153,25 +143,25 @@ def test_render_subtitles__valid_input(
             valid_init_kwargs(update={"margin_bottom_px": -1}),
             valid_render_kwargs(),
             ValueError,
-            r"margin_bottom_px \(-1\) must be in the range \[0, 640\]",
+            r"margin_bottom_px \(-1\) must be in the range \[0, 1080\]",
         ),
         (
-            valid_init_kwargs(update={"margin_bottom_px": 641}),
+            valid_init_kwargs(update={"margin_bottom_px": 1081}),
             valid_render_kwargs(),
             ValueError,
-            r"margin_bottom_px \(641\) must be in the range \[0, 640\]",
+            r"margin_bottom_px \(1081\) must be in the range \[0, 1080\]",
         ),
         (
             valid_init_kwargs(update={"margin_h_px": -1}),
             valid_render_kwargs(),
             ValueError,
-            r"margin_h_px \(-1\) must be in the range \[0, 180\]",
+            r"margin_h_px \(-1\) must be in the range \[0, 303\]",
         ),
         (
-            valid_init_kwargs(update={"margin_h_px": 181}),
+            valid_init_kwargs(update={"margin_h_px": 304}),
             valid_render_kwargs(),
             ValueError,
-            r"margin_h_px \(181\) must be in the range \[0, 180\]",
+            r"margin_h_px \(304\) must be in the range \[0, 303\]",
         ),
     ],
 )
@@ -186,7 +176,7 @@ def test_init_renderer__invalid_arg__fails(
 @pytest.mark.local_integration
 def test_render_subtitles__invalid_params__no_subtitles_in_range():
     with WorkingFolderContext():
-        src_video_path = MARCHAND_360P_MP4
+        src_video_path = VIKIT_PITCH_MP4
         with VideoFileClip(src_video_path) as src_video:
             src_video_duration = src_video.duration
 

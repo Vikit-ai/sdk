@@ -94,6 +94,7 @@ class RawMultiModalBasedVideo(Video):
                 QualityCheckHandler(
                     video_gen_handler=video_gen_handler,
                     is_good_until=build_settings.is_good_until,
+                    max_attempts=build_settings.max_attempts,
                 )
             )
 

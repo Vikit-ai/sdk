@@ -21,6 +21,7 @@ from loguru import logger
 import tests.testing_medias as test_media
 import tests.testing_tools as tools  # used to get a library of test prompts
 import vikit.wrappers.ffmpeg_wrapper as ffmpegwrapper
+from tests.medias.references_for_tests import CHATGPT_SCENARIO_TXT
 from tests.testing_medias import (
     get_cat_video_path,
     get_test_transition_stones_trainboy_path,
@@ -171,7 +172,7 @@ class TestCompositeVideo:
             test_video_gpt = CompositeVideo()
             prompt_text = ""
 
-            with open("../../../tests/medias/chatgpt-scenario.txt", "r") as file:
+            with open(CHATGPT_SCENARIO_TXT, "r") as file:
                 for line in file:
                     if line.startswith("New_scene"):
                         if current_section:

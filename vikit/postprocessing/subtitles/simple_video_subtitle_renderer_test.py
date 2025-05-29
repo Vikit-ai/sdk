@@ -5,16 +5,25 @@ import pytest
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 from tests.medias.references_for_tests import (
-    MARCHAND_360P_MP4,
-    MARCHAND_CHUNK_SRT,
-    QUOTIDIEN_360P_MP4,
-    QUOTIDIEN_CHUNK_SRT,
+    VIKIT_PITCH_MP4,
+    DEMAIN_DES_LAUBE_SRT,
     RANCHO_FONT,
 )
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.postprocessing.subtitles.simple_video_subtitle_renderer import (
     SimpleVideoSubtitleRenderer,
 )
+
+
+def _create_dict(
+    base_dict: dict[str, any],
+    remove: list[str] = [],
+    update: dict[str, any] = {},
+):
+    for k in set(remove).union(update.keys()):
+        assert k in base_dict, f"Key ({k}) not found in {base_dict}"
+
+    return {k: v for k, v in base_dict.items() if k not in remove} | update
 
 
 def valid_init_kwargs(remove: list[str] = [], update: dict[str, any] = {}):
@@ -24,38 +33,25 @@ def valid_init_kwargs(remove: list[str] = [], update: dict[str, any] = {}):
         "margin_bottom_ratio": 0.20,
         "margin_h_ratio": 0.10,
     }
-    return {k: v for k, v in valid_kwargs.items() if k not in remove} | update
+    return _create_dict(valid_kwargs, remove, update)
 
 
 def valid_render_kwargs(remove: list[str] = [], update: dict[str, any] = {}):
     valid_kwargs = {
-        "input_video_path": MARCHAND_360P_MP4,
-        "subtitle_srt_filepath": MARCHAND_CHUNK_SRT,
+        "input_video_path": VIKIT_PITCH_MP4,
+        "subtitle_srt_filepath": DEMAIN_DES_LAUBE_SRT,
         "output_video_path": "output.mp4",
         "text_color": "white",
         "highlight_color": (0, 0, 0),
         "highlight_opacity": 0.8,
     }
-    return {k: v for k, v in valid_kwargs.items() if k not in remove} | update
+    return _create_dict(valid_kwargs, remove, update)
 
 
 @pytest.mark.local_integration
-@pytest.mark.parametrize(
-    "video_path, subtitle_path",
-    [
-        (MARCHAND_360P_MP4, MARCHAND_CHUNK_SRT),
-        (QUOTIDIEN_360P_MP4, QUOTIDIEN_CHUNK_SRT),
-    ],
-)
-def test_create_video_subtitles__valid_input__succeeds(video_path, subtitle_path):
+def test_create_video_subtitles__valid_input__succeeds():
     with WorkingFolderContext():
-        render_kwargs = valid_render_kwargs(
-            update={
-                "input_video_path": video_path,
-                "subtitle_srt_filepath": subtitle_path,
-            }
-        )
-
+        render_kwargs = valid_render_kwargs()
         subtitle_renderer = SimpleVideoSubtitleRenderer(**valid_init_kwargs())
         subtitle_renderer.add_subtitles_to_video(**render_kwargs)
 
@@ -63,19 +59,17 @@ def test_create_video_subtitles__valid_input__succeeds(video_path, subtitle_path
         assert os.path.exists(output_video_path), (
             f"Output video file was not created: {os.path.abspath(output_video_path)}"
         )
+        input_video_path = render_kwargs["input_video_path"]
         assert (
             VideoFileClip(output_video_path).duration
-            >= VideoFileClip(video_path).duration
+            >= VideoFileClip(input_video_path).duration
         ), "Output video duration is incorrect"
 
 
 @pytest.mark.local_integration
 def test_create_video_subtitles__missing_optional_args__succeeds():
     with WorkingFolderContext():
-        init_kwargs = valid_init_kwargs(
-            remove=["font_path", "font_size_pt", "margin_bottom_ratio"]
-        )
-        subtitle_renderer = SimpleVideoSubtitleRenderer(**init_kwargs)
+        subtitle_renderer = SimpleVideoSubtitleRenderer()
 
         render_kwargs = valid_render_kwargs(
             remove=["text_color", "highlight_color", "highlight_opacity"]
