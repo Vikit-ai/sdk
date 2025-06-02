@@ -18,8 +18,10 @@ from pathlib import Path
 
 import pysrt
 
-from tests.testing_medias import (get_test_prompt_recording_trainboy,
-                                  get_test_recorded_prompt_path)
+from tests.testing_medias import (
+    get_test_prompt_recording_trainboy,
+    get_test_recorded_prompt_path,
+)
 from vikit.prompt.recorded_prompt import RecordedPrompt
 from vikit.prompt.subtitle_extractor import SubtitleExtractor
 from vikit.video.video import Video
@@ -28,7 +30,6 @@ SAMPLE_MEDIA_FOLDER = "tests/medias/"
 
 
 def create_fake_prompt_for_local_tests_moss_stones_train_boy():
-
     _sample_media_dir = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         SAMPLE_MEDIA_FOLDER,

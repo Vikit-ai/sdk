@@ -18,23 +18,16 @@ from loguru import logger
 from vikit.common.file_tools import download_or_copy_file
 from vikit.common.handler import Handler
 from vikit.gateways.ML_models_gateway import MLModelsGateway
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.video.video import Video
 
 
 class VideoInterpolationHandler(Handler):
-
     async def execute_async(self, video: Video, ml_models_gateway: MLModelsGateway):
-
         logger.info(
             f"About to interpolate video: id: {video.id}, media: {video.media_url[:50]}"
         )
 
-        interpolated_video = (
-            await ml_models_gateway.interpolate_async(
-                video.media_url
-            )
-        )
+        interpolated_video = await ml_models_gateway.interpolate_async(video.media_url)
         assert interpolated_video, "Interpolated video was not generated properly"
         video.metadata.is_interpolated = True
 

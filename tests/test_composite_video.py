@@ -14,7 +14,6 @@
 # ==============================================================================
 
 import os
-import warnings
 
 import pytest
 from loguru import logger
@@ -22,8 +21,11 @@ from loguru import logger
 import tests.testing_medias as test_media
 import tests.testing_tools as tools  # used to get a library of test prompts
 import vikit.wrappers.ffmpeg_wrapper as ffmpegwrapper
-from tests.testing_medias import (get_cat_video_path,
-                                  get_test_transition_stones_trainboy_path)
+from tests.medias.references_for_tests import CHATGPT_SCENARIO_TXT
+from tests.testing_medias import (
+    get_cat_video_path,
+    get_test_transition_stones_trainboy_path,
+)
 from tests.testing_tools import test_prompt_library
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
@@ -71,9 +73,9 @@ class TestCompositeVideo:
         cp_video = CompositeVideo()
         cp_video.append_video(imp_video)
         cp_vid_duration = cp_video.get_duration()
-        assert (
-            cp_vid_duration == imp_video.get_duration()
-        ), f"Duration should be the same, {cp_video.get_duration()} != {imp_video.get_duration()}"
+        assert cp_vid_duration == imp_video.get_duration(), (
+            f"Duration should be the same, {cp_video.get_duration()} != {imp_video.get_duration()}"
+        )
 
         prompt = tools.test_prompt_library["tired"]
         build_settings = VideoBuildSettings(
@@ -89,9 +91,9 @@ class TestCompositeVideo:
         assert ratio > 0, "Ratio should be greater than 0"
         # Here the ratio should be low as we have a 6s video and a very long prompt which last much longer.
         # so the ratio will make it so a 6s video is slowed down to match the prompt duration
-        assert (
-            ratio == cp_vid_duration / prompt.duration
-        ), f"Ratio should be {cp_vid_duration / prompt.duration} but is {ratio}"
+        assert ratio == cp_vid_duration / prompt.duration, (
+            f"Ratio should be {cp_vid_duration / prompt.duration} but is {ratio}"
+        )
 
     @pytest.mark.local_integration
     @pytest.mark.core_local_integration
@@ -121,7 +123,6 @@ class TestCompositeVideo:
     @pytest.mark.local_integration
     @pytest.mark.asyncio
     async def test_int_create_video_mix_with_preexisting_video_bin_no_bkg_music(self):
-
         with WorkingFolderContext():
             video = ImportedVideo(test_media.get_cat_video_path())
             test_video_mixer = CompositeVideo()
@@ -150,9 +151,9 @@ class TestCompositeVideo:
             video_imp = ImportedVideo(test_media.get_generated_3s_forest_video_1_path())
             test_video_mixer = CompositeVideo()
             test_video_mixer.append_video(video).append_video(video_imp)
-            assert (
-                video._needs_video_reencoding
-            ), f"Video should need reencoding, type: {type(video)}"
+            assert video._needs_video_reencoding, (
+                f"Video should need reencoding, type: {type(video)}"
+            )
             await test_video_mixer.build(
                 ml_models_gateway=MLModelsGatewayFactory().get_ml_models_gateway(
                     test_mode=True
@@ -171,7 +172,7 @@ class TestCompositeVideo:
             test_video_gpt = CompositeVideo()
             prompt_text = ""
 
-            with open("../../../tests/medias/chatgpt-scenario.txt", "r") as file:
+            with open(CHATGPT_SCENARIO_TXT, "r") as file:
                 for line in file:
                     if line.startswith("New_scene"):
                         if current_section:
@@ -223,12 +224,12 @@ class TestCompositeVideo:
                     test_mode=True
                 ),
             )
-            assert (
-                test_video_mixer.media_url is not None
-            ), "Media URL should not be null"
-            assert (
-                test_video_mixer.background_music
-            ), "Background music should not be null"
+            assert test_video_mixer.media_url is not None, (
+                "Media URL should not be null"
+            )
+            assert test_video_mixer.background_music, (
+                "Background music should not be null"
+            )
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
@@ -387,9 +388,7 @@ class TestCompositeVideo:
     @pytest.mark.integration
     @pytest.mark.asyncio
     async def test_train_boy_local_no_transitions_with_music_and_prompts(self):
-
         with WorkingFolderContext():
-
             final_composite_video = CompositeVideo()
             for subtitle in test_prompt_library["moss_stones-train_boy"].subtitles:
                 video = RawTextBasedVideo(subtitle.text)
@@ -418,7 +417,6 @@ class TestCompositeVideo:
         https://github.com/leclem/aivideo/issues/6
         """
         with WorkingFolderContext():
-
             bld_settings = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True, generate_background_music=True
@@ -457,7 +455,6 @@ class TestCompositeVideo:
         https://github.com/leclem/aivideo/issues/6
         """
         with WorkingFolderContext():
-
             bld_settings = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True, generate_background_music=True

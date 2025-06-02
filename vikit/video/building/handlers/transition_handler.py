@@ -18,12 +18,10 @@ from loguru import logger
 from vikit.common.file_tools import url_exists
 from vikit.common.handler import Handler
 from vikit.gateways.ML_models_gateway import MLModelsGateway
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.video.video import Video
 
 
 class VideoBuildingHandlerTransition(Handler):
-
     async def execute_async(self, video: Video, ml_models_gateway: MLModelsGateway):
         """
         Process the video generation binaries: we actually do ask the video to build itself
@@ -41,13 +39,13 @@ class VideoBuildingHandlerTransition(Handler):
                 {video.source_video.media_url}, target: {video.target_video.media_url}"
         )
 
-        assert (
-            video.source_video.media_url
-        ), f"source video must be generated, video: {video.source_video}"
-        assert (
-            video.target_video.media_url
-        ), f"target video must be generated, \
+        assert video.source_video.media_url, (
+            f"source video must be generated, video: {video.source_video}"
+        )
+        assert video.target_video.media_url, (
+            f"target video must be generated, \
                 {video.target_video.media_url}, id: {video.target_video.id}"
+        )
         assert url_exists(video.source_video.media_url), "source_video must exist"
         assert url_exists(video.target_video.media_url), "target_video must exist"
 

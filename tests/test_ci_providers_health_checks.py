@@ -15,12 +15,12 @@
 
 import pytest
 
+from tests.testing_medias import get_test_prompt_image
 from vikit.common.context_managers import WorkingFolderContext
+from vikit.prompt.prompt_factory import PromptFactory
+from vikit.video.raw_image_based_video import RawImageBasedVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video import VideoBuildSettings
-from vikit.prompt.prompt_factory import PromptFactory
-from tests.testing_medias import get_test_prompt_image
-from vikit.video.raw_image_based_video import RawImageBasedVideo
 
 
 class TestProvidersHealthChecks:
@@ -85,7 +85,6 @@ class TestProvidersHealthChecks:
     @pytest.mark.asyncio
     async def test_runway_provider_and_generate(self):
         with WorkingFolderContext():
-
             image_prompt = await PromptFactory().create_prompt_from_image(
                 image=get_test_prompt_image(), text="add up clouds in the sky"
             )

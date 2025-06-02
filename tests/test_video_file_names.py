@@ -79,10 +79,9 @@ class TestVideoFileNames:
         fname = str(
             raw_text_video.get_file_name_by_state(build_settings=VideoBuildSettings()),
         )
-        assert VideoFileName.is_video_file_name(
-            fname
-        ), "The file name of the RawTextBasedVideo instance is not valid. Generated file name: {}".format(
-            fname
+        assert VideoFileName.is_video_file_name(fname), (
+            "The file name of the RawTextBasedVideo instance is not valid. Generated "
+            f"file name: {fname}"
         )
 
     @pytest.mark.unit
@@ -102,7 +101,6 @@ class TestVideoFileNames:
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_extract_features(self):
-
         bld_set = VideoBuildSettings()
         bld_set.id = "1234567890"
         bld_set.build_date = datetime.date(2024, 7, 1)
@@ -123,7 +121,6 @@ class TestVideoFileNames:
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_extract_features_no_features(self):
-
         bld_set = VideoBuildSettings()
         bld_set.id = "1234567890"
         bld_set.build_date = datetime.date(2024, 7, 1)
@@ -141,9 +138,9 @@ class TestVideoFileNames:
         extracted_features = video_file_name.extract_features_as_string()
         # Check if the extracted features are correct
         expected_features = "ooooo"
-        assert (
-            extracted_features == expected_features
-        ), f"Expected: {expected_features}, got: {extracted_features}"
+        assert extracted_features == expected_features, (
+            f"Expected: {expected_features}, got: {extracted_features}"
+        )
 
     def get_test_build_settings(self):
         bld_set = VideoBuildSettings()
@@ -161,19 +158,19 @@ class TestVideoFileNames:
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_video_file_names_across_building_steps(self):
-
         root_composite_video = CompositeVideo()
         bld_set = self.get_test_build_settings()
 
         fname = str(root_composite_video.get_file_name_by_state(build_settings=bld_set))
         vid_fname = VideoFileName.from_file_name(fname)
 
-        assert (
-            vid_fname.video_features == "ooooo"
-        ), f"The video features are not correct: features returned: {vid_fname.video_features}, expected ooooo"
-        assert (
-            vid_fname.build_id == bld_set.id
-        ), "The build ID is not correct, {}".format(bld_set.id)
+        assert vid_fname.video_features == "ooooo", (
+            "The video features are not correct: features returned: "
+            f"{vid_fname.video_features}, expected ooooo"
+        )
+        assert vid_fname.build_id == bld_set.id, (
+            f"The build ID is not correct: {bld_set.id}"
+        )
 
         assert vid_fname._build_date == bld_set.build_date
 
@@ -187,10 +184,9 @@ class TestVideoFileNames:
             root_composite_video.get_file_name_by_state(build_settings=bld_set)
         )
         vid_fname = VideoFileName.from_file_name(fname_built)
-        assert (
-            vid_fname.video_features == "oorio"
-        ), "The video features are not correct: features returned: {}".format(
-            vid_fname.video_features
+        assert vid_fname.video_features == "oorio", (
+            "The video features are not correct: features returned: "
+            f"{vid_fname.video_features}"
         )
         assert (  # Check the build id has not changed
             vid_fname.build_id == bld_set.id
@@ -204,10 +200,9 @@ class TestVideoFileNames:
             root_composite_video.get_file_name_by_state(build_settings=bld_set)
         )
         vid_fname = VideoFileName.from_file_name(fname_built)
-        assert (
-            vid_fname.video_features == "gorio"
-        ), "The video features are not correct: features returned: {}".format(
-            vid_fname.video_features
+        assert vid_fname.video_features == "gorio", (
+            "The video features are not correct: features returned: "
+            f"{vid_fname.video_features}"
         )
         assert (  # Check the build id has not changed
             vid_fname.build_id == bld_set.id
@@ -220,10 +215,9 @@ class TestVideoFileNames:
             root_composite_video.get_file_name_by_state(build_settings=bld_set)
         )
         vid_fname = VideoFileName.from_file_name(fname_built)
-        assert (
-            vid_fname.video_features == "gvrio"
-        ), "The video features are not correct: features returned: {}".format(
-            vid_fname.video_features
+        assert vid_fname.video_features == "gvrio", (
+            "The video features are not correct: features returned: "
+            f"{vid_fname.video_features}"
         )
         assert (  # Check the build id has not changed
             vid_fname.build_id == bld_set.id

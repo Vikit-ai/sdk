@@ -21,7 +21,6 @@ from vikit.video.raw_text_based_video import RawTextBasedVideo
 
 
 class TestMetaData:
-
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)

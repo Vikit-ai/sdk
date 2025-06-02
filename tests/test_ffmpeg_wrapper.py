@@ -22,11 +22,15 @@ from loguru import logger
 
 import tests.testing_medias as tests_medias
 from vikit.common.context_managers import WorkingFolderContext
-from vikit.wrappers.ffmpeg_wrapper import (concatenate_videos,
-                                           create_zoom_video, cut_video,
-                                           extract_audio_from_video,
-                                           generate_video_from_image,
-                                           get_media_duration, reencode_video)
+from vikit.wrappers.ffmpeg_wrapper import (
+    concatenate_videos,
+    create_zoom_video,
+    cut_video,
+    extract_audio_from_video,
+    generate_video_from_image,
+    get_media_duration,
+    reencode_video,
+)
 
 
 class TestFFMPEGWrapper:
@@ -220,8 +224,8 @@ class TestFFMPEGWrapper:
         """
         Extract the audio and test its duration
         """
-        
-        image_video = await generate_video_from_image(
-            image_url=tests_medias.get_test_prompt_image(),
-        )
-        assert int(get_media_duration(image_video)) == 5
+        with WorkingFolderContext():
+            image_video = await generate_video_from_image(
+                image_url=tests_medias.get_test_prompt_image(),
+            )
+            assert int(get_media_duration(image_video)) == 5

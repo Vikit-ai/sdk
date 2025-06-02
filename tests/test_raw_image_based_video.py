@@ -32,7 +32,6 @@ TEST_PROMPT = get_test_prompt_image()
 
 
 class TestRawImagePromptBasedVideo:
-
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
@@ -127,7 +126,6 @@ class TestRawImagePromptBasedVideo:
     @pytest.mark.asyncio
     async def test_build_single_video_with_generated_bg_music_no_subtitles(self):
         with WorkingFolderContext():
-
             build_settings = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True,

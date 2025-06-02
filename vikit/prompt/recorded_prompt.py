@@ -29,12 +29,19 @@ class RecordedPrompt(Prompt):
     to generate a prompt from a recorded audio file, like a podcast or a video soundtrack (e.g. a musical video clip)
     """
 
-    def __init__(self, audio_recording=None, subtitles=None, duration=None, text=None, build_settings: PromptBuildSettings = PromptBuildSettings()):
+    def __init__(
+        self,
+        audio_recording=None,
+        subtitles=None,
+        duration=None,
+        text=None,
+        build_settings: PromptBuildSettings = PromptBuildSettings(),
+    ):
         """
         Initialize the prompt with the path to the recorded audio prompt
         """
-        super().__init__(build_settings = build_settings)
-        
+        super().__init__(build_settings=build_settings)
+
         self.audio_recording = audio_recording
         self.subtitles: list[pysrt.SubRipItem] = subtitles
         self.duration = duration
@@ -62,9 +69,9 @@ class RecordedPrompt(Prompt):
 
         if recorded_audio_prompt_path is None:
             raise ValueError("The path to the recorded audio file is not provided")
-        assert os.path.exists(
-            recorded_audio_prompt_path
-        ), f"The provided target recording path does not exists/ {recorded_audio_prompt_path}"
+        assert os.path.exists(recorded_audio_prompt_path), (
+            f"The provided target recording path does not exists/ {recorded_audio_prompt_path}"
+        )
 
         self.audio_recording = await convert_as_mp3_file(
             recorded_audio_prompt_path,

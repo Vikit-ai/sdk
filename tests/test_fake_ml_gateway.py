@@ -19,7 +19,6 @@ import vikit.gateways.fake_ML_models_gateway as fake_ML_models_gateway
 
 
 class TestFakeMLGateway:
-
     @pytest.mark.unit
     @pytest.mark.asyncio
     async def test_get_subtitles(self):

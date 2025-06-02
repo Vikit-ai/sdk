@@ -14,8 +14,6 @@
 # ==============================================================================
 
 from vikit.common.GeneralBuildSettings import GeneralBuildSettings
-from vikit.gateways.ML_models_gateway import MLModelsGateway
-from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 
 
 class PromptBuildSettings(GeneralBuildSettings):
@@ -25,15 +23,13 @@ class PromptBuildSettings(GeneralBuildSettings):
         generate_from_llm_keyword: bool = False,  # Ask to generate the video by generating keywords from a LLM Prompt
         generate_from_llm_prompt: bool = True,
         model_provider: str = None,
-        **kwargs
+        **kwargs,
     ):
-
         super().__init__(
             delete_interim_files=delete_interim_files,
         )
-        self.model_provider=model_provider
+        self.model_provider = model_provider
         self.generate_from_llm_keyword = generate_from_llm_keyword
         self.generate_from_llm_prompt = generate_from_llm_prompt
         # self.excluded_words = ""
         self._additional_args = kwargs
-

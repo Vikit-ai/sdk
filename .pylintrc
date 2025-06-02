@@ -129,12 +129,6 @@ disable=R,
         wrong-import-order,
         xrange-builtin,
         zip-builtin-not-iterating,
-        C0326,
-        C0303,
-        C0301,
-        C0304,
-        C0330,
-        C0325
 
 
 [REPORTS]
@@ -146,6 +140,9 @@ output-format=text
 
 # Tells whether to display a full report or only the messages
 reports=no
+
+# Activate the evaluation score.
+score=no
 
 # Python expression which should return a note less than 10 (10 is the highest
 # note). You have access to the variables errors warning, statement which
@@ -263,8 +260,7 @@ max-module-lines=99999
 
 # String used as indentation unit.  The internal Google style guide mandates 2
 # spaces.  Google's externaly-published style guide says 4, consistent with
-# PEP 8.  Here, we use 2 spaces, for conformity with many open-sourced Google
-# projects (like TensorFlow).
+# PEP 8.
 indent-string='    '
 
 # Number of spaces of indent required inside a hanging  or continued line.

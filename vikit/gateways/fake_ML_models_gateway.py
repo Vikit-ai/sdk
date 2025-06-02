@@ -109,7 +109,6 @@ class FakeMLModelsGateway(MLModelsGateway):
     async def get_keywords_from_prompt_async(
         self, subtitleText, excluded_words: str = None, sleep_time: int = 0
     ):
-
         await asyncio.sleep(sleep_time)  # Simulate a long process with time.sleep
         return "KEYWORDS FROM PROMPT", "test title"
 
@@ -120,7 +119,6 @@ class FakeMLModelsGateway(MLModelsGateway):
         return "ENHANCED FROM PROMPT", "test title"
 
     async def get_subtitles_async(self, audiofile_path, sleep_time: int = 0):
-
         logger.trace(f"Getting subtitles for {audiofile_path}")
         return await self.get_subtitles(
             audiofile_path=audiofile_path, sleep_time=sleep_time
@@ -133,7 +131,9 @@ class FakeMLModelsGateway(MLModelsGateway):
             subs = f.read()
         return {"transcription": subs}
 
-    async def generate_video_async(self, prompt, model_provider: str, aspect_ratio=(16,9), sleep_time: int = 0):
+    async def generate_video_async(
+        self, prompt, model_provider: str, aspect_ratio=(16, 9), sleep_time: int = 0
+    ):
         await asyncio.sleep(sleep_time)
 
         if model_provider == "vikit":
@@ -175,5 +175,5 @@ class FakeMLModelsGateway(MLModelsGateway):
     def extract_audio_slice(self, i, end, audiofile_path, target_file_name: str = None):
         return tests_medias.get_test_prompt_recording_trainboy()
 
-    async def ask_gemini(self, prompt, more_contents= None):
+    async def ask_gemini(self, prompt, more_contents=None):
         return "-1"

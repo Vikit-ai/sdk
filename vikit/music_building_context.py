@@ -21,20 +21,21 @@ class MusicBuildingContext:
         generate_background_music: bool = False,
         use_recorded_prompt_as_audio: bool = False,
         expected_music_length: float = None,
-        background_music_file:str=None
+        background_music_file: str = None,
     ):
         """
         A context class for building music.
 
         params:
-        apply_background_music: bool, whether to apply background music to the prompt, generate_background_music won't be considered if apply_background_music False
-        generate_background_music: bool, whether to generate music taking inspiration from the prompt
-        use_recorded_prompt_as_audio: bool, whether to use recorded prompt as audio
-        expected_music_length: float, expected length of the music in seconds
+          apply_background_music: bool, whether to apply background music to the prompt,
+            generate_background_music won't be considered if apply_background_music if
+            set to False
+          generate_background_music: bool, whether to generate music taking inspiration
+            from the prompt
+          use_recorded_prompt_as_audio: bool, whether to use recorded prompt as audio
+          expected_music_length: float, expected length of the music in seconds
 
         """
-        # length in seconds, setting default to 0:
-
         self.use_recorded_prompt_as_audio = use_recorded_prompt_as_audio
         self.apply_background_music = apply_background_music
         self.generate_background_music = generate_background_music

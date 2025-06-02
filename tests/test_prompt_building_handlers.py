@@ -17,10 +17,12 @@
 import pytest
 
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-from vikit.prompt.building.handlers.prompt_by_keywords_handler import \
-    PromptByKeywordsHandler
-from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import \
-    PromptByRawUserTextHandler
+from vikit.prompt.building.handlers.prompt_by_keywords_handler import (
+    PromptByKeywordsHandler,
+)
+from vikit.prompt.building.handlers.prompt_by_raw_usertext_handler import (
+    PromptByRawUserTextHandler,
+)
 from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 

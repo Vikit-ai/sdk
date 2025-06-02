@@ -23,8 +23,10 @@ from loguru import logger
 import vikit.common.config as config
 from vikit.gateways.ML_models_gateway import MLModelsGateway
 from vikit.prompt.subtitle_extractor import SubtitleExtractor
-from vikit.wrappers.ffmpeg_wrapper import (extract_audio_slice,
-                                           get_media_duration)
+from vikit.wrappers.ffmpeg_wrapper import (
+    extract_audio_slice,
+    get_media_duration,
+)
 
 
 class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
@@ -124,9 +126,9 @@ class RecordedPromptSubtitlesExtractor(SubtitleExtractor):
                         p.returncode, p.args, output=stdout, stderr=stderr
                     )
 
-            assert os.path.exists(
-                config.get_subtitles_default_file_name(tempUuid)
-            ), "The generated subtitles file does not exists after having generating subtitles from audio file"
+            assert os.path.exists(config.get_subtitles_default_file_name(tempUuid)), (
+                "The generated subtitles file does not exists after having generating subtitles from audio file"
+            )
             subs = pysrt.open(config.get_subtitles_default_file_name(tempUuid))
 
         return subs

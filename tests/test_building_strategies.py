@@ -17,8 +17,9 @@ import pytest
 
 import tests.testing_tools as tools
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
-from vikit.video.building.build_order import \
-    get_lazy_dependency_chain_build_order
+from vikit.video.building.build_order import (
+    get_lazy_dependency_chain_build_order,
+)
 from vikit.video.composite_video import CompositeVideo
 from vikit.video.prompt_based_video import PromptBasedVideo
 from vikit.video.raw_text_based_video import RawTextBasedVideo
@@ -53,9 +54,9 @@ class TestVideoBuildingStrategies:
 
         assert video_build_order is not None
         # here we check the leaf has been generated first, then the root composite
-        assert (
-            len(video_build_order) == 2
-        ), f"Should have 2 videos, instead we had {len(video_build_order)}"
+        assert len(video_build_order) == 2, (
+            f"Should have 2 videos, instead we had {len(video_build_order)}"
+        )
 
         assert video_build_order[0].id == rtbv.id
         assert video_build_order[1].id == composite.id
@@ -93,16 +94,16 @@ class TestVideoBuildingStrategies:
             build_settings=build_settings,
             already_added=set(),
         )
-        assert (
-            len(pbv.video_list) == 4
-        ), f"Should have 4 subtitles for trainboy prompt, instead we had {len(pbv.video_list)}"
+        assert len(pbv.video_list) == 4, (
+            f"Should have 4 subtitles for trainboy prompt, instead we had {len(pbv.video_list)}"
+        )
         assert video_build_order is not None
 
         # In this test, we have 4 subtitles, so with a promptbasedvideo we should have 4 prompts * 2 rawtextbasedvideo
         #  + 4 transitions + 4 child composite videos + one parent root composite video
-        assert (
-            len(video_build_order) == 13
-        ), f"Should have 17 videos, instead we had {len(video_build_order)}"
+        assert len(video_build_order) == 13, (
+            f"Should have 17 videos, instead we had {len(video_build_order)}"
+        )
 
         # Check we have the right order: for the first subtitle, we should have
         #  rawtextbasedvideo ->  second rawtextbasedvideo ->  transition
@@ -118,17 +119,17 @@ class TestVideoBuildingStrategies:
         assert video_build_order[2].id == pbv.video_list[0].id  # first child composite
         assert isinstance(video_build_order[2], CompositeVideo)
 
-        assert (
-            video_build_order[3].id == pbv.video_list[1].video_list[0].id
-        ), f"Second subtitle first rawtextbasedvideo should be next, instead we had {video_build_order[4].id}"
+        assert video_build_order[3].id == pbv.video_list[1].video_list[0].id, (
+            f"Second subtitle first rawtextbasedvideo should be next, instead we had {video_build_order[4].id}"
+        )
         assert video_build_order[4].id == pbv.video_list[1].video_list[1].id
 
-        assert isinstance(
-            video_build_order[3], RawTextBasedVideo
-        ), f"Instead we had {type(video_build_order[4])}"
-        assert isinstance(
-            video_build_order[4], RawTextBasedVideo
-        ), f"Instead we had {type(video_build_order[5])}"
+        assert isinstance(video_build_order[3], RawTextBasedVideo), (
+            f"Instead we had {type(video_build_order[4])}"
+        )
+        assert isinstance(video_build_order[4], RawTextBasedVideo), (
+            f"Instead we had {type(video_build_order[5])}"
+        )
 
         assert isinstance(video_build_order[5], CompositeVideo)
         assert isinstance(video_build_order[12], CompositeVideo)

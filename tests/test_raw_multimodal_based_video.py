@@ -19,8 +19,11 @@ import warnings
 import pytest
 from loguru import logger
 
-from tests.testing_medias import (get_cat_video_path, get_test_prompt_image,
-                                  get_test_prompt_recording)
+from tests.testing_medias import (
+    get_cat_video_path,
+    get_test_prompt_image,
+    get_test_prompt_recording,
+)
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.music_building_context import MusicBuildingContext
@@ -34,7 +37,6 @@ TEST_PROMPT_VIDEO = get_cat_video_path()
 
 
 class TestRawMultiModalBasedVideo:
-
     def setUp(self) -> None:
         warnings.simplefilter("ignore", category=ResourceWarning)
         warnings.simplefilter("ignore", category=UserWarning)
@@ -156,7 +158,6 @@ class TestRawMultiModalBasedVideo:
     @pytest.mark.asyncio
     async def test_build_single_video_with_generated_bg_music_no_subtitles(self):
         with WorkingFolderContext():
-
             build_settings = VideoBuildSettings(
                 music_building_context=MusicBuildingContext(
                     apply_background_music=True,

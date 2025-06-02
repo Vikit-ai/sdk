@@ -32,8 +32,10 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         target_dir_path: str = None,
         output_video_file_name: str = None,
         vikit_api_key: str = None,
-        aspect_ratio:tuple = (16,9),
+        aspect_ratio: tuple = (16, 9),
         is_good_until=None,
+        prompt_updater_fn=None,
+        max_attempts=1,
     ):
         """
         VideoBuildSettings class constructor
@@ -55,6 +57,12 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
             aspect_ratio: tuple : The aspect ratio of the video
             output_video_file_name: str : The output video file name (one is generated for you by default)
             is_good_until: A filter function to apply to the generated videos
+            max_attempts: The maximum number of times to attempt the video generation.
+                Used only in combination with the is_good_until filter function.
+            prompt_updater_fn (function): A optional hook function that updates the
+                video generation prompt for each attempt. If not specified, the same
+                prompt is reused for every attempt. Used in combination with the
+                is_good_until filter function and max_attempts.
         """
 
         super().__init__(
@@ -73,6 +81,8 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
         self.vikit_api_key = vikit_api_key
         self.aspect_ratio = aspect_ratio
         self.is_good_until = is_good_until
+        self.max_attempts = max_attempts
+        self.prompt_updater_fn = prompt_updater_fn
 
     def __copy__(self):
         return VideoBuildSettings(
@@ -88,4 +98,5 @@ class VideoBuildSettings(GeneralBuildSettings.GeneralBuildSettings):
             output_video_file_name=None,
             vikit_api_key=self.vikit_api_key,
             aspect_ratio=self.aspect_ratio,
+            max_attempts=self.max_attempts,
         )

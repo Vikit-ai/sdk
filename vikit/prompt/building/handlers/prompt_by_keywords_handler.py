@@ -20,7 +20,6 @@ from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 
 class PromptByKeywordsHandler(Handler):
-
     async def execute_async(
         self,
         text_prompt: str,

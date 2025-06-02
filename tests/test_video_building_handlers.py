@@ -21,8 +21,9 @@ from vikit.common.context_managers import WorkingFolderContext
 from vikit.gateways.ML_models_gateway_factory import MLModelsGatewayFactory
 from vikit.prompt.prompt_factory import PromptFactory
 from vikit.prompt.recorded_prompt import RecordedPrompt
-from vikit.video.building.handlers.use_prompt_audio_track_and_audio_merging_handler import \
-    UsePromptAudioTrackAndAudioMergingHandler
+from vikit.video.building.handlers.use_prompt_audio_track_and_audio_merging_handler import (
+    UsePromptAudioTrackAndAudioMergingHandler,
+)
 from vikit.video.building.handlers.videogen_handler import VideoGenHandler
 from vikit.video.raw_text_based_video import RawTextBasedVideo
 from vikit.video.video_build_settings import VideoBuildSettings
@@ -51,9 +52,9 @@ class TestVideoBuildingHandlers:
             )
             assert video_built is not None, "Video built should not be None"
             logger.debug(f"Video built media: {video_built.media_url}")
-            assert (
-                video_built.media_url is not None
-            ), "Video built should have a media url"
+            assert video_built.media_url is not None, (
+                "Video built should have a media url"
+            )
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
@@ -75,6 +76,6 @@ class TestVideoBuildingHandlers:
             video__merged_with_prompt_original_audio = await handler.execute_async(
                 video=vid
             )
-            assert (
-                video__merged_with_prompt_original_audio is not None
-            ), "Video built should not be None"
+            assert video__merged_with_prompt_original_audio is not None, (
+                "Video built should not be None"
+            )

@@ -30,7 +30,6 @@ class FixedImageVideoGenHandler(Handler):
     """
 
     async def execute_async(self, video: Video, ml_models_gateway: MLModelsGateway):
-
         logger.info(
             f"About to generate fixed image video: id: {video.id}, image: {video.prompt.image[:50]}"
         )
@@ -39,14 +38,19 @@ class FixedImageVideoGenHandler(Handler):
 
         image_path = await download_or_copy_file(
             url=video.prompt.image,
-            local_path="for_fixed_image_video_" + get_canonical_name(video.prompt.image) + "." + video.prompt.image.split('.')[-1],
+            local_path="for_fixed_image_video_"
+            + get_canonical_name(video.prompt.image)
+            + "."
+            + video.prompt.image.split(".")[-1],
         )
-        
+
         if video.prompt.duration is None:
-            fixed_image_video = await generate_video_from_image(image_url = image_path)
+            fixed_image_video = await generate_video_from_image(image_url=image_path)
         else:
-            fixed_image_video = await generate_video_from_image(image_url = image_path, duration = video.prompt.duration)
-        
+            fixed_image_video = await generate_video_from_image(
+                image_url=image_path, duration=video.prompt.duration
+            )
+
         assert fixed_image_video, "Fixed image video video was not generated properly"
 
         video.media_url = fixed_image_video

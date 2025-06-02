@@ -26,7 +26,7 @@ You need a personal access token, which you can easily obtain from [here](https:
 
 ### Requirements for local installation
 
-- Python 3.8+ 
+- Python 3.12+ 
 - `requirements.txt` contains requirements for python environment
 - FFMPEG and FFPROBE (on mac, using homebrew: brew install ffmpeg and on linux, using apt-get: sudo apt-get install ffmpeg)
 - ImageMagick (for subtitles only; on mac, using homebrew: brew install imagemagick and on linux, using apt-get: sudo apt-get install imagemagick) 

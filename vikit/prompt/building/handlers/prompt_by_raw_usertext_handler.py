@@ -20,7 +20,6 @@ from vikit.prompt.prompt_build_settings import PromptBuildSettings
 
 
 class PromptByRawUserTextHandler(Handler):
-
     async def execute_async(
         self,
         text_prompt: str,
@@ -48,9 +47,7 @@ class PromptByRawUserTextHandler(Handler):
         (
             enhanced_prompt,
             title,
-        ) = await ml_models_gateway.get_enhanced_prompt_async(
-            text_prompt
-        )
+        ) = await ml_models_gateway.get_enhanced_prompt_async(text_prompt)
         logger.info(
             f"Finished processing prompt, Enhanced prompt: {enhanced_prompt}, title: {title}"
         )

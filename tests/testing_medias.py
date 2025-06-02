@@ -27,7 +27,6 @@ SMALL_RUNWAY_VIDEO_FILE_NAME = "runway.mp4"
 INTERPOLATE_VIDEO_FILE_NAME = "interpolate.mp4"
 GENERATED_3S_FOREST_VIDEO_SAMPLE_1 = "forest.mp4"
 GENERATED_3S_FOREST_VIDEO_SAMPLE__2 = "treasures.mp4"
-SAMPLE_LOGO = "logo.png"
 GENERATED_TRANSITION_FOREST_TREASURE_VIDEO_SAMPLE = (
     "transition_[seine]_from_treasures_to_forest.mp4"
 )
@@ -71,8 +70,6 @@ def get_paris_video():
 def get_interpolate_video():
     return os.path.join(_media_dir, INTERPOLATE_VIDEO_FILE_NAME)
 
-def get_sample_logo():
-    return os.path.join(_media_dir, SAMPLE_LOGO)
 
 def get_sample_gen_background_music():
     return os.path.join(_media_dir, SAMPLE_GENERATED_BG_MUSIC)
@@ -100,10 +97,6 @@ def get_stabilityai_image_video_path():
 
 def get_haiper_video_path():
     return os.path.join(_media_dir, SMALL_HAIPER_VIDEO_FILE_NAME)
-
-
-def get_luma_video_path():
-    return os.path.join(_media_dir, SMALL_LUMA_VIDEO_FILE_NAME)
 
 
 def get_videocrafter_video_path():
