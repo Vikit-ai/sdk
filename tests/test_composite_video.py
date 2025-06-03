@@ -103,9 +103,9 @@ class TestCompositeVideo:
     ):
         with WorkingFolderContext():
             video = ImportedVideo(test_media.get_cat_video_path())
-            test_video_mixer = CompositeVideo()
-            test_video_mixer.append_video(video)
-            built = await test_video_mixer.build(
+            test_vidcomp = CompositeVideo()
+            test_vidcomp.append_video(video)
+            built_video = await test_vidcomp.build(
                 build_settings=VideoBuildSettings(
                     music_building_context=MusicBuildingContext(
                         apply_background_music=True, generate_background_music=True
@@ -118,7 +118,8 @@ class TestCompositeVideo:
                 ),
             )
 
-            assert built.media_url is not None
+            assert built_video is not None
+            assert built_video.media_url is not None
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio

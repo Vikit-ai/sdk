@@ -55,7 +55,6 @@ class TestFFMPEGWrapper:
         """
 
         with WorkingFolderContext():
-            concat_file_name = "concatenate.txt"
             # Here we have to reencode the videos first
             catrix_reloaded = await reencode_video(
                 video_url=tests_medias.get_cat_video_path(),
@@ -66,19 +65,13 @@ class TestFFMPEGWrapper:
                 target_video_name="trainboy_reencoded.mp4",
             )
 
-            with open(concat_file_name, "w") as f:
-                f.write(f"file {catrix_reloaded}\n")
-                f.write(f"file {trainboy_reencoded}\n")
-
             generated_vid_file = await concatenate_videos(
-                input_file=concat_file_name,
+                video_file_paths=[catrix_reloaded, trainboy_reencoded],
                 target_file_name="target.mp4",
-                ratioToMultiplyAnimations=1,
+                ratio_to_multiply_animations=1,
             )
 
-            assert generated_vid_file is not None
             assert generated_vid_file == "target.mp4"
-            assert generated_vid_file != ""
             assert os.path.exists(generated_vid_file)
             assert os.path.getsize(generated_vid_file) > 0
 
@@ -94,20 +87,16 @@ class TestFFMPEGWrapper:
         """
 
         with WorkingFolderContext():
-            concat_file_name = "concatenate.txt"
-            with open(concat_file_name, "w") as f:
-                f.write(f"file {tests_medias.get_generated_3s_forest_video_2_path()}\n")
-                f.write(f"file {tests_medias.get_generated_3s_forest_video_1_path()}\n")
-
             generated_vid_file = await concatenate_videos(
-                input_file=concat_file_name,
+                video_file_paths=[
+                    tests_medias.get_generated_3s_forest_video_2_path(),
+                    tests_medias.get_generated_3s_forest_video_1_path(),
+                ],
                 target_file_name="target.mp4",
-                ratioToMultiplyAnimations=1,
+                ratio_to_multiply_animations=1,
             )
 
-            assert generated_vid_file is not None
             assert generated_vid_file == "target.mp4"
-            assert generated_vid_file != ""
             assert os.path.exists(generated_vid_file)
             assert os.path.getsize(generated_vid_file) > 0
 
