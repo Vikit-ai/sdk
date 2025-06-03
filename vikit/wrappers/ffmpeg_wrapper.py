@@ -17,6 +17,7 @@ import asyncio
 import json
 import os
 import subprocess
+from tempfile import NamedTemporaryFile
 
 from loguru import logger
 
@@ -335,90 +336,105 @@ async def convert_as_mp3_file(fileName, target_file_name: str):
 
 
 async def concatenate_videos(
-    input_file: str,
-    target_file_name=None,
-    ratioToMultiplyAnimations=1,
-    bias=0.33,
-    fps=16,
-    max_fps=16,
-):
+    video_file_paths: list[str],
+    target_file_name: str = None,
+    ratio_to_multiply_animations: float = 1,
+    fps: int = 16,
+) -> str:
     """
-    Concatenate all the videos in the list using a concatenation file
+    Concatenate multiple videos into a single video.
 
     Args:
-        input_file (str): The path to the input file
-        target_file_name (str): The target file name
-        ratioToMultiplyAnimations (int): The ratio to multiply animations
-        bias (int): The bias to add to the ratio for the sound to be in sync with video frames
+        video_file_paths: The file paths to the videos to concatenate. Must contain at
+            least 1 path.
+        target_file_name: The target file of the video file to create. Default:
+            TargetCompositeVideo.mp4
+        ratioToMultiplyAnimations: The ratio by which to speed up or slow down the video
+            to match its duration to an expected duration, e.g. of an audio track.
+        fps: frames per second (i.e. frame rate) of the output video
 
     Returns:
         str: The path to the concatenated video file
     """
-    target_file_name = (
-        target_file_name if target_file_name is not None else "TargetCompositeVideo.mp4"
-    )
+    if len(video_file_paths) < 1:
+        raise ValueError("video_file_paths must contain at least 1 element")
 
-    if ratioToMultiplyAnimations <= 0:
+    for video_path in video_file_paths:
+        if not os.path.exists(video_path):
+            raise FileNotFoundError(video_path)
+
+    if ratio_to_multiply_animations <= 0:
         raise ValueError(
-            f"Ratio to multiply animations should be greater than 0. Got {ratioToMultiplyAnimations}"
+            "Ratio to multiply animations should be greater than 0. Got "
+            f"{ratio_to_multiply_animations}"
+        )
+    
+    target_file_name = target_file_name or "TargetCompositeVideo.mp4"
+
+    # Generate a temporary file containing the video file paths as required by ffmpeg.
+    with NamedTemporaryFile(mode="w") as input_file:
+        for video_path in video_file_paths:
+            input_file.write(f"file '{os.path.abspath(video_path)}'{os.linesep}")
+        input_file.flush()
+
+        logger.trace("About to start ffmpeg video concat.")
+
+        cmd = (
+            "ffmpeg",
+            "-y",
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            input_file.name,
+            "-vf",
+            f"setpts={1 / ratio_to_multiply_animations}*N/{fps}/TB+STARTPTS,fps={fps}",
+            "-c:v",
+            "libx264",
+            "-crf",
+            "23",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "192k",
+            target_file_name,
         )
 
-    cmd = (
-        "ffmpeg",
-        "-y",
-        "-f",
-        "concat",
-        "-safe",
-        "0",
-        "-i",
-        input_file,
-        "-vf",
-        f"setpts={1 / ratioToMultiplyAnimations} * N/{fps}/TB + STARTPTS,fps={fps}",  #
-        "-c:v",
-        "libx264",
-        "-crf",
-        "23",
-        "-c:a",
-        "aac",
-        "-b:a",
-        "192k",
-        target_file_name,
-    )
+        logger.debug(" ".join(cmd))
 
-    logger.debug(" ".join(cmd))
+        # Build the ffmpeg command
+        process = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, stderr = await process.communicate()
 
-    # Build the ffmpeg command
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await process.communicate()
+        if process.returncode != 0:
+            error_messages = []
+            if stdout:
+                error_messages.append(f"stdout: {stdout.decode()}")
+            if stderr:
+                error_messages.append(f"stderr: {stderr.decode()}")
 
-    if process.returncode != 0:
-        error_messages = []
-        if stdout:
-            error_messages.append(f"stdout: {stdout.decode()}")
-        if stderr:
-            error_messages.append(f"stderr: {stderr.decode()}")
+            if error_messages:
+                error_message = "ffmpeg command failed with: " + " and ".join(
+                    error_messages
+                )
+            else:
+                error_message = "ffmpeg command failed without error output"
 
-        if error_messages:
-            error_message = "ffmpeg command failed with: " + " and ".join(
-                error_messages
-            )
-        else:
-            error_message = "ffmpeg command failed without error output"
+            logger.error(error_message)
+            raise Exception(error_message)
 
-        logger.error(error_message)
-        raise Exception(error_message)
-
-    return target_file_name  #
+    return target_file_name
 
 
 async def merge_audio(
     media_url: str,
     audio_file_path: str,
-    audio_file_relative_volume: float = None,
+    audio_file_relative_volume: float | None = None,
     target_file_name=None,
 ):
     """
@@ -457,7 +473,7 @@ async def merge_audio(
 async def _merge_audio_and_video_with_existing_audio(
     media_url: str,
     audio_file_path: str,
-    audio_file_relative_volume=1,
+    audio_file_relative_volume=1.0,
     target_file_name=None,
 ):
     """

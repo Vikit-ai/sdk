@@ -19,7 +19,6 @@ import uuid as uid
 
 from loguru import logger
 
-import vikit.common.config as config
 from vikit.music_building_context import MusicBuildingContext
 from vikit.video.building.build_order import (
     get_lazy_dependency_chain_build_order,
@@ -28,11 +27,7 @@ from vikit.video.building.build_order import (
 from vikit.video.video import DEFAULT_VIDEO_TITLE, Video
 from vikit.video.video_build_settings import VideoBuildSettings
 from vikit.video.video_types import VideoType
-from vikit.wrappers.ffmpeg_wrapper import (
-    concatenate_videos,
-    get_media_duration,
-    get_media_fps,
-)
+from vikit.wrappers.ffmpeg_wrapper import concatenate_videos, get_media_duration
 
 
 class CompositeVideo(Video, is_composite_video):
@@ -261,82 +256,78 @@ class CompositeVideo(Video, is_composite_video):
 
         # at this stage we should have all the videos generated. Will be improved in the future
         # in case we are called directly on a child composite without starting by the composite root
-        self.media_url = await self.concatenate()
+        self.media_url = await self._build_video_binary()
 
         return self
 
-    async def concatenate(self):
+    async def _build_video_binary(self):
         """
-        Concatenate the videos for this composite
+        Builds a video binary file by concatenating the videos contained in the current
+        composite video list.
         """
-        video_list_file = "_".join(
-            [
-                self.get_title()[:5],
-                str(self.temp_id),
-                config.get_video_list_file_name(self.composite_video_uuid),
-            ]
-        )
-        ratio = self._get_ratio_to_multiply_animations(
-            build_settings=self.build_settings
-        )
-        logger.debug("ratio to multiply animations about to be applied: " + str(ratio))
-
-        sum_files_fps = 0
-        number_files = 0
-        max_fps = -1
-
-        with open(video_list_file, "w") as myfile:
-            for video in self.video_list:
-                if not video.discarded:  # If the video has a media url
-                    file_name = video.media_url
-                    video_fps = get_media_fps(video.media_url)
-                    logger.trace(f"Video fps (composite_video): {video_fps}")
-                    sum_files_fps = sum_files_fps + video_fps
-                    if max_fps < video_fps:
-                        max_fps = video_fps
-                    number_files = number_files + 1
-                    myfile.write("file " + file_name + os.linesep)
-
-        logger.debug(
-            f"Setting average fps to the composite video: {str(sum_files_fps / number_files)}"
-        )
-
         return await concatenate_videos(
-            input_file=os.path.abspath(video_list_file),
+            video_file_paths=[
+                video.media_url for video in self.video_list if not video.discarded
+            ],
             target_file_name=self.get_file_name_by_state(
-                build_settings=video.build_settings,
+                build_settings=self.build_settings,
             ),
-            ratioToMultiplyAnimations=ratio,
-            fps=24,  # sum_files_fps / number_files,
-            max_fps=max_fps,
-        )  # keeping one consistent file name
+            ratio_to_multiply_animations=self._get_ratio_to_multiply_animations(
+                build_settings=self.build_settings
+            ),
+            fps=24,
+        )
 
-    def _get_ratio_to_multiply_animations(self, build_settings: VideoBuildSettings):
-        # Now we box the video composing this composite into the expected length, typically the one of a prompt
+    def _get_ratio_to_multiply_animations(
+        self, build_settings: VideoBuildSettings
+    ) -> float:
+        # Now we box the video composing this composite into the expected length,
+        # typically the one of a prompt
         if build_settings.expected_length is None:
             if build_settings.prompt is not None:
                 logger.debug(
-                    f"parameters video_composite.get_duration() build_settings.prompt : {self.get_duration()}, {build_settings.prompt}"
+                    "parameters video_composite.get_duration() build_settings.prompt: "
+                    f"{self.get_duration()}, {build_settings.prompt}"
                 )
-                ratioToMultiplyAnimations = (
+                ratio_to_multiply_animations = (
+                    # TODO: review this code path as it is likely never used, as
+                    # duration is not a member of the prompt
                     self.get_duration() / build_settings.prompt.duration
                 )
             else:
-                ratioToMultiplyAnimations = 1
+                ratio_to_multiply_animations = 1
         else:
             if build_settings.expected_length <= 0:
                 raise ValueError(
-                    f"Expected length should be greater than 0. Got {build_settings.expected_length}"
+                    "Expected length should be greater than 0. Got "
+                    f"{build_settings.expected_length}"
                 )
-            ratioToMultiplyAnimations = (
+            if self.get_duration() is None:
+                raise ValueError(
+                    "Composite video duration is None, cannot compute ratio. Please "
+                    "ensure all videos are built."
+                )
+            if self.get_duration() <= 0:
+                raise ValueError(
+                    "Composite video duration should be greater than 0. Got "
+                    f"{self.get_duration()}"
+                )
+
+            ratio_to_multiply_animations = (
                 self.get_duration() / build_settings.expected_length
             )
 
-        return ratioToMultiplyAnimations
+        logger.debug(
+            f"Composite video {self.id} ratio to multiply animations: "
+            f"{ratio_to_multiply_animations}"
+        )
+        return ratio_to_multiply_animations
 
     async def run_post_build_actions_hook(self, build_settings: VideoBuildSettings):
         if not build_settings.target_file_name:
             if self.is_root_video_composite:
+                if self.media_url is None:
+                    raise ValueError("media_url is None, cannot determine file name.")
                 name, extension = os.path.splitext(os.path.basename(self.media_url))
                 _name = name.replace(DEFAULT_VIDEO_TITLE, "YourVideo")
                 new_name = f"{_name}_{uid.uuid4()}{extension}"
