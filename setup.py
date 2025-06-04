@@ -26,6 +26,8 @@ setup(
         "tenacity>=8.0.0",
         "pytest>=7.0.0",
         "pytest-asyncio>=0.18.0",
+        "CairoSVG>=2.7.1",
+        "opencv-python>=4.10.0.84",
     ],
     extras_require={
         "dev": [
