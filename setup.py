@@ -18,7 +18,7 @@ setup(
     author="Vikit.ai",
     author_email="hello@vikit.ai",
     url="https://github.com/vikit-ai/sdk",
-    packages=find_packages(exclude=["tests*"]),
+    packages=find_packages(include=["vikit*"]),
     install_requires=[
         "aiohttp>=3.8.0",
         "aiofiles>=0.8.0",
