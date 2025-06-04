@@ -203,12 +203,14 @@ def get_max_file_size_url_gemini() -> int:
 
 
 def get_default_working_folder_root() -> str:
-    if get_environment() == "dev":
-        default_root = os.path.join(repo_root, "tmp")
-    else:
-        default_root = "/app/"
+    default_root = os.getenv("DEFAULT_WORKING_FOLDER_ROOT")
+    if default_root:
+        return default_root
 
-    return os.getenv("DEFAULT_WORKING_FOLDER_ROOT", default_root)
+    if get_environment() == "dev":
+        return os.path.join(repo_root, "tmp")
+
+    return "/app/"
 
 
 def get_seconds_per_word() -> float:
