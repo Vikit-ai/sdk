@@ -2,8 +2,7 @@ import os
 
 import pytest
 
-from medias import ARIAL_TTF_PATH
-from tests.medias.references_for_tests import VIKIT_PITCH_MP4
+from tests.medias.references_for_tests import RANCHO_FONT, VIKIT_PITCH_MP4
 from vikit.common.context_managers import WorkingFolderContext
 from vikit.common.models import TimePeriod
 from vikit.postprocessing.text_overlay.model import (
@@ -12,15 +11,13 @@ from vikit.postprocessing.text_overlay.model import (
     TextOverlayLineStyle,
     TextOverlayPosition,
 )
-from vikit.postprocessing.text_overlay.renderer import (
-    render_text_overlay,
-)
+from vikit.postprocessing.text_overlay.renderer import render_text_overlay
 
 
 @pytest.mark.local_integration
 def test_render_text_overlay__valid_overlay():
     line_style1 = TextOverlayLineStyle(
-        font_path=ARIAL_TTF_PATH,
+        font_path=RANCHO_FONT,
         font_size_pt=30,
         text_color="#e2eeff",
         line_spacing_px=3,

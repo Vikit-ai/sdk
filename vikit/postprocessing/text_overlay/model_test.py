@@ -1,12 +1,12 @@
 import pytest
 
-from medias import ARIAL_TTF_PATH
+from tests.medias.references_for_tests import RANCHO_FONT
 from vikit.postprocessing.text_overlay.model import TextOverlayLineStyle
 
 
 @pytest.mark.unit
 def test_line_style__font_path_found__succeeds():
-    TextOverlayLineStyle(font_path=ARIAL_TTF_PATH, font_size_pt=20)
+    TextOverlayLineStyle(font_path=RANCHO_FONT, font_size_pt=20)
     # No error should be raised.
 
 
