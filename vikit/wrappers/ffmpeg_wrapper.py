@@ -261,34 +261,7 @@ async def extract_audio_slice(
         "copy",
         target_file_name,
     )
-
-    logger.debug(" ".join(cmd))
-
-    # Create sub part of subtitles
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-
-    stdout, stderr = await process.communicate()
-    if process.returncode != 0:
-        error_messages = []
-        if stdout:
-            error_messages.append(f"stdout: {stdout.decode()}")
-        if stderr:
-            error_messages.append(f"stderr: {stderr.decode()}")
-
-        if error_messages:
-            error_message = "ffmpeg command failed with: " + " and ".join(
-                error_messages
-            )
-        else:
-            error_message = "ffmpeg command failed without error output"
-
-        logger.error(error_message)
-        raise Exception(error_message)
-
+    await _run_command(cmd)
     return target_file_name
 
 
@@ -305,33 +278,7 @@ async def convert_as_mp3_file(fileName, target_file_name: str):
     """
 
     cmd = ("ffmpeg", "-y", "-i", fileName, target_file_name)
-
-    logger.debug(" ".join(cmd))
-
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-
-    stdout, stderr = await process.communicate()
-    if process.returncode != 0:
-        error_messages = []
-        if stdout:
-            error_messages.append(f"stdout: {stdout.decode()}")
-        if stderr:
-            error_messages.append(f"stderr: {stderr.decode()}")
-
-        if error_messages:
-            error_message = "ffmpeg command failed with: " + " and ".join(
-                error_messages
-            )
-        else:
-            error_message = "ffmpeg command failed without error output"
-
-        logger.error(error_message)
-        raise Exception(error_message)
-
+    await _run_command(cmd)
     return target_file_name
 
 
@@ -368,7 +315,7 @@ async def concatenate_videos(
             "Ratio to multiply animations should be greater than 0. Got "
             f"{ratio_to_multiply_animations}"
         )
-    
+
     target_file_name = target_file_name or "TargetCompositeVideo.mp4"
 
     # Generate a temporary file containing the video file paths as required by ffmpeg.
@@ -400,34 +347,7 @@ async def concatenate_videos(
             "192k",
             target_file_name,
         )
-
-        logger.debug(" ".join(cmd))
-
-        # Build the ffmpeg command
-        process = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, stderr = await process.communicate()
-
-        if process.returncode != 0:
-            error_messages = []
-            if stdout:
-                error_messages.append(f"stdout: {stdout.decode()}")
-            if stderr:
-                error_messages.append(f"stderr: {stderr.decode()}")
-
-            if error_messages:
-                error_message = "ffmpeg command failed with: " + " and ".join(
-                    error_messages
-                )
-            else:
-                error_message = "ffmpeg command failed without error output"
-
-            logger.error(error_message)
-            raise Exception(error_message)
-
+        await _run_command(cmd)
     return target_file_name
 
 
@@ -477,8 +397,8 @@ async def _merge_audio_and_video_with_existing_audio(
     target_file_name=None,
 ):
     """
-    Merge audio with the video in the case where video already has at least one audio track, typically
-    when the video is imported / already existing
+    Merge audio with the video in the case where video already has at least one audio
+    track, typically when the video is imported / already existing
 
     Args:
         media_url (str): The media url to merge
@@ -490,7 +410,6 @@ async def _merge_audio_and_video_with_existing_audio(
         str: The merged audio file
 
     """
-
     media_url_to_use = media_url
     # Special case
     if target_file_name == media_url:
@@ -507,53 +426,35 @@ async def _merge_audio_and_video_with_existing_audio(
         "-i",
         media_url_to_use,
         "-filter_complex",
-        f"[0:a]apad,loudnorm,volume={audio_file_relative_volume},aformat=sample_fmts=u8|s16:channel_layouts=stereo[A];[1:a][A]amerge[out]",
+        (
+            f"[0:a]apad,loudnorm,volume={audio_file_relative_volume},"
+            "aformat=sample_fmts=u8|s16:channel_layouts=stereo[A];[1:a][A]amerge[out]"
+        ),
         "-map",
         "1:v",
         "-c:v",
         "libx264",
         "-profile:v",
         "baseline",
+        # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
         "-level",
-        "3.0",  # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
+        "3.0",
+        # This tells FFmpeg to use the yuv420p pixel format.
         "-pix_fmt",
-        "yuv420p",  # This tells FFmpeg to use the yuv420p pixel format.
+        "yuv420p",
         "-map",
         "[out]",
         "-acodec",
         "aac",
+        # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
         "-ar",
-        "44100",  # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
+        "44100",
+        # This tells FFmpeg to use 2 audio channels.
         "-ac",
-        "2",  # This tells FFmpeg to use 2 audio channels.
+        "2",
         target_file_name,
     )
-
-    logger.debug(" ".join(cmd))
-
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout=asyncio.subprocess.PIPE,  # Capture the error output
-        stderr=asyncio.subprocess.PIPE,  # Capture the error output
-    )
-
-    stdout, stderr = await process.communicate()
-    if process.returncode != 0:
-        error_messages = []
-        if stdout:
-            error_messages.append(f"stdout: {stdout.decode()}")
-        if stderr:
-            error_messages.append(f"stderr: {stderr.decode()}")
-
-        if error_messages:
-            error_message = "ffmpeg command failed with: " + " and ".join(
-                error_messages
-            )
-        else:
-            error_message = "ffmpeg command failed without error output"
-
-        logger.error(error_message)
-        raise Exception(error_message)
+    await _run_command(cmd)
     return target_file_name
 
 
@@ -607,35 +508,9 @@ async def _merge_audio_and_video_without_audio_track(
         "44100",
         "-ac",
         "2",
-    )
-
-    logger.debug(" ".join(cmd))
-
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
         target_file_name,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
     )
-
-    stdout, stderr = await process.communicate()
-    if process.returncode != 0:
-        error_messages = []
-        if stdout:
-            error_messages.append(f"stdout: {stdout.decode()}")
-        if stderr:
-            error_messages.append(f"stderr: {stderr.decode()}")
-
-        if error_messages:
-            error_message = "ffmpeg command failed with: " + " and ".join(
-                error_messages
-            )
-        else:
-            error_message = "ffmpeg command failed without error output"
-
-        logger.error(error_message)
-        raise Exception(error_message)
-
+    await _run_command(cmd)
     return target_file_name
 
 
@@ -669,48 +544,27 @@ async def reencode_video(video_url, target_video_name=None):
         "libx264",
         "-profile:v",
         "baseline",
+        # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
         "-level",
-        "3.0",  # This tells FFmpeg to use the H.264 Baseline Profile with a level of 3.0.
+        "3.0",
+        # This tells FFmpeg to use the yuv420p pixel format.
         "-pix_fmt",
-        "yuv420p",  # This tells FFmpeg to use the yuv420p pixel format.
+        "yuv420p",
         "-acodec",
         "aac",
+        # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
         "-ar",
-        "44100",  # This tells FFmpeg to use a sample rate of 44100 Hz for the audio.
+        "44100",
+        # This tells FFmpeg to use 2 audio channels.
         "-ac",
-        "2",  # This tells FFmpeg to use 2 audio channels.
+        "2",
         target_video_name,
     )
-
-    logger.debug(" ".join(cmd))
-
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-
-    stdout, stderr = await process.communicate()
-    if process.returncode != 0:
-        error_messages = []
-        if stdout:
-            error_messages.append(f"stdout: {stdout.decode()}")
-        if stderr:
-            error_messages.append(f"stderr: {stderr.decode()}")
-
-        if error_messages:
-            error_message = "ffmpeg command failed with: " + " and ".join(
-                error_messages
-            )
-        else:
-            error_message = "ffmpeg command failed without error output"
-
-        logger.error(error_message)
-        raise Exception(error_message)
-
+    await _run_command(cmd)
     return target_video_name
 
 
+# TODO: remove unused parameter target_duration
 async def cut_video(
     video_url, start_time, end_time, target_duration=None, target_video_name=None
 ):
@@ -745,34 +599,7 @@ async def cut_video(
         "libx264",
         target_video_name,
     )
-
-    logger.debug(" ".join(cmd))
-
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-
-    stdout, stderr = await process.communicate()
-    logger.trace(stdout)
-    if process.returncode != 0:
-        error_messages = []
-        if stdout:
-            error_messages.append(f"stdout: {stdout.decode()}")
-        if stderr:
-            error_messages.append(f"stderr: {stderr.decode()}")
-
-        if error_messages:
-            error_message = "ffmpeg command failed with: " + " and ".join(
-                error_messages
-            )
-        else:
-            error_message = "ffmpeg command failed without error output"
-
-        logger.error(error_message)
-        raise Exception(error_message)
-
+    await _run_command(cmd)
     return target_video_name
 
 
@@ -787,40 +614,17 @@ async def get_first_frame_as_image_ffmpeg(media_url, target_path=None):
         "-y",
         "-i",
         media_url,
+        # It is a video filter that selects the frames to extract eq(n\\,0) means it
+        # selects the frame where n (the frame number) is equal to 0, in other word,
+        # the first frame.
         "-vf",
-        "select=eq(n\\,0)",  # It is a video filter that selects the frames to extract
-        #  eq(n\\,0) means it selects the frame where n (the frame number) is equal to 0, in other word, the first frame.
-        "-vframes",  # Specifies the number of video frames to output.
-        "1",  # We want one single frame
+        "select=eq(n\\,0)",
+        # Output a single frame.
+        "-vframes",
+        "1",
         target_path,
     )
-
-    logger.debug(" ".join(cmd))
-
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-
-    stdout, stderr = await process.communicate()
-    if process.returncode != 0:
-        error_messages = []
-        if stdout:
-            error_messages.append(f"stdout: {stdout.decode()}")
-        if stderr:
-            error_messages.append(f"stderr: {stderr.decode()}")
-
-        if error_messages:
-            error_message = "ffmpeg command failed with: " + " and ".join(
-                error_messages
-            )
-        else:
-            error_message = "ffmpeg command failed without error output"
-
-        logger.error(error_message)
-        raise Exception(error_message)
-
+    await _run_command(cmd)
     return target_path
 
 
@@ -829,7 +633,8 @@ async def reverse_video(
     target_video_name=None,
 ):
     """
-    Reverses the frames of the video, with last frame being the first, second to last the second etc... and first frame the latest one
+    Reverses the frames of the video, with last frame being the first, second to last
+    the second etc... and first frame the latest one
     Args:
         video_url (str): The video to reverse
         target_video_name (string) : Optional, the name of the output video
@@ -843,32 +648,7 @@ async def reverse_video(
         target_video_name = "reversed_" + get_canonical_name(video_url) + ".mp4"
     # ffmpeg -i example.mp4 -vf reverse -an output_r.mp4
     cmd = ("ffmpeg", "-i", video_url, "-vf", "reverse", target_video_name)
-
-    logger.debug(" ".join(cmd))
-
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await process.communicate()
-    logger.trace(f"In reverse video, here is the stdout: {stdout}")
-    if process.returncode != 0:
-        error_messages = []
-        if stdout:
-            error_messages.append(f"stdout: {stdout.decode()}")
-        if stderr:
-            error_messages.append(f"stderr: {stderr.decode()}")
-
-        if error_messages:
-            error_message = "ffmpeg command failed with: " + " and ".join(
-                error_messages
-            )
-        else:
-            error_message = "ffmpeg command failed without error output"
-
-        logger.error(error_message)
-        raise Exception(error_message)
+    await _run_command(cmd)
     return target_video_name
 
 
@@ -901,41 +681,22 @@ async def create_zoom_video(
         "-i",
         image_url,
         "-vf",
-        "scale=16000:-1,zoompan=z='min(zoom+0.008,2)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=125,fps=24",
+        (
+            "scale=16000:-1,"
+            "zoompan="
+            "z='min(zoom+0.008,2)':"
+            "x='iw/2-(iw/zoom/2)':"
+            "y='ih/2-(ih/zoom/2)':"
+            "d=125,"
+            "fps=24"
+        ),
         "-c:v",
         "libx264",
         "-t",
         str(target_duration),
         target_video_name,
     )
-
-    logger.debug(" ".join(cmd))
-
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-
-    stdout, stderr = await process.communicate()
-    logger.trace(f"In create_zoom_video , here is the stdout: {stdout}")
-    if process.returncode != 0:
-        error_messages = []
-        if stdout:
-            error_messages.append(f"stdout: {stdout.decode()}")
-        if stderr:
-            error_messages.append(f"stderr: {stderr.decode()}")
-
-        if error_messages:
-            error_message = "ffmpeg command failed with: " + " and ".join(
-                error_messages
-            )
-        else:
-            error_message = "ffmpeg command failed without error output"
-
-        logger.error(error_message)
-        raise Exception(error_message)
-
+    await _run_command(cmd)
     return target_video_name
 
 
@@ -945,39 +706,22 @@ async def get_last_frame_as_image_ffmpeg(media_url, target_path=None):
     """
     assert media_url, "no media URL provided"
 
-    process = await asyncio.create_subprocess_exec(
+    cmd = (
         "ffmpeg",
-        "-sseof",  # Specifies that it should start x seconds from the end of the file
-        "-3",  # We want the last 3 seconds.
+        # Include the last 3 seconds of the video
+        "-sseof",
+        "-3",
         "-i",
         media_url,
-        "-update",  # Means that it should update the output image if a new frame is available
-        "1",  # We want one single frame
-        "-q:v",  # -q:v 1  specifies the quality of the output image (1 being the best quality).
+        # Update the output image if a new frame is available to a single frame.
+        "-update",
+        "1",
+        # Specifies the quality of the output image (1 being the best quality).
+        "-q:v",
         "1",
         target_path,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
     )
-
-    stdout, stderr = await process.communicate()
-    if process.returncode != 0:
-        error_messages = []
-        if stdout:
-            error_messages.append(f"stdout: {stdout.decode()}")
-        if stderr:
-            error_messages.append(f"stderr: {stderr.decode()}")
-
-        if error_messages:
-            error_message = "ffmpeg command failed with: " + " and ".join(
-                error_messages
-            )
-        else:
-            error_message = "ffmpeg command failed without error output"
-
-        logger.error(error_message)
-        raise Exception(error_message)
-
+    await _run_command(cmd)
     return target_path
 
 
@@ -995,22 +739,28 @@ async def generate_video_from_image(
     cmd = (
         "ffmpeg",
         "-y",
-        "-loop",  # Loops on first frame, the image
+        # Loops on first frame, the image
+        "-loop",
         "1",
+        # Specifies first frame as the image
         "-i",
-        image_url,  # Specifies first frame as the image
-        "-c:v",  # The encoding library
+        image_url,
+        # The encoding library
+        "-c:v",
         "libx264",
-        "-t",  # Specifying the duration
+        # Specifying the duration
+        "-t",
         str(duration),
+        # Specifying dimensions, should be a multiple of 2
         "-vf",
-        "scale="
-        + str(dimensions[0])
-        + ":"
-        + str(dimensions[1]),  # Specifying dimensions, should be a multiple of 2
+        "scale=" + str(dimensions[0]) + ":" + str(dimensions[1]),
         target_path,
     )
+    await _run_command(cmd)
+    return target_path
 
+
+async def _run_command(cmd: tuple[str]):
     logger.debug(" ".join(cmd))
 
     process = await asyncio.create_subprocess_exec(
@@ -1036,4 +786,3 @@ async def generate_video_from_image(
 
         logger.error(error_message)
         raise Exception(error_message)
-    return target_path
