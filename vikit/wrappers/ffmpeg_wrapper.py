@@ -323,10 +323,7 @@ async def concatenate_videos(
 
     cmd = ["ffmpeg", "-y"]
     filter_parts = []
-    concat_video_inputs = ""
-    concat_audio_inputs = []
     fps_values = []
-
     audio_flags = []
 
     for idx, path in enumerate(video_file_paths):
@@ -349,7 +346,6 @@ async def concatenate_videos(
             f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
             f"fps={{fps}},setpts={1 / ratio_to_multiply_animations:.6f}*PTS[v{idx}]"
         )
-        concat_video_inputs += f"[v{idx}]"
 
     average_fps = fps if fps else (sum(fps_values) / len(fps_values))
     logger.debug(f"Using target fps: {average_fps:.2f}")
@@ -363,18 +359,23 @@ async def concatenate_videos(
             filter_parts.append(
                 f"[{idx}:a:0]asetpts=PTS-STARTPTS,atempo={ratio_to_multiply_animations:.6f}[a{idx}]"
             )
-            concat_audio_inputs.append(f"[a{idx}]")
+
+        # Build video and audio input strings
+        video_inputs = "".join(f"[v{idx}]" for idx in range(len(video_file_paths)))
+        audio_inputs = "".join(f"[a{idx}]" for idx in range(len(video_file_paths)))
 
         filter_complex = ";".join(f.format(fps=average_fps) for f in filter_parts)
-        filter_complex += f";{concat_video_inputs}{''.join(concat_audio_inputs)}concat=n={len(video_file_paths)}:v=1:a=1[outv][outa]"
+        filter_complex += f";{video_inputs}{audio_inputs}concat=n={len(video_file_paths)}:v=1:a=1[outv][outa]"
         map_options = ["-map", "[outv]", "-map", "[outa]"]
         audio_codec_options = ["-c:a", "aac", "-b:a", "192k"]
 
     elif none_have_audio:
         # No audio in any video -> concat video only
+        video_inputs = "".join(f"[v{idx}]" for idx in range(len(video_file_paths)))
+
         filter_complex = ";".join(f.format(fps=average_fps) for f in filter_parts)
         filter_complex += (
-            f";{concat_video_inputs}concat=n={len(video_file_paths)}:v=1:a=0[outv]"
+            f";{video_inputs}concat=n={len(video_file_paths)}:v=1:a=0[outv]"
         )
         map_options = ["-map", "[outv]"]
         audio_codec_options = []
@@ -386,30 +387,23 @@ async def concatenate_videos(
         durations = [get_media_duration(p) for p in video_file_paths]
 
         # Build audio filters: real audio for videos with audio, silent audio for those without
-        filter_parts_audio = []
-        concat_audio_inputs = []
         for idx, has_audio in enumerate(audio_flags):
             if has_audio:
                 # Apply tempo change to match video speed change
-                filter_parts_audio.append(
+                filter_parts.append(
                     f"[{idx}:a:0]asetpts=PTS-STARTPTS,atempo={ratio_to_multiply_animations:.6f}[a{idx}]"
                 )
-                concat_audio_inputs.append(f"[a{idx}]")
             else:
                 # Generate silent audio with duration adjusted for speed change
                 duration = durations[idx] / ratio_to_multiply_animations
-                filter_parts_audio.append(f"aevalsrc=0:d={duration:.6f}[a{idx}]")
-                concat_audio_inputs.append(f"[a{idx}]")
+                filter_parts.append(f"aevalsrc=0:d={duration:.6f}[a{idx}]")
 
-        filter_complex_video = ";".join(f.format(fps=average_fps) for f in filter_parts)
-        filter_complex_audio = ";".join(filter_parts_audio)
+        # Build video and audio input strings
+        video_inputs = "".join(f"[v{idx}]" for idx in range(len(video_file_paths)))
+        audio_inputs = "".join(f"[a{idx}]" for idx in range(len(video_file_paths)))
 
-        filter_complex = (
-            filter_complex_video
-            + ";"
-            + filter_complex_audio
-            + f";{concat_video_inputs}{''.join(concat_audio_inputs)}concat=n={len(video_file_paths)}:v=1:a=1[outv][outa]"
-        )
+        filter_complex = ";".join(f.format(fps=average_fps) for f in filter_parts)
+        filter_complex += f";{video_inputs}{audio_inputs}concat=n={len(video_file_paths)}:v=1:a=1[outv][outa]"
 
         map_options = ["-map", "[outv]", "-map", "[outa]"]
         audio_codec_options = ["-c:a", "aac", "-b:a", "192k"]
