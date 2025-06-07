@@ -286,7 +286,7 @@ async def concatenate_videos(
     video_file_paths: list[str],
     target_file_name: str = None,
     ratio_to_multiply_animations: float = 1,
-    fps: int = 24,
+    fps: int | None = None,
 ) -> str:
     """
     Concatenate multiple videos into a single video.
@@ -306,13 +306,23 @@ async def concatenate_videos(
     if len(video_file_paths) < 1:
         raise ValueError("video_file_paths must contain at least 1 element")
 
+    average_fps, count_fps = 0, 0
+
     for video_path in video_file_paths:
         if not os.path.exists(video_path):
             raise FileNotFoundError(video_path)
+        if fps:
+            average_fps = fps
+        else:
+            video_fps = get_media_fps(video_path[0])
+            count_fps += video_fps
+            logger.debug(f"Video {video_path} has {video_fps} fps")
+        average_fps += count_fps / len(video_file_paths)
+    logger.debug(f"Average fps of all videos is {average_fps} fps")
 
-    logger.debug(
+    logger.info(
         f"Concatenating {len(video_file_paths)} videos with ratio "
-        f"{ratio_to_multiply_animations} and fps {fps}"
+        f"{ratio_to_multiply_animations} and fps {average_fps}"
     )
 
     if ratio_to_multiply_animations <= 0:
@@ -341,7 +351,7 @@ async def concatenate_videos(
             "-i",
             input_file.name,
             "-vf",
-            f"setpts={1 / ratio_to_multiply_animations}*N/{fps}/TB+STARTPTS,fps={fps}",
+            f"setpts={1 / ratio_to_multiply_animations}*N/{average_fps}/TB+STARTPTS,fps={average_fps}",
             "-c:v",
             "libx264",
             "-crf",
