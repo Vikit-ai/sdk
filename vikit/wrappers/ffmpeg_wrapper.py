@@ -314,7 +314,7 @@ async def concatenate_videos(
         if fps:
             average_fps = fps
         else:
-            video_fps = get_media_fps(video_path[0])
+            video_fps = get_media_fps(video_path)
             count_fps += video_fps
             logger.debug(f"Video {video_path} has {video_fps} fps")
         average_fps += count_fps / len(video_file_paths)
