@@ -388,7 +388,6 @@ async def concatenate_videos(
 
         audio_flags.append(has_audio_track(path))
 
-        # Filtre vidéo pour normaliser la taille, les FPS et la vitesse
         video_filter_parts.append(
             f"[{idx}:v:0]scale=w={width}:h={height}:force_original_aspect_ratio=decrease,"
             f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
@@ -402,7 +401,6 @@ async def concatenate_videos(
     video_inputs = "".join(f"[v{idx}]" for idx in range(len(video_file_paths)))
 
     if not any(audio_flags):
-        # Cas 1: Aucune vidéo n'a de son
         logger.debug("Aucune piste audio détectée. Concaténation vidéo uniquement.")
         filter_complex = ";".join(formatted_video_filters)
         filter_complex += (
@@ -411,12 +409,10 @@ async def concatenate_videos(
         map_options = ["-map", "[outv]"]
         audio_codec_options = []
     else:
-        # Cas 2: Au moins une vidéo a du son (cas mixte ou toutes avec son)
         logger.debug("Pistes audio détectées. Normalisation et concaténation audio.")
 
-        # Trouver une vidéo de référence pour les propriétés audio
         audio_ref_path = next(
-            path for i, path in enumerate(video_file_paths) if audio_flags[i]
+            (path for i, path in enumerate(video_file_paths) if audio_flags[i]), None
         )
         sample_rate, channel_layout = get_audio_properties(audio_ref_path)
         logger.debug(
@@ -428,16 +424,16 @@ async def concatenate_videos(
 
         for idx, path in enumerate(video_file_paths):
             if audio_flags[idx]:
-                # Cette vidéo a du son : on le normalise
                 audio_filter_parts.append(
                     f"[{idx}:a:0]aformat=sample_rates={sample_rate}:channel_layouts={channel_layout},"
                     f"asetpts=PTS-STARTPTS,atempo={ratio_to_multiply_animations:.6f}[a{idx}]"
                 )
             else:
-                # Cette vidéo n'a pas de son : on génère du silence
                 duration = durations[idx] / ratio_to_multiply_animations
+                # --- CORRECTION APPLIQUÉE ICI ---
+                # Remplacement de 'r=' par 'sample_rate=' qui est le paramètre correct.
                 audio_filter_parts.append(
-                    f"aevalsrc=exprs=0:d={duration:.6f}:r={sample_rate}:cl={channel_layout}[a{idx}]"
+                    f"aevalsrc=exprs=0:d={duration:.6f}:sample_rate={sample_rate}:channel_layout={channel_layout}[a{idx}]"
                 )
 
         audio_inputs = "".join(f"[a{idx}]" for idx in range(len(video_file_paths)))
@@ -455,7 +451,6 @@ async def concatenate_videos(
     cmd.extend(audio_codec_options)
     cmd.append(target_file_name)
 
-    logger.debug(f"Commande FFmpeg finale: {' '.join(cmd)}")
     await _run_command(cmd)
     return target_file_name
 
