@@ -282,6 +282,13 @@ async def convert_as_mp3_file(fileName, target_file_name: str):
     return target_file_name
 
 
+import os
+from tempfile import NamedTemporaryFile
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 async def concatenate_videos(
     video_file_paths: list[str],
     target_file_name: str = None,
@@ -289,87 +296,72 @@ async def concatenate_videos(
     fps: int | None = None,
 ) -> str:
     """
-    Concatenate multiple videos into a single video. The fps is inferred from the
-    individual videos, or can be forced by the user. The video duration is adjusted
-    according to the ratioToMultiplyAnimations parameter, which is useful to match the
-    duration of the video to an expected duration, e.g. of an audio track.
+    Concatenate multiple videos into a single video with consistent timing and fps.
 
     Args:
-        video_file_paths: The file paths to the videos to concatenate. Must contain at
-            least 1 path.
-        target_file_name: The target file of the video file to create. Default:
-            TargetCompositeVideo.mp4
-        ratioToMultiplyAnimations: The ratio by which to speed up or slow down the video
-            to match its duration to an expected duration, e.g. of an audio track.
-        fps: use if you need to force the frame rate (in frames per second) of the output video
+        video_file_paths: List of input video paths.
+        target_file_name: Output file name. Defaults to TargetCompositeVideo.mp4.
+        ratio_to_multiply_animations: Speed multiplier.
+        fps: Optional override for target FPS.
 
     Returns:
-        str: The path to the concatenated video file
+        str: Path to the generated output video.
     """
-    if len(video_file_paths) < 1:
+    if not video_file_paths:
         raise ValueError("video_file_paths must contain at least 1 element")
 
-    if fps:
-        average_fps = fps
-    else:
-        logger.debug("No fps provided, inferring from video files")
-        fps_values = []
-
-        for path in video_file_paths:
-            if not os.path.exists(path):
-                raise FileNotFoundError(path)
-
-            video_fps = get_media_fps(path)
-            logger.debug(f"Video {path} has {video_fps} fps")
-
-            if video_fps <= 0:
-                raise ValueError(f"Invalid fps ({video_fps}) in file: {path}")
-
-            fps_values.append(video_fps)
-
-        if len(set(fps_values)) > 1:
-            logger.warning("Videos have different fps. Using average fps.")
-
-        average_fps = sum(fps_values) / len(fps_values)
-
-    logger.debug(f"Average fps of all videos: {average_fps:.2f} fps")
-
-    logger.info(
-        f"About to concatenate {len(video_file_paths)} videos with ratio "
-        f"{ratio_to_multiply_animations} and fps {average_fps}"
-    )
-
     if ratio_to_multiply_animations <= 0:
-        raise ValueError(
-            "Ratio to multiply animations should be greater than 0. Got "
-            f"{ratio_to_multiply_animations}"
-        )
+        raise ValueError("ratio_to_multiply_animations must be > 0")
 
     target_file_name = target_file_name or "TargetCompositeVideo.mp4"
 
-    # Generate a temporary file containing the video file paths as required by ffmpeg.
-    with NamedTemporaryFile(mode="w") as input_file:
-        for video_path in video_file_paths:
-            input_file.write(f"file '{os.path.abspath(video_path)}'{os.linesep}")
-        input_file.flush()
-        logger.debug(f"Content of temporary file {input_file.name}:")
-        with open(input_file.name, "r") as f:
-            logger.debug(f.read())
-        input_file.seek(0)  # Reset the file pointer to the beginning
+    cmd = ["ffmpeg", "-y"]
+    fps_values = []
+    filter_parts = []
+    concat_inputs = ""
 
-        logger.debug("About to start ffmpeg video concat.")
+    for i, path in enumerate(video_file_paths):
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"File not found: {path}")
 
-        cmd = (
-            "ffmpeg",
-            "-y",
-            "-f",
-            "concat",
-            "-safe",
-            "0",
-            "-i",
-            input_file.name,
-            "-vf",
-            f"setpts={1 / ratio_to_multiply_animations}*N/{average_fps}/TB+STARTPTS,fps={average_fps}",
+        cmd.extend(["-i", path])  # add input
+
+        video_fps = get_media_fps(path)
+        if video_fps <= 0:
+            raise ValueError(f"Invalid fps ({video_fps}) in file: {path}")
+        fps_values.append(video_fps)
+
+        # prepare filter for each stream
+        filter_parts.append(
+            f"[{i}:v:0]fps={{fps}},setpts={1 / ratio_to_multiply_animations:.6f}*PTS[v{i}];"
+            f"[{i}:a:0]asetpts=PTS-STARTPTS[a{i}]"
+        )
+        concat_inputs += f"[v{i}][a{i}]"
+
+    # Determine average FPS
+    if fps:
+        target_fps = fps
+    else:
+        if len(set(fps_values)) > 1:
+            logger.warning("Videos have different fps. Using average fps.")
+        target_fps = sum(fps_values) / len(fps_values)
+
+    logger.debug(f"Using target fps: {target_fps:.2f}")
+
+    # Replace placeholder in filter with actual fps
+    filter_complex = ";".join(part.format(fps=target_fps) for part in filter_parts)
+    filter_complex += (
+        f";{concat_inputs}concat=n={len(video_file_paths)}:v=1:a=1[outv][outa]"
+    )
+
+    cmd.extend(
+        [
+            "-filter_complex",
+            filter_complex,
+            "-map",
+            "[outv]",
+            "-map",
+            "[outa]",
             "-c:v",
             "libx264",
             "-crf",
@@ -379,8 +371,12 @@ async def concatenate_videos(
             "-b:a",
             "192k",
             target_file_name,
-        )
-        await _run_command(cmd)
+        ]
+    )
+
+    logger.debug(f"Running ffmpeg command: {' '.join(cmd)}")
+    await _run_command(cmd)
+
     return target_file_name
 
 
