@@ -310,6 +310,11 @@ async def concatenate_videos(
         if not os.path.exists(video_path):
             raise FileNotFoundError(video_path)
 
+    logger.debug(
+        f"Concatenating {len(video_file_paths)} videos with ratio "
+        f"{ratio_to_multiply_animations} and fps {fps}"
+    )
+
     if ratio_to_multiply_animations <= 0:
         raise ValueError(
             "Ratio to multiply animations should be greater than 0. Got "

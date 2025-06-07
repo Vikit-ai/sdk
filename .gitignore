@@ -13,6 +13,7 @@ data/interim/
 env/
 venv/
 .venv/
+py3.**/
 build/
 develop-eggs/
 dist/
