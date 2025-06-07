@@ -304,24 +304,6 @@ def get_video_resolution(video_path):
     return width, height
 
 
-def build_filter_complex(video_paths, width, height, fps=30):
-    filter_parts = []
-    concat_inputs = ""
-    for i in range(len(video_paths)):
-        filter_parts.append(
-            f"[{i}:v]scale={width}:{height}:force_original_aspect_ratio=decrease,"
-            f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
-            "setsar=1,"
-            f"fps={fps},format=yuv420p,setpts=PTS-STARTPTS[v{i}]"
-        )
-        filter_parts.append(f"[{i}:a]aresample=44100,asetpts=PTS-STARTPTS[a{i}]")
-        concat_inputs += f"[v{i}][a{i}]"
-
-    filter_complex = ";".join(filter_parts)
-    filter_complex += f";{concat_inputs}concat=n={len(video_paths)}:v=1:a=1[outv][outa]"
-    return filter_complex
-
-
 async def concatenate_videos(
     video_file_paths: list[str],
     target_file_name: str = None,
@@ -361,7 +343,6 @@ async def concatenate_videos(
         has_audio = has_audio_track(path)
         audio_flags.append(has_audio)
 
-        # Video filter (always applied)
         filter_parts.append(
             f"[{idx}:v:0]scale=w={width}:h={height}:force_original_aspect_ratio=decrease,"
             f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
@@ -372,76 +353,32 @@ async def concatenate_videos(
     average_fps = fps if fps else (sum(fps_values) / len(fps_values))
     logger.debug(f"Using target fps: {average_fps:.2f}")
 
-    all_have_audio = all(audio_flags)
-    none_have_audio = not any(audio_flags)
+    durations = [get_media_duration(p) for p in video_file_paths]
 
-    if all_have_audio:
-        # All videos have audio -> concat video + audio normally
-        for idx in range(len(video_file_paths)):
-            filter_parts.append(f"[{idx}:a:0]asetpts=PTS-STARTPTS[a{idx}]")
+    filter_parts_audio = []
+    for idx, has_audio in enumerate(audio_flags):
+        if has_audio:
+            filter_parts_audio.append(f"[{idx}:a:0]asetpts=PTS-STARTPTS[a{idx}]")
+            concat_audio_inputs.append(f"[a{idx}]")
+        else:
+            duration = durations[idx]
+            filter_parts_audio.append(f"aevalsrc=0:d={duration}[a{idx}]")
             concat_audio_inputs.append(f"[a{idx}]")
 
-        filter_complex = ";".join(f.format(fps=average_fps) for f in filter_parts)
-        filter_complex += f";{concat_video_inputs}{''.join(concat_audio_inputs)}concat=n={len(video_file_paths)}:v=1:a=1[outv][outa]"
-        map_options = ["-map", "[outv]", "-map", "[outa]"]
-        audio_codec_options = ["-c:a", "aac", "-b:a", "192k"]
+    filter_complex_video = ";".join(f.format(fps=average_fps) for f in filter_parts)
+    filter_complex_audio = ";".join(filter_parts_audio)
 
-    elif none_have_audio:
-        # No audio in any video -> concat video only
-        filter_complex = ";".join(f.format(fps=average_fps) for f in filter_parts)
-        filter_complex += (
-            f";{concat_video_inputs}concat=n={len(video_file_paths)}:v=1:a=0[outv]"
-        )
-        map_options = ["-map", "[outv]"]
-        audio_codec_options = []
-
-    else:
-        # Mixed audio presence -> concat video + audio
-        # For videos without audio, generate silent audio stream matching video duration
-        durations = [get_media_duration(p) for p in video_file_paths]
-
-        # Build audio filters: real audio for videos with audio, silent audio for those without
-        filter_parts_audio = []
-        concat_audio_inputs = []
-        for idx, has_audio in enumerate(audio_flags):
-            if has_audio:
-                filter_parts_audio.append(f"[{idx}:a:0]asetpts=PTS-STARTPTS[a{idx}]")
-                concat_audio_inputs.append(f"[a{idx}]")
-            else:
-                duration = durations[idx]
-                # Generate silent audio of the same duration as the video
-                filter_parts_audio.append(f"aevalsrc=0:d={duration}[a{idx}]")
-                concat_audio_inputs.append(f"[a{idx}]")
-
-        filter_complex_video = ";".join(f.format(fps=average_fps) for f in filter_parts)
-        filter_complex_audio = ";".join(filter_parts_audio)
-
-        filter_complex = (
-            filter_complex_video
-            + ";"
-            + filter_complex_audio
-            + f";{concat_video_inputs}{''.join(concat_audio_inputs)}concat=n={len(video_file_paths)}:v=1:a=1[outv][outa]"
-        )
-
-        map_options = ["-map", "[outv]", "-map", "[outa]"]
-        audio_codec_options = ["-c:a", "aac", "-b:a", "192k"]
-
-    cmd.extend(["-filter_complex", filter_complex])
-    cmd.extend(map_options)
-
-    cmd.extend(
-        [
-            "-c:v",
-            "libx264",
-            "-crf",
-            "23",
-            "-preset",
-            "fast",
-        ]
+    filter_complex = (
+        f"{filter_complex_video};"
+        f"{filter_complex_audio};"
+        f"{concat_video_inputs}concat=n={len(video_file_paths)}:v=1:a=0[outv];"
+        f"{''.join(concat_audio_inputs)}concat=n={len(video_file_paths)}:v=0:a=1[outa]"
     )
 
-    cmd.extend(audio_codec_options)
-
+    cmd.extend(["-filter_complex", filter_complex])
+    cmd.extend(["-map", "[outv]", "-map", "[outa]"])
+    cmd.extend(["-c:v", "libx264", "-crf", "23", "-preset", "fast"])
+    cmd.extend(["-c:a", "aac", "-b:a", "192k"])
     cmd.append(target_file_name)
 
     logger.debug(f"Running ffmpeg command: {' '.join(cmd)}")
