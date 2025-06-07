@@ -304,105 +304,186 @@ def get_video_resolution(video_path):
     return width, height
 
 
+aimport os
+import subprocess
+import logging
+from typing import List
+
+# Configuration du logger (vous pouvez l'adapter à votre projet)
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+# --- Fonctions d'assistance (à compléter avec vos implémentations existantes) ---
+
+async def _run_command(cmd: list[str]):
+    """Exécute une commande shell."""
+    process = await asyncio.create_subprocess_exec(
+        *cmd,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await process.communicate()
+    if process.returncode != 0:
+        logger.error(f"Erreur FFmpeg: {stderr.decode()}")
+        raise RuntimeError(f"FFmpeg a échoué avec le code {process.returncode}")
+    logger.debug(f"FFmpeg a terminé avec succès: {stdout.decode()}")
+
+
+def get_video_resolution(file_path: str) -> tuple[int, int]:
+    """Récupère la résolution (largeur, hauteur) d'une vidéo."""
+    # Votre implémentation ici...
+    # Exemple :
+    cmd = ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "csv=s=x:p=0", file_path]
+    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    width, height = map(int, result.stdout.strip().split('x'))
+    return width, height
+
+def get_media_fps(file_path: str) -> float:
+    """Récupère le FPS d'une vidéo."""
+    # Votre implémentation ici...
+    # Exemple :
+    cmd = ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=r_frame_rate", "-of", "default=noprint_wrappers=1:nokey=1", file_path]
+    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    num, den = map(int, result.stdout.strip().split('/'))
+    return num / den if den else 0
+
+def has_audio_track(file_path: str) -> bool:
+    """Vérifie si une vidéo a une piste audio."""
+    # Votre implémentation ici...
+    # Exemple :
+    cmd = ["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=codec_type", "-of", "default=noprint_wrappers=1:nokey=1", file_path]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    return result.stdout.strip() != ""
+
+def get_media_duration(file_path: str) -> float:
+    """Récupère la durée d'un média en secondes."""
+    # Votre implémentation ici...
+    # Exemple :
+    cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", file_path]
+    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    return float(result.stdout.strip())
+
+# --- NOUVELLE fonction d'assistance pour les propriétés audio ---
+
+def get_audio_properties(file_path: str) -> tuple[int, str]:
+    """
+    Récupère la fréquence d'échantillonnage et la disposition des canaux du premier flux audio.
+    Retourne (fréquence, disposition), par ex. (48000, 'stereo').
+    Utilise des valeurs par défaut sûres en cas d'échec.
+    """
+    try:
+        command = [
+            "ffprobe", "-v", "error",
+            "-select_streams", "a:0",
+            "-show_entries", "stream=sample_rate,channel_layout",
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            file_path
+        ]
+        logger.debug(f"Exécution de ffprobe: {' '.join(command)}")
+        result = subprocess.run(command, capture_output=True, text=True, check=True, encoding='utf-8')
+        output = result.stdout.strip().split('\n')
+        if len(output) >= 2:
+            sample_rate = int(output[0])
+            channel_layout = output[1]
+            return sample_rate, channel_layout
+        else:
+            logger.warning(f"Impossible de parser les propriétés audio de {file_path}. Utilisation des valeurs par défaut.")
+            return 48000, "stereo"
+    except (subprocess.CalledProcessError, FileNotFoundError, ValueError, IndexError) as e:
+        logger.warning(f"Erreur lors de la récupération des propriétés audio pour {file_path}: {e}. Utilisation des valeurs par défaut.")
+        return 48000, "stereo"
+
+# --- Fonction principale refactorisée ---
+
 async def concatenate_videos(
     video_file_paths: list[str],
     target_file_name: str = None,
     ratio_to_multiply_animations: float = 1,
     fps: int | None = None,
 ) -> str:
+    """
+    Concatène plusieurs fichiers vidéo en un seul, en gérant correctement les
+    pistes audio manquantes en générant du silence.
+    """
     if not video_file_paths:
-        raise ValueError("video_file_paths must contain at least 1 element")
+        raise ValueError("La liste video_file_paths doit contenir au moins un élément")
 
     if ratio_to_multiply_animations <= 0:
-        raise ValueError("ratio_to_multiply_animations must be > 0")
+        raise ValueError("ratio_to_multiply_animations doit être > 0")
 
     target_file_name = target_file_name or "TargetCompositeVideo.mp4"
 
     width, height = get_video_resolution(video_file_paths[0])
-    logger.debug(f"Using reference resolution: {width}x{height}")
+    logger.debug(f"Utilisation de la résolution de référence: {width}x{height}")
 
     cmd = ["ffmpeg", "-y"]
-    filter_parts = []
+    video_filter_parts = []
     fps_values = []
     audio_flags = []
 
     for idx, path in enumerate(video_file_paths):
         if not os.path.exists(path):
-            raise FileNotFoundError(f"File not found: {path}")
+            raise FileNotFoundError(f"Fichier non trouvé: {path}")
 
         cmd.extend(["-i", path])
 
         video_fps = get_media_fps(path)
         if video_fps <= 0:
-            raise ValueError(f"Invalid fps ({video_fps}) in file: {path}")
+            raise ValueError(f"FPS invalide ({video_fps}) dans le fichier: {path}")
         fps_values.append(video_fps)
 
-        has_audio = has_audio_track(path)
-        audio_flags.append(has_audio)
+        audio_flags.append(has_audio_track(path))
 
-        # Video filter (always applied)
-        filter_parts.append(
+        # Filtre vidéo pour normaliser la taille, les FPS et la vitesse
+        video_filter_parts.append(
             f"[{idx}:v:0]scale=w={width}:h={height}:force_original_aspect_ratio=decrease,"
             f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
             f"fps={{fps}},setpts={1 / ratio_to_multiply_animations:.6f}*PTS[v{idx}]"
         )
 
     average_fps = fps if fps else (sum(fps_values) / len(fps_values))
-    logger.debug(f"Using target fps: {average_fps:.2f}")
+    logger.debug(f"Utilisation des FPS cibles: {average_fps:.2f}")
+    
+    formatted_video_filters = [f.format(fps=average_fps) for f in video_filter_parts]
+    video_inputs = "".join(f"[v{idx}]" for idx in range(len(video_file_paths)))
 
-    all_have_audio = all(audio_flags)
-    none_have_audio = not any(audio_flags)
-
-    if all_have_audio:
-        # All videos have audio -> concat video + audio normally
-        for idx in range(len(video_file_paths)):
-            filter_parts.append(
-                f"[{idx}:a:0]asetpts=PTS-STARTPTS,atempo={ratio_to_multiply_animations:.6f}[a{idx}]"
-            )
-
-        # Build video and audio input strings
-        video_inputs = "".join(f"[v{idx}]" for idx in range(len(video_file_paths)))
-        audio_inputs = "".join(f"[a{idx}]" for idx in range(len(video_file_paths)))
-
-        filter_complex = ";".join(f.format(fps=average_fps) for f in filter_parts)
-        filter_complex += f";{video_inputs}{audio_inputs}concat=n={len(video_file_paths)}:v=1:a=1[outv][outa]"
-        map_options = ["-map", "[outv]", "-map", "[outa]"]
-        audio_codec_options = ["-c:a", "aac", "-b:a", "192k"]
-
-    elif none_have_audio:
-        # No audio in any video -> concat video only
-        video_inputs = "".join(f"[v{idx}]" for idx in range(len(video_file_paths)))
-
-        filter_complex = ";".join(f.format(fps=average_fps) for f in filter_parts)
-        filter_complex += (
-            f";{video_inputs}concat=n={len(video_file_paths)}:v=1:a=0[outv]"
-        )
+    if not any(audio_flags):
+        # Cas 1: Aucune vidéo n'a de son
+        logger.debug("Aucune piste audio détectée. Concaténation vidéo uniquement.")
+        filter_complex = ";".join(formatted_video_filters)
+        filter_complex += f";{video_inputs}concat=n={len(video_file_paths)}:v=1:a=0[outv]"
         map_options = ["-map", "[outv]"]
         audio_codec_options = []
-
     else:
-        # Mixed audio presence -> concat video + audio
-        # For videos without audio, generate silent audio stream matching video duration
+        # Cas 2: Au moins une vidéo a du son (cas mixte ou toutes avec son)
+        logger.debug("Pistes audio détectées. Normalisation et concaténation audio.")
+        
+        # Trouver une vidéo de référence pour les propriétés audio
+        audio_ref_path = next(path for i, path in enumerate(video_file_paths) if audio_flags[i])
+        sample_rate, channel_layout = get_audio_properties(audio_ref_path)
+        logger.debug(f"Propriétés audio de référence: {sample_rate}Hz, {channel_layout}")
 
         durations = [get_media_duration(p) for p in video_file_paths]
+        audio_filter_parts = []
 
-        # Build audio filters: real audio for videos with audio, silent audio for those without
-        for idx, has_audio in enumerate(audio_flags):
-            if has_audio:
-                # Apply tempo change to match video speed change
-                filter_parts.append(
-                    f"[{idx}:a:0]asetpts=PTS-STARTPTS,atempo={ratio_to_multiply_animations:.6f}[a{idx}]"
+        for idx, path in enumerate(video_file_paths):
+            if audio_flags[idx]:
+                # Cette vidéo a du son : on le normalise
+                audio_filter_parts.append(
+                    f"[{idx}:a:0]aformat=sample_rates={sample_rate}:channel_layouts={channel_layout},"
+                    f"asetpts=PTS-STARTPTS,atempo={ratio_to_multiply_animations:.6f}[a{idx}]"
                 )
             else:
-                # Generate silent audio with duration adjusted for speed change
+                # Cette vidéo n'a pas de son : on génère du silence
                 duration = durations[idx] / ratio_to_multiply_animations
-                filter_parts.append(f"aevalsrc=0:d={duration:.6f}[a{idx}]")
-
-        # Build video and audio input strings
-        video_inputs = "".join(f"[v{idx}]" for idx in range(len(video_file_paths)))
+                audio_filter_parts.append(
+                    f"aevalsrc=exprs=0:d={duration:.6f}:r={sample_rate}:cl={channel_layout}[a{idx}]"
+                )
+        
         audio_inputs = "".join(f"[a{idx}]" for idx in range(len(video_file_paths)))
-
-        filter_complex = ";".join(f.format(fps=average_fps) for f in filter_parts)
+        all_filters = formatted_video_filters + audio_filter_parts
+        
+        filter_complex = ";".join(all_filters)
         filter_complex += f";{video_inputs}{audio_inputs}concat=n={len(video_file_paths)}:v=1:a=1[outv][outa]"
 
         map_options = ["-map", "[outv]", "-map", "[outa]"]
@@ -410,25 +491,15 @@ async def concatenate_videos(
 
     cmd.extend(["-filter_complex", filter_complex])
     cmd.extend(map_options)
-
-    cmd.extend(
-        [
-            "-c:v",
-            "libx264",
-            "-crf",
-            "23",
-            "-preset",
-            "fast",
-        ]
-    )
-
+    cmd.extend(["-c:v", "libx264", "-crf", "23", "-preset", "fast"])
     cmd.extend(audio_codec_options)
-
     cmd.append(target_file_name)
 
-    logger.debug(f"Running ffmpeg command: {' '.join(cmd)}")
+    logger.debug(f"Commande FFmpeg finale: {' '.join(cmd)}")
     await _run_command(cmd)
     return target_file_name
+
+
 
 
 async def merge_audio(
