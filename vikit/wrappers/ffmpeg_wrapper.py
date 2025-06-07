@@ -302,16 +302,6 @@ def get_video_resolution(video_path):
     width = info["streams"][0]["width"]
     height = info["streams"][0]["height"]
     return width, height
-
-
-# Configuration du logger (vous pouvez l'adapter à votre projet)
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
-# --- Fonctions d'assistance (à compléter avec vos implémentations existantes) ---
-
-
-async def _run_command(cmd: list[str]):
     """Exécute une commande shell."""
     process = await asyncio.create_subprocess_exec(
         *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
@@ -321,27 +311,6 @@ async def _run_command(cmd: list[str]):
         logger.error(f"Erreur FFmpeg: {stderr.decode()}")
         raise RuntimeError(f"FFmpeg a échoué avec le code {process.returncode}")
     logger.debug(f"FFmpeg a terminé avec succès: {stdout.decode()}")
-
-
-def get_video_resolution(file_path: str) -> tuple[int, int]:
-    """Récupère la résolution (largeur, hauteur) d'une vidéo."""
-    # Votre implémentation ici...
-    # Exemple :
-    cmd = [
-        "ffprobe",
-        "-v",
-        "error",
-        "-select_streams",
-        "v:0",
-        "-show_entries",
-        "stream=width,height",
-        "-of",
-        "csv=s=x:p=0",
-        file_path,
-    ]
-    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    width, height = map(int, result.stdout.strip().split("x"))
-    return width, height
 
 
 def get_media_fps(file_path: str) -> float:
@@ -449,9 +418,6 @@ def get_audio_properties(file_path: str) -> tuple[int, str]:
             f"Erreur lors de la récupération des propriétés audio pour {file_path}: {e}. Utilisation des valeurs par défaut."
         )
         return 48000, "stereo"
-
-
-# --- Fonction principale refactorisée ---
 
 
 async def concatenate_videos(
