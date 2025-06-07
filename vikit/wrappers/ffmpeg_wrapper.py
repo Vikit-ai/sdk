@@ -309,22 +309,33 @@ async def concatenate_videos(
     if len(video_file_paths) < 1:
         raise ValueError("video_file_paths must contain at least 1 element")
 
-    average_fps, count_fps = 0, 0
+    if fps:
+        average_fps = fps
+    else:
+        logger.debug("No fps provided, inferring from video files")
+        fps_values = []
 
-    for video_path in video_file_paths:
-        if not os.path.exists(video_path):
-            raise FileNotFoundError(video_path)
-        if fps:
-            average_fps = fps
-        else:
-            video_fps = get_media_fps(video_path)
-            count_fps += video_fps
-            logger.debug(f"Video {video_path} has {video_fps} fps")
-        average_fps += count_fps / len(video_file_paths)
-    logger.debug(f"Average fps of all videos is {average_fps} fps")
+        for path in video_file_paths:
+            if not os.path.exists(path):
+                raise FileNotFoundError(path)
+
+            video_fps = get_media_fps(path)
+            logger.debug(f"Video {path} has {video_fps} fps")
+
+            if video_fps <= 0:
+                raise ValueError(f"Invalid fps ({video_fps}) in file: {path}")
+
+            fps_values.append(video_fps)
+
+        if len(set(fps_values)) > 1:
+            logger.warning("Videos have different fps. Using average fps.")
+
+        average_fps = sum(fps_values) / len(fps_values)
+
+    logger.debug(f"Average fps of all videos: {average_fps:.2f} fps")
 
     logger.info(
-        f"Concatenating {len(video_file_paths)} videos with ratio "
+        f"About to concatenate {len(video_file_paths)} videos with ratio "
         f"{ratio_to_multiply_animations} and fps {average_fps}"
     )
 
@@ -341,8 +352,12 @@ async def concatenate_videos(
         for video_path in video_file_paths:
             input_file.write(f"file '{os.path.abspath(video_path)}'{os.linesep}")
         input_file.flush()
+        logger.debug(f"Content of temporary file {input_file.name}:")
+        with open(input_file.name, "r") as f:
+            logger.debug(f.read())
+        input_file.seek(0)  # Reset the file pointer to the beginning
 
-        logger.trace("About to start ffmpeg video concat.")
+        logger.debug("About to start ffmpeg video concat.")
 
         cmd = (
             "ffmpeg",
