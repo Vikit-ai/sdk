@@ -431,9 +431,9 @@ async def concatenate_videos(
             else:
                 duration = durations[idx] / ratio_to_multiply_animations
                 # --- CORRECTION APPLIQUÉE ICI ---
-                # Remplacement de 'r=' par 'sample_rate=' qui est le paramètre correct.
+                # Remplacement de 'aevalsrc' par 'anullsrc' et 'atrim', une méthode plus robuste.
                 audio_filter_parts.append(
-                    f"aevalsrc=exprs=0:d={duration:.6f}:sample_rate={sample_rate}:channel_layout={channel_layout}[a{idx}]"
+                    f"anullsrc=channel_layout={channel_layout}:sample_rate={sample_rate},atrim=duration={duration:.6f}[a{idx}]"
                 )
 
         audio_inputs = "".join(f"[a{idx}]" for idx in range(len(video_file_paths)))
