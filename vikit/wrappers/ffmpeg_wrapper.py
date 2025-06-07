@@ -286,7 +286,7 @@ async def concatenate_videos(
     video_file_paths: list[str],
     target_file_name: str = None,
     ratio_to_multiply_animations: float = 1,
-    fps: int = 16,
+    fps: int = 24,
 ) -> str:
     """
     Concatenate multiple videos into a single video.
