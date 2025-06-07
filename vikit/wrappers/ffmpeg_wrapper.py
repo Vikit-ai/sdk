@@ -17,7 +17,6 @@ import asyncio
 import json
 import os
 import subprocess
-from tempfile import NamedTemporaryFile
 
 from loguru import logger
 
@@ -282,31 +281,12 @@ async def convert_as_mp3_file(fileName, target_file_name: str):
     return target_file_name
 
 
-import os
-from tempfile import NamedTemporaryFile
-import logging
-
-logger = logging.getLogger(__name__)
-
-
 async def concatenate_videos(
     video_file_paths: list[str],
     target_file_name: str = None,
     ratio_to_multiply_animations: float = 1,
     fps: int | None = None,
 ) -> str:
-    """
-    Concatenate multiple videos into a single video with consistent timing and fps.
-
-    Args:
-        video_file_paths: List of input video paths.
-        target_file_name: Output file name. Defaults to TargetCompositeVideo.mp4.
-        ratio_to_multiply_animations: Speed multiplier.
-        fps: Optional override for target FPS.
-
-    Returns:
-        str: Path to the generated output video.
-    """
     if not video_file_paths:
         raise ValueError("video_file_paths must contain at least 1 element")
 
@@ -316,43 +296,46 @@ async def concatenate_videos(
     target_file_name = target_file_name or "TargetCompositeVideo.mp4"
 
     cmd = ["ffmpeg", "-y"]
-    fps_values = []
     filter_parts = []
     concat_inputs = ""
+    fps_values = []
+    all_have_audio = True
 
-    for i, path in enumerate(video_file_paths):
+    for idx, path in enumerate(video_file_paths):
         if not os.path.exists(path):
             raise FileNotFoundError(f"File not found: {path}")
 
-        cmd.extend(["-i", path])  # add input
+        cmd.extend(["-i", path])
 
+        # FPS check
         video_fps = get_media_fps(path)
         if video_fps <= 0:
             raise ValueError(f"Invalid fps ({video_fps}) in file: {path}")
         fps_values.append(video_fps)
 
-        # prepare filter for each stream
+        # Check audio
+        has_audio = has_audio_track(path)
+        all_have_audio = all_have_audio and has_audio
+
+        # Filter graph components
         filter_parts.append(
-            f"[{i}:v:0]fps={{fps}},setpts={1 / ratio_to_multiply_animations:.6f}*PTS[v{i}];"
-            f"[{i}:a:0]asetpts=PTS-STARTPTS[a{i}]"
+            f"[{idx}:v:0]fps={{fps}},setpts={1 / ratio_to_multiply_animations:.6f}*PTS[v{idx}]"
         )
-        concat_inputs += f"[v{i}][a{i}]"
+        concat_inputs += f"[v{idx}]"
 
-    # Determine average FPS
-    if fps:
-        target_fps = fps
-    else:
-        if len(set(fps_values)) > 1:
-            logger.warning("Videos have different fps. Using average fps.")
-        target_fps = sum(fps_values) / len(fps_values)
+        if has_audio:
+            filter_parts.append(f"[{idx}:a:0]asetpts=PTS-STARTPTS[a{idx}]")
+            concat_inputs += f"[a{idx}]"
 
-    logger.debug(f"Using target fps: {target_fps:.2f}")
+    # Determine target fps
+    average_fps = fps if fps else (sum(fps_values) / len(fps_values))
+    logger.debug(f"Using target fps: {average_fps:.2f}")
 
-    # Replace placeholder in filter with actual fps
-    filter_complex = ";".join(part.format(fps=target_fps) for part in filter_parts)
-    filter_complex += (
-        f";{concat_inputs}concat=n={len(video_file_paths)}:v=1:a=1[outv][outa]"
-    )
+    # Construct filter_complex
+    filter_complex = ";".join(f.format(fps=average_fps) for f in filter_parts)
+    filter_complex += f";{concat_inputs}concat=n={len(video_file_paths)}:v=1:a={1 if all_have_audio else 0}[outv]"
+    if all_have_audio:
+        filter_complex += "[outa]"
 
     cmd.extend(
         [
@@ -360,8 +343,14 @@ async def concatenate_videos(
             filter_complex,
             "-map",
             "[outv]",
-            "-map",
-            "[outa]",
+        ]
+    )
+
+    if all_have_audio:
+        cmd.extend(["-map", "[outa]"])
+
+    cmd.extend(
+        [
             "-c:v",
             "libx264",
             "-crf",
@@ -376,7 +365,6 @@ async def concatenate_videos(
 
     logger.debug(f"Running ffmpeg command: {' '.join(cmd)}")
     await _run_command(cmd)
-
     return target_file_name
 
 
