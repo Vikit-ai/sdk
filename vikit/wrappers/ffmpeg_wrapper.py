@@ -281,6 +281,47 @@ async def convert_as_mp3_file(fileName, target_file_name: str):
     return target_file_name
 
 
+def get_video_resolution(video_path):
+    """Récupère la résolution (width, height) d'une vidéo via ffprobe"""
+    cmd = [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "stream=width,height",
+        "-of",
+        "json",
+        video_path,
+    ]
+    result = subprocess.run(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True
+    )
+    info = json.loads(result.stdout)
+    width = info["streams"][0]["width"]
+    height = info["streams"][0]["height"]
+    return width, height
+
+
+def build_filter_complex(video_paths, width, height, fps=30):
+    filter_parts = []
+    concat_inputs = ""
+    for i in range(len(video_paths)):
+        filter_parts.append(
+            f"[{i}:v]scale={width}:{height}:force_original_aspect_ratio=decrease,"
+            f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
+            "setsar=1,"
+            f"fps={fps},format=yuv420p,setpts=PTS-STARTPTS[v{i}]"
+        )
+        filter_parts.append(f"[{i}:a]aresample=44100,asetpts=PTS-STARTPTS[a{i}]")
+        concat_inputs += f"[v{i}][a{i}]"
+
+    filter_complex = ";".join(filter_parts)
+    filter_complex += f";{concat_inputs}concat=n={len(video_paths)}:v=1:a=1[outv][outa]"
+    return filter_complex
+
+
 async def concatenate_videos(
     video_file_paths: list[str],
     target_file_name: str = None,
@@ -294,6 +335,10 @@ async def concatenate_videos(
         raise ValueError("ratio_to_multiply_animations must be > 0")
 
     target_file_name = target_file_name or "TargetCompositeVideo.mp4"
+
+    # Récupérer la résolution de la première vidéo comme référence
+    width, height = get_video_resolution(video_file_paths[0])
+    logger.debug(f"Using reference resolution: {width}x{height}")
 
     cmd = ["ffmpeg", "-y"]
     filter_parts = []
@@ -317,9 +362,11 @@ async def concatenate_videos(
         has_audio = has_audio_track(path)
         all_have_audio = all_have_audio and has_audio
 
-        # Filter graph components
+        # Filter graph : scale + pad à la résolution de référence + ajustement fps + timing
         filter_parts.append(
-            f"[{idx}:v:0]fps={{fps}},setpts={1 / ratio_to_multiply_animations:.6f}*PTS[v{idx}]"
+            f"[{idx}:v:0]scale=w={width}:h={height}:force_original_aspect_ratio=decrease,"
+            f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,"
+            f"fps={{fps}},setpts={1 / ratio_to_multiply_animations:.6f}*PTS[v{idx}]"
         )
         concat_inputs += f"[v{idx}]"
 
@@ -327,11 +374,11 @@ async def concatenate_videos(
             filter_parts.append(f"[{idx}:a:0]asetpts=PTS-STARTPTS[a{idx}]")
             concat_inputs += f"[a{idx}]"
 
-    # Determine target fps
+    # Déterminer la fps cible
     average_fps = fps if fps else (sum(fps_values) / len(fps_values))
     logger.debug(f"Using target fps: {average_fps:.2f}")
 
-    # Construct filter_complex
+    # Construire filter_complex concat avec video + audio si présent
     filter_complex = ";".join(f.format(fps=average_fps) for f in filter_parts)
     filter_complex += f";{concat_inputs}concat=n={len(video_file_paths)}:v=1:a={1 if all_have_audio else 0}[outv]"
     if all_have_audio:
@@ -355,6 +402,8 @@ async def concatenate_videos(
             "libx264",
             "-crf",
             "23",
+            "-preset",
+            "fast",
             "-c:a",
             "aac",
             "-b:a",
