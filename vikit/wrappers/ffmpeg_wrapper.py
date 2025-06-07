@@ -289,7 +289,10 @@ async def concatenate_videos(
     fps: int | None = None,
 ) -> str:
     """
-    Concatenate multiple videos into a single video.
+    Concatenate multiple videos into a single video. The fps is inferred from the
+    individual videos, or can be forced by the user. The video duration is adjusted
+    according to the ratioToMultiplyAnimations parameter, which is useful to match the
+    duration of the video to an expected duration, e.g. of an audio track.
 
     Args:
         video_file_paths: The file paths to the videos to concatenate. Must contain at
@@ -298,7 +301,7 @@ async def concatenate_videos(
             TargetCompositeVideo.mp4
         ratioToMultiplyAnimations: The ratio by which to speed up or slow down the video
             to match its duration to an expected duration, e.g. of an audio track.
-        fps: frames per second (i.e. frame rate) of the output video
+        fps: use if you need to force the frame rate (in frames per second) of the output video
 
     Returns:
         str: The path to the concatenated video file
