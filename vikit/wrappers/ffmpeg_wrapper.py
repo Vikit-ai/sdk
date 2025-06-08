@@ -225,6 +225,9 @@ def get_audio_properties(file_path: str) -> tuple[int, str]:
         return 48000, "stereo"
 
 
+# --- Fonction principale réécrite avec ffmpeg-python ---
+
+
 async def concatenate_videos(
     video_file_paths: list[str],
     target_file_name: str = None,
@@ -336,14 +339,16 @@ async def concatenate_videos(
         .run_async(pipe_stdout=True, pipe_stderr=True)
     )
 
-    # Attendre la fin du processus
-    stdout, stderr = await process.wait()
+    # --- CORRECTION APPLIQUÉE ICI ---
+    # Utiliser process.communicate() pour attendre la fin et récupérer stdout/stderr
+    stdout, stderr = await process.communicate()
 
     if process.returncode != 0:
-        logger.error(f"Erreur FFmpeg : {stderr.decode()}")
+        logger.error(f"Erreur FFmpeg : {stderr.decode(errors='ignore')}")
         raise RuntimeError(f"FFmpeg a échoué avec le code {process.returncode}")
 
     logger.info(f"Vidéo concaténée avec succès : {target_file_name}")
+    return target_file_name
 
 
 async def merge_audio(
