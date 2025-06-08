@@ -16,6 +16,7 @@
 import math
 import os
 import warnings
+import subprocess
 
 import pytest
 from loguru import logger
@@ -30,6 +31,8 @@ from vikit.wrappers.ffmpeg_wrapper import (
     generate_video_from_image,
     get_media_duration,
     reencode_video,
+    has_audio_track,
+    get_video_resolution,
 )
 
 
@@ -218,3 +221,105 @@ class TestFFMPEGWrapper:
                 image_url=tests_medias.get_test_prompt_image(),
             )
             assert int(get_media_duration(image_video)) == 5
+
+
+def _create_dummy_video(
+    file_path: str,
+    duration: int,
+    with_audio: bool,
+    width: int = 640,
+    height: int = 480,
+    rate: int = 24,
+):
+    """
+    Helper function to create a dummy video file using ffmpeg.
+    """
+    video_cmd = [
+        "ffmpeg",
+        "-f",
+        "lavfi",
+        "-i",
+        f"testsrc=duration={duration}:size={width}x{height}:rate={rate}",
+    ]
+
+    if with_audio:
+        audio_cmd = [
+            "-f",
+            "lavfi",
+            "-i",
+            "anullsrc=channel_layout=stereo:sample_rate=44100",
+        ]
+        cmd = video_cmd + audio_cmd
+        cmd.extend(["-map", "0:v", "-map", "1:a"])
+    else:
+        cmd = video_cmd
+        cmd.extend(["-map", "0:v"])
+
+    cmd.extend(
+        [
+            "-y",
+            "-t",
+            str(duration),
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            "-shortest",
+            str(file_path),
+        ]
+    )
+
+    logger.debug(f"Running command to create dummy video: {' '.join(cmd)}")
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+    logger.debug(f"Successfully created dummy video: {file_path}")
+
+
+@pytest.mark.local_integration
+@pytest.mark.asyncio
+async def test_concatenate_mixed_audio_videos():
+    """
+    Test the concatenation of a video with audio and a video without audio.
+    It ensures the final video correctly contains an audio track.
+    """
+    with WorkingFolderContext() as wf:
+        video_with_audio_path = "video_with_audio.mp4"
+        video_without_audio_path = "video_without_audio.mp4"
+        output_path = "concatenated_video.mp4"
+
+        duration1 = 3
+        duration2 = 2
+        total_duration = duration1 + duration2
+
+        # 1. Setup
+        _create_dummy_video(video_with_audio_path, duration=duration1, with_audio=True)
+        _create_dummy_video(
+            video_without_audio_path, duration=duration2, with_audio=False
+        )
+
+        assert os.path.exists(video_with_audio_path)
+        assert os.path.exists(video_without_audio_path)
+
+        # 2. Execute
+        await concatenate_videos(
+            video_file_paths=[video_with_audio_path, video_without_audio_path],
+            target_file_name=output_path,
+            fps=24,
+        )
+
+        # 3. Assert
+        assert os.path.exists(output_path), "The output video file was not created."
+
+        output_duration = get_media_duration(output_path)
+        assert output_duration == pytest.approx(total_duration, abs=0.5), (
+            f"Expected duration ~{total_duration}s, but got {output_duration:.2f}s."
+        )
+
+        assert has_audio_track(output_path), (
+            "The concatenated video should have an audio track, but it doesn't."
+        )
+
+        output_width, output_height = get_video_resolution(output_path)
+        assert output_width == 640
+        assert output_height == 480
+
+        logger.info("Test for mixed audio concatenation passed successfully.")

@@ -198,6 +198,27 @@ def get_media_duration(file_path: str) -> float:
     return float(probe["format"]["duration"])
 
 
+def _get_atempo_filters(ratio: float) -> list:
+    """Génère une liste de filtres atempo pour ffmpeg-python."""
+    if ratio == 1.0:
+        return []
+
+    filters = []
+    # Ralentis
+    while ratio < 0.5:
+        filters.append({"name": "atempo", "args": ["0.5"]})
+        ratio *= 2
+    # Accélérés
+    while ratio > 100.0:
+        filters.append({"name": "atempo", "args": ["2.0"]})
+        ratio /= 2
+
+    if ratio != 1.0:
+        filters.append({"name": "atempo", "args": [f"{ratio:.6f}"]})
+
+    return filters
+
+
 def get_audio_properties(file_path: str) -> tuple[int, str]:
     """Récupère les propriétés audio en utilisant ffmpeg.probe."""
     logger.debug(f"Sondage de {file_path} pour les propriétés audio...")
@@ -225,9 +246,6 @@ def get_audio_properties(file_path: str) -> tuple[int, str]:
         return 48000, "stereo"
 
 
-# --- Fonction principale réécrite avec ffmpeg-python ---
-
-
 async def concatenate_videos(
     video_file_paths: list[str],
     target_file_name: str = None,
@@ -235,51 +253,30 @@ async def concatenate_videos(
     fps: int | None = None,
 ) -> str:
     """
-    Concatène des vidéos en utilisant la bibliothèque ffmpeg-python.
+    Concatène des vidéos en utilisant la bibliothèque ffmpeg-python de manière robuste.
     """
     if not video_file_paths:
         raise ValueError("La liste video_file_paths ne peut pas être vide.")
 
     target_file_name = target_file_name or "TargetCompositeVideo.mp4"
 
-    # Détermination des propriétés cibles
+    # Propriétés cibles
     ref_width, ref_height = get_video_resolution(video_file_paths[0])
     target_fps = fps if fps else get_media_fps(video_file_paths[0])
     logger.debug(f"Propriétés cibles : {ref_width}x{ref_height} @ {target_fps:.2f} FPS")
 
-    # Création des flux d'entrée
     inputs = [ffmpeg.input(path) for path in video_file_paths]
 
-    # Traitement de chaque flux vidéo
     processed_videos = []
-    for stream in inputs:
-        processed_v = (
-            stream.video.filter(
-                "scale",
-                w=ref_width,
-                h=ref_height,
-                force_original_aspect_ratio="decrease",
-            )
-            .filter("pad", w=ref_width, h=ref_height, x="(ow-iw)/2", y="(oh-ih)/2")
-            .filter("fps", fps=target_fps)
-            .filter("setpts", f"{1 / ratio_to_multiply_animations:.6f}*PTS")
-        )
-        processed_videos.append(processed_v)
+    processed_audios = []
 
-    # Vérification et traitement des flux audio
     audio_flags = [has_audio_track(path) for path in video_file_paths]
+    has_any_audio = any(audio_flags)
 
-    if not any(audio_flags):
-        # Cas 1 : Aucune vidéo n'a d'audio
-        logger.debug("Aucun audio. Concaténation vidéo uniquement.")
-        concatenated_stream = ffmpeg.concat(*processed_videos, v=1, a=0)
-    else:
-        # Cas 2 : Au moins une vidéo a de l'audio
-        logger.debug(
-            "Audio détecté. Normalisation et génération de silence si nécessaire."
-        )
+    # Préparer les filtres atempo si nécessaire
+    atempo_filters = _get_atempo_filters(ratio_to_multiply_animations)
 
-        # Propriétés audio de référence
+    if has_any_audio:
         ref_audio_path = next(
             path for i, path in enumerate(video_file_paths) if audio_flags[i]
         )
@@ -288,66 +285,111 @@ async def concatenate_videos(
             f"Propriétés audio de référence : {ref_sample_rate}Hz, {ref_channel_layout}"
         )
 
-        processed_audios = []
-        for i, stream in enumerate(inputs):
+    for i, stream in enumerate(inputs):
+        # --- Traitement Vidéo ---
+        # <--- CORRECTION : Ordre des filtres (setpts avant fps)
+        processed_v = (
+            stream.video.filter("setpts", f"{1 / ratio_to_multiply_animations:.6f}*PTS")
+            .filter("fps", fps=target_fps)
+            .filter(
+                "scale",
+                w=ref_width,
+                h=ref_height,
+                force_original_aspect_ratio="decrease",
+            )
+            .filter("pad", w=ref_width, h=ref_height, x="(ow-iw)/2", y="(oh-ih)/2")
+        )
+        processed_videos.append(processed_v)
+
+        # --- Traitement Audio ---
+        if has_any_audio:
             if audio_flags[i]:
-                # Traiter le flux audio existant
-                processed_a = (
-                    stream.audio.filter(
-                        "aformat",
-                        sample_rates=ref_sample_rate,
-                        channel_layouts=ref_channel_layout,
-                    )
-                    .filter("asetpts", "PTS-STARTPTS")
-                    .filter("atempo", f"{ratio_to_multiply_animations:.6f}")
+                # Appliquer les filtres de formatage et de vitesse
+                processed_a = stream.audio.filter(
+                    "aformat",
+                    sample_rates=ref_sample_rate,
+                    channel_layouts=ref_channel_layout,
                 )
+                processed_a = processed_a.filter("asetpts", "PTS-STARTPTS")
+
+                # <--- CORRECTION : Utilisation de filter_multi pour chaîner atempo
+                if atempo_filters:
+                    processed_a = processed_a.filter_multi(atempo_filters)
+
                 processed_audios.append(processed_a)
             else:
-                # Générer un flux de silence
+                # <--- CORRECTION FINALE : La syntaxe correcte pour lavfi ---
                 duration = (
                     get_media_duration(video_file_paths[i])
                     / ratio_to_multiply_animations
                 )
-                silent_a = ffmpeg.input(
-                    f"anullsrc",
-                    f="lavfi",
-                    channel_layout=ref_channel_layout,
-                    sample_rate=ref_sample_rate,
-                ).filter("atrim", duration=duration)
+
+                # On construit la chaîne de description complète pour le filtre aevalsrc
+                aevalsrc_description = (
+                    f"aevalsrc=exprs=0"
+                    f":d={duration:.6f}"
+                    f":s={ref_sample_rate}"
+                    f":c={ref_channel_layout}"
+                )
+
+                # On passe cette chaîne comme "nom de fichier" au périphérique virtuel lavfi
+                silent_a = ffmpeg.input(aevalsrc_description, f="lavfi")
+
                 processed_audios.append(silent_a)
 
-        # Concaténer les flux vidéo et audio traités
-        concatenated_stream = ffmpeg.concat(
-            *processed_videos, *processed_audios, v=1, a=1
-        )
+    if has_any_audio:
+        interleaved_streams = []
+        for video_stream, audio_stream in zip(processed_videos, processed_audios):
+            interleaved_streams.append(video_stream)
+            interleaved_streams.append(audio_stream)
 
-    # Définition de la sortie et exécution de la commande
+        concatenated_stream = ffmpeg.concat(*interleaved_streams, v=1, a=1)
+    else:
+        # S'il n'y a pas d'audio, pas besoin d'entrelacer.
+        concatenated_stream = ffmpeg.concat(*processed_videos, v=1, a=0)
+
+    # Exécution
     logger.debug("Construction et exécution de la commande ffmpeg...")
-    process = (
-        ffmpeg.output(
-            concatenated_stream,
-            target_file_name,
-            **{
-                "c:v": "libx264",
-                "crf": 23,
-                "preset": "fast",
-                "c:a": "aac",
-                "b:a": "192k",
-            },
+    output_options = {
+        "c:v": "libx264",
+        "crf": 23,
+        "preset": "fast",
+        "c:a": "aac",
+        "b:a": "192k",
+    }
+    # Ne pas inclure les options audio s'il n'y a pas de son
+    if not has_any_audio:
+        del output_options["c:a"]
+        del output_options["b:a"]
+
+    try:
+        process = (
+            ffmpeg.output(concatenated_stream, target_file_name, **output_options)
+            .overwrite_output()
+            .run_async(
+                pipe_stderr=True
+            )  # Rediriger stderr est crucial pour les erreurs
         )
-        .overwrite_output()
-        .run_async(pipe_stdout=True, pipe_stderr=True)
-    )
+        loop = asyncio.get_running_loop()
 
-    # --- CORRECTION APPLIQUÉE ICI ---
-    # Utiliser process.communicate() pour attendre la fin et récupérer stdout/stderr
-    stdout, stderr = await process.communicate()
+        return_code = await loop.run_in_executor(
+            None,  # Utilise le ThreadPoolExecutor par défaut
+            process.wait,  # La fonction bloquante à exécuter
+        )
+        if return_code != 0:
+            # 4. Si erreur, lire stderr (qui est aussi une opération bloquante)
+            #    en utilisant le même pattern.
+            stderr_bytes = await loop.run_in_executor(None, process.stderr.read)
+            error_message = stderr_bytes.decode("utf-8").strip()
+            logger.error(f"Erreur FFmpeg (code {return_code}):\n{error_message}")
+            raise RuntimeError(f"FFmpeg a échoué : {error_message}")
 
-    if process.returncode != 0:
-        logger.error(f"Erreur FFmpeg : {stderr.decode(errors='ignore')}")
-        raise RuntimeError(f"FFmpeg a échoué avec le code {process.returncode}")
+    except ffmpeg.Error as e:
+        # Gérer les erreurs de construction de la commande ffmpeg-python
+        logger.error(f"Erreur de construction FFmpeg : {e.stderr.decode('utf-8')}")
+        raise
 
-    logger.info(f"Vidéo concaténée avec succès : {target_file_name}")
+    logger.info(f"Concaténation terminée avec succès : {target_file_name}")
     return target_file_name
 
 
