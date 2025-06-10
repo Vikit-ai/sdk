@@ -275,7 +275,6 @@ class CompositeVideo(Video, is_composite_video):
             ratio_to_multiply_animations=self._get_ratio_to_multiply_animations(
                 build_settings=self.build_settings
             ),
-            fps=24,
         )
 
     def _get_ratio_to_multiply_animations(

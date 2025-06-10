@@ -286,22 +286,24 @@ async def concatenate_videos(
     video_file_paths: list[str],
     target_file_name: str = None,
     ratio_to_multiply_animations: float = 1,
-    fps: int = 16,
 ) -> str:
     """
     Concatenate multiple videos into a single video.
 
     Args:
         video_file_paths: The file paths to the videos to concatenate. Must contain at
-            least 1 path.
+            least 1 path and all videos must have the same FPS.
         target_file_name: The target file of the video file to create. Default:
             TargetCompositeVideo.mp4
         ratioToMultiplyAnimations: The ratio by which to speed up or slow down the video
             to match its duration to an expected duration, e.g. of an audio track.
-        fps: frames per second (i.e. frame rate) of the output video
 
     Returns:
         str: The path to the concatenated video file
+
+    Raises:
+        ValueError: If video_file_paths is empty or the videos don't have the same FPS.
+        FileNotFoundError: If any of the video files does not exist.
     """
     if len(video_file_paths) < 1:
         raise ValueError("video_file_paths must contain at least 1 element")
@@ -309,6 +311,13 @@ async def concatenate_videos(
     for video_path in video_file_paths:
         if not os.path.exists(video_path):
             raise FileNotFoundError(video_path)
+
+    # Ensure that all videos have the same FPS and record it for later use.
+    fps_values = set(get_media_fps(path) for path in video_file_paths)
+    if len(fps_values) > 1:
+        fps_by_path = {path: get_media_fps(path) for path in video_file_paths}
+        raise ValueError(f"Cannot concatenate videos with different FPS: {fps_by_path}")
+    fps = list(fps_values)[0]
 
     if ratio_to_multiply_animations <= 0:
         raise ValueError(
@@ -514,7 +523,7 @@ async def _merge_audio_and_video_without_audio_track(
     return target_file_name
 
 
-async def reencode_video(video_url, target_video_name=None):
+async def reencode_video(video_url, target_video_name=None, fps=24):
     """
     Reencode the video, doing this for imported video that might not concatenate well
     with generated ones or among themselves
@@ -539,7 +548,7 @@ async def reencode_video(video_url, target_video_name=None):
         "-i",
         video_url,
         "-filter:v",
-        "fps=24",
+        f"fps={fps}",
         "-c:v",
         "libx264",
         "-profile:v",

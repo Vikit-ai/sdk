@@ -77,6 +77,31 @@ class TestFFMPEGWrapper:
 
     @pytest.mark.local_integration
     @pytest.mark.asyncio
+    async def test_concatenate_videos__fps_mismatch__fails(self):
+        with WorkingFolderContext():
+            # Here we have to reencode the videos first
+            catrix_reloaded = await reencode_video(
+                video_url=tests_medias.get_cat_video_path(),
+                target_video_name="supercat_reencoded.mp4",
+                fps=24,
+            )
+            trainboy_reencoded = await reencode_video(
+                video_url=tests_medias.get_test_transition_stones_trainboy_path(),
+                target_video_name="trainboy_reencoded.mp4",
+                fps=25,  # different FPS
+            )
+
+            with pytest.raises(
+                ValueError, match="Cannot concatenate videos with different FPS"
+            ):
+                await concatenate_videos(
+                    video_file_paths=[catrix_reloaded, trainboy_reencoded],
+                    target_file_name="target.mp4",
+                    ratio_to_multiply_animations=1,
+                )
+
+    @pytest.mark.local_integration
+    @pytest.mark.asyncio
     async def test_concat_generated_video_files(
         self,
     ):
