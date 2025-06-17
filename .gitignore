@@ -123,3 +123,4 @@ examples/inputs/*/*.jpg
 .egg-info/
 
 tmp/
+py3.12/
