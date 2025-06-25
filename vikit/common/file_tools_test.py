@@ -65,7 +65,7 @@ async def test_download_or_copy_file__empty_url():
 
 @pytest.mark.unit
 @pytest.mark.asyncio
-async def test_download_or_copy_file__unexisting_path():
+async def test_download_or_copy_file__unsupported_path():
     with pytest.raises(ValueError):
         _ = await download_or_copy_file(
             url="crazy://funny.com/a.jpg", local_path="downloaded_file.txt"
