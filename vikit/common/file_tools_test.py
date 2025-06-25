@@ -59,7 +59,6 @@ async def test_download_with_local_file():
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_download_or_copy_file__empty_url():
-    """Test that download_or_copy_file raises ValueError with empty URL"""
     with pytest.raises(ValueError):
         _ = await download_or_copy_file(url="", local_path="downloaded_file.txt")
 
@@ -67,7 +66,6 @@ async def test_download_or_copy_file__empty_url():
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_download_or_copy_file__unexisting_path():
-    """Test that download_or_copy_file raises ValueError with empty URL"""
     with pytest.raises(ValueError):
         _ = await download_or_copy_file(
             url="crazy://funny.com/a.jpg", local_path="downloaded_file.txt"
