@@ -56,6 +56,22 @@ async def test_download_with_local_file():
         assert os.path.getsize(downloaded_file) > 0
 
 
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_download_or_copy_file__empty_url():
+    with pytest.raises(ValueError):
+        _ = await download_or_copy_file(url="", local_path="downloaded_file.txt")
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_download_or_copy_file__unsupported_path():
+    with pytest.raises(ValueError):
+        _ = await download_or_copy_file(
+            url="crazy://funny.com/a.jpg", local_path="downloaded_file.txt"
+        )
+
+
 @pytest.mark.integration
 @pytest.mark.asyncio
 @pytest.mark.parametrize(

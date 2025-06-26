@@ -373,6 +373,8 @@ async def download_or_copy_file(
             blob_path="/".join(url.split("/")[3:]),
             destination_file_name=local_path,
         )
+    else:
+        raise ValueError(f"Unsupported path type: {path_desc['type']} for url: {url}")
 
 
 def _check_http_response(response: aiohttp.ClientResponse):

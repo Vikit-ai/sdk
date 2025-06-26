@@ -1,0 +1,47 @@
+name: Check Model Providers
+
+on:
+  schedule:
+    - cron: "0 0,12 * * *" # midnight and noon
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --fix-missing -y
+          python -m pip install --upgrade pip
+          sudo apt-get install -qq -y ffmpeg 
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Test with pytest
+        env:
+          VIKIT_API_TOKEN: ${{ secrets.VIKIT_API_TOKEN }}
+          ELEVEN_LABS_KEY: ${{ secrets.ELEVEN_LABS_KEY }}
+          OPENAI_WHISPER_MODEL_ID: ${{ secrets.OPENAI_WHISPER_MODEL_ID }}
+          TESTMODE: ${{ vars.TESTMODE }}
+          ELEVEN_LABS_API_URI: ${{ vars.ELEVEN_LABS_API_URI }}
+          NB_RETRIES_HTTP_CALLS: ${{ vars.NB_RETRIES_HTTP_CALLS }}
+          SUB_AUDIO_FOR_SOUND_PREFIX: ${{ vars.SUB_AUDIO_FOR_SOUND_PREFIX }}
+          PROMPT_MP3_FILE_NAME: ${{ vars.PROMPT_MP3_FILE_NAME }}
+          VIDEO_ENCODED_WITHOUT_MUSIC_FILE_PREFIX: ${{ vars.VIDEO_ENCODED_WITHOUT_MUSIC_FILE_PREFIX }}
+          INITIAL_AUDIO_FILE_NAME: ${{ vars.INITIAL_AUDIO_FILE_NAME }}
+          VIDEO_LIST_FILE_NAME: ${{ vars.VIDEO_LIST_FILE_NAME }}
+          DEFAULT_BACKGROUND_MUSIC: ${{ vars.DEFAULT_BACKGROUND_MUSIC }}
+        run: |
+          pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_stabilityai_provider_and_generate
+          pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_luma_provider_and_generate
+          pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_videocrafter_provider_and_generate
+          pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_haiper_provider_and_generate
+          pytest -s tests/test_ci_providers_health_checks.py::TestProvidersHealthChecks::test_runway_provider_and_generate
