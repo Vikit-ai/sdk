@@ -3,7 +3,6 @@ name: Check Model Providers
 on:
   schedule:
     - cron: "0 0,12 * * *" # midnight and noon
-    # - cron: "0 18 * * 5" # All Fridays at 6:00 PM
 
 jobs:
   test:
